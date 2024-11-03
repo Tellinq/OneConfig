@@ -12,6 +12,7 @@ hypixel-modapi = "1.0"
 hypixel-data = "0.1.2" # Dep of hypixel-modapi
 
 # Not in risk of needing to be relaunched / bumped by JiJ
+snakeyaml = "1.31"
 nightconfig = "3.6.6"
 isolated-lwjgl3-loader = "0.1.1"
 deftu-filestream = "0.4.1" # dep of isolated-lwjgl3-loader
@@ -61,6 +62,7 @@ lwjgl-stb = { module = "org.lwjgl:lwjgl-stb", version.ref = "lwjgl" }
 lwjgl-tinyfd = { module = "org.lwjgl:lwjgl-tinyfd", version.ref = "lwjgl" }
 lwjgl-opengl = { module = "org.lwjgl:lwjgl-opengl", version.ref = "lwjgl" }
 
+snakeyaml = { module = "org.yaml:snakeyaml", version.ref = "snakeyaml" }
 nightconfig = { module = "com.electronwill.night-config:core", version.ref = "nightconfig" }
 nightconfig-toml = { module = "com.electronwill.night-config:toml", version.ref = "nightconfig" }
 nightconfig-yaml = { module = "com.electronwill.night-config:yaml", version.ref = "nightconfig" }

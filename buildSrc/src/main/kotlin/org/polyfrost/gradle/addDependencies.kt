@@ -13,6 +13,7 @@ fun Project.provideIncludedDependencies(version: Triple<Int, Int, Int>?, loader:
     deps.addAll(libs.findBundle("kotlin").get().get())
     deps.addAll(libs.findBundle("kotlinx").get().get())
     deps.addAll(libs.findBundle("nightconfig").get().get())
+    deps.add(libs.findLibrary("snakeyaml").get().get())
     deps.add(libs.findLibrary("isolated-lwjgl3-loader").get().get())
     deps.add(libs.findLibrary("deftu-filestream").get().get())
     deps.add(libs.findLibrary("polyui").get().get())
