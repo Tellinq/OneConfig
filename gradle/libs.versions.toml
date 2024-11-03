@@ -15,7 +15,7 @@ hypixel-data = "0.1.2" # Dep of hypixel-modapi
 snakeyaml = "1.31"
 nightconfig = "3.6.6"
 isolated-lwjgl3-loader = "0.1.1"
-deftu-filestream = "0.4.1" # dep of isolated-lwjgl3-loader
+polyio = "0.1.0"
 
 # Per version
 universalcraft = "299"
@@ -44,7 +44,7 @@ junit-bom = { module = "org.junit:junit-bom", version.ref = "junit-bom" }
 mixin = { module = "org.polyfrost:polymixin", version.ref = "mixin" }
 
 isolated-lwjgl3-loader = { module = "org.polyfrost:isolated-lwjgl3-loader", version.ref = "isolated-lwjgl3-loader" }
-deftu-filestream = { module = "dev.deftu:filestream", version.ref = "deftu-filestream" }
+polyio = { module = "org.polyfrost:polyio", version.ref = "polyio" }
 
 hypixel-modapi = { module = "net.hypixel:mod-api", version.ref = "hypixel-modapi" }
 hypixel-data = { module = "net.hypixel:hypixel-data", version.ref = "hypixel-data" }
