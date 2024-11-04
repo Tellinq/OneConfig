@@ -89,7 +89,7 @@ object NotificationsManager {
     @JvmOverloads
     fun enqueue(type: Type, title: String = type.title, description: String, durationNanos: Long) = enqueueCustom(
         Block(
-            Image("polyui/chevron-down.svg".image(Vec2(32f, 32f))),
+            Image("polyui/chevron-down.svg".image(), size = Vec2(32f, 32f)),
             Text(title, fontSize = 14f).setFont { medium },
             Text(description, fontSize = 12f),
             size = Vec2(235f, 100f),

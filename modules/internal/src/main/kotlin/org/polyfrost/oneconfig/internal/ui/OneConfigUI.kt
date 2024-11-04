@@ -56,9 +56,7 @@ object OneConfigUI {
     private val playerHead = PolyImage(
         "https://mc-heads.net/avatar/${Platform.player().playerName ?: "Steve"}/24",
         type = PolyImage.Type.Raster,
-    ).also {
-        it.size = (24f by 24f)
-    }
+    )
     private val searchNoneFound = Text("oneconfig.search.nonefound", fontSize = 16f)
     private val search = Group(searchNoneFound, visibleSize = Vec2(1130f, 635f))
 

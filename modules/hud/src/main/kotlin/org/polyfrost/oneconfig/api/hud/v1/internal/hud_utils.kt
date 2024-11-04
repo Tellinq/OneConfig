@@ -151,7 +151,7 @@ fun Hud<*>.build(): Block {
     } else {
         HudManager.polyUI.every(freq) {
             if (update()) {
-                get().parent.recalculate()
+                get()._parent?.recalculate()
             }
         }
     }

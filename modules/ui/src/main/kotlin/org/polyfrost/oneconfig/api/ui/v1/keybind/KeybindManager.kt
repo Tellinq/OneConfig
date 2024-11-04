@@ -34,6 +34,7 @@ import org.polyfrost.polyui.input.InputManager
 import org.polyfrost.polyui.input.KeyBinder
 import org.polyfrost.polyui.input.KeyModifiers
 import org.polyfrost.polyui.input.Keys
+import org.polyfrost.polyui.utils.Int2IntMap
 import org.polyfrost.universal.UKeyboard
 
 @Suppress("UnstableApiUsage")
@@ -43,7 +44,7 @@ object KeybindManager {
     val inputManager = InputManager(null, keyBinder, settings)
 
     @JvmStatic
-    val modsMap: Map<Int, Byte>
+    val modsMap: Int2IntMap
 
     @JvmStatic
     val keysMap: Map<Int, Keys>
@@ -58,16 +59,17 @@ object KeybindManager {
             keyBinder.update(50_000L, inputManager.mods, true)
         }.register()
 
-        modsMap = hashMapOf(
-            UKeyboard.KEY_LSHIFT to KeyModifiers.LSHIFT.value,
-            UKeyboard.KEY_RSHIFT to KeyModifiers.RSHIFT.value,
-            UKeyboard.KEY_LCONTROL to KeyModifiers.LCONTROL.value,
-            UKeyboard.KEY_RCONTROL to KeyModifiers.RCONTROL.value,
-            UKeyboard.KEY_LMENU to KeyModifiers.LALT.value,
-            UKeyboard.KEY_RMENU to KeyModifiers.RALT.value,
-            UKeyboard.KEY_LMETA to KeyModifiers.LMETA.value,
-            UKeyboard.KEY_RMETA to KeyModifiers.RMETA.value
-        )
+        val m = Int2IntMap(8)
+        m[UKeyboard.KEY_LSHIFT] = KeyModifiers.LSHIFT.value.toInt()
+        m[UKeyboard.KEY_LSHIFT] = KeyModifiers.LSHIFT.value.toInt()
+        m[UKeyboard.KEY_RSHIFT] = KeyModifiers.RSHIFT.value.toInt()
+        m[UKeyboard.KEY_LCONTROL] = KeyModifiers.LCONTROL.value.toInt()
+        m[UKeyboard.KEY_RCONTROL] = KeyModifiers.RCONTROL.value.toInt()
+        m[UKeyboard.KEY_LMENU] = KeyModifiers.LALT.value.toInt()
+        m[UKeyboard.KEY_RMENU] = KeyModifiers.RALT.value.toInt()
+        m[UKeyboard.KEY_LMETA] = KeyModifiers.LMETA.value.toInt()
+        m[UKeyboard.KEY_RMETA] = KeyModifiers.RMETA.value.toInt()
+        modsMap = m
 
         keysMap = hashMapOf(
             UKeyboard.KEY_F1 to Keys.F1,
@@ -105,7 +107,7 @@ object KeybindManager {
     }
 
     @JvmStatic
-    fun builder() = KeybindHelper()
+    fun builder() = OCKeybindHelper()
 
     @JvmStatic
     fun translateKey(inputManager: InputManager, key: Int, character: Char, state: Boolean) {
@@ -115,7 +117,11 @@ object KeybindManager {
 
         if (state) {
             keysMap[key]?.let { inputManager.keyDown(it); return }
-            modsMap[key]?.let { inputManager.addModifier(it); return }
+            val m = modsMap[key]
+            if (m != 0) {
+                inputManager.addModifier(m.toByte())
+                return
+            }
             // modern fix because glfwModCharCallback doesn't work correctly
             if (inputManager.mods > 1 && key < 255) {
                 inputManager.keyTyped((key + 32).toChar())
@@ -123,7 +129,11 @@ object KeybindManager {
             inputManager.keyDown(key)
         } else {
             keysMap[key]?.let { inputManager.keyUp(it); return }
-            modsMap[key]?.let { inputManager.removeModifier(it); return }
+            val m = modsMap[key]
+            if (m != 0) {
+                inputManager.removeModifier(m.toByte())
+                return
+            }
             inputManager.keyUp(key)
         }
 

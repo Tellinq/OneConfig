@@ -200,16 +200,18 @@ abstract class Hud<T : Drawable> : Cloneable, Config("null", null, "null", null)
             val value = !new
             // useless null-safety checks, but I don't want to risk dumb errors
             val it = it ?: return
-            val siblings = it.parent.children ?: return
             if (value == it.isEnabled) return
-
             it.isEnabled = value
+
+            val parent = it._parent ?: return
+            val siblings = parent.children ?: return
+
             if (siblings.size == 1) {
-                it.parent.isEnabled = value
+                parent.isEnabled = value
             } else if (!value && siblings.fastAll { !it.renders }) {
-                it.parent.isEnabled = false
+                parent.isEnabled = false
             }
-            it.parent.recalculate()
+            parent.recalculate()
         }
 
     /**
@@ -235,7 +237,7 @@ abstract class Hud<T : Drawable> : Cloneable, Config("null", null, "null", null)
      */
     protected fun updateWhenChanged(optionName: String) {
         if (isReal) addCallback(optionName) {
-            if (update()) get().parent.recalculate()
+            if (update()) get()._parent?.recalculate()
         }
         else LOGGER.warn("attempted to add callback to {}'s option '{}', but it is not real. no action has been taken.", title(), optionName)
     }

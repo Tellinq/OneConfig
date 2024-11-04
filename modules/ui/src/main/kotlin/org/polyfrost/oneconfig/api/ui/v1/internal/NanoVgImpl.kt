@@ -26,44 +26,28 @@ class NanoVgImpl(
 
     }
 
-    object NanoVgConstantsImpl : NanoVgApi.NanoVgConstants {
+    object ConstantsImpl : NanoVgApi.Constants {
 
-        override fun NVG_ROUND(): Int {
-            return NanoVG.NVG_ROUND
-        }
+        override fun NVG_ROUND() = NanoVG.NVG_ROUND
 
-        override fun NVG_ALIGN_LEFT(): Int {
-            return NanoVG.NVG_ALIGN_LEFT
-        }
+        override fun NVG_ALIGN_LEFT() = NanoVG.NVG_ALIGN_LEFT
 
-        override fun NVG_ALIGN_TOP(): Int {
-            return NanoVG.NVG_ALIGN_TOP
-        }
+        override fun NVG_ALIGN_TOP() = NanoVG.NVG_ALIGN_TOP
 
-        override fun NVG_HOLE(): Int {
-            return NanoVG.NVG_HOLE
-        }
+        override fun NVG_HOLE() = NanoVG.NVG_HOLE
 
-        override fun NVG_IMAGE_FLIPY(): Int {
-            return NanoVG.NVG_IMAGE_FLIPY
-        }
+        override fun NVG_IMAGE_FLIPY() = NanoVG.NVG_IMAGE_FLIPY
 
     }
 
     private var handle: Long = -1
     private var svgHandle: Long = -1
 
-    override fun constants(): NanoVgApi.NanoVgConstants {
-        return NanoVgConstantsImpl
-    }
+    override fun constants() = ConstantsImpl
 
-    override fun handle(): Long {
-        return handle
-    }
+    override fun handle() = handle
 
-    override fun svgHandle(): Long {
-        return svgHandle
-    }
+    override fun svgHandle() = svgHandle
 
     override fun maybeSetup() {
         if (handle == -1L) {
@@ -131,21 +115,15 @@ class NanoVgImpl(
         NanoVG.nvgRestore(handle)
     }
 
-    override fun createPaint(): Long {
-        return NVGPaint.malloc().address()
-    }
+    override fun createPaint() = NVGPaint.malloc().address()
 
     override fun fillPaint(address: Long) {
         NanoVG.nvgFillPaint(handle, NVGPaint.create(address))
     }
 
-    override fun getPaintColor(address: Long): Long {
-        return NVGPaint.create(address).innerColor().address()
-    }
+    override fun getPaintColor(address: Long) = NVGPaint.create(address).innerColor().address()
 
-    override fun createColor(): Long {
-        return NVGColor.malloc().address()
-    }
+    override fun createColor() = NVGColor.malloc().address()
 
     override fun fillColor(address: Long) {
         NanoVG.nvgFillColor(handle, NVGColor.create(address))
@@ -306,9 +284,9 @@ class NanoVgImpl(
         return floatArrayOf(svg.width(), svg.height())
     }
 
-    override fun parseSvg(data: ByteBuffer): Triple<Long, Float, Float> {
+    override fun parseSvg(data: ByteBuffer): NanoVgApi.SVG {
         val result = NanoSVG.nsvgParse(data, PIXELS, 96f) ?: throw IllegalStateException("Failed to parse SVG data")
-        return Triple(result.address(), result.width(), result.height())
+        return NanoVgApi.SVG(result.address(), result.width(), result.height())
     }
 
     override fun deleteSvg(address: Long) {

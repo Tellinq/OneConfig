@@ -37,6 +37,7 @@ import java.util.function.Consumer;
 public final class OCPolyUIBuilder extends PolyUIBuilder {
     private float desiredScreenWidth, desiredScreenHeight;
     private Consumer<PolyUI> onClose;
+    private boolean pauses, blurs;
 
     private OCPolyUIBuilder() {
         Settings s = getSettings();
@@ -61,8 +62,26 @@ public final class OCPolyUIBuilder extends PolyUIBuilder {
         return this;
     }
 
+    public OCPolyUIBuilder pauses() {
+        return pauses(true);
+    }
+
+    public OCPolyUIBuilder pauses(boolean state) {
+        this.pauses = state;
+        return this;
+    }
+
+    public OCPolyUIBuilder blurs() {
+        return blurs(true);
+    }
+
+    public OCPolyUIBuilder blurs(boolean state) {
+        this.blurs = state;
+        return this;
+    }
+
     public PolyUI make(Drawable... drawables) {
-        if (getRenderer() == null) setRenderer(UIManager.INSTANCE.getRenderer());
+        if (getRenderer() == null) renderer(UIManager.INSTANCE.getRenderer());
         return super.make(drawables);
     }
 
@@ -71,7 +90,7 @@ public final class OCPolyUIBuilder extends PolyUIBuilder {
      */
     public PolyUI makeAndOpen(Drawable... drawables) {
         PolyUI p = make(drawables);
-        Object screen = UIManager.INSTANCE.createPolyUIScreen(p, desiredScreenWidth, desiredScreenHeight, getPauses(), getBlurs(), onClose);
+        Object screen = UIManager.INSTANCE.createPolyUIScreen(p, desiredScreenWidth, desiredScreenHeight, pauses, blurs, onClose);
         p.setWindow(UIManager.INSTANCE.createWindow());
         Platform.screen().display(screen);
         return p;

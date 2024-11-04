@@ -92,7 +92,7 @@ fun HudsPage(huds: Collection<Hud<*>>): Drawable {
                 if (!HudManager.panelExists) return@every
                 huds.forEach {
                     if (it.update()) {
-                        it.get().parent.recalculate()
+                        it.get()._parent?.recalculate()
                     }
                 }
             }
@@ -155,7 +155,7 @@ private fun createDesigner(hud: Hud<*>): Drawable {
         if (isLegacy) {
             Text("oneconfig.hudeditor.cantedit.aslegacy").secondary()
         } else {
-            if ((hud.get().parent.children?.size ?: 0) > 1) {
+            if ((hud.get()._parent?.children?.size ?: 0) > 1) {
                 Text("oneconfig.hudeditor.choosesomething").padded(3f, 3f).secondary()
             } else {
                 when (hud.get()) {
@@ -238,7 +238,7 @@ private fun interactiveAlignment(hud: Hud<*>): Drawable {
                     .onDragStart {
                         px = polyUI.mouseX
                         py = polyUI.mouseY
-                        hud.get().parent.let {
+                        hud.get()._parent?.let {
                             it as Drawable
                             s0 = it.skewX
                             s1 = it.skewY
@@ -259,7 +259,7 @@ private fun interactiveAlignment(hud: Hud<*>): Drawable {
                             it.skewX = sx
                             it.skewY = sy
                         }
-                        hud.get().parent.let {
+                        hud.get()._parent?.let {
                             it as Drawable
                             it.skewX = sx
                             it.skewY = sy
@@ -320,7 +320,7 @@ fun textOptions(text: Text): Drawable {
                 2 -> mcFont.get(text.fontWeight, text.italic)
                 else -> polyUI.fonts.get(text.fontWeight, text.italic)
             }
-            text.parent.recalculate()
+            text._parent?.recalculate()
             val ex = (parent.parent[1][0] as? Text) ?: return@onChange false
             ex.font = text.font
             ex.parent.recalculate()
@@ -330,7 +330,7 @@ fun textOptions(text: Text): Drawable {
             .apply {
                 (this[1][0] as TextInput).numeric(1f, 100f).on(Event.Change.Number) { (it) ->
                     text.fontSize = it.toFloat()
-                    text.parent.recalculate()
+                    text._parent?.recalculate()
                     val ex = (parent.parent.parent[1][0] as? Text) ?: return@on true
                     ex.fontSize = text.fontSize
                     ex.parent.recalculate()
@@ -358,7 +358,7 @@ fun textOptions(text: Text): Drawable {
             "oneconfig.fweight.900"
         ).onChange { it: Int ->
             text.fontWeight = Font.byWeight((it + 1) * 100)
-            text.parent.recalculate()
+            text._parent?.recalculate()
             val ex = (parent.parent[1][0] as? Text) ?: return@onChange false
             ex.fontWeight = text.fontWeight
             ex.parent.recalculate()

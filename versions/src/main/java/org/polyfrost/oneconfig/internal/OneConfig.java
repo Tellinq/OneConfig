@@ -26,6 +26,7 @@
 
 package org.polyfrost.oneconfig.internal;
 
+import kotlin.Unit;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.polyfrost.oneconfig.api.commands.v1.CommandManager;
@@ -37,10 +38,10 @@ import org.polyfrost.oneconfig.api.hypixel.v0.HypixelUtils;
 import org.polyfrost.oneconfig.api.platform.v1.Platform;
 import org.polyfrost.oneconfig.api.ui.v1.UIManager;
 import org.polyfrost.oneconfig.api.ui.v1.internal.BlurHandler;
-import org.polyfrost.oneconfig.api.ui.v1.keybind.KeybindHelper;
+import org.polyfrost.oneconfig.api.ui.v1.keybind.OCKeybindHelper;
 import org.polyfrost.oneconfig.internal.ui.OneConfigUI;
-import org.polyfrost.oneconfig.utils.v1.Multithreading;
 import org.polyfrost.oneconfig.utils.v1.MavenUpdateChecker;
+import org.polyfrost.oneconfig.utils.v1.Multithreading;
 import org.polyfrost.polyui.PolyUI;
 import org.polyfrost.polyui.component.Drawable;
 import org.polyfrost.polyui.input.KeyModifiers;
@@ -95,7 +96,12 @@ public class OneConfig
         b.then(runs("locraw").does(() -> UChat.chat(HypixelUtils.getLocation()))).description("Get your current location on Hypixel");
         b.then(runs("hud").does(() -> Platform.screen().display(HudManager.INSTANCE.getWithEditor())).description("Opens the OneConfig HUD editor"));
         CommandManager.registerCommand(b.build());
-        KeybindHelper.builder().mods(KeyModifiers.RSHIFT).does((Runnable) OneConfigUI.INSTANCE::open).register();
+        OCKeybindHelper builder = OCKeybindHelper.builder();
+        builder.mods(KeyModifiers.RSHIFT).does((s) -> {
+            OneConfigUI.INSTANCE.open();
+            return Unit.INSTANCE;
+        });
+        builder.register();
         EventManager.register(InitializationEvent.class, e -> HudManager.INSTANCE.initialize());
         LOGGER.info("OneConfig initialized!");
     }

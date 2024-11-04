@@ -6,7 +6,7 @@ import java.nio.ByteBuffer;
 
 public interface NanoVgApi {
 
-    interface NanoVgConstants {
+    interface Constants {
 
         int NVG_ROUND();
 
@@ -20,7 +20,7 @@ public interface NanoVgApi {
 
     }
 
-    NanoVgConstants constants();
+    Constants constants();
 
     long handle();
     long svgHandle();
@@ -137,10 +137,21 @@ public interface NanoVgApi {
 
     float[] svgBounds(long address);
 
-    Triple<Long, Float, Float> parseSvg(ByteBuffer data);
+    SVG parseSvg(ByteBuffer data);
 
     void deleteSvg(long address);
 
     void rasterizeSvg(long address, float x, float y, float scale, ByteBuffer data, int w, int h, int stride);
 
+
+    final class SVG {
+        public final long address;
+        public final float width, height;
+
+        public SVG(long address, float width, float height) {
+            this.address = address;
+            this.width = width;
+            this.height = height;
+        }
+    }
 }
