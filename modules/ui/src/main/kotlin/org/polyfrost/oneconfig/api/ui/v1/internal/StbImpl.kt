@@ -12,4 +12,6 @@ class StbImpl : StbApi {
         channelsOutput: IntArray,
         desiredChannels: Int
     ) = STBImage.stbi_load_from_memory(buffer, widthOutput, heightOutput, channelsOutput, desiredChannels) ?: throw IllegalStateException("Failed to load image from memory")
+
+    override fun failureReason() = STBImage.stbi_failure_reason()
 }

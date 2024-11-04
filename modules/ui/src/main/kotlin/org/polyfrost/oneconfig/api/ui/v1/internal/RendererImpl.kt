@@ -27,13 +27,7 @@
 package org.polyfrost.oneconfig.api.ui.v1.internal
 
 import org.apache.logging.log4j.LogManager
-import org.lwjgl.nanovg.NanoSVG.nsvgParse
-import org.lwjgl.nanovg.NanoSVG.nsvgRasterize
-import org.lwjgl.nanovg.NanoVG.nvgCreateImageRGBA
 import org.lwjgl.opengl.GL11
-import org.lwjgl.stb.STBImage.stbi_failure_reason
-import org.lwjgl.stb.STBImage.stbi_load_from_memory
-import org.lwjgl.system.MemoryUtil
 import org.polyfrost.oneconfig.api.ui.v1.api.LwjglApi
 import org.polyfrost.oneconfig.api.ui.v1.api.NanoVgApi
 import org.polyfrost.oneconfig.api.ui.v1.api.StbApi
@@ -426,7 +420,7 @@ class RendererImpl(
     private fun loadImage(image: PolyImage, data: ByteBuffer): Int {
         val w = IntArray(1)
         val h = IntArray(1)
-        val d = stb.loadFromMemory(data, w, h, IntArray(1), 4) ?: throw IllegalStateException("Failed to load image ${image.resourcePath}: ${stbi_failure_reason()}")
+        val d = stb.loadFromMemory(data, w, h, IntArray(1), 4) ?: throw IllegalStateException("Failed to load image ${image.resourcePath}: ${stb.failureReason()}")
         if (!image.size.isPositive) PolyImage.setImageSize(image, Vec2(w[0].toFloat(), h[0].toFloat()))
         return nanoVg.createImage(w[0].toFloat(), h[0].toFloat(), d, 0)
     }
