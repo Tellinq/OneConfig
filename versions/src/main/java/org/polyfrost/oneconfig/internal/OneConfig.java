@@ -36,7 +36,6 @@ import org.polyfrost.oneconfig.api.event.v1.events.InitializationEvent;
 import org.polyfrost.oneconfig.api.hud.v1.HudManager;
 import org.polyfrost.oneconfig.api.hypixel.v0.HypixelUtils;
 import org.polyfrost.oneconfig.api.platform.v1.Platform;
-import org.polyfrost.oneconfig.api.ui.v1.UIManager;
 import org.polyfrost.oneconfig.api.ui.v1.internal.BlurHandler;
 import org.polyfrost.oneconfig.api.ui.v1.keybind.OCKeybindHelper;
 import org.polyfrost.oneconfig.internal.ui.OneConfigUI;
@@ -115,7 +114,8 @@ public class OneConfig
             Class.forName(PolyUI.class.getName());
             Class.forName(Drawable.class.getName());
             Class.forName(Translator.class.getName());
-            UIManager.INSTANCE.getRenderer();
+            // todo: fix for fabric loaders as fails due to running too early
+            // UIManager.INSTANCE.getRenderer();
         } catch (Exception e) {
             throw new IllegalStateException("Failed to preload necessary PolyUI classes", e);
         }

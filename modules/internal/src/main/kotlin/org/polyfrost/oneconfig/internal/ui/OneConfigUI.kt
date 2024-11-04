@@ -48,7 +48,6 @@ import org.polyfrost.polyui.data.Cursor
 import org.polyfrost.polyui.data.PolyImage
 import org.polyfrost.polyui.unit.Align
 import org.polyfrost.polyui.unit.Vec2
-import org.polyfrost.polyui.unit.by
 import org.polyfrost.polyui.unit.seconds
 import org.polyfrost.polyui.utils.image
 
@@ -65,7 +64,7 @@ object OneConfigUI {
 
     @JvmOverloads
     fun open(initialScreen: Component = ModsPage(ConfigManager.active().trees())) {
-        val builder = (OCPolyUIBuilder.create().blurs() as OCPolyUIBuilder).atResolution(1920f, 1080f)
+        val builder = OCPolyUIBuilder.create().blurs().atResolution(1920f, 1080f)
             .backgroundColor(rgba(21, 21, 21)).size(1400f, 700f) as OCPolyUIBuilder
         builder.translatorDelegate("assets/oneconfig")
         builder.onClose { _ ->
@@ -90,24 +89,23 @@ object OneConfigUI {
                 SidebarButton(
                     "assets/oneconfig/ico/profiles.svg".image(),
                     "oneconfig.profiles",
-                ).addHoverInfo(Text("this feature is experimental and is coming soon!")),
-                SidebarButton("assets/oneconfig/ico/keyboard.svg".image(), "oneconfig.keybinds"),
+                ).disable().addHoverInfo(Text("this feature is experimental and is coming soon!")),
+                SidebarButton("assets/oneconfig/ico/keyboard.svg".image(), "oneconfig.keybinds").disable(),
                 Text("oneconfig.sidebar.title.personal", fontSize = 11f).setPalette { text.secondary }.padded(0f, 12f, 0f, 0f),
                 SidebarButton("assets/oneconfig/ico/paintbrush.svg".image(), "oneconfig.themes", label("oneconfig.soon")).onClick {
                     openPage(ThemesPage(), "oneconfig.themes")
-                },
+                }.disable(),
                 SidebarButton("assets/oneconfig/ico/cog.svg".image(), "oneconfig.preferences"),
                 Text("oneconfig.sidebar.title.extra", fontSize = 11f).setPalette { text.secondary }.padded(0f, 12f, 0f, 0f),
+                SidebarButton("assets/oneconfig/ico/refresh.svg".image(), "oneconfig.changelog"),
                 SidebarButton(
-                    "assets/oneconfig/ico/refresh.svg".image(),
-                    "oneconfig.changelog",
-                ),
-                SidebarButton(
-                    "assets/oneconfig/ico/text.svg".image(),
-                    "oneconfig.feedback",
-                    label("oneconfig.beta"),
+                    "assets/oneconfig/ico/text.svg".image(), "oneconfig.feedback"
                 ).onClick { openPage(FeedbackPage(), "oneconfig.feedback") },
-                SidebarButton0("assets/oneconfig/ico/hud.svg".image(), "oneconfig.edithud").onClick {
+                SidebarButton0(
+                    "assets/oneconfig/ico/hud.svg".image(),
+                    "oneconfig.edithud",
+                    label("oneconfig.beta")
+                ).onClick {
                     Platform.screen().display(HudManager.getWithEditor())
                 }.padded(0f, 200f, 0f, 0f),
                 size = Vec2(273f, 700f),
@@ -116,7 +114,8 @@ object OneConfigUI {
             Group(
                 Group(
                     Group(
-                        Image("assets/oneconfig/ico/left-arrow.svg".image()).named("Back").disable(), Image("assets/oneconfig/ico/right-arrow.svg".image()).named("Forward").disable(),
+                        Image("assets/oneconfig/ico/left-arrow.svg".image()).named("Back").disable(),
+                        Image("assets/oneconfig/ico/right-arrow.svg".image()).named("Forward").disable(),
                         Text(
                             "oneconfig.mods",
                             fontSize = 24f,
@@ -147,7 +146,7 @@ object OneConfigUI {
                                     if (search.children?.size == 0) search.children?.add(searchNoneFound)
                                     if (ui[1][1] !== search) openPage(search, "oneconfig.search")
                                     search.recalculate()
-                                } else if(ui[1][1] === search) {
+                                } else if (ui[1][1] === search) {
                                     openPage(ModsPage(ConfigManager.active().trees()), "oneconfig.mods")
                                 }
                                 false

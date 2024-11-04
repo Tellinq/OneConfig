@@ -84,7 +84,7 @@ fun ModsPage(trees: Collection<Tree>): Drawable {
         }.toTypedArray(),
         visibleSize = Vec2(1130f, 635f),
         alignment = Align(cross = Align.Cross.Start, pad = Vec2(18f, 18f)),
-    ).namedId("ModsPage")
+    ).makeRearrangeableGrid().namedId("ModsPage")
 }
 
 fun ThemesPage(): Drawable {
