@@ -65,7 +65,7 @@ fun ModsPage(trees: Collection<Tree>): Drawable {
             if (it.getMetadata<Any?>("hidden") != null) return@mapNotNull null
             Group(
                 Block(
-                    Image(it.getMetadata<String>("icon")?.image() ?: defaultModImage),
+                    Image(it.getMetadata<String>("icon")?.image() ?: defaultModImage).onInit { size = size.coerceAtMost(Vec2(64f, 64f)) },
                     radii = modBoxTopRad,
                     alignment = imageAlign,
                     size = Vec2(256f, 104f),
