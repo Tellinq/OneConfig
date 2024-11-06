@@ -33,6 +33,7 @@ import org.jetbrains.annotations.MustBeInvokedByOverriders;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.polyfrost.oneconfig.api.platform.v1.Platform;
+import org.polyfrost.oneconfig.api.ui.v1.Notifications;
 import org.polyfrost.oneconfig.api.ui.v1.screen.BlurScreen;
 import org.polyfrost.polyui.PolyUI;
 import org.polyfrost.polyui.component.Drawable;
@@ -53,7 +54,7 @@ public class PolyUIScreen extends UScreen implements BlurScreen {
     @NotNull
     public final PolyUI polyUI;
 
-    private final float desiredScreenWidth, desiredScreenHeight;
+    private final float designedWidth, designedHeight, initialWidth, initialHeight;
     private final boolean pauses, blurs;
     private final Consumer<PolyUI> close;
 
@@ -61,11 +62,13 @@ public class PolyUIScreen extends UScreen implements BlurScreen {
     private int mx, my;
     //#endif
 
-    public PolyUIScreen(@NotNull PolyUI polyUI, float desiredScreenWidth, float desiredScreenHeight, boolean pauses, boolean blurs, Consumer<PolyUI> onClose) {
+    public PolyUIScreen(@NotNull PolyUI polyUI, float designedWidth, float designedHeight, boolean pauses, boolean blurs, Consumer<PolyUI> onClose) {
         super(true);
         this.polyUI = polyUI;
-        this.desiredScreenWidth = desiredScreenWidth;
-        this.desiredScreenHeight = desiredScreenHeight;
+        this.designedWidth = designedWidth;
+        this.designedHeight = designedHeight;
+        this.initialWidth = polyUI.getMaster().getWidth();
+        this.initialHeight = polyUI.getMaster().getHeight();
         this.blurs = blurs;
         this.pauses = pauses;
         this.close = onClose;
@@ -76,14 +79,12 @@ public class PolyUIScreen extends UScreen implements BlurScreen {
         // asm: normally, a polyui instance is as big as its window and that is it.
         // however, inside minecraft, the actual content is smaller than the window size, so resizing it directly would just fuck it up.
         // so instead, the developer specifies a resolution that their UI was designed for, and we resize accordingly.
-        if (desiredScreenWidth == 0f || desiredScreenHeight == 0f) return;
-        float sx = w / desiredScreenWidth;
-        float sy = h / desiredScreenHeight;
+        if (designedWidth == 0f || designedHeight == 0f) return;
+        float sx = w / designedWidth;
+        float sy = h / designedHeight;
         if (sx == 1f && sy == 1f) return;
-        float currentW = polyUI.getMaster().getWidth();
-        float currentH = polyUI.getMaster().getHeight();
         try {
-            polyUI.resize(currentW * sx, currentH * sy, force);
+            polyUI.resize(initialWidth * sx, initialHeight * sy, force);
         } catch (Exception e) {
             death(e);
         }
@@ -121,8 +122,8 @@ public class PolyUIScreen extends UScreen implements BlurScreen {
     @Override
     @MustBeInvokedByOverriders
     public final void onResize(Minecraft client, int width, int height) {
-        float w = (float) Platform.screen().viewportWidth();
-        float h = (float) Platform.screen().viewportHeight();
+        float w = (float) Platform.screen().windowWidth();
+        float h = (float) Platform.screen().windowHeight();
         adjustResolution(w, h, false);
     }
 
@@ -189,7 +190,13 @@ public class PolyUIScreen extends UScreen implements BlurScreen {
     @MustBeInvokedByOverriders
     public boolean uMouseScrolled(double delta) {
         try {
-            polyUI.getInputManager().mouseScrolled(0f, (float) delta);
+            float v = (float)
+                    //#if MC<13000
+                    //$$ delta / 8f;
+                    //#else
+                    delta;
+                    //#endif
+            polyUI.getInputManager().mouseScrolled(0f, v);
         } catch (Exception e) {
             death(e);
         }
@@ -244,6 +251,7 @@ public class PolyUIScreen extends UScreen implements BlurScreen {
     @Override
     @MustBeInvokedByOverriders
     public void onScreenClose() {
+        polyUI.getInputManager().unfocus();
         if (close != null) close.accept(polyUI);
         // noinspection DataFlowIssue
         this.polyUI.getWindow().setCursor(Cursor.Pointer);
@@ -251,7 +259,7 @@ public class PolyUIScreen extends UScreen implements BlurScreen {
 
     private void death(Exception e) {
         Platform.screen().close();
-        LOGGER.error("An unexpected error occurred processing {}", getClass().getName(), e);
-        // todo notify
+        LOGGER.error("Unexpected error", e);
+        Notifications.enqueue(Notifications.Type.Error, "An unexpected error occurred with this screen.\nPlease report this to the developer!", 5_000_000_000L);
     }
 }

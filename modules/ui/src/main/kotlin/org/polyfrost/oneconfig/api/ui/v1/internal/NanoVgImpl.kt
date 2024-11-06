@@ -3,11 +3,10 @@ package org.polyfrost.oneconfig.api.ui.v1.internal
 import org.lwjgl.nanovg.NSVGImage
 import org.lwjgl.nanovg.NVGColor
 import org.lwjgl.nanovg.NVGPaint
-import org.lwjgl.nanovg.NanoSVG
-import org.lwjgl.nanovg.NanoVG
+import org.lwjgl.nanovg.NanoSVG.*
+import org.lwjgl.nanovg.NanoVG.*
 import org.lwjgl.nanovg.NanoVGGL2
 import org.lwjgl.nanovg.NanoVGGL3
-import org.lwjgl.system.MemoryUtil
 import org.polyfrost.oneconfig.api.ui.v1.api.NanoVgApi
 import java.nio.ByteBuffer
 
@@ -18,30 +17,29 @@ class NanoVgImpl(
     private val isOpenGl3: JBoolean
 ) : NanoVgApi {
 
-
     private companion object {
 
         // ByteBuffer.of("px\u0000")
-        private val PIXELS: ByteBuffer = MemoryUtil.memAlloc(3).put(112).put(120).put(0).flip() as ByteBuffer
+        private val PIXELS = ByteBuffer.allocateDirect(3).put(112).put(120).put(0).flip() as ByteBuffer
 
     }
 
     object ConstantsImpl : NanoVgApi.Constants {
 
-        override fun NVG_ROUND() = NanoVG.NVG_ROUND
+        override fun NVG_ROUND() = NVG_ROUND
 
-        override fun NVG_ALIGN_LEFT() = NanoVG.NVG_ALIGN_LEFT
+        override fun NVG_ALIGN_LEFT() = NVG_ALIGN_LEFT
 
-        override fun NVG_ALIGN_TOP() = NanoVG.NVG_ALIGN_TOP
+        override fun NVG_ALIGN_TOP() = NVG_ALIGN_TOP
 
-        override fun NVG_HOLE() = NanoVG.NVG_HOLE
+        override fun NVG_HOLE() = NVG_HOLE
 
-        override fun NVG_IMAGE_FLIPY() = NanoVG.NVG_IMAGE_FLIPY
+        override fun NVG_IMAGE_FLIPY() = NVG_IMAGE_FLIPY
 
     }
 
-    private var handle: Long = -1
-    private var svgHandle: Long = -1
+    private var handle: Long = -1L
+    private var svgHandle: Long = -1L
 
     override fun constants() = ConstantsImpl
 
@@ -56,7 +54,7 @@ class NanoVgImpl(
                 false -> NanoVGGL2.nvgCreate(NanoVGGL2.NVG_ANTIALIAS)
             }
 
-            if (handle == MemoryUtil.NULL) {
+            if (handle == 0L /* NULL */) {
                 throw IllegalStateException("Failed to create NanoVG context")
             }
 
@@ -65,8 +63,8 @@ class NanoVgImpl(
         }
 
         if (svgHandle == -1L) {
-            val svgHandle = NanoSVG.nsvgCreateRasterizer()
-            if (svgHandle == MemoryUtil.NULL) {
+            val svgHandle = nsvgCreateRasterizer()
+            if (svgHandle == 0L /* NULL */) {
                 throw IllegalStateException("Failed to create NanoSVG context")
             }
 
@@ -76,49 +74,49 @@ class NanoVgImpl(
     }
 
     override fun beginFrame(width: Float, height: Float, scale: Float) {
-        NanoVG.nvgBeginFrame(handle, width, height, scale)
+        nvgBeginFrame(handle, width, height, scale)
     }
 
     override fun endFrame() {
-        NanoVG.nvgEndFrame(handle)
+        nvgEndFrame(handle)
     }
 
     override fun globalAlpha(alpha: Float) {
-        NanoVG.nvgGlobalAlpha(handle, alpha)
+        nvgGlobalAlpha(handle, alpha)
     }
 
     override fun translate(x: Float, y: Float) {
-        NanoVG.nvgTranslate(handle, x, y)
+        nvgTranslate(handle, x, y)
     }
 
     override fun scale(x: Float, y: Float) {
-        NanoVG.nvgScale(handle, x, y)
+        nvgScale(handle, x, y)
     }
 
     override fun rotate(angle: Float) {
-        NanoVG.nvgRotate(handle, angle)
+        nvgRotate(handle, angle)
     }
 
     override fun skewX(angle: Float) {
-        NanoVG.nvgSkewX(handle, angle)
+        nvgSkewX(handle, angle)
     }
 
     override fun skewY(angle: Float) {
-        NanoVG.nvgSkewY(handle, angle)
+        nvgSkewY(handle, angle)
     }
 
     override fun save() {
-        NanoVG.nvgSave(handle)
+        nvgSave(handle)
     }
 
     override fun restore() {
-        NanoVG.nvgRestore(handle)
+        nvgRestore(handle)
     }
 
     override fun createPaint() = NVGPaint.malloc().address()
 
     override fun fillPaint(address: Long) {
-        NanoVG.nvgFillPaint(handle, NVGPaint.create(address))
+        nvgFillPaint(handle, NVGPaint.create(address))
     }
 
     override fun getPaintColor(address: Long) = NVGPaint.create(address).innerColor().address()
@@ -126,11 +124,11 @@ class NanoVgImpl(
     override fun createColor() = NVGColor.malloc().address()
 
     override fun fillColor(address: Long) {
-        NanoVG.nvgFillColor(handle, NVGColor.create(address))
+        nvgFillColor(handle, NVGColor.create(address))
     }
 
     override fun rgba(address: Long, rgba: Int) {
-        NanoVG.nvgRGBA(
+        nvgRGBA(
             (rgba shr 16 and 0xFF).toByte(),
             (rgba shr 8 and 0xFF).toByte(),
             (rgba and 0xFF).toByte(),
@@ -140,19 +138,19 @@ class NanoVgImpl(
     }
 
     override fun beginPath() {
-        NanoVG.nvgBeginPath(handle)
+        nvgBeginPath(handle)
     }
 
     override fun pathWinding(winding: Int) {
-        NanoVG.nvgPathWinding(handle, winding)
+        nvgPathWinding(handle, winding)
     }
 
     override fun fill() {
-        NanoVG.nvgFill(handle)
+        nvgFill(handle)
     }
 
     override fun roundedRect(x: Float, y: Float, w: Float, h: Float, r: Float) {
-        NanoVG.nvgRoundedRect(handle, x, y, w, h, r)
+        nvgRoundedRect(handle, x, y, w, h, r)
     }
 
     override fun roundedRectVarying(
@@ -165,79 +163,79 @@ class NanoVgImpl(
         br: Float,
         bl: Float
     ) {
-        NanoVG.nvgRoundedRectVarying(handle, x, y, w, h, tl, tr, br, bl)
+        nvgRoundedRectVarying(handle, x, y, w, h, tl, tr, br, bl)
     }
 
     override fun lineJoin(join: Int) {
-        NanoVG.nvgLineJoin(handle, join)
+        nvgLineJoin(handle, join)
     }
 
     override fun lineCap(cap: Int) {
-        NanoVG.nvgLineCap(handle, cap)
+        nvgLineCap(handle, cap)
     }
 
     override fun stroke() {
-        NanoVG.nvgStroke(handle)
+        nvgStroke(handle)
     }
 
     override fun strokeWidth(width: Float) {
-        NanoVG.nvgStrokeWidth(handle, width)
+        nvgStrokeWidth(handle, width)
     }
 
     override fun strokePaint(address: Long) {
-        NanoVG.nvgStrokePaint(handle, NVGPaint.create(address))
+        nvgStrokePaint(handle, NVGPaint.create(address))
     }
 
     override fun strokeColor(address: Long) {
-        NanoVG.nvgStrokeColor(handle, NVGColor.create(address))
+        nvgStrokeColor(handle, NVGColor.create(address))
     }
 
     override fun moveTo(x: Float, y: Float) {
-        NanoVG.nvgMoveTo(handle, x, y)
+        nvgMoveTo(handle, x, y)
     }
 
     override fun lineTo(x: Float, y: Float) {
-        NanoVG.nvgLineTo(handle, x, y)
+        nvgLineTo(handle, x, y)
     }
 
     override fun createFont(name: String, buffer: ByteBuffer): Int {
-        return NanoVG.nvgCreateFontMem(handle, name, buffer, false)
+        return nvgCreateFontMem(handle, name, buffer, false)
     }
 
     override fun fontSize(size: Float) {
-        NanoVG.nvgFontSize(handle, size)
+        nvgFontSize(handle, size)
     }
 
     override fun fontFaceId(id: Int) {
-        NanoVG.nvgFontFaceId(handle, id)
+        nvgFontFaceId(handle, id)
     }
 
     override fun textAlign(align: Int) {
-        NanoVG.nvgTextAlign(handle, align)
+        nvgTextAlign(handle, align)
     }
 
     override fun text(x: Float, y: Float, text: String) {
-        NanoVG.nvgText(handle, x, y, text)
+        nvgText(handle, x, y, text)
     }
 
     override fun textBounds(x: Float, y: Float, text: String, bounds: FloatArray): Float {
-        return NanoVG.nvgTextBounds(handle, x, y, text, bounds)
+        return nvgTextBounds(handle, x, y, text, bounds)
     }
 
     override fun createImage(width: Float, height: Float, buffer: ByteBuffer, flags: Int): Int {
-        return NanoVG.nvgCreateImageRGBA(handle, width.toInt(), height.toInt(), flags, buffer)
+        return nvgCreateImageRGBA(handle, width.toInt(), height.toInt(), flags, buffer)
     }
 
     override fun scissor(x: Float, y: Float, w: Float, h: Float) {
-        NanoVG.nvgScissor(handle, x, y, w, h)
+        nvgScissor(handle, x, y, w, h)
     }
 
     override fun intersectScissor(x: Float, y: Float, w: Float, h: Float) {
-        NanoVG.nvgIntersectScissor(handle, x, y, w, h)
+        nvgIntersectScissor(handle, x, y, w, h)
     }
 
     override fun resetScissor() {
-        NanoVG.nvgResetScissor(handle)
+        nvgResetScissor(handle)
     }
 
     override fun imagePattern(
@@ -250,15 +248,15 @@ class NanoVgImpl(
         alpha: Float,
         address: Long
     ) {
-        NanoVG.nvgImagePattern(handle, x, y, w, h, angle, image, alpha, NVGPaint.create(address))
+        nvgImagePattern(handle, x, y, w, h, angle, image, alpha, NVGPaint.create(address))
     }
 
     override fun linearGradient(address: Long, x0: Float, y0: Float, x1: Float, y1: Float, startColor: Long, endColor: Long) {
-        NanoVG.nvgLinearGradient(handle, x0, y0, x1, y1, NVGColor.create(startColor), NVGColor.create(endColor), NVGPaint.create(address))
+        nvgLinearGradient(handle, x0, y0, x1, y1, NVGColor.create(startColor), NVGColor.create(endColor), NVGPaint.create(address))
     }
 
     override fun radialGradient(address: Long, cx: Float, cy: Float, inr: Float, outr: Float, startColor: Long, endColor: Long) {
-        NanoVG.nvgRadialGradient(handle, cx, cy, inr, outr, NVGColor.create(startColor), NVGColor.create(endColor), NVGPaint.create(address))
+        nvgRadialGradient(handle, cx, cy, inr, outr, NVGColor.create(startColor), NVGColor.create(endColor), NVGPaint.create(address))
     }
 
     override fun boxGradient(
@@ -272,25 +270,20 @@ class NanoVgImpl(
         startColor: Long,
         endColor: Long
     ) {
-        NanoVG.nvgBoxGradient(handle, x, y, w, h, r, f, NVGColor.create(startColor), NVGColor.create(endColor), NVGPaint.create(address))
+        nvgBoxGradient(handle, x, y, w, h, r, f, NVGColor.create(startColor), NVGColor.create(endColor), NVGPaint.create(address))
     }
 
     override fun deleteImage(address: Int) {
-        NanoVG.nvgDeleteImage(handle, address)
-    }
-
-    override fun svgBounds(address: Long): FloatArray {
-        val svg = NSVGImage.create(address)
-        return floatArrayOf(svg.width(), svg.height())
+        nvgDeleteImage(handle, address)
     }
 
     override fun parseSvg(data: ByteBuffer): NanoVgApi.SVG {
-        val result = NanoSVG.nsvgParse(data, PIXELS, 96f) ?: throw IllegalStateException("Failed to parse SVG data")
+        val result = nsvgParse(data, PIXELS, 96f) ?: throw IllegalStateException("Failed to parse SVG data")
         return NanoVgApi.SVG(result.address(), result.width(), result.height())
     }
 
     override fun deleteSvg(address: Long) {
-        NanoSVG.nsvgDelete(NSVGImage.create(address))
+        nsvgDelete(NSVGImage.create(address))
     }
 
     override fun rasterizeSvg(
@@ -303,7 +296,7 @@ class NanoVgImpl(
         h: Int,
         stride: Int
     ) {
-        NanoSVG.nsvgRasterize(svgHandle, NSVGImage.create(address), x, y, scale, data, w, h, stride)
+        nsvgRasterize(svgHandle, NSVGImage.create(address), x, y, scale, data, w, h, stride)
     }
 
 }

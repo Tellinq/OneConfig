@@ -112,8 +112,8 @@ public class UIManagerImpl implements UIManager {
     }
 
     @Override
-    public Object createPolyUIScreen(@NotNull PolyUI polyUI, float desiredScreenWidth, float desiredScreenHeight, boolean pauses, boolean blurs, Consumer<PolyUI> onClose) {
-        return new PolyUIScreen(polyUI, desiredScreenWidth, desiredScreenHeight, pauses, blurs, onClose);
+    public Object createPolyUIScreen(@NotNull PolyUI polyUI, float designedWidth, float designedHeight, boolean pauses, boolean blurs, Consumer<PolyUI> onClose) {
+        return new PolyUIScreen(polyUI, designedWidth, designedHeight, pauses, blurs, onClose);
     }
 
     @Override

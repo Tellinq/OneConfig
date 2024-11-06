@@ -42,7 +42,7 @@ import org.polyfrost.polyui.unit.seconds
 import org.polyfrost.polyui.utils.image
 
 
-object NotificationsManager {
+object Notifications {
     private const val PADDING = 8f
     private const val MAX = 5
     private val polyUI = UIManager.INSTANCE.defaultInstance
@@ -51,6 +51,7 @@ object NotificationsManager {
     private var lastY = 0f
     private var i = 0
 
+    @JvmStatic
     fun enqueueCustom(vararg components: Component, progressFunc: Animation): Block {
         val out = Block(children = components, at = Vec2(polyUI.size.x + PADDING, 0f)).withBoarder().withStates()
         var failedToFinishNormally = false
@@ -87,6 +88,7 @@ object NotificationsManager {
     }
 
     @JvmOverloads
+    @JvmStatic
     fun enqueue(type: Type, title: String = type.title, description: String, durationNanos: Long) = enqueueCustom(
         Block(
             Image("polyui/chevron-down.svg".image(), size = Vec2(32f, 32f)),

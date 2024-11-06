@@ -72,15 +72,19 @@ fun interface Visualizer {
             val options: Array<String> = prop.getMetadata("options") ?: emptyArray()
             if (prop.type.isEnum) {
                 require(options.isEmpty()) { "Dropdowns should not have options when used with enums (offender=${prop.id})" }
-                val index = prop.type.enumConstants.indexOf(prop.get())
+                val constants = prop.type.enumConstants
+                val index = constants.indexOf(prop.get())
                 return Dropdown(
                     optPadding = 24f,
                     initial = index,
-                    entries = prop.type.enumConstants.mapToArray {
+                    entries = constants.mapToArray {
                         it as Enum<*>
                         null to (it::class.java.fields[0].get(it) as? String ?: it.name)
                     },
-                )
+                ).onChange { i: Int ->
+                    prop.setAs(constants[i])
+                    false
+                }
             } else {
                 require(prop.type == Int::class.java) { "Dropdowns can only be used with enums or integers (offender=${prop.id}, type=${prop.type})" }
                 require(options.size >= 2) { "Dropdowns must have at least two options (offender=${prop.id})" }
@@ -88,7 +92,10 @@ fun interface Visualizer {
                     optPadding = 24f,
                     initial = prop.getAs(),
                     entries = options.mapToArray { null to it },
-                )
+                ).onChange { i: Int ->
+                    prop.setAs(i)
+                    false
+                }
             }
         }
     }

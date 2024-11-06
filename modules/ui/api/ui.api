@@ -1,21 +1,21 @@
-public final class org/polyfrost/oneconfig/api/ui/v1/NotificationsManager {
-	public static final field INSTANCE Lorg/polyfrost/oneconfig/api/ui/v1/NotificationsManager;
-	public final fun enqueue (Lorg/polyfrost/oneconfig/api/ui/v1/NotificationsManager$Type;Ljava/lang/String;J)Lorg/polyfrost/polyui/component/impl/Block;
-	public final fun enqueue (Lorg/polyfrost/oneconfig/api/ui/v1/NotificationsManager$Type;Ljava/lang/String;Ljava/lang/String;J)Lorg/polyfrost/polyui/component/impl/Block;
-	public static synthetic fun enqueue$default (Lorg/polyfrost/oneconfig/api/ui/v1/NotificationsManager;Lorg/polyfrost/oneconfig/api/ui/v1/NotificationsManager$Type;Ljava/lang/String;Ljava/lang/String;JILjava/lang/Object;)Lorg/polyfrost/polyui/component/impl/Block;
-	public final fun enqueueCustom ([Lorg/polyfrost/polyui/component/Component;Lorg/polyfrost/polyui/animate/Animation;)Lorg/polyfrost/polyui/component/impl/Block;
+public final class org/polyfrost/oneconfig/api/ui/v1/Notifications {
+	public static final field INSTANCE Lorg/polyfrost/oneconfig/api/ui/v1/Notifications;
+	public static final fun enqueue (Lorg/polyfrost/oneconfig/api/ui/v1/Notifications$Type;Ljava/lang/String;J)Lorg/polyfrost/polyui/component/impl/Block;
+	public static final fun enqueue (Lorg/polyfrost/oneconfig/api/ui/v1/Notifications$Type;Ljava/lang/String;Ljava/lang/String;J)Lorg/polyfrost/polyui/component/impl/Block;
+	public static synthetic fun enqueue$default (Lorg/polyfrost/oneconfig/api/ui/v1/Notifications$Type;Ljava/lang/String;Ljava/lang/String;JILjava/lang/Object;)Lorg/polyfrost/polyui/component/impl/Block;
+	public static final fun enqueueCustom ([Lorg/polyfrost/polyui/component/Component;Lorg/polyfrost/polyui/animate/Animation;)Lorg/polyfrost/polyui/component/impl/Block;
 }
 
-public final class org/polyfrost/oneconfig/api/ui/v1/NotificationsManager$Type : java/lang/Enum {
-	public static final field Error Lorg/polyfrost/oneconfig/api/ui/v1/NotificationsManager$Type;
-	public static final field Info Lorg/polyfrost/oneconfig/api/ui/v1/NotificationsManager$Type;
-	public static final field Success Lorg/polyfrost/oneconfig/api/ui/v1/NotificationsManager$Type;
-	public static final field Warning Lorg/polyfrost/oneconfig/api/ui/v1/NotificationsManager$Type;
+public final class org/polyfrost/oneconfig/api/ui/v1/Notifications$Type : java/lang/Enum {
+	public static final field Error Lorg/polyfrost/oneconfig/api/ui/v1/Notifications$Type;
+	public static final field Info Lorg/polyfrost/oneconfig/api/ui/v1/Notifications$Type;
+	public static final field Success Lorg/polyfrost/oneconfig/api/ui/v1/Notifications$Type;
+	public static final field Warning Lorg/polyfrost/oneconfig/api/ui/v1/Notifications$Type;
 	public static fun getEntries ()Lkotlin/enums/EnumEntries;
 	public final fun getIcon ()Ljava/lang/String;
 	public final fun getTitle ()Ljava/lang/String;
-	public static fun valueOf (Ljava/lang/String;)Lorg/polyfrost/oneconfig/api/ui/v1/NotificationsManager$Type;
-	public static fun values ()[Lorg/polyfrost/oneconfig/api/ui/v1/NotificationsManager$Type;
+	public static fun valueOf (Ljava/lang/String;)Lorg/polyfrost/oneconfig/api/ui/v1/Notifications$Type;
+	public static fun values ()[Lorg/polyfrost/oneconfig/api/ui/v1/Notifications$Type;
 }
 
 public final class org/polyfrost/oneconfig/api/ui/v1/OCPolyUIBuilder : org/polyfrost/polyui/utils/PolyUIBuilder {
@@ -25,6 +25,7 @@ public final class org/polyfrost/oneconfig/api/ui/v1/OCPolyUIBuilder : org/polyf
 	public static fun create ()Lorg/polyfrost/oneconfig/api/ui/v1/OCPolyUIBuilder;
 	public fun make ([Lorg/polyfrost/polyui/component/Drawable;)Lorg/polyfrost/polyui/PolyUI;
 	public fun makeAndOpen ([Lorg/polyfrost/polyui/component/Drawable;)Lorg/polyfrost/polyui/PolyUI;
+	public fun makeAndOpenWithRef ([Lorg/polyfrost/polyui/component/Drawable;)Lkotlin/Pair;
 	public fun onClose (Ljava/lang/Runnable;)Lorg/polyfrost/oneconfig/api/ui/v1/OCPolyUIBuilder;
 	public fun onClose (Ljava/util/function/Consumer;)Lorg/polyfrost/oneconfig/api/ui/v1/OCPolyUIBuilder;
 	public fun pauses ()Lorg/polyfrost/oneconfig/api/ui/v1/OCPolyUIBuilder;
@@ -92,7 +93,6 @@ public abstract interface class org/polyfrost/oneconfig/api/ui/v1/api/NanoVgApi 
 	public abstract fun strokeColor (J)V
 	public abstract fun strokePaint (J)V
 	public abstract fun strokeWidth (F)V
-	public abstract fun svgBounds (J)[F
 	public abstract fun svgHandle ()J
 	public abstract fun text (FFLjava/lang/String;)V
 	public abstract fun textAlign (I)V

@@ -27,6 +27,7 @@
 package org.polyfrost.oneconfig.api.ui.v1;
 
 import org.polyfrost.oneconfig.api.platform.v1.Platform;
+import org.polyfrost.oneconfig.api.platform.v1.ScreenPlatform;
 import org.polyfrost.polyui.PolyUI;
 import org.polyfrost.polyui.Settings;
 import org.polyfrost.polyui.component.Drawable;
@@ -35,7 +36,7 @@ import org.polyfrost.polyui.utils.PolyUIBuilder;
 import java.util.function.Consumer;
 
 public final class OCPolyUIBuilder extends PolyUIBuilder {
-    private float desiredScreenWidth, desiredScreenHeight;
+    private float designedWidth, designedHeight;
     private Consumer<PolyUI> onClose;
     private boolean pauses, blurs;
 
@@ -56,9 +57,9 @@ public final class OCPolyUIBuilder extends PolyUIBuilder {
         return this;
     }
 
-    public OCPolyUIBuilder atResolution(float desiredScreenWidth, float desiredScreenHeight) {
-        this.desiredScreenWidth = desiredScreenWidth;
-        this.desiredScreenHeight = desiredScreenHeight;
+    public OCPolyUIBuilder atResolution(float designedWidth, float designedHeight) {
+        this.designedWidth = designedWidth;
+        this.designedHeight = designedHeight;
         return this;
     }
 
@@ -90,10 +91,23 @@ public final class OCPolyUIBuilder extends PolyUIBuilder {
      */
     public PolyUI makeAndOpen(Drawable... drawables) {
         PolyUI p = make(drawables);
-        Object screen = UIManager.INSTANCE.createPolyUIScreen(p, desiredScreenWidth, desiredScreenHeight, pauses, blurs, onClose);
+        Object screen = UIManager.INSTANCE.createPolyUIScreen(p, designedWidth, designedHeight, pauses, blurs, onClose);
         p.setWindow(UIManager.INSTANCE.createWindow());
         Platform.screen().display(screen);
         return p;
+    }
+
+    /**
+     * create, and open a new PolyUI screen, backed by the returned instance. Additionally, a window is also created and assigned to the instance.
+     * <br>
+     * Also returns a reference to the window object. use {@link Platform#screen()} and {@link ScreenPlatform#display(Object)} to display it.
+     */
+    public kotlin.Pair<PolyUI, Object> makeAndOpenWithRef(Drawable... drawables) {
+        PolyUI p = make(drawables);
+        Object screen = UIManager.INSTANCE.createPolyUIScreen(p, designedWidth, designedHeight, pauses, blurs, onClose);
+        p.setWindow(UIManager.INSTANCE.createWindow());
+        Platform.screen().display(screen);
+        return new kotlin.Pair<>(p, screen);
     }
 
     public static OCPolyUIBuilder create() {

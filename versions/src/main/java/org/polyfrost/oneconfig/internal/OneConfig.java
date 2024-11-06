@@ -97,7 +97,7 @@ public class OneConfig
         CommandManager.registerCommand(b.build());
         OCKeybindHelper builder = OCKeybindHelper.builder();
         builder.mods(KeyModifiers.RSHIFT).does((s) -> {
-            OneConfigUI.INSTANCE.open();
+            if (s) OneConfigUI.INSTANCE.open();
             return Unit.INSTANCE;
         });
         builder.register();

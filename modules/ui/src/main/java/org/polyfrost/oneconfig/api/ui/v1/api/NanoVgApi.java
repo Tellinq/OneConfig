@@ -1,7 +1,5 @@
 package org.polyfrost.oneconfig.api.ui.v1.api;
 
-import kotlin.Triple;
-
 import java.nio.ByteBuffer;
 
 public interface NanoVgApi {
@@ -23,15 +21,15 @@ public interface NanoVgApi {
     Constants constants();
 
     long handle();
+
     long svgHandle();
 
     /**
      * If this instance is not set up already, it will set up the instance (initializes it's NVG and NSVG context).
      *
      * @throws IllegalStateException if the instance failed to set up.
-     *
-     * @since 0.2.0
      * @author Deftu
+     * @since 0.2.0
      */
     void maybeSetup();
 
@@ -134,8 +132,6 @@ public interface NanoVgApi {
     void boxGradient(long address, float x, float y, float w, float h, float r, float f, long startColor, long endColor);
 
     void deleteImage(int address);
-
-    float[] svgBounds(long address);
 
     SVG parseSvg(ByteBuffer data);
 

@@ -137,7 +137,7 @@ public abstract class EventHandler<E extends Event> implements Comparable<EventH
 
     @ApiStatus.Internal
     public final boolean onError() {
-        return !(errors++ > ERROR_THRESHOLD);
+        return errors++ > ERROR_THRESHOLD;
     }
 
     @Override
