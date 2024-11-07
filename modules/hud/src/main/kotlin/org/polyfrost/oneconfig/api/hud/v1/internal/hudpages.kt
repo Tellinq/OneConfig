@@ -53,6 +53,7 @@ import kotlin.math.atan2
 import kotlin.math.min
 
 val alignC = Align(main = Align.Main.Center, cross = Align.Cross.Center)
+val alignNoPad = Align(pad = Vec2.ZERO)
 private val mcFont = FontFamily("Minecraft", "assets/oneconfig/fonts/minecraft")
 const val angleSnapMargin = PI / 12.0
 const val minMargin = 4f
@@ -129,6 +130,7 @@ private fun createSettings(hud: Hud<*>): Drawable {
 
 private fun createDesigner(hud: Hud<*>): Drawable {
     val isLegacy = hud is LegacyHud
+    val parent = hud.get().parent
     return Group(
         Text("oneconfig.hudeditor.general.title", fontSize = 16f).setFont { medium },
         subheading("oneconfig.hudeditor.padding.title", "oneconfig.hudeditor.padding.info"),
@@ -141,12 +143,32 @@ private fun createDesigner(hud: Hud<*>): Drawable {
                     "oneconfig.align.end",
                     "oneconfig.align.spacebetween",
                     "oneconfig.align.spaceevenly",
-                ).minimumSize(70f by 32f).titled("oneconfig.hudeditor.padding.mode.main"),
+                ).minimumSize(70f by 32f).titled("oneconfig.hudeditor.padding.mode.main").onChange { index: Int ->
+                    val a = parent.alignment
+                    parent.alignment = Align(Align.Main.entries[index], a.cross, a.mode, a.pad, a.maxRowSize)
+                    false
+                },
                 Dropdown(
                     "oneconfig.align.start", "oneconfig.align.center", "oneconfig.align.end",
-                ).minimumSize(70f by 32f).titled("oneconfig.hudeditor.padding.mode.cross"),
-                BoxedTextInput("assets/oneconfig/ico/info.svg".image(), placeholder = "8", size = Vec2(72f, 0f), post = "px").titled("oneconfig.hudeditor.padding.main"),
-                BoxedTextInput("assets/oneconfig/ico/info.svg".image(), placeholder = "6", size = Vec2(72f, 0f), post = "px").titled("oneconfig.hudeditor.padding.cross"),
+                ).minimumSize(70f by 32f).titled("oneconfig.hudeditor.padding.mode.cross").onChange { index: Int ->
+                    val a = parent.alignment
+                    parent.alignment = Align(a.main, Align.Cross.entries[index], a.mode, a.pad, a.maxRowSize)
+                    false
+                },
+                BoxedNumericInput("assets/oneconfig/ico/info.svg".image(), initialValue = parent.alignment.pad.x, size = Vec2(72f, 0f), post = "px").also {
+                    it[0].onChange { value: Float ->
+                        val a = parent.alignment
+                        parent.alignment = Align(a.main, a.cross, a.mode, Vec2(value, a.pad.y), a.maxRowSize)
+                        false
+                    }
+                }.titled("oneconfig.hudeditor.padding.main"),
+                BoxedNumericInput("assets/oneconfig/ico/info.svg".image(), initialValue = parent.alignment.pad.y, size = Vec2(72f, 0f), post = "px").also {
+                    it[0].onChange { value: Float ->
+                        val a = parent.alignment
+                        parent.alignment = Align(a.main, a.cross, a.mode, Vec2(a.pad.x, value), a.maxRowSize)
+                        false
+                    }
+                }.titled("oneconfig.hudeditor.padding.cross"),
                 size = Vec2(328f, 0f),
             ),
         ),
@@ -305,6 +327,7 @@ private fun interactiveAlignment(hud: Hud<*>): Drawable {
 }
 
 fun textOptions(text: Text): Drawable {
+    var prevWeight: Font.Weight = Font.Weight.Regular
     return Group(
         subheading("oneconfig.hudeditor.text.title", "oneconfig.hudeditor.text.info"),
         Block(
@@ -326,17 +349,16 @@ fun textOptions(text: Text): Drawable {
             ex.parent.recalculate()
             false
         }.titled("oneconfig.hudeditor.text.font"),
-        BoxedTextInput("assets/oneconfig/ico/info.svg".image(), placeholder = "1-100", initialValue = text.fontSize.toString(), size = Vec2(72f, 0f), post = "px")
-            .apply {
-                (this[1][0] as TextInput).numeric(1f, 100f).on(Event.Change.Number) { (it) ->
-                    text.fontSize = it.toFloat()
-                    text._parent?.recalculate()
-                    val ex = (parent.parent.parent[1][0] as? Text) ?: return@on true
-                    ex.fontSize = text.fontSize
-                    ex.parent.recalculate()
-                    true
-                }
-            }.titled("oneconfig.hudeditor.text.size"),
+        BoxedNumericInput("assets/oneconfig/ico/info.svg".image(), initialValue = text.fontSize, min = 1f, size = Vec2(72f, 0f), post = "px").also {
+            it[0].onChange { value: Float ->
+                text.fontSize = value
+                text._parent?.recalculate()
+                val ex = (parent.parent.parent[1][0] as? Text) ?: return@onChange false
+                ex.fontSize = text.fontSize
+                ex.parent.recalculate()
+                false
+            }
+        }.titled("oneconfig.hudeditor.text.size"),
         Radiobutton(
             "assets/oneconfig/ico/info.svg".image(),
             "assets/oneconfig/ico/info.svg".image(),
@@ -352,10 +374,6 @@ fun textOptions(text: Text): Drawable {
             "oneconfig.fweight.300",
             "oneconfig.fweight.400",
             "oneconfig.fweight.500",
-            "oneconfig.fweight.600",
-            "oneconfig.fweight.700",
-            "oneconfig.fweight.800",
-            "oneconfig.fweight.900"
         ).onChange { it: Int ->
             text.fontWeight = Font.byWeight((it + 1) * 100)
             text._parent?.recalculate()
@@ -364,15 +382,23 @@ fun textOptions(text: Text): Drawable {
             ex.parent.recalculate()
             false
         }.titled("oneconfig.hudeditor.text.weight"),
-        Radiobutton(
-            "assets/oneconfig/ico/info.svg".image(),
-            "assets/oneconfig/ico/info.svg".image(),
-            "assets/oneconfig/ico/info.svg".image(),
-            optionLateralPadding = 2f,
-            optionVerticalPadding = 2f,
-        ).onChange { it: Int ->
-            false
-        }.titled("oneconfig.hudeditor.text.effects"),
+        Group(
+            Block(Image("assets/oneconfig/ico/info.svg"), alignment = alignNoPad).radius(2f).toggleable(text.fontWeight.value > 500).onToggle {
+                if(it) {
+                    prevWeight = text.fontWeight
+                    text.fontWeight = when(text.fontWeight) {
+                        Font.Weight.Thin, Font.Weight.ExtraLight, Font.Weight.Light -> Font.Weight.SemiBold
+                        Font.Weight.Regular -> Font.Weight.Bold
+                        Font.Weight.Medium -> Font.Weight.ExtraBold
+                        else -> text.fontWeight
+                    }
+                } else {
+                    text.fontWeight = prevWeight
+                }
+            },
+            Block(Image("assets/oneconfig/ico/info.svg"), alignment = alignNoPad).radius(2f).toggleable(text.italic).onToggle { text.italic = it },
+            Block(Image("assets/oneconfig/ico/info.svg"), alignment = alignNoPad).radius(2f).toggleable(text.strikethrough).onToggle { text.strikethrough = it },
+        ).titled("oneconfig.hudeditor.text.effects"),
         *colorOptions(text),
         size = Vec2(476f, 0f),
         alignment = Align(pad = Vec2(0f, 8f))

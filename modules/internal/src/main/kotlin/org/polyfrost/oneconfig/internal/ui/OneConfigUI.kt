@@ -79,9 +79,9 @@ object OneConfigUI {
                 Group(
                     Block(
                         size = Vec2(225f, 32f),
-                    ).ignoreLayout().afterParentInit {
-                        val modsBtn = parent[3]
-                        Move(this, modsBtn.x, modsBtn.y, false).add()
+                    ).ignoreLayout().afterParentInit(Int.MAX_VALUE) {
+                        // move to mod button
+                        this.at = parent[3].at
                     },
                     Image("assets/oneconfig/brand/oneconfig.svg".image()).named("Logo"),
                     Text("oneconfig.sidebar.title.options", fontSize = 11f).setPalette { text.secondary }.padded(0f, 24f, 0f, 0f),
@@ -131,7 +131,7 @@ object OneConfigUI {
                                 Image(
                                     "assets/oneconfig/ico/bell.svg".image(),
                                 ),
-                                Image(playerHead).radius(6f).named("ProfileImage").withBoarder(
+                                Image(playerHead, size = Vec2(24f, 24f)).radius(6f).named("ProfileImage").withBoarder(
                                     rgba(255, 255, 255, 0.14f),
                                     width = 1f,
                                 ).addHoverInfo(Text(Platform.player().playerName.ifEmpty { "Steve" })),

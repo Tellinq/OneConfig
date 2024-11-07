@@ -94,7 +94,6 @@ object Notifications {
             Image("polyui/chevron-down.svg".image(), size = Vec2(32f, 32f)),
             Text(title, fontSize = 14f).setFont { medium },
             Text(description, fontSize = 12f),
-            size = Vec2(235f, 100f),
         ),
         progressFunc = Animations.Linear.create(durationNanos)
     )
