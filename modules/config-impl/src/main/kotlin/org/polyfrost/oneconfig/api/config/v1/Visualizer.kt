@@ -29,7 +29,7 @@ package org.polyfrost.oneconfig.api.config.v1
 import org.polyfrost.oneconfig.api.config.v1.internal.ConfigVisualizer.Companion.strv
 import org.polyfrost.polyui.color.PolyColor
 import org.polyfrost.polyui.color.mutable
-import org.polyfrost.polyui.component.*
+import org.polyfrost.polyui.component.Drawable
 import org.polyfrost.polyui.component.extensions.*
 import org.polyfrost.polyui.component.impl.*
 import org.polyfrost.polyui.event.Event
@@ -63,7 +63,8 @@ fun interface Visualizer {
             if (p !is PolyColor.Mutable) {
                 prop.setAsReferential(p.mutable())
             }
-            return Block(color = prop.getAs(), size = Vec2(58f, 32f)).withBoarder(3f, color = { page.border20 }).onClick { ColorPicker(prop.getAs<PolyColor.Mutable>().ref(), null, null, polyUI); true }
+            return Block(color = prop.getAs(), size = Vec2(58f, 32f)).withBoarder(3f, color = { page.border20 })
+                .onClick { ColorPicker(prop.getAs<PolyColor.Mutable>().ref(), null, null, polyUI); true }
         }
     }
 

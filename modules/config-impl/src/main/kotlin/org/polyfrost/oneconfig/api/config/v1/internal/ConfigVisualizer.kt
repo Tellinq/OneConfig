@@ -158,7 +158,7 @@ open class ConfigVisualizer {
         val list = options.getOrPut(category) { HashMap(4) }.getOrPut(subcategory) { ArrayList(8) }
         if (node is Property<*>) {
             val vis = node.getVisualizer() ?: return
-            list.add(Triple(node.title, node.description, wrap(vis.visualize(node), node.title ?: return, node.description, icon)))
+            list.add(Triple(node.title, node.description, wrap(vis.visualize(node), node.title ?: return, node.description, icon).addHideHandler(node)))
         } else {
             node as Tree
             if (node.map.isEmpty()) {
@@ -192,7 +192,7 @@ open class ConfigVisualizer {
                 if (node !is Property<*>) return@map null
                 val vis = node.getVisualizer() ?: return@map null
                 index.add(node.title to node.description)
-                wrapForAccordion(vis.visualize(node), node.title ?: return@map null, node.description)
+                wrapForAccordion(vis.visualize(node), node.title ?: return@map null, node.description).addHideHandler(node)
             }
         var open = false
         val out = Block(
@@ -273,6 +273,16 @@ open class ConfigVisualizer {
             val it = vis.getDeclaredConstructor().newInstance() ?: throw IllegalStateException("Visualizer $vis could not be instantiated; ensure it has a public no-args constructor")
             it as? Visualizer ?: throw IllegalArgumentException("Visualizer $vis does not implement Visualizer")
         }
+    }
+
+    private fun Drawable.addHideHandler(prop: Property<*>): Drawable {
+        prop.onDisplayChange { s ->
+            this.isEnabled = s
+            if (prop.getMetadata<Boolean?>("hideOnDisplayFailure") == true) {
+                // todo
+            }
+        }
+        return this
     }
 
     companion object {

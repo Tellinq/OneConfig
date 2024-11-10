@@ -35,7 +35,6 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.function.BooleanSupplier;
-import java.util.function.Consumer;
 import java.util.function.Predicate;
 
 public abstract class Config {
@@ -73,7 +72,7 @@ public abstract class Config {
 
     protected void addDependency(String option, String name, BooleanSupplier condition) {
         Property<?> opt = getProperty(option).addDisplayCondition(condition);
-        opt.getOrPutMetadata("dependencyNames", () -> new ArrayList<String>(3)).add(name);
+        if (name != null) opt.getOrPutMetadata("dependencyNames", () -> new ArrayList<String>(3)).add(name);
     }
 
     /**
@@ -82,10 +81,11 @@ public abstract class Config {
      * @param option    the option to add the dependency to
      * @param condition the <b>boolean option</b> which provides the dependency
      */
+    @SuppressWarnings("unchecked")
     protected void addDependency(String option, String condition) {
         Property<?> cond = getProperty(condition);
         if (cond.type != boolean.class) throw new IllegalArgumentException("Condition property must be boolean");
-        Property<?> opt = getProperty(option).addDisplayCondition(cond::getAs);
+        Property<?> opt = getProperty(option).addDisplayCondition((Property<Boolean>) cond);
         opt.getOrPutMetadata("dependencyNames", () -> new ArrayList<String>(3)).add(cond.getTitle());
     }
 
@@ -100,16 +100,11 @@ public abstract class Config {
         ((Property<T>) getProperty(option)).addCallback(callback);
     }
 
-    /**
-     * Add a callback to the specified option path, which is dot-separated for sub-configs.
-     * <br>
-     * The name of the option should be the name of the field.
-     */
-    @SuppressWarnings("unchecked")
-    @kotlin.OverloadResolutionByLambdaReturnType
-    protected <T> void addCallback(String option, Consumer<T> callback) {
-        ((Property<T>) getProperty(option)).addCallback(callback);
+
+    protected void hideWhenShouldNotDisplay(String option) {
+        getProperty(option).addMetadata("hideOnDisplayFailure", true);
     }
+
 
     /**
      * Add a callback to the specified option path, which is dot-separated for sub-configs.
@@ -119,6 +114,7 @@ public abstract class Config {
     protected void addCallback(String option, Runnable callback) {
         getProperty(option).addCallback(t -> {
             callback.run();
+            return false;
         });
     }
 

@@ -32,6 +32,7 @@ import org.polyfrost.oneconfig.utils.v1.MHUtils;
 import org.polyfrost.oneconfig.utils.v1.WrappingUtils;
 
 import java.io.Serializable;
+import java.lang.ref.WeakReference;
 import java.util.*;
 import java.util.function.BooleanSupplier;
 import java.util.function.Consumer;
@@ -53,8 +54,8 @@ public abstract class Property<T> extends Node implements Serializable {
      */
     @NotNull
     public transient final Class<?> type;
-    protected transient List<@NotNull Consumer<@Nullable T>> callbacks = null;
-    protected transient List<@NotNull Predicate<@Nullable T>> predicates = null;
+    protected transient List<@NotNull Predicate<@Nullable T>> callbacks = null;
+    private transient Consumer<Boolean> displayCallback = null;
     private transient boolean display = true;
     private transient List<BooleanSupplier> conditions = null;
 
@@ -77,15 +78,33 @@ public abstract class Property<T> extends Node implements Serializable {
         return display;
     }
 
+    public void onDisplayChange(Consumer<Boolean> callback) {
+        this.displayCallback = callback;
+    }
+
     /**
      * Add a display condition to this property.
      */
     public final Property<T> addDisplayCondition(@NotNull BooleanSupplier condition) {
-        if (conditions == null) conditions = new ArrayList<>(5);
+        if (conditions == null) conditions = new ArrayList<>(3);
         conditions.add(condition);
         revaluateDisplay();
         return this;
     }
+
+    public final Property<T> addDisplayCondition(@NotNull Property<Boolean> condition) {
+        // asm: weak ref to avoid a potential memory leak if we are discarded for any reason
+        WeakReference<Property<T>> ref = new WeakReference<>(this);
+        condition.addCallback(t -> {
+            Property<T> self = ref.get();
+            if (self == null) return false;
+            else self.revaluateDisplay();
+            return false;
+        });
+        this.addDisplayCondition(condition::get);
+        return this;
+    }
+
 
     public final Property<T> addDisplayCondition(@NotNull BooleanSupplier... conditions) {
         return addDisplayCondition(Arrays.asList(conditions));
@@ -101,14 +120,17 @@ public abstract class Property<T> extends Node implements Serializable {
     }
 
     public void revaluateDisplay() {
-        display = true;
-        if (conditions == null) return;
-        for (BooleanSupplier s : conditions) {
-            if (!s.getAsBoolean()) {
-                display = false;
-                break;
+        if (conditions != null) {
+            for (BooleanSupplier s : conditions) {
+                if (!s.getAsBoolean()) {
+                    if (display && displayCallback != null) displayCallback.accept(false);
+                    display = false;
+                    return;
+                }
             }
         }
+        if (displayCallback != null) displayCallback.accept(true);
+        display = true;
     }
 
     /**
@@ -132,23 +154,10 @@ public abstract class Property<T> extends Node implements Serializable {
      * Add a callback to this property, which is called when the value changes.
      *
      * @param callback the callback to add. The new value is passed to the callback. Return true if you wish to cancel the setting of the property.
-     * @see #removeCallback(Consumer)
+     * @see #removeCallback(Predicate)
      */
     @kotlin.OverloadResolutionByLambdaReturnType
     public final Property<T> addCallback(@NotNull Predicate<@Nullable T> callback) {
-        if (predicates == null) predicates = new ArrayList<>(2);
-        predicates.add(callback);
-        return this;
-    }
-
-    /**
-     * Add a callback to this property, which is called when the value changes.
-     *
-     * @param callback the callback to add. The new value is passed to the callback.
-     * @see #removeCallback(Consumer)
-     */
-    @kotlin.OverloadResolutionByLambdaReturnType
-    public final Property<T> addCallback(@NotNull Consumer<@Nullable T> callback) {
         if (callbacks == null) callbacks = new ArrayList<>(2);
         callbacks.add(callback);
         return this;
@@ -157,24 +166,11 @@ public abstract class Property<T> extends Node implements Serializable {
     @SafeVarargs
     @kotlin.OverloadResolutionByLambdaReturnType
     public final Property<T> addCallback(@NotNull Predicate<@Nullable T>... callbacks) {
-        return addCancellableCallbacks(Arrays.asList(callbacks));
-    }
-
-    @SafeVarargs
-    @kotlin.OverloadResolutionByLambdaReturnType
-    public final Property<T> addCallback(@NotNull Consumer<@Nullable T>... callbacks) {
         return addCallback(Arrays.asList(callbacks));
     }
 
     @kotlin.OverloadResolutionByLambdaReturnType
-    public final Property<T> addCancellableCallbacks(@NotNull Collection<Predicate<@Nullable T>> callbacks) {
-        if (this.predicates == null) this.predicates = new ArrayList<>(callbacks);
-        else this.predicates.addAll(callbacks);
-        return this;
-    }
-
-    @kotlin.OverloadResolutionByLambdaReturnType
-    public final Property<T> addCallback(@NotNull Collection<Consumer<@Nullable T>> callbacks) {
+    public final Property<T> addCallback(@NotNull Collection<Predicate<@Nullable T>> callbacks) {
         if (this.callbacks == null) this.callbacks = new ArrayList<>(callbacks);
         else this.callbacks.addAll(callbacks);
         return this;
@@ -195,17 +191,9 @@ public abstract class Property<T> extends Node implements Serializable {
     /**
      * Remove a callback.
      */
-    public final void removeCallback(@NotNull Consumer<@Nullable T> callback) {
+    public final void removeCallback(@NotNull Predicate<@Nullable T> callback) {
         if (callbacks == null) return;
         callbacks.remove(callback);
-    }
-
-    /**
-     * Remove a callback.
-     */
-    public final void removeCallback(@NotNull Predicate<@Nullable T> callback) {
-        if (predicates == null) return;
-        predicates.remove(callback);
     }
 
     /**
@@ -232,8 +220,8 @@ public abstract class Property<T> extends Node implements Serializable {
      * Use this method with caution.
      */
     public void setReferential(@Nullable T value) {
-        if (predicates != null) {
-            for (Predicate<T> p : predicates) {
+        if (callbacks != null) {
+            for (Predicate<T> p : callbacks) {
                 try {
                     if (p.test(value)) {
                         LOGGER.info("property {} set cancelled by {}", this.getID(), p);
@@ -245,15 +233,6 @@ public abstract class Property<T> extends Node implements Serializable {
             }
         }
         set0(value);
-        if (callbacks != null) {
-            for (Consumer<T> c : callbacks) {
-                try {
-                    c.accept(value);
-                } catch (Throwable t) {
-                    LOGGER.error("failed to call callback {} on property {}", c, this.getID(), t);
-                }
-            }
-        }
     }
 
     protected abstract void set0(@Nullable T value);
