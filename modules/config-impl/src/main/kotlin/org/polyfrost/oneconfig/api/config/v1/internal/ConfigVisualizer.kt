@@ -34,7 +34,8 @@ import org.polyfrost.oneconfig.api.config.v1.Visualizer
 import org.polyfrost.polyui.animate.Animations
 import org.polyfrost.polyui.color.PolyColor
 import org.polyfrost.polyui.color.rgba
-import org.polyfrost.polyui.component.*
+import org.polyfrost.polyui.component.Component
+import org.polyfrost.polyui.component.Drawable
 import org.polyfrost.polyui.component.extensions.*
 import org.polyfrost.polyui.component.impl.*
 import org.polyfrost.polyui.data.PolyImage
@@ -46,7 +47,10 @@ import org.polyfrost.polyui.unit.Align
 import org.polyfrost.polyui.unit.Vec2
 import org.polyfrost.polyui.unit.by
 import org.polyfrost.polyui.unit.seconds
-import org.polyfrost.polyui.utils.*
+import org.polyfrost.polyui.utils.fastEach
+import org.polyfrost.polyui.utils.image
+import org.polyfrost.polyui.utils.levenshteinDistance
+import org.polyfrost.polyui.utils.mapToArray
 import kotlin.math.PI
 
 open class ConfigVisualizer {
@@ -276,11 +280,38 @@ open class ConfigVisualizer {
     }
 
     private fun Drawable.addHideHandler(prop: Property<*>): Drawable {
+        this.on(Event.Lifetime.Disabled) {
+            this.alpha = 0.8f
+        }
+        this.on(Event.Lifetime.Enabled) {
+            this.alpha = 1f
+        }
+        var hidden = false
         prop.onDisplayChange { s ->
-            this.isEnabled = s
-            if (prop.getMetadata<Boolean?>("hideOnDisplayFailure") == true) {
-                // todo
+            if (s == Property.Display.HIDDEN) {
+                hidden = true
+                if (!initialized) {
+                    this.afterParentInit {
+                        layoutIgnored = true
+                        x = -100f
+                        y = -100f
+                        parent.position()
+                        renders = false
+                    }
+                } else {
+                    layoutIgnored = true
+                    x = -100f
+                    y = -100f
+                    parent.position()
+                    renders = false
+                }
+            } else if (hidden) {
+                hidden = false
+                layoutIgnored = false
+                parent.position()
+                renders = true
             }
+            this.isEnabled = s == Property.Display.SHOWN
         }
         return this
     }

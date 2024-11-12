@@ -34,7 +34,6 @@ import org.polyfrost.oneconfig.utils.v1.WrappingUtils;
 import java.io.Serializable;
 import java.lang.ref.WeakReference;
 import java.util.*;
-import java.util.function.BooleanSupplier;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
@@ -55,9 +54,9 @@ public abstract class Property<T> extends Node implements Serializable {
     @NotNull
     public transient final Class<?> type;
     protected transient List<@NotNull Predicate<@Nullable T>> callbacks = null;
-    private transient Consumer<Boolean> displayCallback = null;
-    private transient boolean display = true;
-    private transient List<BooleanSupplier> conditions = null;
+    private transient Consumer<Display> displayCallback = null;
+    private transient Display display = Display.SHOWN;
+    private transient List<Supplier<Display>> conditions = null;
 
     protected Property(@Nullable String id, @Nullable String title, @Nullable String description, @NotNull Class<T> type) {
         super(id, title, description);
@@ -72,27 +71,28 @@ public abstract class Property<T> extends Node implements Serializable {
     /**
      * This is used by the frontend to know if this property is able to be displayed, which is controlled by {@link #conditions}.
      *
-     * @see #addDisplayCondition(BooleanSupplier)
+     * @see #addDisplayCondition(Supplier)
      */
     public final boolean canDisplay() {
-        return display;
+        return display == Display.SHOWN;
     }
 
-    public void onDisplayChange(Consumer<Boolean> callback) {
+    public void onDisplayChange(Consumer<Display> callback) {
         this.displayCallback = callback;
+        if (callback != null && display != Display.SHOWN) callback.accept(display);
     }
 
     /**
      * Add a display condition to this property.
      */
-    public final Property<T> addDisplayCondition(@NotNull BooleanSupplier condition) {
+    public final Property<T> addDisplayCondition(@NotNull Supplier<Display> condition) {
         if (conditions == null) conditions = new ArrayList<>(3);
         conditions.add(condition);
         revaluateDisplay();
         return this;
     }
 
-    public final Property<T> addDisplayCondition(@NotNull Property<Boolean> condition) {
+    public final Property<T> addDisplayCondition(@NotNull Property<Boolean> condition, boolean hides) {
         // asm: weak ref to avoid a potential memory leak if we are discarded for any reason
         WeakReference<Property<T>> ref = new WeakReference<>(this);
         condition.addCallback(t -> {
@@ -101,16 +101,21 @@ public abstract class Property<T> extends Node implements Serializable {
             else self.revaluateDisplay();
             return false;
         });
-        this.addDisplayCondition(condition::get);
+        if (hides) {
+            this.addDisplayCondition(() -> Boolean.FALSE.equals(condition.get()) ? Display.HIDDEN : Display.SHOWN);
+        } else {
+            this.addDisplayCondition(() -> Boolean.FALSE.equals(condition.get()) ? Display.DISABLED : Display.SHOWN);
+        }
         return this;
     }
 
 
-    public final Property<T> addDisplayCondition(@NotNull BooleanSupplier... conditions) {
+    @SafeVarargs
+    public final Property<T> addDisplayCondition(@NotNull Supplier<Display>... conditions) {
         return addDisplayCondition(Arrays.asList(conditions));
     }
 
-    public final Property<T> addDisplayCondition(@NotNull Collection<BooleanSupplier> conditions) {
+    public final Property<T> addDisplayCondition(@NotNull Collection<Supplier<Display>> conditions) {
         if (this.conditions == null) this.conditions = new ArrayList<>(conditions);
         else {
             this.conditions.addAll(conditions);
@@ -120,26 +125,23 @@ public abstract class Property<T> extends Node implements Serializable {
     }
 
     public void revaluateDisplay() {
+        Display d = Display.SHOWN;
         if (conditions != null) {
-            for (BooleanSupplier s : conditions) {
-                if (!s.getAsBoolean()) {
-                    if (display && displayCallback != null) displayCallback.accept(false);
-                    display = false;
-                    return;
+            for (Supplier<Display> s : conditions) {
+                Display out = s.get();
+                if (out == Display.HIDDEN) {
+                    d = Display.HIDDEN;
+                    break;
+                }
+                if (out == Display.DISABLED) {
+                    d = Display.DISABLED;
                 }
             }
         }
-        if (displayCallback != null) displayCallback.accept(true);
-        display = true;
-    }
-
-    /**
-     * Remove a display condition from this property.
-     */
-    public final void removeDisplayCondition(@NotNull BooleanSupplier condition) {
-        if (conditions == null) return;
-        conditions.remove(condition);
-        revaluateDisplay();
+        if (d != display) {
+            if (displayCallback != null) displayCallback.accept(d);
+            display = d;
+        }
     }
 
     /**
@@ -147,14 +149,13 @@ public abstract class Property<T> extends Node implements Serializable {
      */
     protected final void clearDisplayConditions() {
         conditions = null;
-        display = true;
+        display = Display.SHOWN;
     }
 
     /**
      * Add a callback to this property, which is called when the value changes.
      *
      * @param callback the callback to add. The new value is passed to the callback. Return true if you wish to cancel the setting of the property.
-     * @see #removeCallback(Predicate)
      */
     @kotlin.OverloadResolutionByLambdaReturnType
     public final Property<T> addCallback(@NotNull Predicate<@Nullable T> callback) {
@@ -186,14 +187,6 @@ public abstract class Property<T> extends Node implements Serializable {
         this.setAs(that.get());
         if (that.conditions != null) this.addDisplayCondition(that.conditions);
         if (that.callbacks != null) addCallback((Collection) that.callbacks);
-    }
-
-    /**
-     * Remove a callback.
-     */
-    public final void removeCallback(@NotNull Predicate<@Nullable T> callback) {
-        if (callbacks == null) return;
-        callbacks.remove(callback);
     }
 
     /**
@@ -312,6 +305,12 @@ public abstract class Property<T> extends Node implements Serializable {
      */
     public final boolean isArray() {
         return type.isArray();
+    }
+
+    public enum Display {
+        SHOWN,
+        DISABLED,
+        HIDDEN
     }
 
 

@@ -72,13 +72,13 @@ public class TestConfig_Test extends Config {
     public static boolean scow = false;
     @Switch(title = "Cow", description = "Something that is way too long and is going to be trimmed (I hope) because that is what its meant to do")
     public static boolean cgow = false;
-    @Switch(title = "Cow", description = "Something that is way too long and is going to be trimmed (I hope) because that is what its meant to do")
+    @Switch(title = "Cow 2", description = "Something that is way too long and is going to be trimmed (I hope) because that is what its meant to do")
     public static boolean c2ow = false;
-    @Switch(title = "Cow", description = "Something that is way too long and is going to be trimmed (I hope) because that is what its meant to do")
+    @Switch(title = "Cow 3", description = "Something that is way too long and is going to be trimmed (I hope) because that is what its meant to do")
     public static boolean c3ow = false;
-    @Switch(title = "Cow", description = "Something that is way too long and is going to be trimmed (I hope) because that is what its meant to do")
+    @Switch(title = "Cow 4", description = "Something that is way too long and is going to be trimmed (I hope) because that is what its meant to do")
     public static boolean c4ow = false;
-    @Switch(title = "Cow", description = "Something that is way too long and is going to be trimmed (I hope) because that is what its meant to do")
+    @Switch(title = "Cow 5", description = "Something that is way too long and is going to be trimmed (I hope) because that is what its meant to do")
     public static boolean c5ow = false;
     @RadioButton(title = "radio", description = "send help")
     public static Align.Main radio = Align.Main.Center;
@@ -89,6 +89,8 @@ public class TestConfig_Test extends Config {
 
     public TestConfig_Test() {
         super("test_mod.json", "Test Mod", Category.QOL);
+        addDependency("c3ow", "c2ow");
+        hideIf("c5ow", "c4ow");
     }
 
     @Button(title = "Test")

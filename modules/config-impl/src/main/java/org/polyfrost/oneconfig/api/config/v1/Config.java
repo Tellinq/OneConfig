@@ -34,8 +34,8 @@ import org.polyfrost.oneconfig.api.config.v1.annotations.Include;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.function.BooleanSupplier;
 import java.util.function.Predicate;
+import java.util.function.Supplier;
 
 public abstract class Config {
     protected Tree tree;
@@ -66,13 +66,17 @@ public abstract class Config {
         return ConfigManager.collect(this, id);
     }
 
-    protected void addDependency(String option, BooleanSupplier condition) {
-        getProperty(option).addDisplayCondition(condition);
-    }
-
-    protected void addDependency(String option, String name, BooleanSupplier condition) {
+    protected void addDependency(String option, String name, Supplier<Property.Display> condition) {
         Property<?> opt = getProperty(option).addDisplayCondition(condition);
         if (name != null) opt.getOrPutMetadata("dependencyNames", () -> new ArrayList<String>(3)).add(name);
+    }
+
+    protected void addDependency(String option, String condition) {
+        addDependency(option, condition, false);
+    }
+
+    protected void hideIf(String option, String condition) {
+        addDependency(option, condition, true);
     }
 
     /**
@@ -82,10 +86,10 @@ public abstract class Config {
      * @param condition the <b>boolean option</b> which provides the dependency
      */
     @SuppressWarnings("unchecked")
-    protected void addDependency(String option, String condition) {
+    protected void addDependency(String option, String condition, boolean hide) {
         Property<?> cond = getProperty(condition);
         if (cond.type != boolean.class) throw new IllegalArgumentException("Condition property must be boolean");
-        Property<?> opt = getProperty(option).addDisplayCondition((Property<Boolean>) cond);
+        Property<?> opt = getProperty(option).addDisplayCondition((Property<Boolean>) cond, hide);
         opt.getOrPutMetadata("dependencyNames", () -> new ArrayList<String>(3)).add(cond.getTitle());
     }
 
