@@ -104,12 +104,6 @@ public abstract class Config {
         ((Property<T>) getProperty(option)).addCallback(callback);
     }
 
-
-    protected void hideWhenShouldNotDisplay(String option) {
-        getProperty(option).addMetadata("hideOnDisplayFailure", true);
-    }
-
-
     /**
      * Add a callback to the specified option path, which is dot-separated for sub-configs.
      * <br>

@@ -111,7 +111,7 @@ object KeybindManager {
 
     @JvmStatic
     fun translateKey(inputManager: InputManager, key: Int, character: Char, state: Boolean) {
-        if (character != '\u0000') {
+        if (character != '\u0000' && (character.isLetterOrDigit() || character.isWhitespace())) {
             inputManager.keyTyped(character)
         }
 
@@ -125,8 +125,7 @@ object KeybindManager {
             // modern fix because glfwModCharCallback doesn't work correctly
             if (inputManager.mods > 1 && key < 255) {
                 inputManager.keyTyped((key + 32).toChar())
-            }
-            inputManager.keyDown(key)
+            } else inputManager.keyDown(key)
         } else {
             keysMap[key]?.let { inputManager.keyUp(it); return }
             val m = modsMap[key]

@@ -100,6 +100,9 @@ public class TestConfig_Test extends Config {
 
     @Accordion(title = "an accordion", description = "AAAAAAAAAAAAAAAAAAAAAAAAAAH", index = 4)
     public static class AinnerAAAA {
+        @Include
+        public static boolean enabled = true;
+
         @Text(title = "Text")
         public static String text = "Hello world!";
 

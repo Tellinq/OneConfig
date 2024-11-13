@@ -57,9 +57,9 @@ public abstract class org/polyfrost/oneconfig/api/config/v1/Property : org/polyf
 	public final fun addCallback (Ljava/util/function/Predicate;)Lorg/polyfrost/oneconfig/api/config/v1/Property;
 	public final fun addCallback ([Ljava/util/function/Predicate;)Lorg/polyfrost/oneconfig/api/config/v1/Property;
 	public final fun addDisplayCondition (Ljava/util/Collection;)Lorg/polyfrost/oneconfig/api/config/v1/Property;
-	public final fun addDisplayCondition (Ljava/util/function/BooleanSupplier;)Lorg/polyfrost/oneconfig/api/config/v1/Property;
-	public final fun addDisplayCondition (Lorg/polyfrost/oneconfig/api/config/v1/Property;)Lorg/polyfrost/oneconfig/api/config/v1/Property;
-	public final fun addDisplayCondition ([Ljava/util/function/BooleanSupplier;)Lorg/polyfrost/oneconfig/api/config/v1/Property;
+	public final fun addDisplayCondition (Ljava/util/function/Supplier;)Lorg/polyfrost/oneconfig/api/config/v1/Property;
+	public final fun addDisplayCondition (Lorg/polyfrost/oneconfig/api/config/v1/Property;Z)Lorg/polyfrost/oneconfig/api/config/v1/Property;
+	public final fun addDisplayCondition ([Ljava/util/function/Supplier;)Lorg/polyfrost/oneconfig/api/config/v1/Property;
 	public final fun canDisplay ()Z
 	protected final fun clearCallbacks ()V
 	protected final fun clearDisplayConditions ()V
@@ -72,8 +72,6 @@ public abstract class org/polyfrost/oneconfig/api/config/v1/Property : org/polyf
 	public fun onDisplayChange (Ljava/util/function/Consumer;)V
 	public fun overwrite (Lorg/polyfrost/oneconfig/api/config/v1/Node;)V
 	public static fun recast (Lorg/polyfrost/oneconfig/api/config/v1/Property;)Lorg/polyfrost/oneconfig/api/config/v1/Property;
-	public final fun removeCallback (Ljava/util/function/Predicate;)V
-	public final fun removeDisplayCondition (Ljava/util/function/BooleanSupplier;)V
 	public fun revaluateDisplay ()V
 	public final fun set (Ljava/lang/Object;)V
 	protected abstract fun set0 (Ljava/lang/Object;)V
@@ -81,6 +79,14 @@ public abstract class org/polyfrost/oneconfig/api/config/v1/Property : org/polyf
 	public final fun setAsReferential (Ljava/lang/Object;)V
 	public fun setReferential (Ljava/lang/Object;)V
 	public final fun toString ()Ljava/lang/String;
+}
+
+public final class org/polyfrost/oneconfig/api/config/v1/Property$Display : java/lang/Enum {
+	public static final field DISABLED Lorg/polyfrost/oneconfig/api/config/v1/Property$Display;
+	public static final field HIDDEN Lorg/polyfrost/oneconfig/api/config/v1/Property$Display;
+	public static final field SHOWN Lorg/polyfrost/oneconfig/api/config/v1/Property$Display;
+	public static fun valueOf (Ljava/lang/String;)Lorg/polyfrost/oneconfig/api/config/v1/Property$Display;
+	public static fun values ()[Lorg/polyfrost/oneconfig/api/config/v1/Property$Display;
 }
 
 public final class org/polyfrost/oneconfig/api/config/v1/Property$KtProperty : org/polyfrost/oneconfig/api/config/v1/Property {

@@ -260,6 +260,6 @@ public class PolyUIScreen extends UScreen implements BlurScreen {
     private void death(Exception e) {
         Platform.screen().close();
         LOGGER.error("Unexpected error", e);
-        Notifications.enqueue(Notifications.Type.Error, "An unexpected error occurred with this screen.\nPlease report this to the developer!", 5_000_000_000L);
+        Notifications.enqueue(Notifications.Type.Error, "An unexpected error occurred with this screen.\nPlease report this to the developer!");
     }
 }

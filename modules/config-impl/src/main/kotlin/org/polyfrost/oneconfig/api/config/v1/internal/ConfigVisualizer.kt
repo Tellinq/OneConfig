@@ -64,7 +64,7 @@ open class ConfigVisualizer {
     protected val stdAccord = Align(main = Align.Main.SpaceBetween, pad = Vec2.ZERO)
     protected val ic2text = Align(pad = Vec2(8f, 0f))
     protected val stdOpt = Align(cross = Align.Cross.Start, mode = Align.Mode.Vertical, pad = Vec2(0f, 8f))
-    protected val accordOpt = Align(cross = Align.Cross.Start, pad = Vec2(24f, 12f))
+    protected val accordOpt = Align(cross = Align.Cross.Start, pad = Vec2(22f, 12f))
 
     /**
      * For information, see [create].
@@ -198,33 +198,59 @@ open class ConfigVisualizer {
                 index.add(node.title to node.description)
                 wrapForAccordion(vis.visualize(node), node.title ?: return@map null, node.description).addHideHandler(node)
             }
+
         var open = false
+        val e: Property<*>? = tree.getProp("enabled")
+        val toWrap: Drawable
+        var enabled: Property<Boolean>? = null
+        // asm: signature as it prevents re-wrapping of function
+        val openInsn: Drawable.(Any?) -> Unit = {
+            open = !open
+            val arrow = if (enabled != null) this[1][1] else this[1]
+            Rotate(arrow, if (!open) PI else 0.0, false, Animations.Default.create(0.2.seconds)).add()
+            val value = parent[1].height
+            val anim = Animations.Default.create(0.4.seconds)
+            val operation = Resize(parent, width = 0f, height = if (open) -value else value, add = true, anim)
+            addOperation(
+                object : ComponentOp.Animatable<Component>(parent, anim, onFinish = {
+                    this[1].renders = !open
+                    this[1].isEnabled = !open
+                }) {
+                    override fun apply(value: Float) {
+                        operation.apply()
+                        // asm: instruct parent (options list) to replace all its children so that they move with it closing
+                        self.parent.position()
+                        // asm: instruct all children of this accordion to update their visibility based on THIS, NOT its parent
+                        self[1].children!!.fastEach { option ->
+                            option.renders = option.intersects(self.x, self.y, self.width, self.height)
+                        }
+                    }
+                },
+            )
+        }
+
+        if (e != null && e.type == Boolean::class.java && e.getVisualizer() == null) {
+            toWrap = Group(
+                Switch(
+                    lateralStretch = 2f,
+                    size = 21f,
+                    state = e.getAs()
+                ).onToggle {
+                    e.setAs(it)
+                    if (open != !it) (parent.parent as Drawable).openInsn(null)
+                },
+                Image("polyui/chevron-down.svg").also { it.rotation = PI }
+            )
+            enabled = e as Property<Boolean>
+        } else {
+            toWrap = Image("polyui/chevron-down.svg").also { it.rotation = PI }
+        }
         val out = Block(
-            wrap(Image("polyui/chevron-down.svg".image()).also { it.rotation = PI }, title, desc, icon).events {
-                self.color = PolyColor.TRANSPARENT
-                Event.Mouse.Companion.Clicked then {
-                    open = !open
-                    Rotate(this[1], if (!open) PI else 0.0, false, Animations.Default.create(0.2.seconds)).add()
-                    val value = parent[1].height
-                    val anim = Animations.Default.create(0.4.seconds)
-                    val operation = Resize(parent, width = 0f, height = if (open) -value else value, add = true, anim)
-                    addOperation(
-                        object : ComponentOp.Animatable<Component>(parent, anim, onFinish = {
-                            this[1].renders = !open
-                            this[1].isEnabled = !open
-                        }) {
-                            override fun apply(value: Float) {
-                                operation.apply()
-                                // asm: instruct parent (options list) to replace all its children so that they move with it closing
-                                self.parent.position()
-                                // asm: instruct all children of this accordion to update their visibility based on THIS, NOT its parent
-                                self[1].children!!.fastEach {
-                                    it.renders = it.intersects(self.x, self.y, self.width, self.height)
-                                }
-                            }
-                        },
-                    )
-                    true
+            wrap(toWrap, title, desc, icon).also {
+                it.color = PolyColor.TRANSPARENT
+                it.onClick {
+                    if(enabled != null && !enabled.getAs<Boolean>()) return@onClick
+                    this.openInsn(null)
                 }
             },
             Group(
@@ -291,7 +317,7 @@ open class ConfigVisualizer {
             if (s == Property.Display.HIDDEN) {
                 hidden = true
                 if (!initialized) {
-                    this.afterParentInit {
+                    this.afterParentInit(Int.MAX_VALUE) {
                         layoutIgnored = true
                         x = -100f
                         y = -100f
