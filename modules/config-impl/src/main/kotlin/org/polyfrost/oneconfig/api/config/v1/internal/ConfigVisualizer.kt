@@ -319,15 +319,15 @@ open class ConfigVisualizer {
                 if (!initialized) {
                     this.afterParentInit(Int.MAX_VALUE) {
                         layoutIgnored = true
-                        x = -100f
-                        y = -100f
+                        x = 1000000f
+                        y = 1000000f
                         parent.position()
                         renders = false
                     }
                 } else {
                     layoutIgnored = true
-                    x = -100f
-                    y = -100f
+                    x = 1000000f
+                    y = 1000000f
                     parent.position()
                     renders = false
                 }

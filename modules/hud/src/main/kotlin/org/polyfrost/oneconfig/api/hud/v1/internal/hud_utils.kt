@@ -40,6 +40,7 @@ import org.polyfrost.polyui.event.Event
 import org.polyfrost.polyui.unit.Point
 import org.polyfrost.polyui.unit.by
 import org.polyfrost.polyui.utils.fastEach
+import kotlin.math.sqrt
 
 private val LOGGER = LogManager.getLogger("OneConfig/HUD")
 
@@ -53,18 +54,21 @@ private val scaleBlob by lazy {
     ).radius(10f).draggable().onDragStart {
         sx = polyUI.mouseX
         sy = polyUI.mouseY
-        st = scaleX
-    }.onDragEnd {
+        st = cur?.scaleX ?: 1f
+    }.onDrag {
         cur?.let {
             val dx = polyUI.mouseX - sx
             val dy = polyUI.mouseY - sy
-            val s = st + (((dx + dy) / (it.width + it.height))).coerceIn(0.5f, 3f)
+            val dst = sqrt(dx * dx + dy * dy)
+            val init = sqrt(it.width * it.width + it.height * it.height)
+            val sign = if(dx + dy < 0f) -1f else 1f
+            val s = (st + sign * (dst / init)).coerceIn(0.5f, 3f)
+
             it.scaleX = s
             it.scaleY = s
             x = it.x + (it.width * s) - (width / 2f)
             y = it.y + (it.height * s) - (height / 2f)
         }
-        true
     }.apply {
 //        addEventHandler(Event.Mouse.Pressed(0)) {
         // if(!polyUI.inputManager.hasFocused) polyUI.focus(this)
@@ -261,6 +265,13 @@ private fun Drawable.trySnapY(ly: Float): Boolean {
  * Method to be used as the `onDrag` handler for HUD elements.
  */
 fun Drawable.snapHandler() {
+    if (cur === this) {
+        val vs = visibleSize
+        scaleBlob.let {
+            it.x = x + vs.x - (it.width / 2f)
+            it.y = y + vs.y - (it.height / 2f)
+        }
+    }
     HudManager.slinex = -1f
     HudManager.sliney = -1f
     if (HudManager.panelOpen) return
@@ -281,7 +292,7 @@ fun Drawable.snapHandler() {
     // expensive!
     polyUI.master.children?.fastEach {
         if (it === this) return@fastEach
-        if (it === HudManager.panel) return@fastEach
+        if (it === HudManager.panel || it === scaleBlob) return@fastEach
         if (!it.renders) return@fastEach
 
         if (!hran) {
