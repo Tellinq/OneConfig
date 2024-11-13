@@ -101,7 +101,10 @@ public abstract class OneConfigV0CompatMixin {
 
                 prop.description = opt.description;
                 prop.addMetadata("visualizer", visualizer);
-                prop.addDisplayCondition(opt::isHidden);
+                prop.addDisplayCondition(() -> {
+                    if (opt.isHidden()) return Property.Display.HIDDEN;
+                    else return Property.Display.SHOWN;
+                });
                 target.put(prop);
             }
             ConfigManager.active().register(t);
