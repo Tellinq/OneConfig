@@ -148,18 +148,7 @@ public class OneConfig
         long t1 = System.nanoTime();
         try {
             // Copycat
-            /// Ensure native is loaded
             Clipboard.getInstance();
-
-            /// Ensure copying works
-            Clipboard clipboard = Clipboard.getInstance();
-            String currentContent = clipboard.getString();
-            clipboard.setString("OneConfig Test");
-            if (!"OneConfig Test".equals(clipboard.getString())) {
-                throw new IllegalStateException("Failed to set clipboard content");
-            }
-
-            clipboard.setString(currentContent); // Reset clipboard
         } catch (Exception e) {
             throw new IllegalStateException("Failed to preload necessary Copycat classes", e);
         }
