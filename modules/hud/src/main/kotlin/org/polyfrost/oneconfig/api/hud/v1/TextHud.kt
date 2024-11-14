@@ -132,7 +132,7 @@ abstract class TextHud(
             if (isReal) {
                 addCallback("template") {
                     _formatter = null
-                    if (update()) get()._parent?.recalculate()
+                    updateAndRecalculate()
                 }
             }
         }

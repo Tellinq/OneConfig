@@ -233,13 +233,15 @@ abstract class Hud<T : Drawable> : Cloneable, Config("null", null, "null", null)
     open fun initialize() {}
 
     /**
-     * shorthand for [adding a callback][addCallback] on the given property that just calls [update].
+     * shorthand for [adding a callback][addCallback] on the given property that just calls [updateAndRecalculate].
      */
     protected fun updateWhenChanged(optionName: String) {
-        if (isReal) addCallback(optionName) {
-            if (update()) get()._parent?.recalculate()
-        }
+        if (isReal) addCallback(optionName, this::updateAndRecalculate)
         else LOGGER.warn("attempted to add callback to {}'s option '{}', but it is not real. no action has been taken.", title(), optionName)
+    }
+
+    protected fun updateAndRecalculate() {
+        if (update()) get()._parent?.recalculate()
     }
 
     /**

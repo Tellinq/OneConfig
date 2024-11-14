@@ -22,6 +22,7 @@ public abstract class org/polyfrost/oneconfig/api/hud/v1/Hud : org/polyfrost/one
 	public final fun setHidden (Z)V
 	public abstract fun title ()Ljava/lang/String;
 	public abstract fun update ()Z
+	protected final fun updateAndRecalculate ()V
 	public fun updateFrequency ()J
 	protected final fun updateWhenChanged (Ljava/lang/String;)V
 }
