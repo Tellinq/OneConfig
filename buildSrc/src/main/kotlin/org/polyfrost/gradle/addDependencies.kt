@@ -16,6 +16,19 @@ fun Project.provideIncludedDependencies(version: Triple<Int, Int, Int>?, loader:
     deps.add(libs.findLibrary("snakeyaml").get().get())
     deps.add(libs.findLibrary("isolated-lwjgl3-loader").get().get())
     deps.add(libs.findLibrary("polyio").get().get())
+    val copycat = libs.findLibrary("copycat").get().get()
+    deps.add(copycat)
+    setOf(
+        "windows" to setOf("x64", "x86"),
+        "linux" to setOf("x64", "x86", "arm", "arm64"),
+        "osx" to setOf("x64", "arm64")
+    ).forEach { (os, arches) ->
+        arches.forEach { arch ->
+            deps.add("${copycat.group}:${copycat.name}-natives-$os-$arch:${copycat.version}")
+        }
+    }
+
+    deps.add(libs.findLibrary("copycat-image-awt").get().get())
     deps.add(libs.findLibrary("polyui").get().get())
     deps.add(libs.findLibrary("hypixel-modapi").get().get())
     deps.add(libs.findLibrary("hypixel-data").get().get())

@@ -26,12 +26,12 @@
 
 package org.polyfrost.oneconfig.api.ui.v1.internal.wrappers;
 
+import dev.deftu.clipboard.Clipboard;
 import net.minecraft.client.Minecraft;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.polyfrost.oneconfig.api.platform.v1.Platform;
-import org.polyfrost.oneconfig.utils.v1.IOUtils;
 import org.polyfrost.polyui.PolyUI;
 import org.polyfrost.polyui.renderer.Window;
 import org.polyfrost.polyui.data.Cursor;
@@ -73,20 +73,12 @@ public class MCWindow extends Window {
     @Nullable
     @Override
     public String getClipboard() {
-        //#if MC>=11300
-        //$$ return glfwGetClipboardString(handle);
-        //#else
-        return IOUtils.getStringFromClipboard();
-        //#endif
+        return Clipboard.getInstance().getString();
     }
 
     @Override
     public void setClipboard(@Nullable String s) {
-        //#if MC>=11300
-        //$$ glfwSetClipboardString(handle, s);
-        //#else
-        IOUtils.copyStringToClipboard(s);
-        //#endif
+        Clipboard.getInstance().setString(s);
     }
 
     @Override

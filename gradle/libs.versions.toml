@@ -16,6 +16,8 @@ snakeyaml = "1.31"
 nightconfig = "3.6.6"
 isolated-lwjgl3-loader = "0.1.1"
 polyio = "0.1.0"
+copycat = "0.1.1"
+copycat-image-awt = "0.1.1"
 
 # Per version
 universalcraft = "299"
@@ -45,6 +47,8 @@ mixin = { module = "org.polyfrost:polymixin", version.ref = "mixin" }
 
 isolated-lwjgl3-loader = { module = "org.polyfrost:isolated-lwjgl3-loader", version.ref = "isolated-lwjgl3-loader" }
 polyio = { module = "org.polyfrost:polyio", version.ref = "polyio" }
+copycat = { module = "dev.deftu:copycat", version.ref = "copycat" }
+copycat-image-awt = { module = "dev.deftu:copycat-image-awt", version.ref = "copycat-image-awt" }
 
 hypixel-modapi = { module = "net.hypixel:mod-api", version.ref = "hypixel-modapi" }
 hypixel-data = { module = "net.hypixel:hypixel-data", version.ref = "hypixel-data" }
