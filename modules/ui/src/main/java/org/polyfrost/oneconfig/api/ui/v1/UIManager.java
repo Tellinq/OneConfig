@@ -100,6 +100,7 @@ public interface UIManager {
         p.resize(Platform.screen().windowWidth(), Platform.screen().windowHeight(), false);
         EventManager.register(HudRenderEvent.class, ev -> {
             ev.matrices.push();
+            Platform.screen().setSmuggledMatrixStack(ev.matrices);
             p.render();
             ev.matrices.pop();
         });

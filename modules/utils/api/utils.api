@@ -2,14 +2,14 @@ public abstract interface annotation class org/polyfrost/oneconfig/api/ClassHasO
 	public abstract fun value ()[Ljava/lang/String;
 }
 
-public final class org/polyfrost/oneconfig/api/hypixel/v0/HypixelUtils {
-	public static fun getLocation ()Lorg/polyfrost/oneconfig/api/hypixel/v0/HypixelUtils$Location;
-	public static fun getPartyInfo ()Lorg/polyfrost/oneconfig/api/hypixel/v0/HypixelUtils$PartyInfo;
-	public static fun getPlayerInfo ()Lorg/polyfrost/oneconfig/api/hypixel/v0/HypixelUtils$PlayerInfo;
+public final class org/polyfrost/oneconfig/api/hypixel/v1/HypixelUtils {
+	public static fun getLocation ()Lorg/polyfrost/oneconfig/api/hypixel/v1/HypixelUtils$Location;
+	public static fun getPartyInfo ()Lorg/polyfrost/oneconfig/api/hypixel/v1/HypixelUtils$PartyInfo;
+	public static fun getPlayerInfo ()Lorg/polyfrost/oneconfig/api/hypixel/v1/HypixelUtils$PlayerInfo;
 	public static fun isHypixel ()Z
 }
 
-public final class org/polyfrost/oneconfig/api/hypixel/v0/HypixelUtils$Location {
+public final class org/polyfrost/oneconfig/api/hypixel/v1/HypixelUtils$Location {
 	public fun getGameType ()Ljava/util/Optional;
 	public fun getLastGameType ()Ljava/util/Optional;
 	public fun getLastLobbyName ()Ljava/util/Optional;
@@ -29,7 +29,7 @@ public final class org/polyfrost/oneconfig/api/hypixel/v0/HypixelUtils$Location 
 	public fun wasInLobby ()Z
 }
 
-public final class org/polyfrost/oneconfig/api/hypixel/v0/HypixelUtils$PartyInfo {
+public final class org/polyfrost/oneconfig/api/hypixel/v1/HypixelUtils$PartyInfo {
 	public fun <init> ()V
 	public fun getMembers ()Ljava/util/Map;
 	public fun getPartySize ()I
@@ -37,7 +37,7 @@ public final class org/polyfrost/oneconfig/api/hypixel/v0/HypixelUtils$PartyInfo
 	public fun update ()V
 }
 
-public final class org/polyfrost/oneconfig/api/hypixel/v0/HypixelUtils$PlayerInfo {
+public final class org/polyfrost/oneconfig/api/hypixel/v1/HypixelUtils$PlayerInfo {
 	public fun <init> ()V
 	public fun getMonthlyPackageRank ()Ljava/util/Optional;
 	public fun getPackageRank ()Ljava/util/Optional;
@@ -112,10 +112,12 @@ public abstract interface class org/polyfrost/oneconfig/api/platform/v1/ScreenPl
 	public abstract fun current ()Ljava/lang/Object;
 	public fun display (Ljava/lang/Object;)V
 	public abstract fun display (Ljava/lang/Object;I)V
+	public abstract fun getSmuggledMatrixStack ()Lorg/polyfrost/universal/UMatrixStack;
 	public abstract fun isInChat ()Z
 	public abstract fun isInDebug ()Z
 	public fun pixelRatio ()F
 	public abstract fun playClickSound ()V
+	public abstract fun setSmuggledMatrixStack (Lorg/polyfrost/universal/UMatrixStack;)V
 	public abstract fun viewportHeight ()I
 	public abstract fun viewportWidth ()I
 	public abstract fun windowHeight ()I

@@ -47,16 +47,20 @@ abstract class TextHud(
     @TextAnnotation(title = "Text Suffix")
     var suffix: String = ""
 ) : Hud<Text>() {
-    private val sb = StringBuilder()
+    /**
+     * [StringBuilder] instance that is used for constructing the HUD text.
+     */
+    @get:JvmName("getStringBuilder")
+    protected val sb = StringBuilder()
     override fun create() = Text("".translated().dont(), fontSize = 16f)
 
     override fun update(): Boolean {
-        val t = getText()
+        sb.clear()
         if (prefix.isNotEmpty()) sb.append(prefix).append(' ')
-        sb.append(t)
+        val t = getText()
+        if (t != null) sb.append(t)
         if (suffix.isNotEmpty()) sb.append(' ').append(suffix)
         get().text = sb.toString()
-        sb.clear()
         return true
     }
 
@@ -71,8 +75,10 @@ abstract class TextHud(
     /**
      * get the text to be shown on this HUD.
      * **do not call this method yourself.**
+     *
+     * **hot tip:** use [sb] directly for better performance.
      */
-    protected abstract fun getText(): String
+    protected abstract fun getText(): String?
 
 
     /**
@@ -126,7 +132,7 @@ abstract class TextHud(
             if (isReal) {
                 addCallback("template") {
                     _formatter = null
-                    if(update()) get()._parent?.recalculate()
+                    if (update()) get()._parent?.recalculate()
                 }
             }
         }

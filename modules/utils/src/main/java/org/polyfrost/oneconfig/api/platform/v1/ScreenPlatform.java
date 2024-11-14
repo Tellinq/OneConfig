@@ -26,7 +26,9 @@
 
 package org.polyfrost.oneconfig.api.platform.v1;
 
+import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Nullable;
+import org.polyfrost.universal.UMatrixStack;
 
 public interface ScreenPlatform {
     boolean isInChat();
@@ -42,6 +44,21 @@ public interface ScreenPlatform {
     int windowWidth();
 
     int windowHeight();
+
+    /**
+     * <b>Do NOT call this method yourself. it is used for legacy HUD only.</b>
+     */
+    @ApiStatus.Internal
+    @ApiStatus.Obsolete
+    void setSmuggledMatrixStack(UMatrixStack stack);
+
+    /**
+     * Return a special smuggled UMatrixStack that represents the current stack of the screen at the time of calling.
+     * <b>Do NOT call this method yourself. it is used for legacy HUD only.</b>
+     */
+    @ApiStatus.Internal
+    @ApiStatus.Obsolete
+    UMatrixStack getSmuggledMatrixStack();
 
     default float pixelRatio() {
         return (float) viewportWidth() / windowWidth();

@@ -34,7 +34,7 @@ import org.polyfrost.oneconfig.api.commands.v1.factories.builder.CommandBuilder;
 import org.polyfrost.oneconfig.api.event.v1.EventManager;
 import org.polyfrost.oneconfig.api.event.v1.events.InitializationEvent;
 import org.polyfrost.oneconfig.api.hud.v1.HudManager;
-import org.polyfrost.oneconfig.api.hypixel.v0.HypixelUtils;
+import org.polyfrost.oneconfig.api.hypixel.v1.HypixelUtils;
 import org.polyfrost.oneconfig.api.platform.v1.Platform;
 import org.polyfrost.oneconfig.api.ui.v1.internal.BlurHandler;
 import org.polyfrost.oneconfig.api.ui.v1.keybind.OCKeybindHelper;

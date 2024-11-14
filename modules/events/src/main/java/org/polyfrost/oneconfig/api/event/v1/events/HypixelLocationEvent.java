@@ -27,7 +27,7 @@
 package org.polyfrost.oneconfig.api.event.v1.events;
 
 import org.jetbrains.annotations.ApiStatus;
-import org.polyfrost.oneconfig.api.hypixel.v0.HypixelUtils;
+import org.polyfrost.oneconfig.api.hypixel.v1.HypixelUtils;
 
 /**
  * Event that is fired when the player's location is changed.

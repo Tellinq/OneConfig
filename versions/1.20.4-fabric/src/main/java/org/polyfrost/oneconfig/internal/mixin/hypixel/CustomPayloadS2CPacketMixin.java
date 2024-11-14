@@ -31,7 +31,7 @@ import net.minecraft.network.PacketByteBuf;
 import net.minecraft.network.packet.CustomPayload;
 import net.minecraft.network.packet.s2c.common.CustomPayloadS2CPacket;
 import net.minecraft.util.Identifier;
-import org.polyfrost.oneconfig.api.hypixel.v0.internal.HypixelApiInternalsImpl;
+import org.polyfrost.oneconfig.api.hypixel.v1.internal.HypixelApiInternalsImpl;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;

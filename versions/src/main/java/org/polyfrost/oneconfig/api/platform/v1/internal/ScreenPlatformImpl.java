@@ -33,6 +33,7 @@ import org.jetbrains.annotations.Nullable;
 import org.polyfrost.oneconfig.api.event.v1.EventDelay;
 import org.polyfrost.oneconfig.api.platform.v1.Platform;
 import org.polyfrost.oneconfig.api.platform.v1.ScreenPlatform;
+import org.polyfrost.universal.UMatrixStack;
 
 public class ScreenPlatformImpl implements ScreenPlatform {
     //#if MC<11300
@@ -46,6 +47,7 @@ public class ScreenPlatformImpl implements ScreenPlatform {
     //#else
     //$$ private static final net.minecraft.client.gui.widget.button.Button btn = new net.minecraft.client.gui.widget.button.Button(-1, -1, -1, -1, null, (b) -> {});
     //#endif
+    private UMatrixStack smuggled = new UMatrixStack();
 
     @Override
     public boolean isInChat() {
@@ -105,6 +107,17 @@ public class ScreenPlatformImpl implements ScreenPlatform {
         //#else
         return Minecraft.getMinecraft().displayHeight;
         //#endif
+    }
+
+    @Override
+    public void setSmuggledMatrixStack(UMatrixStack stack) {
+        if (stack == null) return;
+        this.smuggled = stack;
+    }
+
+    @Override
+    public UMatrixStack getSmuggledMatrixStack() {
+        return smuggled;
     }
 
     @Override

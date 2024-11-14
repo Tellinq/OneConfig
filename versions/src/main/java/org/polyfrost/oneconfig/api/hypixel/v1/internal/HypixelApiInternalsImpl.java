@@ -24,7 +24,7 @@
  * <https://polyfrost.org/legal/oneconfig/additional-terms>
  */
 
-package org.polyfrost.oneconfig.api.hypixel.v0.internal;
+package org.polyfrost.oneconfig.api.hypixel.v1.internal;
 
 import io.netty.buffer.Unpooled;
 import net.hypixel.modapi.HypixelModAPI;

@@ -68,7 +68,7 @@ public abstract class org/polyfrost/oneconfig/api/hud/v1/LegacyHud : org/polyfro
 	protected final fun createLegacy ()Lorg/polyfrost/polyui/component/Drawable;
 	public abstract fun getHeight ()F
 	public abstract fun getWidth ()F
-	public abstract fun render (Ljava/lang/Object;FF)V
+	public abstract fun render (Lorg/polyfrost/universal/UMatrixStack;FF)V
 	public abstract fun setHeight (F)V
 	public abstract fun setWidth (F)V
 }
@@ -79,6 +79,7 @@ public abstract class org/polyfrost/oneconfig/api/hud/v1/TextHud : org/polyfrost
 	public synthetic fun create ()Lorg/polyfrost/polyui/component/Drawable;
 	protected fun create ()Lorg/polyfrost/polyui/component/impl/Text;
 	public final fun getPrefix ()Ljava/lang/String;
+	protected final fun getStringBuilder ()Ljava/lang/StringBuilder;
 	public final fun getSuffix ()Ljava/lang/String;
 	protected abstract fun getText ()Ljava/lang/String;
 	public fun initialize ()V
