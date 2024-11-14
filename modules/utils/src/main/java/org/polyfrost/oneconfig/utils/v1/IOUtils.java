@@ -50,29 +50,6 @@ public final class IOUtils {
     }
 
     /**
-     * Copy the specified String to the System Clipboard.
-     *
-     * @param s the string to copy
-     */
-    public static void copyStringToClipboard(String s) {
-        StringSelection stringSelection = new StringSelection(s);
-        Toolkit.getDefaultToolkit().getSystemClipboard().setContents(stringSelection, null);
-    }
-
-    /**
-     * Return the String on the system clipboard.
-     *
-     * @return the string on the system clipboard, or null if there is no string on the clipboard or another error occurred.
-     */
-    public static String getStringFromClipboard() {
-        try {
-            return Toolkit.getDefaultToolkit().getSystemClipboard().getContents(null).getTransferData(DataFlavor.stringFlavor).toString();
-        } catch (Exception e) {
-            return null;
-        }
-    }
-
-    /**
      * Copy the given image to the System Clipboard.
      *
      * @param image the image to copy

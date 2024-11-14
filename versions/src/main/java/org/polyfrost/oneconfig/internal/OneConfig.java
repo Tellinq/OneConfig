@@ -26,6 +26,7 @@
 
 package org.polyfrost.oneconfig.internal;
 
+import dev.deftu.clipboard.Clipboard;
 import kotlin.Unit;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -88,37 +89,81 @@ public class OneConfig
 
     private void init() {
         BlurHandler.init();
-        preload();
+
+        preloadCopycat();
+        preloadPolyUI();
+
+        registerCommands();
+        registerKeybinds();
+        registerEventHandlers();
+
+        LOGGER.info("OneConfig initialized!");
+    }
+
+    private static void registerCommands() {
         CommandBuilder b = CommandBuilder.command("oneconfig", "ocfg", "ocfgv1").description("OneConfig main command");
         b.then(runs().does((Runnable) OneConfigUI.INSTANCE::open).description("Opens the OneConfig GUI"));
         b.then(runs("updateCheck").does(() -> Multithreading.submit(() -> UChat.chat(MavenUpdateChecker.oneconfig().hasUpdate() ? "Update available!" : "No updates available"))).description("Check for updates"));
         b.then(runs("locraw").does(() -> UChat.chat(HypixelUtils.getLocation()))).description("Get your current location on Hypixel");
         b.then(runs("hud").does(() -> Platform.screen().display(HudManager.INSTANCE.getWithEditor())).description("Opens the OneConfig HUD editor"));
         CommandManager.registerCommand(b.build());
+    }
+
+    private static void registerKeybinds() {
         OCKeybindHelper builder = OCKeybindHelper.builder();
         builder.mods(KeyModifiers.RSHIFT).does((s) -> {
             if (s) OneConfigUI.INSTANCE.open();
             return Unit.INSTANCE;
         });
+
         builder.register();
+    }
+
+    private static void registerEventHandlers() {
         EventManager.register(InitializationEvent.class, e -> HudManager.INSTANCE.initialize());
-        LOGGER.info("OneConfig initialized!");
     }
 
     /**
      * Ensure that key PolyUI classes are loaded to prevent lag-spikes when loading PolyUI for the first time.
      */
-    private static void preload() {
+    private static void preloadPolyUI() {
         long t1 = System.nanoTime();
         try {
+            // PolyUI
             Class.forName(PolyUI.class.getName());
             Class.forName(Drawable.class.getName());
             Class.forName(Translator.class.getName());
+
+            // OneConfig PolyUI renderer
             // todo: fix for fabric loaders as fails due to running too early
             // UIManager.INSTANCE.getRenderer();
         } catch (Exception e) {
             throw new IllegalStateException("Failed to preload necessary PolyUI classes", e);
         }
+
         LOGGER.info("PolyUI preload took {}ms", (System.nanoTime() - t1) / 1_000_000.0);
+    }
+
+    private static void preloadCopycat() {
+        long t1 = System.nanoTime();
+        try {
+            // Copycat
+            /// Ensure native is loaded
+            Clipboard.getInstance();
+
+            /// Ensure copying works
+            Clipboard clipboard = Clipboard.getInstance();
+            String currentContent = clipboard.getString();
+            clipboard.setString("OneConfig Test");
+            if (!"OneConfig Test".equals(clipboard.getString())) {
+                throw new IllegalStateException("Failed to set clipboard content");
+            }
+
+            clipboard.setString(currentContent); // Reset clipboard
+        } catch (Exception e) {
+            throw new IllegalStateException("Failed to preload necessary Copycat classes", e);
+        }
+
+        LOGGER.info("Copycat preload took {}ms", (System.nanoTime() - t1) / 1_000_000.0);
     }
 }
