@@ -51,13 +51,13 @@ import org.polyfrost.polyui.utils.fastEach
 import org.polyfrost.polyui.utils.image
 import org.polyfrost.polyui.utils.levenshteinDistance
 import org.polyfrost.polyui.utils.mapToArray
+import java.lang.ref.WeakReference
 import kotlin.math.PI
 
 open class ConfigVisualizer {
     private val LOGGER = LogManager.getLogger("OneConfig/Config")
-    protected val cache = HashMap<Tree, Map<String, Map<String, ArrayList<Triple<String, String?, Drawable>>>>>()
+    protected val configs = HashMap<Tree, Drawable>()
     protected val optBg = rgba(39, 49, 55, 0.2f)
-    protected val alignC = Align(cross = Align.Cross.Start)
     protected val alignCV = Align(cross = Align.Cross.Start, mode = Align.Mode.Vertical)
     protected val alignVNoPad = Align(cross = Align.Cross.Start, mode = Align.Mode.Vertical, pad = Vec2.ZERO)
     protected val stdAlign = Align(main = Align.Main.SpaceBetween, pad = Vec2(16f, 8f))
@@ -69,23 +69,36 @@ open class ConfigVisualizer {
     /**
      * For information, see [create].
      */
-    fun get(config: Tree) = create(config)
+    fun get(config: Tree) = configs.getOrPut(config) { create(config) }
 
     fun getMatching(str: String): List<Drawable> {
-        if (str.length < 2) return emptyList()
+        val it = str.trim()
+        if (it.length < 2) return emptyList()
         val out = ArrayList<Drawable>()
-        for ((tree, opts) in cache) {
-            for ((category, sub) in opts) {
-                for ((header, options) in sub) {
-                    for ((title, desc, drawable) in options) {
-                        if (title.contains(str, ignoreCase = true) || title.levenshteinDistance(str) <= 2) out.add(drawable)
-                        else if (desc != null && (desc.contains(str, ignoreCase = true) || desc.levenshteinDistance(str) <= 2)) out.add(drawable)
-                    }
-                }
-            }
+        for (config in configs.keys) {
+            getMatching(it, config, out)
         }
         return out
     }
+
+    private fun getMatching(it: String, config: Tree, out: ArrayList<Drawable>) {
+        config.onAll { _, node ->
+            if (node is Tree) {
+                getMatching(it, node, out)
+                return@onAll
+            }
+            val visualized = node.getMetadata<WeakReference<Drawable>>("drawable")?.get() ?: return@onAll
+            if (node.title.matchesSearch(it) || node.description.matchesSearch(it)) {
+                out.add(visualized)
+            } else {
+                node.getMetadata<ArrayList<String>>("aliases")?.fastEach { alias ->
+                    if (alias.matchesSearch(it)) out.add(visualized)
+                }
+            }
+        }
+    }
+
+    private fun String?.matchesSearch(search: String) = this != null && (this.contains(search, ignoreCase = true) || this.levenshteinDistance(search) <= 2)
 
     /**
      * Turn the given config tree into a PolyUI representation.
@@ -105,20 +118,17 @@ open class ConfigVisualizer {
         config: Tree,
         initialPage: String = "General",
     ): Drawable {
-        val options = cache.getOrPut(config) {
-            val now = System.nanoTime()
-            val options = HashMap<String, HashMap<String, ArrayList<Triple<String, String?, Drawable>>>>(4)
+        val now = System.nanoTime()
+        val options = HashMap<String, HashMap<String, ArrayList<Drawable>>>(4)
 
-            // asm: step 1: sort the tree into a map of:
-            // categories
-            //   -> subcategories
-            //      -> list of options
-            for ((_, node) in config.map) {
-                processNode(node, options)
-            }
-            LOGGER.info("creating config page ${config.title} took ${(System.nanoTime() - now) / 1_000_000f}ms")
-            options
+        // asm: step 1: sort the tree into a map of:
+        // categories
+        //   -> subcategories
+        //      -> list of options
+        for ((_, node) in config.map) {
+            processNode(node, options)
         }
+        LOGGER.info("creating config page ${config.title} took ${(System.nanoTime() - now) / 1_000_000f}ms")
         return makeFinal(flattenSubcategories(options), initialPage)
     }
 
@@ -131,13 +141,13 @@ open class ConfigVisualizer {
         )
     }
 
-    protected open fun flattenSubcategories(options: Map<String, Map<String, ArrayList<Triple<String, String?, Drawable>>>>): Map<String, Drawable> {
+    protected open fun flattenSubcategories(options: Map<String, Map<String, ArrayList<Drawable>>>): Map<String, Drawable> {
         return options.mapValues { (_, subcategories) ->
             Group(
                 children = subcategories.mapToArray { (header, opts) ->
                     Group(
                         Text(header, fontSize = 22f),
-                        *opts.mapToArray { it.third },
+                        *opts.toTypedArray(),
                         alignment = alignCV,
                     )
                 },
@@ -146,7 +156,7 @@ open class ConfigVisualizer {
         }
     }
 
-    protected open /* suspend? */ fun processNode(node: Node, options: HashMap<String, HashMap<String, ArrayList<Triple<String, String?, Drawable>>>>) {
+    protected open /* suspend? */ fun processNode(node: Node, options: HashMap<String, HashMap<String, ArrayList<Drawable>>>) {
         val icon =
             when (val it = node.getMetadata<Any?>("icon")) {
                 null -> null
@@ -162,14 +172,14 @@ open class ConfigVisualizer {
         val list = options.getOrPut(category) { HashMap(4) }.getOrPut(subcategory) { ArrayList(8) }
         if (node is Property<*>) {
             val vis = node.getVisualizer() ?: return
-            list.add(Triple(node.title, node.description, wrap(vis.visualize(node), node.title ?: return, node.description, icon).addHideHandler(node)))
+            list.add(wrap(vis.visualize(node), node.title ?: return, node.description, icon).addHideHandler(node).linkTo(node))
         } else {
             node as Tree
             if (node.map.isEmpty()) {
                 LOGGER.warn("sub-tree ${node.id} is empty; ignoring")
                 return
             }
-            list.add(Triple(node.title, node.description, makeAccordion(node, node.title ?: return, node.description, icon)))
+            list.add(makeAccordion(node, node.title ?: return, node.description, icon).linkTo(node))
         }
     }
 
@@ -190,13 +200,11 @@ open class ConfigVisualizer {
         desc: String?,
         icon: PolyImage?,
     ): Drawable {
-        val index = ArrayList<Pair<String, String?>>(tree.map.size)
         val options =
             tree.map.mapNotNull map@{ (_, node) ->
                 if (node !is Property<*>) return@map null
                 val vis = node.getVisualizer() ?: return@map null
-                index.add(node.title to node.description)
-                wrapForAccordion(vis.visualize(node), node.title ?: return@map null, node.description).addHideHandler(node)
+                wrapForAccordion(vis.visualize(node), node.title ?: return@map null, node.description).addHideHandler(node).linkTo(node)
             }
 
         var open = false
@@ -241,6 +249,7 @@ open class ConfigVisualizer {
                 },
                 Image("polyui/chevron-down.svg").also { it.rotation = PI }
             )
+            @Suppress("UNCHECKED_CAST") // reason: #already-type-checked
             enabled = e as Property<Boolean>
         } else {
             toWrap = Image("polyui/chevron-down.svg").also { it.rotation = PI }
@@ -249,7 +258,7 @@ open class ConfigVisualizer {
             wrap(toWrap, title, desc, icon).also {
                 it.color = PolyColor.TRANSPARENT
                 it.onClick {
-                    if(enabled != null && !enabled.getAs<Boolean>()) return@onClick
+                    if (enabled != null && !enabled.getAs<Boolean>()) return@onClick
                     this.openInsn(null)
                 }
             },
@@ -261,7 +270,6 @@ open class ConfigVisualizer {
             color = optBg,
             alignment = alignVNoPad,
         ).namedId("AccordionHeader")
-        //index.fastEach { this.index[out] = it }
         return out
     }
 
@@ -339,6 +347,12 @@ open class ConfigVisualizer {
             }
             this.isEnabled = s == Property.Display.SHOWN
         }
+        return this
+    }
+
+    private fun Drawable.linkTo(node: Node): Drawable {
+        // asm: stored in a weak reference to avoid potential memory leaks
+        node.addMetadata("drawable", WeakReference(this))
         return this
     }
 

@@ -111,7 +111,7 @@ object KeybindManager {
 
     @JvmStatic
     fun translateKey(inputManager: InputManager, key: Int, character: Char, state: Boolean) {
-        if (character != '\u0000' && (character.isLetterOrDigit() || character.isWhitespace())) {
+        if (character != '\u0000' && !character.isISOControl() && character.isDefined()) {
             inputManager.keyTyped(character)
         }
 
