@@ -32,6 +32,12 @@ import org.jetbrains.annotations.Nullable;
 
 import java.nio.file.Path;
 
+/**
+ * API for TinyFD, a cross-platform file selection dialog.
+ * <p>
+ * On Linux, TinyFD "allows shell metacharacters in titles, messages, and other input data," meaning that it is vulnerable to command injection.
+ * **Treat all user input as untrusted and sanitize it before passing it to TinyFD.**
+ */
 @SuppressWarnings("unused")
 public interface TinyFdApi {
     String QUESTION_ICON = "question";
