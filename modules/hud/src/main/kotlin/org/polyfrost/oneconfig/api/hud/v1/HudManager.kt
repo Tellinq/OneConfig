@@ -41,6 +41,7 @@ import org.polyfrost.polyui.color.Colors
 import org.polyfrost.polyui.color.PolyColor
 import org.polyfrost.polyui.color.PolyColor.Constants.TRANSPARENT
 import org.polyfrost.polyui.color.rgba
+import org.polyfrost.polyui.component.Component
 import org.polyfrost.polyui.component.Drawable
 import org.polyfrost.polyui.component.extensions.*
 import org.polyfrost.polyui.component.impl.*
@@ -86,65 +87,8 @@ object HudManager {
         register(TextHud.Simple("", "Text Hud", ""))
     }
 
-    private val hudsPage = HudsPage(hudProviders.values)
-
-    val panel = Block(
-        Block(
-            Image("assets/oneconfig/ico/right-arrow.svg").setAlpha(0.1f),
-            size = Vec2(32f, 1048f),
-            alignment = alignC,
-        ).named("CloseArea").withStates().ignoreLayout().setPalette(
-            Colors.Palette(
-                TRANSPARENT,
-                PolyColor.Gradient(rgba(100, 100, 100, 0.4f), TRANSPARENT),
-                PolyColor.Gradient(rgba(100, 100, 100, 0.3f), TRANSPARENT),
-                TRANSPARENT,
-            )
-        ).events {
-            Event.Mouse.Entered then {
-                Fade(this[0], 1f, false, Animations.Default.create(0.08.seconds)).add()
-            }
-            Event.Mouse.Exited then {
-                Fade(this[0], 0.1f, false, Animations.Default.create(0.08.seconds)).add()
-            }
-            Event.Mouse.Companion.Clicked then {
-                toggle()
-            }
-        },
-        Group(
-            Image("assets/oneconfig/ico/left-arrow.svg").setDestructivePalette().withStates().onClick {
-                if (parent.parent[3] !== hudsPage) {
-                    parent.parent[3] = hudsPage
-                } else {
-                    Platform.screen().close()
-                }
-            },
-            Block(
-                Image("assets/oneconfig/ico/search.svg"),
-                TextInput(placeholder = "oneconfig.search.placeholder", visibleSize = Vec2(220f, 12f)),
-                size = Vec2(256f, 32f),
-            ).withBoarder().withCursor(Cursor.Text).onClick {
-                polyUI.focus(this[1])
-            },
-            alignment = Align(main = Align.Main.SpaceBetween, pad = Vec2(12f, 6f)),
-            size = Vec2(500f, 32f),
-        ),
-        Text("oneconfig.hudeditor.title", fontSize = 24f).padded(16f, 0f).setFont { semiBold },
-        hudsPage,
-        size = Vec2(500f, 1048f),
-        alignment = Align(cross = Align.Cross.Start, pad = Vec2(0f, 18f)),
-    ).apply {
-        rawResize = true
-        addOperation {
-            if (polyUI.mouseDown) {
-                if (slinex != -1f) polyUI.renderer.line(slinex, 0f, slinex, polyUI.size.y, snapLineColor, 1f)
-                if (sliney != -1f) polyUI.renderer.line(0f, sliney, polyUI.size.x, sliney, snapLineColor, 1f)
-            } else {
-                slinex = -1f
-                sliney = -1f
-            }
-        }
-    }
+    private lateinit var hudsPage: Component
+    lateinit var panel: Drawable
 
     @Suppress("INVISIBLE_MEMBER", "INVISIBLE_REFERENCE")
     @kotlin.internal.InlineOnly
@@ -167,8 +111,6 @@ object HudManager {
     @ApiStatus.Internal
     fun initialize() {
         polyUI.translator.addDelegate("assets/oneconfig/hud")
-        polyUI.master.addChild(panel, recalculate = false)
-        panel.renders = false
         // todo use for inspections
 //        it.master.onClick { (x, y) ->
 //            val obj = polyUI.inputManager.rayCheckUnsafe(this, x, y) ?: return@onClick false
@@ -212,6 +154,11 @@ object HudManager {
 
     @ApiStatus.Internal
     fun getWithEditor(): Any {
+        if (!::panel.isInitialized) {
+            panel = makePanel()
+            polyUI.master.addChild(panel, recalculate = false)
+            panel.renders = false
+        }
         toggleHudPicker()
         return UIManager.INSTANCE.createPolyUIScreen(polyUI, 0f, 0f, false, true) { editorClose() }
     }
@@ -268,4 +215,65 @@ object HudManager {
     }
 
     internal fun canAutoOpen(): Boolean = !polyUI.master.hasChildIn(polyUI.size.x - panel.width - 34f, 0f, panel.width, polyUI.size.y)
+
+    fun makePanel(): Drawable {
+        hudsPage = HudsPage(hudProviders.values)
+        return Block(
+            Block(
+                Image("assets/oneconfig/ico/right-arrow.svg").setAlpha(0.1f),
+                size = Vec2(32f, 1048f),
+                alignment = alignC,
+            ).named("CloseArea").withStates().ignoreLayout().setPalette(
+                Colors.Palette(
+                    TRANSPARENT,
+                    PolyColor.Gradient(rgba(100, 100, 100, 0.4f), TRANSPARENT),
+                    PolyColor.Gradient(rgba(100, 100, 100, 0.3f), TRANSPARENT),
+                    TRANSPARENT,
+                )
+            ).events {
+                Event.Mouse.Entered then {
+                    Fade(this[0], 1f, false, Animations.Default.create(0.08.seconds)).add()
+                }
+                Event.Mouse.Exited then {
+                    Fade(this[0], 0.1f, false, Animations.Default.create(0.08.seconds)).add()
+                }
+                Event.Mouse.Companion.Clicked then {
+                    toggle()
+                }
+            },
+            Group(
+                Image("assets/oneconfig/ico/left-arrow.svg").setDestructivePalette().withStates().onClick {
+                    if (parent.parent[3] !== hudsPage) {
+                        parent.parent[3] = hudsPage
+                    } else {
+                        Platform.screen().close()
+                    }
+                },
+                Block(
+                    Image("assets/oneconfig/ico/search.svg"),
+                    TextInput(placeholder = "oneconfig.search.placeholder", visibleSize = Vec2(220f, 12f)),
+                    size = Vec2(256f, 32f),
+                ).withBoarder().withCursor(Cursor.Text).onClick {
+                    polyUI.focus(this[1])
+                },
+                alignment = Align(main = Align.Main.SpaceBetween, pad = Vec2(12f, 6f)),
+                size = Vec2(500f, 32f),
+            ),
+            Text("oneconfig.hudeditor.title", fontSize = 24f).padded(16f, 0f).setFont { semiBold },
+            hudsPage,
+            size = Vec2(500f, 1048f),
+            alignment = Align(cross = Align.Cross.Start, pad = Vec2(0f, 18f)),
+        ).apply {
+            rawResize = true
+            addOperation {
+                if (polyUI.mouseDown) {
+                    if (slinex != -1f) polyUI.renderer.line(slinex, 0f, slinex, polyUI.size.y, snapLineColor, 1f)
+                    if (sliney != -1f) polyUI.renderer.line(0f, sliney, polyUI.size.x, sliney, snapLineColor, 1f)
+                } else {
+                    slinex = -1f
+                    sliney = -1f
+                }
+            }
+        }
+    }
 }

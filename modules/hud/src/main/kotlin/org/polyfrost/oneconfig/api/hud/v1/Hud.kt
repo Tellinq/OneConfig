@@ -79,7 +79,7 @@ abstract class Hud<T : Drawable> : Cloneable, Config("null", null, "null", null)
      * HUD config files are stored in `{profile}/huds/{rnd}-`[id], e.g. `huds/42-my_hud.toml`.
      * the random number is omitted for the first instance.
      */
-    abstract fun id(): String
+    open fun id(): String = title().replace(' ', '_').lowercase()
 
     abstract fun category(): Category
 
