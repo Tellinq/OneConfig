@@ -172,14 +172,14 @@ open class ConfigVisualizer {
         val list = options.getOrPut(category) { HashMap(4) }.getOrPut(subcategory) { ArrayList(8) }
         if (node is Property<*>) {
             val vis = node.getVisualizer() ?: return
-            list.add(wrap(vis.visualize(node), node.title ?: return, node.description, icon).addHideHandler(node).linkTo(node))
+            list.add(wrap(vis.visualize(node), node.title, node.description, icon).addHideHandler(node).linkTo(node))
         } else {
             node as Tree
             if (node.map.isEmpty()) {
                 LOGGER.warn("sub-tree ${node.id} is empty; ignoring")
                 return
             }
-            list.add(makeAccordion(node, node.title ?: return, node.description, icon).linkTo(node))
+            list.add(makeAccordion(node, node.title, node.description, icon).linkTo(node))
         }
     }
 
@@ -275,19 +275,20 @@ open class ConfigVisualizer {
 
     protected open fun wrap(
         drawable: Drawable,
-        title: String,
+        title: String?,
         desc: String?,
         icon: PolyImage?,
     ): Drawable = Block(
-        Group(
-            if (icon != null) Image(icon).onInit { ensureLargerThan(32f by 32f) } else null,
+        if (title != null)
             Group(
-                Text(title, fontSize = 22f).setFont { medium },
-                if (desc != null) Text(desc, visibleSize = Vec2(500f, 0f)).secondary() else null,
-                alignment = stdOpt,
-            ),
-            alignment = ic2text,
-        ),
+                if (icon != null) Image(icon).onInit { ensureLargerThan(32f by 32f) } else null,
+                Group(
+                    Text(title, fontSize = 22f).setFont { medium },
+                    if (desc != null) Text(desc, visibleSize = Vec2(500f, 0f)).secondary() else null,
+                    alignment = stdOpt,
+                ),
+                alignment = ic2text,
+            ) else null,
         drawable,
         alignment = stdAlign,
         size = Vec2(1078f, 0f),
