@@ -50,7 +50,7 @@ abstract class LegacyHud : Hud<Drawable>() {
 
     override fun create() = createLegacy()
 
-    abstract fun render(stack: UMatrixStack, x: Float, y: Float)
+    abstract fun render(stack: UMatrixStack, x: Float, y: Float, scaleX: Float, scaleY: Float)
 
     /**
      * Wraps the [render] method in a [Drawable] instance, with the [Drawable.size] property delegating to [width] and [height].
@@ -73,7 +73,7 @@ abstract class LegacyHud : Hud<Drawable>() {
             override fun preRender(delta: Long) {}
 
             override fun render() {
-                render(Platform.screen().smuggledMatrixStack, x, y)
+                render(Platform.screen().smuggledMatrixStack, x, y, scaleX, scaleY)
             }
 
             override fun postRender() {}

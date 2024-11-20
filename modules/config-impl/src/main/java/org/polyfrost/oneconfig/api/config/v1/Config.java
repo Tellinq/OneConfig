@@ -34,6 +34,7 @@ import org.polyfrost.oneconfig.api.config.v1.annotations.Include;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.function.BooleanSupplier;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
 
@@ -73,6 +74,10 @@ public abstract class Config {
 
     protected void addDependency(String option, String condition) {
         addDependency(option, condition, false);
+    }
+
+    protected void hideIf(String option, BooleanSupplier condition) {
+        addDependency(option, null, () -> condition.getAsBoolean() ? Property.Display.HIDDEN : Property.Display.SHOWN);
     }
 
     protected void hideIf(String option, String condition) {

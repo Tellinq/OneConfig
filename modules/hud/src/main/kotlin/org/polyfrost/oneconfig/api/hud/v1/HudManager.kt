@@ -52,6 +52,9 @@ import org.polyfrost.polyui.operations.Move
 import org.polyfrost.polyui.unit.Align
 import org.polyfrost.polyui.unit.Vec2
 import org.polyfrost.polyui.unit.seconds
+import kotlin.io.path.exists
+import kotlin.io.path.readText
+import kotlin.io.path.writeText
 import kotlin.math.PI
 
 object HudManager {
@@ -111,6 +114,13 @@ object HudManager {
     @ApiStatus.Internal
     fun initialize() {
         polyUI.translator.addDelegate("assets/oneconfig/hud")
+        Runtime.getRuntime().addShutdownHook(Thread {
+            ConfigManager.internal().folder.resolve("hudLock.lock").writeText(polyUI.size.value.toString())
+        })
+        val sizeFile = ConfigManager.internal().folder.resolve("hudLock.lock")
+        val size = Vec2(if (sizeFile.exists()) sizeFile.readText().toLong() else 0L)
+        // todo size stuff (upstream in polyui) AHHH
+
         // todo use for inspections
 //        it.master.onClick { (x, y) ->
 //            val obj = polyUI.inputManager.rayCheckUnsafe(this, x, y) ?: return@onClick false
