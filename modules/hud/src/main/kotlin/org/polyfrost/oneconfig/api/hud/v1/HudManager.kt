@@ -114,23 +114,33 @@ object HudManager {
     @ApiStatus.Internal
     fun initialize() {
         polyUI.translator.addDelegate("assets/oneconfig/hud")
+        LOGGER.info("Initializing HUD...")
+        val now = System.nanoTime()
         Runtime.getRuntime().addShutdownHook(Thread {
-            ConfigManager.internal().folder.resolve("hudLock.lock").writeText(polyUI.size.value.toString())
+            ConfigManager.internal().folder.resolve("size.lock").writeText(polyUI.size.value.toString())
         })
-        val sizeFile = ConfigManager.internal().folder.resolve("hudLock.lock")
-        val size = Vec2(if (sizeFile.exists()) sizeFile.readText().toLong() else 0L)
-        // todo size stuff (upstream in polyui) AHHH
+        val sizeFile = ConfigManager.internal().folder.resolve("size.lock")
+        val size = Vec2(if (sizeFile.exists()) sizeFile.readText().toLongOrNull() ?: 0L else 0L)
+        val prevSize: Vec2
+        if (size.isPositive) {
+            prevSize = polyUI.size
+            polyUI.resize(size.x, size.y)
+        } else {
+            LOGGER.warn("Failed to read previous size from size.lock: HUD positions may be inaccurate. If this is first start, you may ignore this message.")
+            prevSize = Vec2.ZERO
+        }
 
         // todo use for inspections
 //        it.master.onClick { (x, y) ->
 //            val obj = polyUI.inputManager.rayCheckUnsafe(this, x, y) ?: return@onClick false
 //            return@onClick false
 //        }
-        val used = HashSet<Class<out Hud<out Drawable>>>(hudProviders.size)
+        val used = HashSet<Class<Hud<Drawable>>>(hudProviders.size)
+        var i = 0
         ConfigManager.active().gatherAll("huds").forEach { data ->
             try {
                 val clsName = data.getProp("hudClass").get() as? String ?: throw IllegalArgumentException("hud tree ${data.id} is missing class name, will be ignored")
-                val cls = Class.forName(clsName) as? Class<Hud<out Drawable>> ?: throw IllegalArgumentException("hud class $clsName is not a subclass of org.polyfrost.oneconfig.api.v1.hud.Hud, will be ignored")
+                val cls = Class.forName(clsName) as? Class<Hud<Drawable>> ?: throw IllegalArgumentException("hud class $clsName is not a subclass of org.polyfrost.oneconfig.api.v1.hud.Hud, will be ignored")
                 // asm: the documentation of Hud states that code should not be run in the constructor
                 // so, we are fine to (potentially) malloc the HUD here
                 // note that this is stored in a map separate to the loaded hud list.
@@ -140,15 +150,17 @@ object HudManager {
                 val hud = h.make(data)
                 val theHud = hud.build()
                 polyUI.master.addChild(theHud, recalculate = false)
-                LOGGER.info("Loaded HUD ${hud.title()} from ${data.id}")
                 val x: Float = data.getProp("x").getAs()
                 val y: Float = data.getProp("y").getAs()
                 theHud.x = x - (hud.get().x - theHud.x)
                 theHud.y = y - (hud.get().y - theHud.y)
+                i++
             } catch (e: Exception) {
                 LOGGER.error("Failed to load HUD from ${data.id}", e)
             }
         }
+        if (prevSize.isPositive) polyUI.resize(prevSize.x, prevSize.y)
+        LOGGER.info("successfully loaded {} HUDs from {} providers", i, hudProviders.size)
         hudProviders.forEach { (cls, h) ->
             if (cls in used) return@forEach
             val default = h.defaultPosition()
@@ -158,8 +170,9 @@ object HudManager {
             theHud.x = default.x
             theHud.y = default.y
             polyUI.master.addChild(theHud, recalculate = false)
-            LOGGER.info("Adding HUD {} to {} (default)", hud.title(), default)
+            LOGGER.info("Added HUD {} to {} (default)", hud.title(), default)
         }
+        LOGGER.info("HUD load took {}ms", (System.nanoTime() - now) / 1_000_000.0)
     }
 
     @ApiStatus.Internal
