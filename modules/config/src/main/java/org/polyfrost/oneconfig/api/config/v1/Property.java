@@ -214,18 +214,20 @@ public abstract class Property<T> extends Node implements Serializable {
      */
     public void setReferential(@Nullable T value) {
         if (callbacks != null) {
+            T prev = get();
+            set0(value);
             for (Predicate<T> p : callbacks) {
                 try {
                     if (p.test(value)) {
                         LOGGER.info("property {} set cancelled by {}", this.getID(), p);
+                        set0(prev);
                         return;
                     }
                 } catch (Throwable t) {
                     LOGGER.error("failed to call cancellable callback {} on property {}", p, this.getID(), t);
                 }
             }
-        }
-        set0(value);
+        } else set0(value);
     }
 
     protected abstract void set0(@Nullable T value);

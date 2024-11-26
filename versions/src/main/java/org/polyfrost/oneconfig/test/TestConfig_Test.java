@@ -26,12 +26,17 @@
 
 package org.polyfrost.oneconfig.test;
 
+import kotlin.Unit;
 import org.polyfrost.oneconfig.api.config.v1.Config;
 import org.polyfrost.oneconfig.api.config.v1.annotations.Number;
 import org.polyfrost.oneconfig.api.config.v1.annotations.*;
-import org.polyfrost.polyui.color.PolyColor;
-import org.polyfrost.polyui.unit.Align;
+import org.polyfrost.oneconfig.api.ui.v1.Notifications;
+import org.polyfrost.oneconfig.api.ui.v1.keybind.OCKeybindHelper;
 import org.polyfrost.polyui.color.ColorUtils;
+import org.polyfrost.polyui.color.PolyColor;
+import org.polyfrost.polyui.input.KeyBinder;
+import org.polyfrost.polyui.input.KeyModifiers;
+import org.polyfrost.polyui.unit.Align;
 import org.polyfrost.universal.UChat;
 
 @SuppressWarnings("unused")
@@ -47,7 +52,7 @@ public class TestConfig_Test extends Config {
     @Number(title = "number", unit = "px", category = "bob")
     public static int number = 50;
 
-//    @Keybind(title = "keybinding", description = "please send help")
+    //    @Keybind(title = "keybinding", description = "please send help")
 //    KeyBinder.Bind bind0 = new KeyBinder.Bind('A', null, null, Modifiers.mods(Modifiers.LCONTROL, Modifiers.LSHIFT), () -> {
 //        UChat.chat("you pressed a bind");
 //        return true;
@@ -86,6 +91,12 @@ public class TestConfig_Test extends Config {
     public boolean added = false;
     @Color(title = "color", category = "bob")
     PolyColor color = ColorUtils.rgba(255, 0, 100, 1f);
+
+    @Keybind(title = "keybind")
+    private KeyBinder.Bind bind = ((OCKeybindHelper) OCKeybindHelper.builder().mods(KeyModifiers.CONTROL).chars('g').does((a) -> {
+        Notifications.enqueue(Notifications.Type.Info, "state: " + a);
+        return Unit.INSTANCE;
+    })).register();
 
     public TestConfig_Test() {
         super("test_mod.json", "Test Mod", Category.QOL);

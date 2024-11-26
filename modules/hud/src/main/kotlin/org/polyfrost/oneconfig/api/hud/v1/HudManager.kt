@@ -117,12 +117,14 @@ object HudManager {
         LOGGER.info("Initializing HUD...")
         val now = System.nanoTime()
         Runtime.getRuntime().addShutdownHook(Thread {
+            LOGGER.info("Saving size lock as ${polyUI.size}")
             ConfigManager.internal().folder.resolve("size.lock").writeText(polyUI.size.value.toString())
         })
         val sizeFile = ConfigManager.internal().folder.resolve("size.lock")
         val size = Vec2(if (sizeFile.exists()) sizeFile.readText().toLongOrNull() ?: 0L else 0L)
         val prevSize: Vec2
         if (size.isPositive) {
+            LOGGER.info("Size to restore: $size")
             prevSize = polyUI.size
             polyUI.resize(size.x, size.y)
         } else {

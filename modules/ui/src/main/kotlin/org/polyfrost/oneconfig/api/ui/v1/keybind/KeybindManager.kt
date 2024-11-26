@@ -112,29 +112,29 @@ object KeybindManager {
     @JvmStatic
     fun translateKey(inputManager: InputManager, key: Int, character: Char, state: Boolean) {
         if (character != '\u0000' && !character.isISOControl() && character.isDefined()) {
-            inputManager.keyTyped(character)
+            if (state) {
+                inputManager.keyTyped(character)
+                inputManager.keyDown(character.code)
+            } else inputManager.keyUp(character.code)
+            return
         }
 
-        if (state) {
-            keysMap[key]?.let { inputManager.keyDown(it); return }
-            val m = modsMap[key]
-            if (m != 0) {
-                inputManager.addModifier(m.toByte())
-                return
-            }
-            // modern fix because glfwModCharCallback doesn't work correctly
-            if (inputManager.mods > 1 && key < 255) {
-                inputManager.keyTyped((key + 32).toChar())
-            } else inputManager.keyDown(key)
-        } else {
-            keysMap[key]?.let { inputManager.keyUp(it); return }
-            val m = modsMap[key]
-            if (m != 0) {
-                inputManager.removeModifier(m.toByte())
-                return
-            }
-            inputManager.keyUp(key)
+        val k = keysMap[key]
+        if (k != null) {
+            if (state) inputManager.keyDown(k)
+            else inputManager.keyUp(k)
+            return
         }
 
+        val m = modsMap[key].toByte()
+        if (m != 0.toByte()) {
+            if (state) inputManager.addModifier(m)
+            else inputManager.removeModifier(m)
+            return
+        }
+
+        val raw = if (inputManager.mods > 1) key + 48 else key
+        if (state) inputManager.keyDown(raw)
+        else inputManager.keyUp(raw)
     }
 }
