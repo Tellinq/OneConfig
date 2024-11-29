@@ -36,10 +36,9 @@ loom {
     }
     if (project.platform.isForge) {
         forge {
-            mixinConfig("mixins.${modId}.json")
+            mixinConfig("mixins.${modId}.json", "mixins.${modId}.init.json")
         }
     }
-    mixin.defaultRefmapName = "mixins.${modId}.refmap.json"
 }
 
 repositories {
@@ -62,6 +61,8 @@ dependencies {
         }
     }
 
+    annotationProcessor(libs.mixin.extras)
+
     for (dep in listOf("-nanovg").run { if (platform.mcVersion < 11300) this else this + listOf("-tinyfd", "-stb", "") }) {
         val lwjglDep = "org.lwjgl:lwjgl$dep:${libs.versions.lwjgl.get()}"
         compileOnlyApi(lwjglDep) {
@@ -75,9 +76,6 @@ dependencies {
     }
 
     if (platform.isLegacyForge) {
-        implementation(libs.mixin) {
-            isTransitive = false
-        }
         compileOnly("cc.polyfrost:oneconfig-${platform}:0.2.2-alpha216") {
             isTransitive = false
         }
@@ -192,12 +190,12 @@ tasks {
                                 "ModSide" to "CLIENT",
                                 "ForceLoadAsMod" to true,
                                 "TweakOrder" to "0",
-                                "MixinConfigs" to "mixins.$modId.json",
+                                "MixinConfigs" to "mixins.$modId.json,mixins.$modId.init.json",
                                 "TweakClass" to tweakClass
                             )
                         )
                     } else {
-                        put("MixinConfigs", "mixins.$modId.json")
+                        put("MixinConfigs", "mixins.$modId.json,mixins.$modId.init.json")
                     }
                 }
                 putAll(

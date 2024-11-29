@@ -25,6 +25,7 @@ lwjgl = "3.3.3" # All downloaded by the isolated-lwjgl3-loader
 
 # Legacy only
 mixin = "0.8.4+build.2"
+mixin-extras = "0.4.1"
 
 # Gradle
 kotlinx-abi = "0.14.0"
@@ -44,6 +45,7 @@ junit = { module = "org.junit.jupiter:junit-jupiter" }
 junit-bom = { module = "org.junit:junit-bom", version.ref = "junit-bom" }
 
 mixin = { module = "org.polyfrost:polymixin", version.ref = "mixin" }
+mixin-extras = { module = "io.github.llamalad7:mixinextras-common", version.ref = "mixin-extras" }
 
 isolated-lwjgl3-loader = { module = "org.polyfrost:isolated-lwjgl3-loader", version.ref = "isolated-lwjgl3-loader" }
 polyio = { module = "org.polyfrost:polyio", version.ref = "polyio" }

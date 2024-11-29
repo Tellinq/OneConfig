@@ -43,6 +43,11 @@ fun Project.provideIncludedDependencies(version: Triple<Int, Int, Int>?, loader:
     } else if (version != null && version.second > 12) { // forge / neoforge
         // TODO add KFF
     }
+    if (version == null // legacy dep module
+        || (version.first == 1 && version.second < 12 && loader == "forge")) {
+        deps.add(libs.findLibrary("mixin").get().get()) // PolyMixin
+    }
+    deps.add(libs.findLibrary("mixin-extras").get().get())
     val actualDeps = mutableListOf<OCDependency>()
     for (dep in deps) {
         actualDeps.add(OCDependency(dep))
