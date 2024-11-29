@@ -4,6 +4,12 @@ import org.gradle.api.Project
 import org.gradle.api.artifacts.VersionCatalogsExtension
 import org.gradle.kotlin.dsl.getByType
 
+/**
+ * Provides the dependencies that should be included in the final jar.
+ * All deps are marked NON-TRANSITIVE; thus, all transitive deps must be explicitly included.
+ * @param version The version of Minecraft. If null, the method is running inside the `:dependencies:legacy` module.
+ * @param loader The mod loader being used.
+ */
 fun Project.provideIncludedDependencies(version: Triple<Int, Int, Int>?, loader: String): List<OCDependency> { // Either a String or ExternalModuleDependency
     val libs = project
         .extensions

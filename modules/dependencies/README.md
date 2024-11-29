@@ -1,6 +1,12 @@
 # OneConfig dependencies
 
-This directory contains the dependencies for the OneConfig project.
+This directory contains the dependencies for the OneConfig project (well, not really, but we'll get to that later).
+
+## TLDR:
+Dealing with mod loaders suck, but we figured it out. Go to the `buildSrc`
+module and go to the `addDependencies` file to modify our dependencies list.
+In most cases, you should not need to touch anything in this module or any other
+buildscript.
 
 ## Complications
 The dependencies we use are also used by various other projects. Hence,
@@ -28,8 +34,7 @@ of handling dependencies, with varying levels of complexity:
   Fabric.
 
 In addition, the `UniversalCraft` library is per-MC version, adding a new
-level of complexity, LWJGL is split between LWJGL2 (1.12 and below) and
-LWJGL3 (1.13 and above), and we require the `PolyMixin` library for
+level of complexity, and we require the `PolyMixin` library for
 1.12.2 and below.
 
 ## So... what do we do?
@@ -44,3 +49,15 @@ LWJGL3 (1.13 and above), and we require the `PolyMixin` library for
   dependencies in the final JAR file.
 - **On NeoForge / modern Forge with JiJ:** We use the same system as
   Fabric.
+
+## Ok... but how do you actually do it?
+
+(Here comes the stupidity)
+
+At this point, it's not worth putting everything in the platform module's
+buildscript. This would require mental gymnastics that would make this
+even more complicated than it already is. So we have a `buildSrc` module
+that contains a method to generate a list of dependencies given the platform
+version and mod loader. In order to add a dependency, you simply add it
+to the `addDependencies` file in the `buildSrc` module. The method will
+automatically handle the rest.
