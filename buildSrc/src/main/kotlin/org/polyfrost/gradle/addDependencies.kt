@@ -44,7 +44,7 @@ fun Project.provideIncludedDependencies(version: Triple<Int, Int, Int>?, loader:
         // TODO add KFF
     }
     if (version == null // legacy dep module
-        || (version.first == 1 && version.second < 12 && loader == "forge")) {
+        || (version.first == 1 && version.second <= 12 && loader == "forge")) {
         deps.add(libs.findLibrary("mixin").get().get()) // PolyMixin
     }
     deps.add(libs.findLibrary("mixin-extras").get().get())
