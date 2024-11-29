@@ -92,6 +92,7 @@ object HudManager {
 
     private lateinit var hudsPage: Component
     lateinit var panel: Drawable
+        private set
 
     @Suppress("INVISIBLE_MEMBER", "INVISIBLE_REFERENCE")
     @kotlin.internal.InlineOnly
@@ -241,7 +242,7 @@ object HudManager {
 
     internal fun canAutoOpen(): Boolean = !polyUI.master.hasChildIn(polyUI.size.x - panel.width - 34f, 0f, panel.width, polyUI.size.y)
 
-    fun makePanel(): Drawable {
+    private fun makePanel(): Drawable {
         hudsPage = HudsPage(hudProviders.values)
         return Block(
             Block(

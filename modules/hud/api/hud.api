@@ -11,7 +11,7 @@ public abstract class org/polyfrost/oneconfig/api/hud/v1/Hud : org/polyfrost/one
 	public final fun get ()Lorg/polyfrost/polyui/component/Drawable;
 	public final fun getHidden ()Z
 	public final fun getHud ()Lorg/polyfrost/polyui/component/Drawable;
-	public abstract fun id ()Ljava/lang/String;
+	public fun id ()Ljava/lang/String;
 	public fun initialize ()V
 	public final fun isReal ()Z
 	public final fun make (Lorg/polyfrost/oneconfig/api/config/v1/Tree;)Lorg/polyfrost/oneconfig/api/hud/v1/Hud;
@@ -47,7 +47,7 @@ public final class org/polyfrost/oneconfig/api/hud/v1/Hud$Category$Companion {
 
 public final class org/polyfrost/oneconfig/api/hud/v1/HudManager {
 	public static final field INSTANCE Lorg/polyfrost/oneconfig/api/hud/v1/HudManager;
-	public final fun getPanel ()Lorg/polyfrost/polyui/component/impl/Block;
+	public final fun getPanel ()Lorg/polyfrost/polyui/component/Drawable;
 	public final fun getPanelExists ()Z
 	public final fun getPanelOpen ()Z
 	public final fun getSlinex ()F
@@ -69,7 +69,7 @@ public abstract class org/polyfrost/oneconfig/api/hud/v1/LegacyHud : org/polyfro
 	protected final fun createLegacy ()Lorg/polyfrost/polyui/component/Drawable;
 	public abstract fun getHeight ()F
 	public abstract fun getWidth ()F
-	public abstract fun render (Lorg/polyfrost/universal/UMatrixStack;FF)V
+	public abstract fun render (Lorg/polyfrost/universal/UMatrixStack;FFFF)V
 	public abstract fun setHeight (F)V
 	public abstract fun setWidth (F)V
 }

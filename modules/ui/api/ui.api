@@ -158,6 +158,7 @@ public final class org/polyfrost/oneconfig/api/ui/v1/keybind/OCKeybindHelper : o
 	public fun <init> ()V
 	public fun build ()Lorg/polyfrost/polyui/input/KeyBinder$Bind;
 	public static final fun builder ()Lorg/polyfrost/oneconfig/api/ui/v1/keybind/OCKeybindHelper;
+	public final fun inScreens ()Lorg/polyfrost/oneconfig/api/ui/v1/keybind/OCKeybindHelper;
 	public final fun register ()Lorg/polyfrost/polyui/input/KeyBinder$Bind;
 	public final fun register (Lorg/polyfrost/polyui/input/KeyBinder$Bind;)Lorg/polyfrost/polyui/input/KeyBinder$Bind;
 }
