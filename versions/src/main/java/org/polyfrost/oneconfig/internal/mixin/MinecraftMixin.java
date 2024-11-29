@@ -48,10 +48,12 @@ public abstract class MinecraftMixin {
     @Shadow
     private Timer timer;
 
+    //#if MC<11300
     @Shadow public int displayWidth;
     @Shadow public int displayHeight;
     @Shadow private int tempDisplayWidth;
     @Shadow private int tempDisplayHeight;
+    //#endif
 
     //@formatter:off
     @Unique

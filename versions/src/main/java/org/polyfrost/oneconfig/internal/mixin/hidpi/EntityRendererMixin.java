@@ -24,6 +24,7 @@
  * <https://polyfrost.org/legal/oneconfig/additional-terms>
  */
 
+//#if MC<11300
 package org.polyfrost.oneconfig.internal.mixin.hidpi;
 
 import net.minecraft.client.Minecraft;
@@ -45,3 +46,4 @@ public abstract class EntityRendererMixin {
         return (int) (mc.displayHeight / Display.getPixelScaleFactor());
     }
 }
+//#endif
