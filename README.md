@@ -1,38 +1,18 @@
 ![OneConfig_banner_wide](https://user-images.githubusercontent.com/62163840/226811571-ffe7a524-c96a-4b6e-9ca9-d29439f5174f.png)
 
-# This README is wildly outdated for V1. We will be writing docs soon. For a quick and dirty migration guide, see https://docsv1.polyfrost.org/temporary-v0-greater-than-v1-migration-guide
-
 # OneConfig
-![Dev Worflow Status](https://img.shields.io/github/actions/workflow/status/Polyfrost/OneConfig/release.yml?style=for-the-badge&color=1452cc&label=release)
-![Dev Worflow Status](https://img.shields.io/github/actions/workflow/status/Polyfrost/OneConfig/build.yml?style=for-the-badge&color=1452cc&label=build)
+![Dev Workflow Status](https://img.shields.io/github/actions/workflow/status/Polyfrost/OneConfig/release.yml?style=for-the-badge&color=1452cc&label=release)
+![Dev Workflow Status](https://img.shields.io/github/actions/workflow/status/Polyfrost/OneConfig/build.yml?style=for-the-badge&color=1452cc&label=build)
 
 OneConfig is a free, open sourced configuration library by [Polyfrost](https://polyfrost.org), designed to give developers a simple config API, which users can interact with in an elegant user interface.
 
 ## ❔ General information
 
-<details>
-  <summary>Click to view screenshots</summary>
-  <img src="https://user-images.githubusercontent.com/62163840/226493559-8cf2e7a9-99fe-4388-a479-8463132260ac.png">
-  <img src="https://user-images.githubusercontent.com/62163840/196335017-0ef66813-1500-4279-a6b1-565ec0741816.png">
-  <img src="https://user-images.githubusercontent.com/62163840/196335021-2df9bf19-d8d8-4872-ac57-1f6a53769cdd.png">
-  <img src="https://user-images.githubusercontent.com/62163840/196335012-9c0f098e-4214-42cf-a83a-9bcbe65a240b.png">
-</details>
-
-### Installation:
-For beginners, we recommend using [SkyClient](https://skyclient.co/), a free and open-sourced mod installer. For more technical users, all of our mods, including [Hytils](https://github.com/Polyfrost/Hytils-Reborn), [CrashPatch](https://github.com/Polyfrost/crashpatch), [EvergreenHUD](https://github.com/Polyfrost/EvergreenHUD), and [Chatting](https://github.com/Polyfrost/chatting) have full support, and come with OneConfig. Most of your existing mods (i.e. ones that use [Vigilance](https://github.com/EssentialGG/Vigilance)) are also supported through our [compatability layer](https://docs.polyfrost.org/oneconfig/config/compatibility).
-
 ### Is it a client?
 While it may look like OneConfig is a client, in reality it's actually a standalone mod. You can actually [see for yourself](https://github.com/Polyfrost/OneConfig-Bootstrap), it doesn't come with any mods of it's own. It's left up to the user to decide which mods they want to actually use.
 
-
 ## ⚡️ Getting started
-Almost everything you could need to start using OneConfig can be found in [our documentation](https://docs.polyfrost.org). For further questions, feel free to make a developer ticket in [our discord](https://polyfrost.org/discord).
-
-- Start a new project with our [mod template](https://github.com/Polyfrost/OneConfigExampleMod/), add OneConfig to an [existing project](https://docs.polyfrost.org/oneconfig/getting-started), or [migrate](https://docs.polyfrost.org/oneconfig/config/compatibility) from ``JSON``, ``Vigilance``, or ``.cfg`` (Forge) files.
-- [Register a config](https://docs.polyfrost.org/oneconfig/config/creating-a-config)
-- [Add config options](https://docs.polyfrost.org/oneconfig/config/adding-options)
-- [HUD system](https://docs.polyfrost.org/oneconfig/huds/creating-a-hud)
-- Check out other [utilities](https://docs.polyfrost.org/oneconfig/utils/oneconfigs-utilities) like [events](https://docs.polyfrost.org/oneconfig/events/event-basics), [commands](https://docs.polyfrost.org/oneconfig/commands/commands), and [custom rendering](https://docs.polyfrost.org/oneconfig/gui/render-manager).
+### Almost everything you could need to start using OneConfig can be found in [our documentation](https://docsv1.polyfrost.org). For further questions, feel free to make a developer ticket in [our discord](https://polyfrost.org/discord).
 
 ## ℹ️ Example mod
 Please check out our [example mod](https://github.com/Polyfrost/OneConfigExampleMod/).
