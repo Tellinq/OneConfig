@@ -1,7 +1,6 @@
 @file:Suppress("UnstableApiUsage")
 // Shared build logic for all versions of OneConfig.
 
-import org.gradle.api.internal.artifacts.dependencies.DefaultExternalModuleDependency
 import org.polyfrost.gradle.provideIncludedDependencies
 import org.polyfrost.gradle.util.noServerRunConfigs
 import java.text.SimpleDateFormat
@@ -133,7 +132,8 @@ tasks {
                 exclude("mcmod.info")
             }
         }
-        // Removes the TestMod entrypoint from the generated JARs.
+
+        // Removes the test-related stuff from everything
         doLast {
             val mainResources = layout.buildDirectory.get().asFile.resolve("resources")
                 .resolve("main")
@@ -144,6 +144,8 @@ tasks {
                 fabricModJson.writeText(lines.joinToString("\n"))
             }
         }
+        exclude("**/**_Test.**")
+        exclude("**/**_Test$**.**")
     }
     remapJar {
         from(shadow.files.map { zipTree(it) })
