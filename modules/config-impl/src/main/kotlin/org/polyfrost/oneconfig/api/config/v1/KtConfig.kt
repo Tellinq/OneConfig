@@ -52,35 +52,43 @@ open class KtConfig(id: String, title: String, category: Category, icon: String?
      * create a new delegate for the given property.
      */
     @JvmSynthetic
-    protected inline fun <reified T> property(def: T? = null, name: String? = null, description: String? = null, visualizer: Class<out Visualizer>) = Provider(def, name, description, T::class.java, visualizer)
+    protected inline fun <reified T> property(def: T? = null, name: String? = null, description: String? = null, category: String? = null, subcategory: String? = null, visualizer: Class<out Visualizer>) =
+        Provider(def, name, description, category, subcategory, T::class.java, visualizer)
 
     @JvmSynthetic
-    protected fun switch(def: Boolean = false, name: String? = null, description: String? = null) = Provider(def, name, description, Boolean::class.java, Visualizer.SwitchVisualizer::class.java)
+    protected fun switch(def: Boolean = false, name: String? = null, description: String? = null, category: String? = null, subcategory: String? = null) =
+        Provider(def, name, description, category, subcategory, Boolean::class.java, Visualizer.SwitchVisualizer::class.java)
 
     @JvmSynthetic
-    protected fun color(def: PolyColor = rgba(0, 0, 0, 1f), name: String? = null, description: String? = null) = Provider(def, name, description, PolyColor::class.java, Visualizer.ColorVisualizer::class.java)
+    protected fun color(def: PolyColor = rgba(0, 0, 0, 1f), name: String? = null, description: String? = null, category: String? = null, subcategory: String? = null) =
+        Provider(def, name, description, category, subcategory, PolyColor::class.java, Visualizer.ColorVisualizer::class.java)
 
     @JvmSynthetic
-    protected fun slider(min: Float = 0f, max: Float = 0f, def: Float = 0f, name: String? = null, description: String? = null) = Provider(def, name, description, Float::class.java, Visualizer.SliderVisualizer::class.java) {
-        addMetadata("min", min)
-        addMetadata("max", max)
-    }
+    protected fun slider(min: Float = 0f, max: Float = 0f, def: Float = 0f, name: String? = null, description: String? = null, category: String? = null, subcategory: String? = null) =
+        Provider(def, name, description, category, subcategory, Float::class.java, Visualizer.SliderVisualizer::class.java) {
+            addMetadata("min", min)
+            addMetadata("max", max)
+        }
 
     @JvmSynthetic
-    protected fun text(def: String = "", name: String? = null, description: String? = null) = Provider(def, name, description, String::class.java, Visualizer.TextVisualizer::class.java)
+    protected fun text(def: String = "", name: String? = null, description: String? = null, category: String? = null, subcategory: String? = null) =
+        Provider(def, name, description, category, subcategory, String::class.java, Visualizer.TextVisualizer::class.java)
 
     @JvmSynthetic
-    protected fun keybind(def: KeyBinder.Bind? = null, name: String? = null, description: String? = null) = Provider(def, name, description, KeyBinder.Bind::class.java, Visualizer.KeybindVisualizer::class.java)
+    protected fun keybind(def: KeyBinder.Bind? = null, name: String? = null, description: String? = null, category: String? = null, subcategory: String? = null) =
+        Provider(def, name, description, category, subcategory, KeyBinder.Bind::class.java, Visualizer.KeybindVisualizer::class.java)
 
     @JvmSynthetic
-    protected fun radiobutton(options: Array<String>, def: Int = 0, name: String? = null, description: String? = null) = Provider(def, name, description, Int::class.java, Visualizer.RadioVisualizer::class.java) {
-        addMetadata("options", options)
-    }
+    protected fun radiobutton(options: Array<String>, def: Int = 0, name: String? = null, description: String? = null, category: String? = null, subcategory: String? = null) =
+        Provider(def, name, description, category, subcategory, Int::class.java, Visualizer.RadioVisualizer::class.java) {
+            addMetadata("options", options)
+        }
 
     @JvmSynthetic
-    protected fun dropdown(options: Array<String>, def: Int = 0, name: String? = null, description: String? = null) = Provider(def, name, description, Int::class.java, Visualizer.DropdownVisualizer::class.java) {
-        addMetadata("options", options)
-    }
+    protected fun dropdown(options: Array<String>, def: Int = 0, name: String? = null, description: String? = null, category: String? = null, subcategory: String? = null) =
+        Provider(def, name, description, category, subcategory, Int::class.java, Visualizer.DropdownVisualizer::class.java) {
+            addMetadata("options", options)
+        }
 
 
     /**
@@ -90,14 +98,18 @@ open class KtConfig(id: String, title: String, category: Category, icon: String?
         private val def: T?,
         private val name: String?,
         private val description: String?,
+        private val category: String?,
+        private val subcategory: String?,
         private val type: Class<T>,
         private val visualizer: Class<out Visualizer>,
         private val extra: (Property<T>.() -> Unit)? = null
-    ) : PropertyDelegateProvider<KtConfig, ReadWriteProperty<KtConfig, T>> {
-        override operator fun provideDelegate(thisRef: KtConfig, property: KProperty<*>): ReadWriteProperty<KtConfig, T> {
+    ) : PropertyDelegateProvider<KtConfig, ReadWriteProperty<KtConfig, T?>> {
+        override operator fun provideDelegate(thisRef: KtConfig, property: KProperty<*>): ReadWriteProperty<KtConfig, T?> {
             val p = Properties.simple(property.name, name ?: property.name, description, def, type)
             extra?.invoke(p)
             p.addMetadata("visualizer", visualizer)
+            p.addMetadata("category", category)
+            p.addMetadata("subcategory", subcategory)
             thisRef.tree.put(p)
             return PropertyDelegate(p)
         }
@@ -106,12 +118,10 @@ open class KtConfig(id: String, title: String, category: Category, icon: String?
     /**
      * The actual delegate property. very simple.
      */
-    private class PropertyDelegate<T>(val property: Property<T>) : ReadWriteProperty<KtConfig, T> {
-        override operator fun getValue(thisRef: KtConfig, property: KProperty<*>): T {
-            return this.property.get()!!
-        }
+    private class PropertyDelegate<T>(val property: Property<T>) : ReadWriteProperty<KtConfig, T?> {
+        override operator fun getValue(thisRef: KtConfig, property: KProperty<*>): T? = this.property.get()
 
-        override operator fun setValue(thisRef: KtConfig, property: KProperty<*>, value: T) {
+        override operator fun setValue(thisRef: KtConfig, property: KProperty<*>, value: T?) {
             this.property.set(value)
         }
     }
