@@ -111,6 +111,7 @@ public class OneConfig
 
     private static void registerKeybinds() {
         OCKeybindHelper builder = OCKeybindHelper.builder();
+        if (Platform.loader().isDevelopmentEnvironment()) builder.inScreens();
         builder.mods(KeyModifiers.RSHIFT).does((s) -> {
             if (s) OneConfigUI.INSTANCE.open();
             return Unit.INSTANCE;

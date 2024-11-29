@@ -24,39 +24,26 @@
  * <https://polyfrost.org/legal/oneconfig/additional-terms>
  */
 
-package org.polyfrost.oneconfig.api.ui.v1.keybind
+package org.polyfrost.oneconfig.internal.mixin.hidpi;
 
-import org.polyfrost.polyui.input.KeyBinder
-import org.polyfrost.polyui.input.KeybindHelper
-import org.polyfrost.polyui.utils.nullIfEmpty
+//#if MC<11300
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.ScaledResolution;
+import org.objectweb.asm.Opcodes;
+import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Redirect;
 
-/**
- * Java builder-style helper for creating keybinds.
- */
-class OCKeybindHelper : KeybindHelper() {
-    private var inScreens = false
-
-    override fun build(): KeyBinder.Bind {
-        val func = func ?: throw IllegalStateException("Function must be set")
-        return if (!inScreens) BindNotInScreen(
-            unmappedKeys.nullIfEmpty()?.toIntArray(),
-            keys.nullIfEmpty()?.toTypedArray(),
-            mouse.nullIfEmpty()?.toIntArray(),
-            mods, duration, func
-        ) else super.build()
+@Mixin(ScaledResolution.class)
+public abstract class ScaledResolutionMixin {
+    @Redirect(method = "<init>", at = @At(value = "FIELD", target = "Lnet/minecraft/client/Minecraft;displayWidth:I", opcode = Opcodes.GETFIELD))
+    private int hiDpiFixWidth(Minecraft mc) {
+        return (int) (mc.displayWidth / org.lwjgl.opengl.Display.getPixelScaleFactor());
     }
 
-    fun inScreens(): OCKeybindHelper {
-        inScreens = true
-        return this
-    }
-
-    fun register() = build().register()
-
-    fun KeyBinder.Bind.register() = KeybindManager.registerKeybind(this)
-
-    companion object {
-        @JvmStatic
-        fun builder() = OCKeybindHelper()
+    @Redirect(method = "<init>", at = @At(value = "FIELD", target = "Lnet/minecraft/client/Minecraft;displayHeight:I", opcode = Opcodes.GETFIELD))
+    private int hiDpiFixHeight(Minecraft mc) {
+        return (int) (mc.displayHeight / org.lwjgl.opengl.Display.getPixelScaleFactor());
     }
 }
+//#endif

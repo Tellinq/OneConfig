@@ -96,6 +96,10 @@ public class OneConfigMixinInit implements IMixinConfigPlugin {
         } else {
             // legacy
             mixins.add("GuiScreenMixin");
+
+            mixins.add("hidpi.ScaledResolutionMixin");
+            mixins.add("hidpi.EntityRendererMixin");
+            mixins.add("hidpi.LoadingScreenRendererMixin");
         }
 
         return mixins;

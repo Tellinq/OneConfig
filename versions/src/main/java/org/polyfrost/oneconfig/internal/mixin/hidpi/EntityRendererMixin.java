@@ -24,39 +24,24 @@
  * <https://polyfrost.org/legal/oneconfig/additional-terms>
  */
 
-package org.polyfrost.oneconfig.api.ui.v1.keybind
+package org.polyfrost.oneconfig.internal.mixin.hidpi;
 
-import org.polyfrost.polyui.input.KeyBinder
-import org.polyfrost.polyui.input.KeybindHelper
-import org.polyfrost.polyui.utils.nullIfEmpty
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.EntityRenderer;
+import org.lwjgl.opengl.Display;
+import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Redirect;
 
-/**
- * Java builder-style helper for creating keybinds.
- */
-class OCKeybindHelper : KeybindHelper() {
-    private var inScreens = false
-
-    override fun build(): KeyBinder.Bind {
-        val func = func ?: throw IllegalStateException("Function must be set")
-        return if (!inScreens) BindNotInScreen(
-            unmappedKeys.nullIfEmpty()?.toIntArray(),
-            keys.nullIfEmpty()?.toTypedArray(),
-            mouse.nullIfEmpty()?.toIntArray(),
-            mods, duration, func
-        ) else super.build()
+@Mixin(EntityRenderer.class)
+public abstract class EntityRendererMixin {
+    @Redirect(method = "updateCameraAndRender", at = @At(value = "FIELD", target = "Lnet/minecraft/client/Minecraft;displayWidth:I", ordinal = 0))
+    private int hiDpiFixMouseX(Minecraft mc) {
+        return (int) (mc.displayWidth / Display.getPixelScaleFactor());
     }
 
-    fun inScreens(): OCKeybindHelper {
-        inScreens = true
-        return this
-    }
-
-    fun register() = build().register()
-
-    fun KeyBinder.Bind.register() = KeybindManager.registerKeybind(this)
-
-    companion object {
-        @JvmStatic
-        fun builder() = OCKeybindHelper()
+    @Redirect(method = "updateCameraAndRender", at = @At(value = "FIELD", target = "Lnet/minecraft/client/Minecraft;displayHeight:I", ordinal = 0))
+    private int hiDpiFixMouseY(Minecraft mc) {
+        return (int) (mc.displayHeight / Display.getPixelScaleFactor());
     }
 }

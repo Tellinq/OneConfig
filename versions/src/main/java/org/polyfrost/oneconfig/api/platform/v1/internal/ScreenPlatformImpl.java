@@ -96,7 +96,7 @@ public class ScreenPlatformImpl implements ScreenPlatform {
         //#if MC>=11502
         //$$ return Minecraft.getInstance().getMainWindow().getWidth();
         //#else
-        return Minecraft.getMinecraft().displayWidth;
+        return (int) (Minecraft.getMinecraft().displayWidth / org.lwjgl.opengl.Display.getPixelScaleFactor());
         //#endif
     }
 
@@ -105,7 +105,7 @@ public class ScreenPlatformImpl implements ScreenPlatform {
         //#if MC>=11502
         //$$ return Minecraft.getInstance().getMainWindow().getHeight();
         //#else
-        return Minecraft.getMinecraft().displayHeight;
+        return (int) (Minecraft.getMinecraft().displayHeight / org.lwjgl.opengl.Display.getPixelScaleFactor());
         //#endif
     }
 

@@ -27,15 +27,18 @@
 package org.polyfrost.oneconfig.internal.mixin;
 //#if MC<=11202
 
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiScreen;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
+import org.lwjgl.opengl.Display;
 import org.polyfrost.oneconfig.api.event.v1.EventManager;
 import org.polyfrost.oneconfig.api.event.v1.events.KeyInputEvent;
 import org.polyfrost.oneconfig.api.event.v1.events.MouseInputEvent;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(GuiScreen.class)
@@ -78,5 +81,18 @@ public abstract class GuiScreenMixin {
     //$$    }
     //$$ }
     //#endif
+
+
+    // HiDPI fixes
+
+    @Redirect(method = "handleMouseInput", at = @At(value = "FIELD", target = "Lnet/minecraft/client/Minecraft;displayWidth:I", ordinal = 0))
+    private int hiDpiFixMouseX(Minecraft mc) {
+        return (int) (mc.displayWidth / Display.getPixelScaleFactor());
+    }
+
+    @Redirect(method = "handleMouseInput", at = @At(value = "FIELD", target = "Lnet/minecraft/client/Minecraft;displayHeight:I", ordinal = 0))
+    private int hiDpiFixMouseY(Minecraft mc) {
+        return (int) (mc.displayHeight / Display.getPixelScaleFactor());
+    }
 }
 //#endif

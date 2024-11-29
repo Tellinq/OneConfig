@@ -33,9 +33,7 @@ import org.polyfrost.oneconfig.api.event.v1.events.*;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
-import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.ModifyArg;
+import org.spongepowered.asm.mixin.injection.*;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 //#if FORGE
@@ -49,6 +47,11 @@ import net.minecraftforge.fml.common.eventhandler.Event;
 public abstract class MinecraftMixin {
     @Shadow
     private Timer timer;
+
+    @Shadow public int displayWidth;
+    @Shadow public int displayHeight;
+    @Shadow private int tempDisplayWidth;
+    @Shadow private int tempDisplayHeight;
 
     //@formatter:off
     @Unique
@@ -75,7 +78,7 @@ public abstract class MinecraftMixin {
     }
 
     //#if MC<=11300
-    @Inject(method = "resize", at = @At("HEAD"))
+    @Inject(method = "resize", at = @At("TAIL"))
     private void ocfg$resizeCallback(int width, int height, CallbackInfo ci) {
         EventManager.INSTANCE.post(new ResizeEvent(width, height));
     }
@@ -209,5 +212,38 @@ public abstract class MinecraftMixin {
         EventManager.INSTANCE.post(new MouseInputEvent(org.lwjgl.input.Mouse.getEventButton(), org.lwjgl.input.Mouse.getEventButtonState() ? 1 : 0));
     }
 
+    //#endif
+
+    // HiDPI fixes
+
+    //#if MC<11300
+    @Inject(method = "startGame", at = @At("HEAD"))
+    private void hiDpiFixInit(CallbackInfo ci) {
+        System.setProperty("org.lwjgl.opengl.Display.enableHighDPI", "true");
+    }
+
+    @ModifyVariable(method = "resize", at = @At(value = "HEAD"), ordinal = 0, argsOnly = true)
+    private int hiDpiFixResizeW(int value) {
+        return (int) (value * org.lwjgl.opengl.Display.getPixelScaleFactor());
+    }
+
+    @ModifyVariable(method = "resize", at = @At(value = "HEAD"), ordinal = 1, argsOnly = true)
+    private int hiDpiFixResizeH(int value) {
+        return (int) (value * org.lwjgl.opengl.Display.getPixelScaleFactor());
+    }
+
+    @ModifyVariable(method = "drawSplashScreen", at = @At("STORE"), ordinal = 0)
+    private int hiDpiFixSplashScale(int value) {
+        return (int) (value * org.lwjgl.opengl.Display.getPixelScaleFactor());
+    }
+
+    @Inject(method = "startGame", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/Minecraft;createDisplay()V", shift = At.Shift.AFTER))
+    private void hiDpiFixDisplaySizes(CallbackInfo ci) {
+        float scale = org.lwjgl.opengl.Display.getPixelScaleFactor();
+        this.displayWidth = (int) (this.displayWidth * scale);
+        this.displayHeight = (int) (this.displayHeight * scale);
+        this.tempDisplayWidth = (int) (this.tempDisplayWidth * scale);
+        this.tempDisplayHeight = (int) (this.tempDisplayHeight * scale);
+    }
     //#endif
 }
