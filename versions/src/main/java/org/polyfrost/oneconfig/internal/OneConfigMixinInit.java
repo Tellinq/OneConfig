@@ -68,6 +68,8 @@ public class OneConfigMixinInit implements IMixinConfigPlugin {
             if (version < 11300) {
                 // legacy forge
                 mixins.add("compat.OneConfigV0CompatMixin");
+                mixins.add("forge.ASMModParserMixin");
+                mixins.add("forge.JarDiscovererMixin");
             }
         } else {
             // fabric specific
