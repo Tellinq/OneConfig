@@ -28,7 +28,7 @@ package org.polyfrost.oneconfig.api.config.v1
 
 class KtConfigTest : KtConfig("super.json", "Super Config", Config.Category.QOL) {
 
-    var p: String by text("amazing", "actually so cool")
+    var p by text("amazing", "actually so cool")
 
     var g by slider(0f, 100f, 5f, "great", "actually so cool")
 }
