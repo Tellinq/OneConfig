@@ -26,10 +26,7 @@
 
 package org.polyfrost.oneconfig.api.config.v1.serialize.impl;
 
-import com.electronwill.nightconfig.core.AbstractConfig;
-import com.electronwill.nightconfig.core.Config;
-import com.electronwill.nightconfig.core.ConfigFormat;
-import com.electronwill.nightconfig.core.InMemoryFormat;
+import com.electronwill.nightconfig.core.*;
 import com.electronwill.nightconfig.core.io.ConfigParser;
 import com.electronwill.nightconfig.core.io.ConfigWriter;
 import com.electronwill.nightconfig.json.JsonFormat;
@@ -112,7 +109,7 @@ public class NightConfigSerializer implements FileSerializer<String> {
                 } else b.put(read(c.valueMap(), tree(e.getKey())));
             } else {
                 Object v = e.getValue();
-                b.put(Properties.simple(e.getKey(), null, null, v));
+                b.put(Properties.simple(e.getKey(), null, null, v == NullObject.NULL_OBJECT ? null : v));
             }
         }
         return b;
