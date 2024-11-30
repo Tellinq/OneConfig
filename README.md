@@ -1,8 +1,7 @@
 ![OneConfig_banner_wide](https://user-images.githubusercontent.com/62163840/226811571-ffe7a524-c96a-4b6e-9ca9-d29439f5174f.png)
 
 # OneConfig
-![Dev Workflow Status](https://img.shields.io/github/actions/workflow/status/Polyfrost/OneConfig/release.yml?style=for-the-badge&color=1452cc&label=release)
-![Dev Workflow Status](https://img.shields.io/github/actions/workflow/status/Polyfrost/OneConfig/build.yml?style=for-the-badge&color=1452cc&label=build)
+![Dev Workflow Status](https://img.shields.io/github/actions/workflow/status/Polyfrost/OneConfig/build.yml?style=for-the-badge&color=1452cc&label=build&branch=v1)
 
 OneConfig is a free, open sourced configuration library by [Polyfrost](https://polyfrost.org), designed to give developers a simple config API, which users can interact with in an elegant user interface.
 
