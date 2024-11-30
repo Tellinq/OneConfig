@@ -40,11 +40,11 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 public abstract class GuiIngameMixin {
     @Inject(method = "render", at = @At(value = "TAIL"))
     //#if MC>=12000
-    //$$ private void ocfg$renderHudCallback(net.minecraft.client.gui.DrawContext context, float tickDelta, CallbackInfo ci) {
+    //$$ private void renderHudCallback(net.minecraft.client.gui.DrawContext context, float tickDelta, CallbackInfo ci) {
     //$$     EventManager.INSTANCE.post(new HudRenderEvent(new UMatrixStack(context.getMatrices()), tickDelta));
     //$$ }
     //#else
-    private void ocfg$renderHudCallback(MatrixStack matrices, float tickDelta, CallbackInfo ci) {
+    private void renderHudCallback(MatrixStack matrices, float tickDelta, CallbackInfo ci) {
         EventManager.INSTANCE.post(new HudRenderEvent(new UMatrixStack(matrices), tickDelta));
     }
     //#endif

@@ -45,14 +45,14 @@ public abstract class NetHandlerPlayClientMixin {
     private ChatReceiveEvent ocfg$chatEvent = null;
 
     @Inject(method = "onGameMessage", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/hud/InGameHud;addChatMessage(Lnet/minecraft/network/MessageType;Lnet/minecraft/text/Text;Ljava/util/UUID;)V"), cancellable = true)
-    private void ocfg$chatCallback(GameMessageS2CPacket packet, CallbackInfo ci) {
+    private void chatCallback(GameMessageS2CPacket packet, CallbackInfo ci) {
         if (ocfg$chatEvent != null && ocfg$chatEvent.cancelled) {
             ci.cancel();
         }
     }
 
     @Redirect(method = "onGameMessage", at = @At(value = "INVOKE", target = "Lnet/minecraft/network/packet/s2c/play/GameMessageS2CPacket;getMessage()Lnet/minecraft/text/Text;"))
-    private Text ocfg$modifyMessage(GameMessageS2CPacket packet) {
+    private Text modifyMessage(GameMessageS2CPacket packet) {
         //@formatter:off
         if (
             //#if MC<11700

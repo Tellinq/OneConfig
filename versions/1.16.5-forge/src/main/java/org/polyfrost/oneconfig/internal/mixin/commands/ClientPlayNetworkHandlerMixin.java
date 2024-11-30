@@ -52,7 +52,7 @@ public class ClientPlayNetworkHandlerMixin {
 
     @SuppressWarnings({"unchecked", "rawtypes"})
     @Inject(method = "handleCommandList", at = @At("RETURN"))
-    private void ocfg$commands$setup(SCommandListPacket packet, CallbackInfo info) {
+    private void commands$setup(SCommandListPacket packet, CallbackInfo info) {
         // Add the commands to the vanilla dispatcher for completion.
         // It's done here because both the server and the client commands have
         // to be in the same dispatcher and completion results.

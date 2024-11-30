@@ -40,7 +40,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 @Mixin(CustomPayloadS2CPacket.class)
 public class CustomPayloadS2CPacketMixin {
     @Inject(method = "readPayload", at = @At(value = "INVOKE", target = "Lnet/minecraft/network/packet/s2c/common/CustomPayloadS2CPacket;readUnknownPayload(Lnet/minecraft/util/Identifier;Lnet/minecraft/network/PacketByteBuf;)Lnet/minecraft/network/packet/UnknownCustomPayload;"), cancellable = true)
-    private static void oneconfig$captureHypixelPacket(Identifier id, PacketByteBuf buf, CallbackInfoReturnable<CustomPayload> cir) {
+    private static void captureHypixelPacket(Identifier id, PacketByteBuf buf, CallbackInfoReturnable<CustomPayload> cir) {
         if (HypixelModAPI.getInstance().getRegistry().isRegistered(id.toString())) {
             cir.setReturnValue(new HypixelApiInternalsImpl.Payload(id, buf));
         }

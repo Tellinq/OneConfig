@@ -44,7 +44,7 @@ import java.io.File;
 public abstract class VigilantCompatMixin {
     @Dynamic("OneConfig VCAL Processor")
     @Inject(method = "<init>(Ljava/io/File;Ljava/lang/String;Lgg/essential/vigilance/data/PropertyCollector;Lgg/essential/vigilance/data/SortingBehavior;)V", at = @At("RETURN"), remap = false)
-    public void ocfg$compat$vigilance(File file, String title, PropertyCollector collector, SortingBehavior par4, CallbackInfo ci) {
+    public void compat$vigilance(File file, String title, PropertyCollector collector, SortingBehavior par4, CallbackInfo ci) {
         // todo rewrite
     }
 

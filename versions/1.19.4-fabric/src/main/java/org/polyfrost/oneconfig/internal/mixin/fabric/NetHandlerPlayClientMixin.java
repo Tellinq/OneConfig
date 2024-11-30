@@ -43,38 +43,38 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 @Mixin(ClientPlayNetworkHandler.class)
 public class NetHandlerPlayClientMixin {
     @Unique
-    private ChatSendEvent ocfg$sendchatevent;
+    private ChatSendEvent ocfg$sendChatEvent;
 
     @Inject(method = "sendCommand", at = @At("HEAD"), cancellable = true)
-    private void ocfg$commands$execute(String command, CallbackInfoReturnable<Boolean> cir) {
+    private void commands$execute(String command, CallbackInfoReturnable<Boolean> cir) {
         if (ClientCommandInternals.executeCommand(command)) {
             cir.setReturnValue(true);
         }
     }
 
     @Inject(method = "sendChatCommand", at = @At("HEAD"), cancellable = true)
-    private void ocfg$commands$execute(String command, CallbackInfo info) {
+    private void commands$execute(String command, CallbackInfo info) {
         if (ClientCommandInternals.executeCommand(command)) {
             info.cancel();
         }
     }
 
     @Inject(method = "sendChatMessage", at = @At("HEAD"), cancellable = true)
-    private void ocfg$chatCallback(String message, CallbackInfo ci) {
-        ocfg$sendchatevent = new ChatSendEvent(message);
-        EventManager.INSTANCE.post(ocfg$sendchatevent);
-        if (ocfg$sendchatevent.cancelled) {
+    private void chatCallback(String message, CallbackInfo ci) {
+        ocfg$sendChatEvent = new ChatSendEvent(message);
+        EventManager.INSTANCE.post(ocfg$sendChatEvent);
+        if (ocfg$sendChatEvent.cancelled) {
             ci.cancel();
         }
     }
 
     @ModifyVariable(method = "sendChatMessage", at = @At("HEAD"), ordinal = 0, argsOnly = true)
-    private String ocfg$modifyMessage(String message) {
-        return ocfg$sendchatevent.message;
+    private String modifyMessage(String message) {
+        return ocfg$sendChatEvent.message;
     }
 
     @Inject(method = "onChatMessage", at = @At("HEAD"), cancellable = true)
-    private void ocfg$chatRecieveCallback(ChatMessageS2CPacket packet, CallbackInfo ci) {
+    private void chatRecieveCallback(ChatMessageS2CPacket packet, CallbackInfo ci) {
         ChatReceiveEvent ev = new ChatReceiveEvent(packet.unsignedContent());
         EventManager.INSTANCE.post(ev);
         if (ev.cancelled) {

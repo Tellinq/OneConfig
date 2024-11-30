@@ -70,18 +70,18 @@ public abstract class MinecraftMixin {
     //#else
     @Inject(method = "startGame", at = @At("RETURN"))
     //#endif
-    private void ocfg$completedInit(CallbackInfo ci) {
+    private void completedInit(CallbackInfo ci) {
         EventManager.INSTANCE.post(InitializationEvent.INSTANCE);
     }
 
     @Inject(method = "shutdownMinecraftApplet", at = @At("HEAD"))
-    private void ocfg$shutdownCallback(CallbackInfo ci) {
+    private void shutdownCallback(CallbackInfo ci) {
         EventManager.INSTANCE.post(ShutdownEvent.INSTANCE);
     }
 
     //#if MC<=11300
-    @Inject(method = "resize", at = @At("TAIL"))
-    private void ocfg$resizeCallback(int width, int height, CallbackInfo ci) {
+    @Inject(method = "resize", at = @At("HEAD"))
+    private void resizeCallback(int width, int height, CallbackInfo ci) {
         EventManager.INSTANCE.post(new ResizeEvent(width, height));
     }
     //#else
@@ -89,7 +89,7 @@ public abstract class MinecraftMixin {
     //$$ public abstract net.minecraft.client.MainWindow getMainWindow();
     //$$
     //$$ @Inject(method = "updateWindowSize", at = @At("HEAD"))
-    //$$ private void ocfg$resizeCallback(CallbackInfo ci) {
+    //$$ private void resizeCallback(CallbackInfo ci) {
     //$$     int[] w = new int[1];
     //$$     int[] h = new int[1];
     //$$     org.lwjgl.glfw.GLFW.glfwGetWindowSize(this.getMainWindow().getHandle(), w, h);
@@ -98,42 +98,42 @@ public abstract class MinecraftMixin {
     //#endif
 
     @Inject(method = "runGameLoop", at = @At(value = "INVOKE", target = UPDATE_CAMERA_AND_RENDER))
-    private void ocfg$renderTickStartCallback(CallbackInfo ci) {
+    private void renderTickStartCallback(CallbackInfo ci) {
         RenderEvent e = RenderEvent.Start.INSTANCE;
         e.deltaTicks = this.timer.renderPartialTicks;
         EventManager.INSTANCE.post(e);
     }
 
     @Inject(method = "runGameLoop", at = @At(value = "INVOKE", target = UPDATE_CAMERA_AND_RENDER, shift = At.Shift.AFTER))
-    private void ocfg$renderTickEndCallback(CallbackInfo ci) {
+    private void renderTickEndCallback(CallbackInfo ci) {
         RenderEvent e = RenderEvent.End.INSTANCE;
         e.deltaTicks = this.timer.renderPartialTicks;
         EventManager.INSTANCE.post(e);
     }
 
     @Inject(method = "runGameLoop", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/shader/Framebuffer;framebufferRender(II)V"))
-    private void ocfg$preFramebufferRenderCallback(CallbackInfo ci) {
+    private void preFramebufferRenderCallback(CallbackInfo ci) {
         EventManager.INSTANCE.post(FramebufferRenderEvent.Start.INSTANCE);
     }
 
     @Inject(method = "runGameLoop", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/shader/Framebuffer;framebufferRender(II)V", shift = At.Shift.AFTER))
-    private void ocfg$postFramebufferRenderCallback(CallbackInfo ci) {
+    private void postFramebufferRenderCallback(CallbackInfo ci) {
         EventManager.INSTANCE.post(FramebufferRenderEvent.End.INSTANCE);
     }
 
     @Inject(method = "runTick", at = @At(value = "INVOKE", target = "Lnet/minecraft/profiler/Profiler;startSection(Ljava/lang/String;)V", ordinal = 0))
-    private void ocfg$tickStartCallback(CallbackInfo ci) {
+    private void tickStartCallback(CallbackInfo ci) {
         EventManager.INSTANCE.post(TickEvent.Start.INSTANCE);
     }
 
     @Inject(method = "runTick", at = @At("TAIL"))
-    private void ocfg$tickEndCallback(CallbackInfo ci) {
+    private void tickEndCallback(CallbackInfo ci) {
         EventManager.INSTANCE.post(TickEvent.End.INSTANCE);
     }
 
     //#if FORGE
     @ModifyArg(method = "displayGuiScreen", at = @At(value = "INVOKE", target = "Lnet/minecraftforge/fml/common/eventhandler/EventBus;post(Lnet/minecraftforge/fml/common/eventhandler/Event;)Z", remap = false))
-    private Event ocfg$screenOpenCallback(Event a) {
+    private Event screenOpenCallback(Event a) {
         if (a instanceof GuiOpenEvent) {
             // w: not imported because 1.18+ they renamed it to be the same (breh)
             GuiOpenEvent forgeEvent = (GuiOpenEvent) a;
@@ -163,7 +163,7 @@ public abstract class MinecraftMixin {
     //$$  "Lnet/minecraft/client/gui/screen/DeathScreen;<init>()V", shift = At.Shift.BY, by = 3
     //#endif
     //$$  ), cancellable = true)
-    //$$  private void ocfg$screenOpenCallback(net.minecraft.client.gui.screen.Screen screen, CallbackInfo ci) {
+    //$$  private void screenOpenCallback(net.minecraft.client.gui.screen.Screen screen, CallbackInfo ci) {
     //$$      ScreenOpenEvent event = new ScreenOpenEvent(screen);
     //$$      EventManager.INSTANCE.post(event);
     //$$      if (event.cancelled) {
@@ -186,7 +186,7 @@ public abstract class MinecraftMixin {
     //#endif
     //#endif
     //@formatter:on
-    private void ocfg$keyCallback(CallbackInfo ci) {
+    private void keyCallback(CallbackInfo ci) {
         int state = 0;
         if (org.lwjgl.input.Keyboard.getEventKeyState()) {
             if (org.lwjgl.input.Keyboard.isRepeatEvent()) {
@@ -210,7 +210,7 @@ public abstract class MinecraftMixin {
     //#endif
     //#endif
     //@formatter:on
-    private void ocfg$mouseCallback(CallbackInfo ci) {
+    private void mouseCallback(CallbackInfo ci) {
         EventManager.INSTANCE.post(new MouseInputEvent(org.lwjgl.input.Mouse.getEventButton(), org.lwjgl.input.Mouse.getEventButtonState() ? 1 : 0));
     }
 

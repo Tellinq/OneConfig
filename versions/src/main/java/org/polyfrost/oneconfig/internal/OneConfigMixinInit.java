@@ -70,6 +70,7 @@ public class OneConfigMixinInit implements IMixinConfigPlugin {
                 mixins.add("compat.OneConfigV0CompatMixin");
                 mixins.add("forge.ASMModParserMixin");
                 mixins.add("forge.JarDiscovererMixin");
+                mixins.add("hidpi.ForgeSplashProgressMixin");
             }
         } else {
             // fabric specific

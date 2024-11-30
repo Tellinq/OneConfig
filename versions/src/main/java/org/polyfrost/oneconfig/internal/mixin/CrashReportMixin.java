@@ -39,26 +39,26 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 @Mixin(CrashReport.class)
 public abstract class CrashReportMixin {
     @Inject(method = "<init>", at = @At("RETURN"))
-    private void ocfg$checkApiIssues(String desc, Throwable cause, CallbackInfo ci) {
+    private void checkApiIssues(String desc, Throwable cause, CallbackInfo ci) {
         if (cause instanceof LinkageError) {
             String message = cause.getMessage();
             if (message != null && message.contains("org.polyfrost.oneconfig")) {
-                ocfg$apiDeath(true);
+                apiDeath(true);
                 return;
             }
             for (StackTraceElement e : cause.getStackTrace()) {
                 if (e.getClassName().contains("org.polyfrost.oneconfig")) {
-                    ocfg$apiDeath(true);
+                    apiDeath(true);
                     return;
                 }
             }
             // asm: still show the window in this case: it's a possible error.
-            ocfg$apiDeath(false);
+            apiDeath(false);
         }
     }
 
     @Unique
-    private static void ocfg$apiDeath(boolean certain) {
+    private static void apiDeath(boolean certain) {
         if (!MavenUpdateChecker.oneconfig().hasUpdate()) return;
         TinyFdApi tinyfd = UIManager.INSTANCE.getTinyFD();
         String title = certain ? "OneConfig API Error" : "OneConfig API Error (Possibly)";

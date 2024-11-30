@@ -43,7 +43,7 @@ public abstract class EntityPlayerSPMixin {
     private ChatSendEvent ocfg$chatEvent;
 
     @Inject(method = "sendChatMessage", at = @At("HEAD"), cancellable = true)
-    public void ocfg$chatCallback(String message, CallbackInfo ci) {
+    public void chatCallback(String message, CallbackInfo ci) {
         //#if MC>=11600
         //$$ if (org.polyfrost.oneconfig.internal.libs.fabric.ClientCommandInternals.executeCommand(message)) {
         //$$     ci.cancel();
@@ -59,7 +59,7 @@ public abstract class EntityPlayerSPMixin {
     }
 
     @ModifyVariable(method = "sendChatMessage", at = @At("HEAD"), ordinal = 0, argsOnly = true)
-    public String ocfg$modifyMessage(String message) {
+    public String modifyMessage(String message) {
         return ocfg$chatEvent.message;
     }
 }

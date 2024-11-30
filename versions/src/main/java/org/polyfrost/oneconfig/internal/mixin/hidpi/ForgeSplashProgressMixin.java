@@ -24,21 +24,30 @@
  * <https://polyfrost.org/legal/oneconfig/additional-terms>
  */
 
-package org.polyfrost.oneconfig.internal.mixin;
+package org.polyfrost.oneconfig.internal.mixin.hidpi;
 
-import net.minecraft.client.gui.hud.InGameHud;
-import org.polyfrost.oneconfig.api.event.v1.EventManager;
-import org.polyfrost.oneconfig.api.event.v1.events.HudRenderEvent;
-import org.polyfrost.universal.UMatrixStack;
+//#if FORGE && MC<11300
+import org.lwjgl.opengl.Display;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import org.spongepowered.asm.mixin.injection.ModifyArg;
 
-@Mixin(InGameHud.class)
-public abstract class GuiIngameMixin {
-    @Inject(method = "render", at = @At(value = "TAIL", shift = At.Shift.BY, by = -4))
-    private void renderHudCallback(float partialTicks, CallbackInfo ci) {
-        EventManager.INSTANCE.post(new HudRenderEvent(UMatrixStack.Compat.INSTANCE.get(), partialTicks));
+@Mixin(targets =
+        //#if MC==10809
+        "net.minecraftforge.fml.client.SplashProgress$3"
+        //#else
+        //$$ "net.minecraftforge.fml.client.SplashProgress$2"
+        //#endif
+        , remap = false)
+public abstract class ForgeSplashProgressMixin {
+    @ModifyArg(method = "run", at = @At(value = "INVOKE", target = "Lorg/lwjgl/opengl/GL11;glViewport(IIII)V"), index = 2)
+    private int hiDpiFixViewportW(int value) {
+        return (int) (value * Display.getPixelScaleFactor());
+    }
+
+    @ModifyArg(method = "run", at = @At(value = "INVOKE", target = "Lorg/lwjgl/opengl/GL11;glViewport(IIII)V"), index = 3)
+    private int hiDpiFixViewportH(int value) {
+        return (int) (value * Display.getPixelScaleFactor());
     }
 }
+//#endif

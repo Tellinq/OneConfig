@@ -61,7 +61,7 @@ public abstract class OneConfigV0CompatMixin {
 
     @Inject(method = "initialize", at = @At("RETURN"))
     @Dynamic("OneConfig V0 Compat")
-    private void ocfg$compat$v0(CallbackInfo ci) {
+    private void compat$v0(CallbackInfo ci) {
         try {
             Tree t = Tree.tree(configFile);
             t.setTitle(mod.name);

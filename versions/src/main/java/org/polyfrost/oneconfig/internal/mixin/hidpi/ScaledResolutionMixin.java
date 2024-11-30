@@ -29,6 +29,7 @@ package org.polyfrost.oneconfig.internal.mixin.hidpi;
 //#if MC<11300
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.ScaledResolution;
+import org.lwjgl.opengl.Display;
 import org.objectweb.asm.Opcodes;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
@@ -38,12 +39,12 @@ import org.spongepowered.asm.mixin.injection.Redirect;
 public abstract class ScaledResolutionMixin {
     @Redirect(method = "<init>", at = @At(value = "FIELD", target = "Lnet/minecraft/client/Minecraft;displayWidth:I", opcode = Opcodes.GETFIELD))
     private int hiDpiFixWidth(Minecraft mc) {
-        return (int) (mc.displayWidth / org.lwjgl.opengl.Display.getPixelScaleFactor());
+        return (int) (mc.displayWidth / Display.getPixelScaleFactor());
     }
 
     @Redirect(method = "<init>", at = @At(value = "FIELD", target = "Lnet/minecraft/client/Minecraft;displayHeight:I", opcode = Opcodes.GETFIELD))
     private int hiDpiFixHeight(Minecraft mc) {
-        return (int) (mc.displayHeight / org.lwjgl.opengl.Display.getPixelScaleFactor());
+        return (int) (mc.displayHeight / Display.getPixelScaleFactor());
     }
 }
 //#endif
