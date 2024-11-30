@@ -24,13 +24,17 @@
  * <https://polyfrost.org/legal/oneconfig/additional-terms>
  */
 
-package org.polyfrost.utils.v1.dsl
+package org.polyfrost.oneconfig.utils.v1.dsl
 
-import net.minecraft.client.Minecraft
+import net.minecraft.client.gui.GuiScreen
+import org.polyfrost.oneconfig.api.config.v1.Config
+import org.polyfrost.oneconfig.api.config.v1.Tree
+import org.polyfrost.oneconfig.api.config.v1.internal.ConfigVisualizer
+import org.polyfrost.oneconfig.api.platform.v1.Platform
+import org.polyfrost.oneconfig.internal.ui.OneConfigUI
 
-/**
- * Gets the current [net.minecraft.client.Minecraft] instance.
- */
-@Suppress("INVISIBLE_MEMBER", "INVISIBLE_REFERENCE")
-@kotlin.internal.InlineOnly
-inline val mc: Minecraft get() = Minecraft.getMinecraft()
+fun GuiScreen.openScreen(ticks: Int = 1) = Platform.screen().display(this, ticks)
+
+fun Tree.openUI() = Platform.screen().display(OneConfigUI.open(ConfigVisualizer.INSTANCE.get(this)))
+
+fun Config.openUI() = this.tree.openUI()
