@@ -61,7 +61,7 @@ private val scaleBlob by lazy {
             val dy = polyUI.mouseY - sy
             val dst = sqrt(dx * dx + dy * dy)
             val init = sqrt(it.width * it.width + it.height * it.height)
-            val sign = if(dx + dy < 0f) -1f else 1f
+            val sign = if (dx + dy < 0f) -1f else 1f
             val s = (st + sign * (dst / init)).coerceIn(0.5f, 3f)
 
             it.scaleX = s
@@ -74,7 +74,6 @@ private val scaleBlob by lazy {
         // if(!polyUI.inputManager.hasFocused) polyUI.focus(this)
 //        }
         on(Event.Focused.Lost) {
-            renders = false
             cur = null
         }
     }.setPalette { brand.fg }
@@ -84,6 +83,10 @@ private val scaleBlob by lazy {
 }
 
 private var cur: Drawable? = null
+    set(value) {
+        field = value
+        scaleBlob.renders = value != null
+    }
 
 /**
  * Build a HUD element, turning the given HUD into a representation for the HUD picker screen.
@@ -92,13 +95,13 @@ private var cur: Drawable? = null
  *
  * The returned element is draggable, and will be added to the screen when dropped.
  */
-fun Hud<*>.buildNew(): Block {
+fun Hud<*>.buildNew(): Drawable {
     var tx = 0f
     var ty = 0f
     if (!multipleInstancesAllowed() && isReal) {
         return makeAlreadyUsed()
     }
-    val o = get().addDefaultBackground(backgroundColor()).draggable(free = true)
+    val o = get().addDefaultBackground(hasBackground(), backgroundColor()).draggable(free = true)
         .onDragStart {
             tx = x - parent.x
             ty = y - parent.y
@@ -147,7 +150,7 @@ fun Hud<*>.makeAlreadyUsed(): Block {
  * Build a HUD element, turning the given HUD into a final HUD element,
  * ready to be placed on the screen.
  */
-fun Hud<*>.build(): Block {
+fun Hud<*>.build(): Drawable {
     val freq = updateFrequency()
     if (freq == 0L) LOGGER.warn("update of HUD $this is 0, this is not recommended!")
     val exe = if (freq < 0L) {
@@ -155,14 +158,15 @@ fun Hud<*>.build(): Block {
     } else {
         HudManager.polyUI.every(freq) {
             if (update()) {
-                get()._parent?.recalculate()
+                getBackground()?.recalculate()
             }
         }
     }
 
-    val o = get().addDefaultBackground(backgroundColor()).addScaler().draggable()
+    val o = get().addDefaultBackground(hasBackground(), backgroundColor()).addScaler().draggable()
         .onDragStart {
             if (HudManager.panelOpen) HudManager.toggle()
+            cur = null
         }
         .onDrag { snapHandler() }
         .onDragEnd {
@@ -201,13 +205,13 @@ fun Hud<*>.build(): Block {
     return o
 }
 
-private fun Drawable.addDefaultBackground(color: PolyColor?) = Block(
+private fun Drawable.addDefaultBackground(add: Boolean, color: PolyColor?) = if (!add) this else Block(
     this,
     alignment = alignC,
     color = color,
 ).radius(6f).withBoarder().namedId("HudBackground")
 
-private fun Block.addScaler(): Block {
+private fun Drawable.addScaler(): Drawable {
     this.on(Event.Mouse.Clicked) {
         val sb = scaleBlob
         sb.renders = true

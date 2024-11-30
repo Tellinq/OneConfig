@@ -203,15 +203,15 @@ abstract class Hud<T : Drawable> : Cloneable, Config("null", null, "null", null)
             if (value == it.isEnabled) return
             it.isEnabled = value
 
-            val parent = it._parent ?: return
-            val siblings = parent.children ?: return
+            val bg = getBackground() ?: return
+            val siblings = bg.children ?: return
 
             if (siblings.size == 1) {
-                parent.isEnabled = value
+                bg.isEnabled = value
             } else if (!value && siblings.fastAll { !it.renders }) {
-                parent.isEnabled = false
+                bg.isEnabled = false
             }
-            parent.recalculate()
+            bg.recalculate()
         }
 
     /**
@@ -219,6 +219,8 @@ abstract class Hud<T : Drawable> : Cloneable, Config("null", null, "null", null)
      * @see hud
      */
     fun get() = it ?: create().also { this.it = it }
+
+    fun getBackground() = if (hasBackground()) get()._parent as? Block else null
 
     /**
      * Create a new instance of your HUD. This should be the complete unit of your hud, **excluding** a background.
@@ -241,7 +243,7 @@ abstract class Hud<T : Drawable> : Cloneable, Config("null", null, "null", null)
     }
 
     protected fun updateAndRecalculate() {
-        if (update()) get()._parent?.recalculate()
+        getBackground()?.recalculate()
     }
 
     /**
@@ -273,6 +275,11 @@ abstract class Hud<T : Drawable> : Cloneable, Config("null", null, "null", null)
     @Suppress("INAPPLICABLE_JVM_NAME")
     @JvmName("defaultPosition")
     open fun defaultPosition(): Vec2 = Vec2.ZERO
+
+    /**
+     * Return `true` if this HUD should have a background by default.
+     */
+    open fun hasBackground() = true
 
     /**
      * Set a custom default background color for this HUD.
@@ -325,9 +332,14 @@ abstract class Hud<T : Drawable> : Cloneable, Config("null", null, "null", null)
      */
     class Category(val name: String, val id: Byte) {
         companion object {
-            @JvmStatic val COMBAT = Category("oneconfig.combat", 1)
-            @JvmStatic val INFO = Category("oneconfig.info", 2)
-            @JvmStatic val PLAYER = Category("oneconfig.player", 3)
+            @JvmStatic
+            val COMBAT = Category("oneconfig.combat", 1)
+
+            @JvmStatic
+            val INFO = Category("oneconfig.info", 2)
+
+            @JvmStatic
+            val PLAYER = Category("oneconfig.player", 3)
         }
 
         override fun toString() = name

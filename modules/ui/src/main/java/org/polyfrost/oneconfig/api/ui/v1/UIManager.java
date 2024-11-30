@@ -97,7 +97,7 @@ public interface UIManager {
         PolyUI p = new PolyUI(new Component[0], getRenderer(), settings, 1920f, 1080f);
         p.getMaster().setRawResize(true);
         p.setWindow(createWindow());
-        p.resize(Platform.screen().windowWidth(), Platform.screen().windowHeight(), false);
+        p.resize(Platform.screen().viewportWidth(), Platform.screen().viewportHeight(), false);
         EventManager.register(HudRenderEvent.class, ev -> {
             ev.matrices.push();
             Platform.screen().setSmuggledMatrixStack(ev.matrices);

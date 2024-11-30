@@ -80,7 +80,7 @@ public abstract class MinecraftMixin {
     }
 
     //#if MC<=11300
-    @Inject(method = "resize", at = @At("HEAD"))
+    @Inject(method = "resize", at = @At("TAIL"))
     private void resizeCallback(int width, int height, CallbackInfo ci) {
         EventManager.INSTANCE.post(new ResizeEvent(width, height));
     }

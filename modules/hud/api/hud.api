@@ -9,8 +9,10 @@ public abstract class org/polyfrost/oneconfig/api/hud/v1/Hud : org/polyfrost/one
 	public fun defaultPosition ()J
 	public final fun equals (Ljava/lang/Object;)Z
 	public final fun get ()Lorg/polyfrost/polyui/component/Drawable;
+	public final fun getBackground ()Lorg/polyfrost/polyui/component/impl/Block;
 	public final fun getHidden ()Z
 	public final fun getHud ()Lorg/polyfrost/polyui/component/Drawable;
+	public fun hasBackground ()Z
 	public fun id ()Ljava/lang/String;
 	public fun initialize ()V
 	public final fun isReal ()Z

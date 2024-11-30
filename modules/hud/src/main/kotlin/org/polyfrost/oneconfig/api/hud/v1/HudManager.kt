@@ -41,7 +41,6 @@ import org.polyfrost.polyui.color.Colors
 import org.polyfrost.polyui.color.PolyColor
 import org.polyfrost.polyui.color.PolyColor.Constants.TRANSPARENT
 import org.polyfrost.polyui.color.rgba
-import org.polyfrost.polyui.component.Component
 import org.polyfrost.polyui.component.Drawable
 import org.polyfrost.polyui.component.extensions.*
 import org.polyfrost.polyui.component.impl.*
@@ -90,7 +89,6 @@ object HudManager {
         register(TextHud.Simple("", "Text Hud", ""))
     }
 
-    private lateinit var hudsPage: Component
     lateinit var panel: Drawable
         private set
 
@@ -243,7 +241,7 @@ object HudManager {
     internal fun canAutoOpen(): Boolean = !polyUI.master.hasChildIn(polyUI.size.x - panel.width - 34f, 0f, panel.width, polyUI.size.y)
 
     private fun makePanel(): Drawable {
-        hudsPage = HudsPage(hudProviders.values)
+        val hudsPage = HudsPage(hudProviders.values)
         return Block(
             Block(
                 Image("assets/oneconfig/ico/right-arrow.svg").setAlpha(0.1f),
