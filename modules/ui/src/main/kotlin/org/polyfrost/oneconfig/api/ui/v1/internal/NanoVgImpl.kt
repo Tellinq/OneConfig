@@ -59,7 +59,6 @@ class NanoVgImpl(
             }
 
             this.handle = handle
-            println("Created NVG context: $handle")
         }
 
         if (svgHandle == -1L) {
@@ -69,7 +68,6 @@ class NanoVgImpl(
             }
 
             this.svgHandle = svgHandle
-            println("Created NSVG rasterizer: $svgHandle")
         }
     }
 
