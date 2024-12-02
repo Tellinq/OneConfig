@@ -155,6 +155,11 @@ net.minecraft.network.protocol.game.ServerboundCustomPayloadPacket net.minecraft
 
 net.minecraft.resources.ResourceLocation net.minecraft.util.ResourceLocation
 
+net.minecraft.world.scores.Objective net.minecraft.scoreboard.ScoreObjective
+net.minecraft.world.scores.PlayerTeam net.minecraft.scoreboard.ScorePlayerTeam
+net.minecraft.world.scores.Scoreboard net.minecraft.scoreboard.Scoreboard
+net.minecraft.world.scores.Scoreboard removePlayerTeam() removeTeam()
+
 net.minecraft.server.commands.HelpCommand ERROR_FAILED FAILED_EXCEPTION
 net.minecraft.server.commands.HelpCommand net.minecraft.command.impl.HelpCommand
 
