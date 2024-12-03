@@ -234,11 +234,6 @@ public abstract class MinecraftMixin {
         return (int) (value * org.lwjgl.opengl.Display.getPixelScaleFactor());
     }
 
-    @ModifyVariable(method = "drawSplashScreen", at = @At("STORE"), ordinal = 0)
-    private int hiDpiFixSplashScale(int value) {
-        return (int) (value * org.lwjgl.opengl.Display.getPixelScaleFactor());
-    }
-
     @Inject(method = "startGame", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/Minecraft;createDisplay()V", shift = At.Shift.AFTER))
     private void hiDpiFixDisplaySizes(CallbackInfo ci) {
         float scale = org.lwjgl.opengl.Display.getPixelScaleFactor();

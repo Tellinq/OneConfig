@@ -39,7 +39,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 @Mixin(value = GuiIngameForge.class, remap = false)
 @ClassHasOverwrites({"1.8.9-fabric", "1.16.5-fabric", "1.16.5-forge"})
 public abstract class GuiIngameMixin {
-    @Inject(method = "renderGameOverlay", at = @At(value = "INVOKE", target = "Lnet/minecraftforge/client/GuiIngameForge;post(Lnet/minecraftforge/client/event/RenderGameOverlayEvent$ElementType;)V", shift = At.Shift.AFTER, remap = false), remap = true)
+    @Inject(method = "renderGameOverlay", at = @At(value = "INVOKE", target = "Lnet/minecraftforge/client/GuiIngameForge;renderPlayerList(II)V", shift = At.Shift.AFTER, remap = false), remap = true)
     private void renderHudCallback(float partialTicks, CallbackInfo ci) {
         EventManager.INSTANCE.post(new HudRenderEvent(UMatrixStack.Compat.INSTANCE.get(), partialTicks));
     }
