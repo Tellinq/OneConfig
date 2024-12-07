@@ -58,7 +58,7 @@ import kotlin.math.PI
 
 object HudManager {
     internal val LOGGER = LogManager.getLogger("OneConfig/HUD")
-    private val hudProviders = HashMap<Class<out Hud<out Drawable>>, Hud<out Drawable>>()
+    private val hudProviders = HashMap<Class<out Hud<*>>, Hud<*>>()
     private val snapLineColor = rgba(170, 170, 170, 0.8f)
 
     /**
@@ -98,12 +98,12 @@ object HudManager {
 
 
     @JvmStatic
-    fun register(hud: Hud<out Drawable>) {
+    fun register(hud: Hud<*>) {
         hudProviders[hud::class.java] = hud
     }
 
     @JvmStatic
-    fun register(vararg huds: Hud<out Drawable>) {
+    fun register(vararg huds: Hud<*>) {
         for (hud in huds) {
             register(hud)
         }
@@ -136,16 +136,14 @@ object HudManager {
 //            val obj = polyUI.inputManager.rayCheckUnsafe(this, x, y) ?: return@onClick false
 //            return@onClick false
 //        }
-        val used = HashSet<Class<Hud<Drawable>>>(hudProviders.size)
+        val used = HashSet<Class<Hud<*>>>(hudProviders.size)
         var i = 0
         ConfigManager.active().gatherAll("huds").forEach { data ->
             try {
                 val clsName = data.getProp("hudClass").get() as? String ?: throw IllegalArgumentException("hud tree ${data.id} is missing class name, will be ignored")
-                val cls = Class.forName(clsName) as? Class<Hud<Drawable>> ?: throw IllegalArgumentException("hud class $clsName is not a subclass of org.polyfrost.oneconfig.api.v1.hud.Hud, will be ignored")
+                val cls = Class.forName(clsName) as? Class<Hud<*>> ?: throw IllegalArgumentException("hud class $clsName is not a subclass of org.polyfrost.oneconfig.api.v1.hud.Hud, will be ignored")
                 // asm: the documentation of Hud states that code should not be run in the constructor
                 // so, we are fine to (potentially) malloc the HUD here
-                // note that this is stored in a map separate to the loaded hud list.
-                // we don't want to register a HUD class ourselves, as it may lead to wierd scenarios when mods are removed.
                 val h = hudProviders.getOrPut(cls) { MHUtils.instantiate(cls, true).getOrThrow() }
                 used.add(cls)
                 val hud = h.make(data)
@@ -188,9 +186,9 @@ object HudManager {
     }
 
     @ApiStatus.Internal
-    fun openHudEditor(hud: Hud<out Drawable>) {
+    fun openHudEditor(hud: Hud<*>) {
         if (!panelOpen) toggle()
-        panel[3] = createInspectionsScreen(hud)
+        panel[0][3] = createInspectionsScreen(hud)
     }
 
     private fun editorClose() {
@@ -202,7 +200,7 @@ object HudManager {
     fun toggle() {
         panelOpen = !panelOpen
         val pg = panel
-        val arrow = pg[0][0] as Image
+        val arrow = pg[0][0][0] as Image
         if (!panelOpen) {
             Move(pg, polyUI.size.x - 32f, pg.y, false, Animations.Default.create(0.2.seconds)).add()
             Fade(pg, 0.8f, false, Animations.Default.create(0.2.seconds)).add()
@@ -242,62 +240,65 @@ object HudManager {
 
     private fun makePanel(): Drawable {
         val hudsPage = HudsPage(hudProviders.values)
-        return Block(
+        return Group(
             Block(
-                Image("assets/oneconfig/ico/right-arrow.svg").setAlpha(0.1f),
-                size = Vec2(32f, 1048f),
-                alignment = alignC,
-            ).named("CloseArea").withStates().ignoreLayout().setPalette(
-                Colors.Palette(
-                    TRANSPARENT,
-                    PolyColor.Gradient(rgba(100, 100, 100, 0.4f), TRANSPARENT),
-                    PolyColor.Gradient(rgba(100, 100, 100, 0.3f), TRANSPARENT),
-                    TRANSPARENT,
-                )
-            ).events {
-                Event.Mouse.Entered then {
-                    Fade(this[0], 1f, false, Animations.Default.create(0.08.seconds)).add()
-                }
-                Event.Mouse.Exited then {
-                    Fade(this[0], 0.1f, false, Animations.Default.create(0.08.seconds)).add()
-                }
-                Event.Mouse.Companion.Clicked then {
-                    toggle()
-                }
-            },
-            Group(
-                Image("assets/oneconfig/ico/left-arrow.svg").setDestructivePalette().withStates().onClick {
-                    if (parent.parent[3] !== hudsPage) {
-                        parent.parent[3] = hudsPage
-                    } else {
-                        Platform.screen().close()
+                Block(
+                    Image("assets/oneconfig/ico/right-arrow.svg").setAlpha(0.1f),
+                    size = Vec2(32f, 1048f),
+                    alignment = alignC,
+                ).named("CloseArea").withStates().ignoreLayout().setPalette(
+                    Colors.Palette(
+                        TRANSPARENT,
+                        PolyColor.Gradient(rgba(100, 100, 100, 0.4f), TRANSPARENT),
+                        PolyColor.Gradient(rgba(100, 100, 100, 0.3f), TRANSPARENT),
+                        TRANSPARENT,
+                    )
+                ).events {
+                    Event.Mouse.Entered then {
+                        Fade(this[0], 1f, false, Animations.Default.create(0.08.seconds)).add()
+                    }
+                    Event.Mouse.Exited then {
+                        Fade(this[0], 0.1f, false, Animations.Default.create(0.08.seconds)).add()
+                    }
+                    Event.Mouse.Companion.Clicked then {
+                        toggle()
                     }
                 },
-                Block(
-                    Image("assets/oneconfig/ico/search.svg"),
-                    TextInput(placeholder = "oneconfig.search.placeholder", visibleSize = Vec2(220f, 12f)),
-                    size = Vec2(256f, 32f),
-                ).withBoarder().withCursor(Cursor.Text).onClick {
-                    polyUI.focus(this[1])
-                },
-                alignment = Align(main = Align.Main.SpaceBetween, pad = Vec2(12f, 6f)),
-                size = Vec2(500f, 32f),
-            ),
-            Text("oneconfig.hudeditor.title", fontSize = 24f).padded(16f, 0f).setFont { semiBold },
-            hudsPage,
-            size = Vec2(500f, 1048f),
-            alignment = Align(cross = Align.Cross.Start, pad = Vec2(0f, 18f)),
-        ).apply {
-            rawResize = true
-            addOperation {
-                if (polyUI.mouseDown) {
-                    if (slinex != -1f) polyUI.renderer.line(slinex, 0f, slinex, polyUI.size.y, snapLineColor, 1f)
-                    if (sliney != -1f) polyUI.renderer.line(0f, sliney, polyUI.size.x, sliney, snapLineColor, 1f)
-                } else {
-                    slinex = -1f
-                    sliney = -1f
+                Group(
+                    Image("assets/oneconfig/ico/left-arrow.svg").setDestructivePalette().withStates().onClick {
+                        if (parent.parent[3] !== hudsPage) {
+                            parent.parent[3] = hudsPage
+                        } else {
+                            Platform.screen().close()
+                        }
+                    },
+                    Block(
+                        Image("assets/oneconfig/ico/search.svg"),
+                        TextInput(placeholder = "oneconfig.search.placeholder", visibleSize = Vec2(220f, 12f)),
+                        size = Vec2(256f, 32f),
+                    ).withBoarder().withCursor(Cursor.Text).onClick {
+                        polyUI.focus(this[1])
+                    },
+                    alignment = Align(main = Align.Main.SpaceBetween, pad = Vec2(12f, 6f)),
+                    size = Vec2(500f, 32f),
+                ),
+                Text("oneconfig.hudeditor.title", fontSize = 24f).padded(16f, 0f).setFont { semiBold },
+                hudsPage,
+                size = Vec2(500f, 1048f),
+                alignment = Align(cross = Align.Cross.Start, pad = Vec2(0f, 18f)),
+            ).apply {
+                rawResize = true
+                addOperation {
+                    if (polyUI.mouseDown) {
+                        if (slinex != -1f) polyUI.renderer.line(slinex, 0f, slinex, polyUI.size.y, snapLineColor, 1f)
+                        if (sliney != -1f) polyUI.renderer.line(0f, sliney, polyUI.size.x, sliney, snapLineColor, 1f)
+                    } else {
+                        slinex = -1f
+                        sliney = -1f
+                    }
                 }
-            }
-        }
+            },
+            size = Vec2(0f, 1080f)
+        )
     }
 }

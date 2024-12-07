@@ -30,6 +30,7 @@ import org.apache.logging.log4j.LogManager
 import org.polyfrost.oneconfig.api.hud.v1.Hud
 import org.polyfrost.oneconfig.api.hud.v1.HudManager
 import org.polyfrost.polyui.color.PolyColor
+import org.polyfrost.polyui.component.Component
 import org.polyfrost.polyui.component.Drawable
 import org.polyfrost.polyui.component.extensions.*
 import org.polyfrost.polyui.component.impl.Block
@@ -205,7 +206,7 @@ fun Hud<*>.build(): Drawable {
     return o
 }
 
-private fun Drawable.addDefaultBackground(add: Boolean, color: PolyColor?) = if (!add) this else Block(
+private fun <T : Drawable> T.addDefaultBackground(add: Boolean, color: PolyColor?) = if (!add) this else Block(
     this,
     alignment = alignC,
     color = color,
@@ -215,15 +216,16 @@ private fun Drawable.addScaler(): Drawable {
     this.on(Event.Mouse.Clicked) {
         val sb = scaleBlob
         sb.renders = true
-        sb.x = x + (width * scaleX) - (sb.width / 2f)
-        sb.y = y + (height * scaleY) - (sb.height / 2f)
+        val vs = visibleSize
+        sb.x = x + vs.x - (sb.width / 2f)
+        sb.y = y + vs.y - (sb.height / 2f)
         cur = this
         return@on false
     }
     return this
 }
 
-private fun Drawable.trySnapX(lx: Float): Boolean {
+private fun Component.trySnapX(lx: Float): Boolean {
     val low = lx - snapMargin
     val high = lx + snapMargin
     if (x + (width / 2f) in low..high) {
@@ -244,7 +246,7 @@ private fun Drawable.trySnapX(lx: Float): Boolean {
     return false
 }
 
-private fun Drawable.trySnapY(ly: Float): Boolean {
+private fun Component.trySnapY(ly: Float): Boolean {
     val low = ly - snapMargin
     val high = ly + snapMargin
     if (y + (height / 2f) in low..high) {
@@ -268,7 +270,7 @@ private fun Drawable.trySnapY(ly: Float): Boolean {
 /**
  * Method to be used as the `onDrag` handler for HUD elements.
  */
-fun Drawable.snapHandler() {
+fun Component.snapHandler() {
     if (cur === this) {
         val vs = visibleSize
         scaleBlob.let {
@@ -315,7 +317,7 @@ fun Drawable.snapHandler() {
     }
 }
 
-fun Drawable.snapHandlerNew() {
+fun Component.snapHandlerNew() {
     // closes the hud manager and prepares the hud to be added once it is dragged outside of it
     if (polyUI.mouseX !in (polyUI.size.x - HudManager.panel.width)..polyUI.size.x) {
         if (HudManager.panelOpen) HudManager.toggle()

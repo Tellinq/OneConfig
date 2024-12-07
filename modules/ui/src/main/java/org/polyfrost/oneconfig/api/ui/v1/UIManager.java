@@ -39,6 +39,7 @@ import org.polyfrost.polyui.component.Component;
 import org.polyfrost.polyui.Settings;
 import org.polyfrost.polyui.renderer.Renderer;
 import org.polyfrost.polyui.renderer.Window;
+import org.polyfrost.universal.UMatrixStack;
 
 import java.util.ServiceLoader;
 import java.util.function.Consumer;
@@ -97,12 +98,11 @@ public interface UIManager {
         PolyUI p = new PolyUI(new Component[0], getRenderer(), settings, 1920f, 1080f);
         p.getMaster().setRawResize(true);
         p.setWindow(createWindow());
-        p.resize(Platform.screen().viewportWidth(), Platform.screen().viewportHeight(), false);
+        p.resize(Platform.screen().windowWidth(), Platform.screen().windowHeight(), false);
         EventManager.register(HudRenderEvent.class, ev -> {
-            ev.matrices.push();
-            Platform.screen().setSmuggledMatrixStack(ev.matrices);
-            p.render();
-            ev.matrices.pop();
+            UMatrixStack stack = ev.matrices;
+            Platform.screen().setSmuggledMatrixStack(stack);
+            stack.runReplacingGlobalState(p::render);
         });
         EventManager.register(ResizeEvent.class, ev -> p.resize(ev.newWidth, ev.newHeight, false));
         return p;

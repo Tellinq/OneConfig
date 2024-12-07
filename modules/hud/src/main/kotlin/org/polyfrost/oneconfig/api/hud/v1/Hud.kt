@@ -105,29 +105,9 @@ abstract class Hud<T : Drawable> : Cloneable, Config("null", null, "null", null)
         tree.addMetadata("hidden", true)
         tree["x"] = ktProperty(out.hud::x)
         tree["y"] = ktProperty(out.hud::y)
-//        tree["x"] = functional(getter = {
-//            val self = out.hud
-//            self.x * if (self.initialized) (self.polyUI.iSize.x / self.polyUI.size.x) else 1f
-//        }, setter = {
-//            val self = out.hud
-//            self.x = it * if (self.initialized) (self.polyUI.size.x / self.polyUI.iSize.x) else 1f
-//        }, type = Float::class.java)
-//        tree["y"] = functional(getter = {
-//            val self = out.hud
-//            self.y * if (self.initialized) (self.polyUI.iSize.y / self.polyUI.size.y) else 1f
-//        }, setter = {
-//            val self = out.hud
-//            self.y = it * if (self.initialized) (self.polyUI.size.y / self.polyUI.iSize.y) else 1f
-//        }, type = Float::class.java)
         tree["hidden"] = ktProperty(out::hidden)
         inspect(out.hud, tree)
         out.addToSerialized(tree)
-        tree["alpha"] = ktProperty(out.hud::alpha)
-        tree["scaleX"] = ktProperty(out.hud::scaleX)
-        tree["scaleY"] = ktProperty(out.hud::scaleY)
-        tree["rotation"] = ktProperty(out.hud::rotation)
-        tree["skewX"] = ktProperty(out.hud::skewX)
-        tree["skewY"] = ktProperty(out.hud::skewY)
         tree["hudClass"] = simple(value = out::class.java.name)
         if (with != null) tree.overwrite(with)
         else LOGGER.info("generated new HUD config for ${out.title()} -> ${tree.id}")
@@ -136,21 +116,29 @@ abstract class Hud<T : Drawable> : Cloneable, Config("null", null, "null", null)
         return out
     }
 
-    private fun inspect(drawable: Component, tree: Tree) {
-        if (drawable is Drawable) tree["color"] = ktProperty(drawable::_color)
-        when (drawable) {
+    private fun inspect(cmp: Component, tree: Tree) {
+        if (cmp is Drawable) {
+            tree["color"] = ktProperty(cmp::_color)
+            tree["alpha"] = ktProperty(cmp::alpha)
+            tree["scaleX"] = ktProperty(cmp::scaleX)
+            tree["scaleY"] = ktProperty(cmp::scaleY)
+            tree["rotation"] = ktProperty(cmp::rotation)
+            tree["skewX"] = ktProperty(cmp::skewX)
+            tree["skewY"] = ktProperty(cmp::skewY)
+        }
+        when (cmp) {
             is Block -> {
-                tree["radii"] = ktProperty(drawable::radii)
-                tree["boarderColor"] = ktProperty(drawable::borderColor)
-                tree["boarderWidth"] = ktProperty(drawable::borderWidth)
+                tree["radii"] = ktProperty(cmp::radii)
+                tree["boarderColor"] = ktProperty(cmp::borderColor)
+                tree["boarderWidth"] = ktProperty(cmp::borderWidth)
             }
 
             is Text -> {
-                tree["font"] = ktProperty(drawable::_font)
-                tree["fontSize"] = ktProperty(drawable::uFontSize)
+                tree["font"] = ktProperty(cmp::_font)
+                tree["fontSize"] = ktProperty(cmp::uFontSize)
             }
         }
-        drawable.children?.fastEachIndexed { i, it ->
+        cmp.children?.fastEachIndexed { i, it ->
             val child = Tree.tree("$i")
             inspect(it, child)
             tree.put(child)
@@ -318,7 +306,7 @@ abstract class Hud<T : Drawable> : Cloneable, Config("null", null, "null", null)
 
     final override fun equals(other: Any?): Boolean {
         if (this === other) return true
-        if (other is Drawable) {
+        if (other is Component) {
             return other == get()
         }
         return false

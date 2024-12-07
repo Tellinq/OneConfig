@@ -34,6 +34,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.polyfrost.oneconfig.api.platform.v1.Platform;
 import org.polyfrost.oneconfig.api.ui.v1.Notifications;
+import org.polyfrost.oneconfig.api.ui.v1.UIManager;
 import org.polyfrost.oneconfig.api.ui.v1.screen.BlurScreen;
 import org.polyfrost.polyui.PolyUI;
 import org.polyfrost.polyui.component.Drawable;
@@ -92,13 +93,6 @@ public class PolyUIScreen extends UScreen implements BlurScreen {
 
     @Override
     public void onDrawScreen(@NotNull UMatrixStack matrices, int mouseX, int mouseY, float delta) {
-        Drawable master = polyUI.getMaster();
-        //noinspection DataFlowIssue
-        float scale = polyUI.getWindow().getPixelRatio();
-        float ox = (Platform.screen().windowWidth() / 2f - master.getWidth() / 2f) * scale;
-        float oy = (Platform.screen().windowHeight() / 2f - master.getHeight() / 2f) * scale;
-        glViewport((int) ox, (int) oy, (int) (master.getWidth() * scale), (int) (master.getHeight() * scale));
-
         //#if MC<11300
         if (mouseX != mx || mouseY != my) {
             mx = mouseX;
@@ -106,11 +100,17 @@ public class PolyUIScreen extends UScreen implements BlurScreen {
             this.mouseMoved(mx, my);
         }
         //#endif
+        if (polyUI == UIManager.INSTANCE.getDefaultInstance()) return;
+
+        Drawable master = polyUI.getMaster();
+        //noinspection DataFlowIssue
+        float scale = polyUI.getWindow().getPixelRatio();
+        float ox = (Platform.screen().windowWidth() / 2f - master.getWidth() / 2f) * scale;
+        float oy = (Platform.screen().windowHeight() / 2f - master.getHeight() / 2f) * scale;
+        glViewport((int) ox, (int) oy, (int) (master.getWidth() * scale), (int) (master.getHeight() * scale));
 
         try {
-            matrices.push();
             matrices.runReplacingGlobalState(polyUI::render);
-            matrices.pop();
         } catch (Exception e) {
             polyUI.getRenderer().endFrame();
             death(e);
