@@ -20,7 +20,7 @@ copycat = "0.1.1"
 copycat-image-awt = "0.1.1"
 
 # Per version
-universalcraft = "299"
+universalcraft = "2.0.0"
 lwjgl = "3.3.3" # All downloaded by the isolated-lwjgl3-loader
 
 # Legacy only
