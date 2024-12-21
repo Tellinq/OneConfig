@@ -1,9 +1,9 @@
-Copyright (C) 2021-2024 Polyfrost and contributors.
+Copyright (C) 2021-2024 Polyfrost Inc. and contributors.
   <https://polyfrost.org> <https://github.com/Polyfrost>
 
   OneConfig is licensed under the terms of version 3 of the GNU Lesser 
 General Public License as published by the Free Software Foundation, AND 
-under the Additional Terms Applicable to OneConfig, as published by Polyfrost, 
+under the Additional Terms Applicable to OneConfig, as published by Polyfrost Inc., 
 either version 1.1 of the Additional Terms, or (at your option) any later 
 version.
 
@@ -856,7 +856,7 @@ Library.
               ADDITIONAL TERMS APPLICABLE TO ONECONFIG
                       Version 1.1, 16 August 2024
 
- Copyright (C) 2024 Polyfrost 
+ Copyright (C) 2024 Polyfrost Inc. 
    <https://polyfrost.org> <https://github.com/Polyfrost>
 
  Everyone is permitted to copy and distribute verbatim copies
@@ -891,8 +891,8 @@ regard to how the rights are labeled or categorized.
    "Standard Version" refers to an unmodified version of the covered
 work, a Compiled form of an unmodified version of the covered work, 
 any covered work that has been modified only in ways explicitly requested
-by Polyfrost, or a Compiled form of any covered work that has been modified 
-only in ways explicitly requested by Polyfrost.
+by Polyfrost Inc., or a Compiled form of any covered work that has been modified 
+only in ways explicitly requested by Polyfrost Inc.
 
   "GNU GPL" refers to Version 3 of the GNU General Public License.
 
@@ -917,21 +917,21 @@ designated in writing by the copyright owner as "Not a Contribution."
 
   The GNU LGPL or GNU GPL do not grant any license or rights to use the 
 trademarks "OneConfig", any "OneConfig" logos, "Polyfrost", any "Polyfrost" 
-logos or any other trademarks of Polyfrost.  You are not authorized to use 
+logos or any other trademarks of Polyfrost Inc.  You are not authorized to use 
 the name Polyfrost, OneConfig or the names of any author or contributor 
 for publicity purposes, without written authorization.
 
   2. Contributions
 
   Unless You explicitly state otherwise, any Contribution intentionally 
-submitted for inclusion in the covered work by You to Polyfrost shall be 
+submitted for inclusion in the covered work by You to Polyfrost Inc. shall be 
 under the terms and conditions of the GNU LGPL and these Additional Terms, 
 or any later versions of the Additional Terms Applicable to OneConfig as 
-published by Polyfrost.  Furthermore, you also agree to specify Polyfrost as 
+published by Polyfrost Inc.  Furthermore, you also agree to specify Polyfrost Inc. as 
 a proxy that can decide whether future versions of the GNU Lesser General Public 
 License shall apply.  Notwithstanding the above, nothing herein shall supersede 
 or modify the terms of any separate license agreement you may have executed with 
-Polyfrost regarding such Contributions.
+Polyfrost Inc. regarding such Contributions.
 
   3. Attribution Requirements.
 
@@ -951,7 +951,7 @@ in focus, and should not be hidden.
 
   The GNU GPL and GNU LGPL do not grant you any license or rights to 
 modify and/or remove these Additional Terms, without written 
-authorization from Polyfrost, in any Adaptation of the Library.
+authorization from Polyfrost Inc., in any Adaptation of the Library.
 
   5. Exceptions.
 
@@ -964,5 +964,5 @@ for monetary compensation.
 without being bound by Section 3 of these Additional Terms.
 
   You may convey the Standard Version of the Library 
-from Polyfrost without being bound by Section 3 of these Additional 
+from Polyfrost Inc. without being bound by Section 3 of these Additional 
 Terms.
