@@ -34,6 +34,7 @@ import org.polyfrost.oneconfig.utils.v1.WrappingUtils;
 import java.io.Serializable;
 import java.lang.ref.WeakReference;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
@@ -413,10 +414,10 @@ public abstract class Property<T> extends Node implements Serializable {
     }
 
     static final class Dummy extends Property<Void> {
-        private static short r = 0;
+        private static final AtomicInteger r = new AtomicInteger(0);
 
         Dummy(@Nullable String id, @Nullable String title, @Nullable String description) {
-            super(id == null ? "dummy$" + r++ : id, title, description, void.class);
+            super(id == null ? "dummy$" + r.incrementAndGet() : id, title, description, void.class);
         }
 
         @Override

@@ -136,12 +136,13 @@ object HudManager {
 //            val obj = polyUI.inputManager.rayCheckUnsafe(this, x, y) ?: return@onClick false
 //            return@onClick false
 //        }
+        val loader = HudManager::class.java.classLoader
         val used = HashSet<Class<Hud<*>>>(hudProviders.size)
         var i = 0
         ConfigManager.active().gatherAll("huds").forEach { data ->
             try {
                 val clsName = data.getProp("hudClass").get() as? String ?: throw IllegalArgumentException("hud tree ${data.id} is missing class name, will be ignored")
-                val cls = Class.forName(clsName) as? Class<Hud<*>> ?: throw IllegalArgumentException("hud class $clsName is not a subclass of org.polyfrost.oneconfig.api.v1.hud.Hud, will be ignored")
+                val cls = Class.forName(clsName, true, loader) as? Class<Hud<*>> ?: throw IllegalArgumentException("hud class $clsName is not a subclass of org.polyfrost.oneconfig.api.v1.hud.Hud, will be ignored")
                 // asm: the documentation of Hud states that code should not be run in the constructor
                 // so, we are fine to (potentially) malloc the HUD here
                 val h = hudProviders.getOrPut(cls) { MHUtils.instantiate(cls, true).getOrThrow() }
@@ -149,11 +150,13 @@ object HudManager {
                 val hud = h.make(data)
                 val theHud = hud.build()
                 polyUI.master.addChild(theHud, recalculate = false)
-                val x: Float = data.getProp("x").getAs()
-                val y: Float = data.getProp("y").getAs()
+                val x = data.getProp("x")?.getAs<Number?>()?.toFloat() ?: 0f
+                val y = data.getProp("y")?.getAs<Number?>()?.toFloat() ?: 0f
                 theHud.x = x - (hud.get().x - theHud.x)
                 theHud.y = y - (hud.get().y - theHud.y)
                 i++
+            } catch (e: ClassNotFoundException) {
+                LOGGER.warn("Didn't load HUD from ${data.id} as it's provider (${e.message?.substringAfter(':')}) wasn't found, was the mod removed?")
             } catch (e: Exception) {
                 LOGGER.error("Failed to load HUD from ${data.id}", e)
             }

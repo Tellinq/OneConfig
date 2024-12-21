@@ -31,6 +31,7 @@ import org.polyfrost.oneconfig.api.platform.v1.Platform
 import org.polyfrost.polyui.component.Drawable
 import org.polyfrost.polyui.component.extensions.namedId
 import org.polyfrost.universal.UMatrixStack
+import org.polyfrost.universal.UResolution
 
 /**
  * [Hud] implementation that uses the old rendering system, with a standard [render] method.
@@ -50,6 +51,13 @@ abstract class LegacyHud : Hud<Drawable>() {
 
     override fun create() = createLegacy()
 
+    /**
+     * Render your HUD. Note that [x] and [y], unlike the normal render methods of other HUD classes, are scaled to **Minecraft's coordinate space**
+     * instead of as raw screen coordinates. This ensures that, when using methods such as those of the WorldRenderer, they show up correctly.
+     * As such, **it is important to multiply your [width] and [height] with the [scaleX] and [scaleY] parameters to ensure accurate rendering.**
+     *
+     * **Note:** This method is called every frame, so you should not perform any heavy calculations here.
+     */
     abstract fun render(stack: UMatrixStack, x: Float, y: Float, scaleX: Float, scaleY: Float)
 
     /**
@@ -73,7 +81,8 @@ abstract class LegacyHud : Hud<Drawable>() {
             override fun preRender(delta: Long) {}
 
             override fun render() {
-                render(Platform.screen().smuggledMatrixStack, x, y, scaleX, scaleY)
+                val scale = Platform.screen().pixelRatio() / UResolution.scaleFactor.toFloat()
+                render(Platform.screen().smuggledMatrixStack, x * scale, y * scale, scaleX * scale, scaleY * scale)
             }
 
             override fun postRender() {}

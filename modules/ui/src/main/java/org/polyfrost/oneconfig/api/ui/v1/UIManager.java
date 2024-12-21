@@ -102,7 +102,7 @@ public interface UIManager {
         EventManager.register(HudRenderEvent.class, ev -> {
             UMatrixStack stack = ev.matrices;
             Platform.screen().setSmuggledMatrixStack(stack);
-            stack.runReplacingGlobalState(p::render);
+            stack.runWithGlobalState(p::render);
         });
         EventManager.register(ResizeEvent.class, ev -> p.resize(ev.newWidth, ev.newHeight, false));
         return p;
