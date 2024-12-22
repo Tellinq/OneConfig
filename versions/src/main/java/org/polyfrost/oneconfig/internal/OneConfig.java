@@ -36,6 +36,7 @@ import org.polyfrost.oneconfig.api.event.v1.EventManager;
 import org.polyfrost.oneconfig.api.event.v1.events.InitializationEvent;
 import org.polyfrost.oneconfig.api.hud.v1.HudManager;
 import org.polyfrost.oneconfig.api.hypixel.v1.HypixelUtils;
+import org.polyfrost.oneconfig.api.platform.v1.LoaderPlatform;
 import org.polyfrost.oneconfig.api.platform.v1.Platform;
 import org.polyfrost.oneconfig.api.ui.v1.UIManager;
 import org.polyfrost.oneconfig.api.ui.v1.internal.BlurHandler;
@@ -89,6 +90,9 @@ public class OneConfig
 
 
     private void init() {
+        LoaderPlatform.ActiveMod self = Platform.loader().getLoadedMod("oneconfig");
+        String v = self == null ? "LOCAL" : self.version;
+        LOGGER.info("Loading OneConfig v{}", v);
         BlurHandler.init();
 
         preloadCopycat();

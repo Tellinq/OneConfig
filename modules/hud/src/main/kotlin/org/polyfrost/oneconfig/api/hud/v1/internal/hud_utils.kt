@@ -225,11 +225,11 @@ private fun Drawable.addScaler(): Drawable {
     return this
 }
 
-private fun Component.trySnapX(lx: Float): Boolean {
+private fun Component.trySnapX(lx: Float, sw: Float): Boolean {
     val low = lx - snapMargin
     val high = lx + snapMargin
-    if (x + (width / 2f) in low..high) {
-        x = lx - (width / 2f)
+    if (x + (sw / 2f) in low..high) {
+        x = lx - (sw / 2f)
         HudManager.slinex = lx
         return true
     }
@@ -238,19 +238,19 @@ private fun Component.trySnapX(lx: Float): Boolean {
         HudManager.slinex = lx
         return true
     }
-    if (x + width in low..high) {
-        x = lx - width
+    if (x + sw in low..high) {
+        x = lx - sw
         HudManager.slinex = lx
         return true
     }
     return false
 }
 
-private fun Component.trySnapY(ly: Float): Boolean {
+private fun Component.trySnapY(ly: Float, sh: Float): Boolean {
     val low = ly - snapMargin
     val high = ly + snapMargin
-    if (y + (height / 2f) in low..high) {
-        y = ly - (height / 2f)
+    if (y + (sh / 2f) in low..high) {
+        y = ly - (sh / 2f)
         HudManager.sliney = ly
         return true
     }
@@ -259,8 +259,8 @@ private fun Component.trySnapY(ly: Float): Boolean {
         HudManager.sliney = ly
         return true
     }
-    if (y + height in low..high) {
-        y = ly - height
+    if (y + sh in low..high) {
+        y = ly - sh
         HudManager.sliney = ly
         return true
     }
@@ -270,12 +270,14 @@ private fun Component.trySnapY(ly: Float): Boolean {
 /**
  * Method to be used as the `onDrag` handler for HUD elements.
  */
-fun Component.snapHandler() {
+fun Drawable.snapHandler() {
+    val vs = visibleSize
+    val w = vs.x * scaleX
+    val h = vs.y * scaleY
     if (cur === this) {
-        val vs = visibleSize
         scaleBlob.let {
-            it.x = x + vs.x - (it.width / 2f)
-            it.y = y + vs.y - (it.height / 2f)
+            it.x = x + w - (it.width / 2f)
+            it.y = y + h - (it.height / 2f)
         }
     }
     HudManager.slinex = -1f
@@ -284,13 +286,13 @@ fun Component.snapHandler() {
 
     // asm: process screen edge snaps + center snap
     // checking center snaps first seems to make it easier to use
-    var hran = trySnapX(polyUI.size.x / 2f) ||
-            trySnapX(1f) ||
-            trySnapX(polyUI.size.x - 1f)
+    var hran = trySnapX(polyUI.size.x / 2f, w) ||
+            trySnapX(1f, w) ||
+            trySnapX(polyUI.size.x - 1f, w)
 
-    var vran = trySnapY(polyUI.size.y / 2f) ||
-            trySnapY(1f) ||
-            trySnapY(polyUI.size.y - 1f)
+    var vran = trySnapY(polyUI.size.y / 2f, h) ||
+            trySnapY(1f, h) ||
+            trySnapY(polyUI.size.y - 1f, h)
 
     // yipee!
     if (hran && vran) return
@@ -300,16 +302,20 @@ fun Component.snapHandler() {
         if (it === this) return@fastEach
         if (it === HudManager.panel || it === scaleBlob) return@fastEach
         if (!it.renders) return@fastEach
+        if (it !is Drawable) return@fastEach
+        val ivs = it.visibleSize
+        val iw = ivs.x * it.scaleX
+        val ih = ivs.y * it.scaleY
 
         if (!hran) {
-            hran = trySnapX(it.x + (it.width / 2f)) ||
-                    trySnapX(it.x) ||
-                    trySnapX(it.x + it.width)
+            hran = trySnapX(it.x + (iw / 2f), w) ||
+                    trySnapX(it.x, w) ||
+                    trySnapX(it.x + iw, w)
         }
         if (!vran) {
-            vran = trySnapY(it.y + (it.height / 2f)) ||
-                    trySnapY(it.y) ||
-                    trySnapY(it.y + it.height)
+            vran = trySnapY(it.y + (ih / 2f), h) ||
+                    trySnapY(it.y, h) ||
+                    trySnapY(it.y + ih, h)
         }
 
         // YIPEEE!
@@ -317,7 +323,7 @@ fun Component.snapHandler() {
     }
 }
 
-fun Component.snapHandlerNew() {
+fun Drawable.snapHandlerNew() {
     // closes the hud manager and prepares the hud to be added once it is dragged outside of it
     if (polyUI.mouseX !in (polyUI.size.x - HudManager.panel.width)..polyUI.size.x) {
         if (HudManager.panelOpen) HudManager.toggle()

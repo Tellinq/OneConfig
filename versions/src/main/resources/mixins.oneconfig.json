@@ -8,12 +8,14 @@
   },
   "verbose": true,
   "client": [
-    "ScoreboardMixin",
     "CrashReportMixin",
     "GuiIngameMixin",
     "MinecraftMixin",
+    "NetHandlerLoginClientMixin",
     "NetworkManagerMixin",
+    "ScoreboardMixin",
     "ShaderGroupAccessor",
+    "SoundManagerMixin",
     "WorldClientMixin",
     "compat.OptifineConfigMixin",
     "compat.VigilantCompatMixin"
