@@ -17,6 +17,7 @@
     "ShaderGroupAccessor",
     "SoundManagerMixin",
     "WorldClientMixin",
+    "SoundManagerMixin",
     "compat.OptifineConfigMixin",
     "compat.VigilantCompatMixin"
   ]
