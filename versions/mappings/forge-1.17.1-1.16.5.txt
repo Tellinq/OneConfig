@@ -25,6 +25,8 @@ com.mojang.blaze3d.vertex.Tesselator end() draw()
 com.mojang.blaze3d.vertex.Tesselator getBuilder() getBuffer()
 com.mojang.blaze3d.vertex.Tesselator net.minecraft.client.renderer.Tessellator
 
+net.minecraft.client.sounds.SoundEngine net.minecraft.client.audio.SoundEngine
+
 net.minecraft.ChatFormatting net.minecraft.util.text.TextFormatting
 net.minecraft.ChatFormatting stripFormatting() getTextWithoutFormattingCodes()
 
@@ -48,6 +50,7 @@ net.minecraft.client.Minecraft options gameSettings
 net.minecraft.client.Minecraft resizeDisplay() updateWindowSize()
 net.minecraft.client.Minecraft runTick() runGameLoop()
 net.minecraft.client.Minecraft screen currentScreen
+net.minecraft.client.Minecraft setLevel() loadWorld()
 net.minecraft.client.Minecraft setScreen() displayGuiScreen()
 
 net.minecraft.client.MouseHandler net.minecraft.client.MouseHelper
@@ -84,6 +87,8 @@ net.minecraft.client.gui.screens.Screen net.minecraft.client.gui.screen.Screen
 net.minecraft.client.multiplayer.ClientLevel$ClientLevelData  net.minecraft.client.multiplayer.ClientLevel$ClientWorldInfo
 net.minecraft.client.multiplayer.ClientLevel net.minecraft.client.world.ClientWorld
 
+net.minecraft.client.multiplayer.ClientHandshakePacketListenerImpl net.minecraft.client.network.login.ClientLoginNetHandler
+net.minecraft.client.multiplayer.ClientHandshakePacketListenerImpl handleGameProfile() handleLoginSuccess()
 net.minecraft.client.multiplayer.ClientPacketListener commands commandDispatcher
 net.minecraft.client.multiplayer.ClientPacketListener getSuggestionsProvider() getSuggestionProvider()
 net.minecraft.client.multiplayer.ClientPacketListener handleCommands() handleCommandList()
@@ -114,6 +119,8 @@ net.minecraft.client.renderer.PostPass net.minecraft.client.shader.Shader
 
 net.minecraft.client.resources.language.I18n get() format()
 net.minecraft.client.resources.language.I18n net.minecraft.client.resources.I18n
+net.minecraft.client.resources.sounds.SoundInstance net.minecraft.client.audio.ISound
+net.minecraft.client.resources.sounds.SoundInstance getLocation() getSoundLocation()
 
 net.minecraft.commands.SharedSuggestionProvider net.minecraft.command.ISuggestionProvider
 

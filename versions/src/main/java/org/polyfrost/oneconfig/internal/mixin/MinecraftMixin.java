@@ -27,6 +27,7 @@
 package org.polyfrost.oneconfig.internal.mixin;
 
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.multiplayer.WorldClient;
 import net.minecraft.util.Timer;
 import org.polyfrost.oneconfig.api.event.v1.EventManager;
 import org.polyfrost.oneconfig.api.event.v1.events.*;
@@ -48,6 +49,7 @@ public abstract class MinecraftMixin {
     @Shadow
     private Timer timer;
 
+    //@formatter:off
     //#if MC<11300
     @Shadow public int displayWidth;
     @Shadow public int displayHeight;
@@ -55,7 +57,8 @@ public abstract class MinecraftMixin {
     @Shadow private int tempDisplayHeight;
     //#endif
 
-    //@formatter:off
+    @Shadow public WorldClient theWorld;
+
     @Unique
     private static final String UPDATE_CAMERA_AND_RENDER =
             //#if MC>=11300
@@ -129,6 +132,11 @@ public abstract class MinecraftMixin {
     @Inject(method = "runTick", at = @At("TAIL"))
     private void tickEndCallback(CallbackInfo ci) {
         EventManager.INSTANCE.post(TickEvent.End.INSTANCE);
+    }
+
+    @Inject(method = "loadWorld(Lnet/minecraft/client/multiplayer/WorldClient;)V", at = @At("HEAD"))
+    private void onWorldUnloadCallback(WorldClient world, CallbackInfo ci) {
+        if (this.theWorld != null) EventManager.INSTANCE.post(new WorldUnloadEvent(this.theWorld));
     }
 
     //#if FORGE
