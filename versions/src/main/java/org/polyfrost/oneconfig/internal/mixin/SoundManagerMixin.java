@@ -28,7 +28,7 @@ public class SoundManagerMixin {
             ),
             argsOnly = true
     )
-    private ISound oneconfig$playSound(ISound value) {
+    private ISound onPlaySoundCallback(ISound value) {
         //#if MC <= 1.8.9
         SoundEventAccessorComposite accessor = ((SoundManagerAccessorMixin) this).getSndHandler().getSound(value.getSoundLocation());
         SoundCategory category = (accessor == null ? null : accessor.getSoundCategory());

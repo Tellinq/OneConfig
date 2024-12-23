@@ -196,6 +196,7 @@ object HudManager {
 
     private fun editorClose() {
         toggleHudPicker()
+        polyUI.unfocus()
         ConfigManager.active().saveAll()
     }
 

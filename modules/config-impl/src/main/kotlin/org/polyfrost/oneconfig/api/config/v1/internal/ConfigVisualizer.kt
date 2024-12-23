@@ -207,7 +207,7 @@ open class ConfigVisualizer {
                 wrapForAccordion(vis.visualize(node), node.title ?: return@map null, node.description).addHideHandler(node).linkTo(node)
             }
 
-        var open = false
+        var open = true
         val e: Property<*>? = tree.getProp("enabled")
         val toWrap: Drawable
         var enabled: Property<Boolean>? = null
@@ -238,13 +238,14 @@ open class ConfigVisualizer {
         }
 
         if (e != null && e.type == Boolean::class.java && e.getVisualizer() == null) {
+            open = e.getAs()
             toWrap = Group(
                 Switch(
                     lateralStretch = 2f,
                     size = 21f,
-                    state = e.getAs()
+                    state = open
                 ).onToggle {
-                    e.setAs(it)
+                    enabled?.setAs(it)
                     if (open != !it) (parent.parent as Drawable).openInsn(null)
                 },
                 Image("polyui/chevron-down.svg").also { it.rotation = PI }
@@ -257,10 +258,7 @@ open class ConfigVisualizer {
         val out = Block(
             wrap(toWrap, title, desc, icon).also {
                 it.color = PolyColor.TRANSPARENT
-                it.onClick {
-                    if (enabled != null && !enabled.getAs<Boolean>()) return@onClick
-                    this.openInsn(null)
-                }
+                it.onClick(openInsn)
             },
             Group(
                 size = Vec2(1078f, 0f),

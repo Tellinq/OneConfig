@@ -28,6 +28,7 @@ package org.polyfrost.oneconfig.api.ui.v1.keybind
 
 import org.polyfrost.oneconfig.api.event.v1.eventHandler
 import org.polyfrost.oneconfig.api.event.v1.events.KeyInputEvent
+import org.polyfrost.oneconfig.api.event.v1.events.ScreenOpenEvent
 import org.polyfrost.oneconfig.api.event.v1.events.TickEvent
 import org.polyfrost.polyui.Settings
 import org.polyfrost.polyui.input.InputManager
@@ -58,6 +59,9 @@ object KeybindManager {
         eventHandler { _: TickEvent.End ->
             keyBinder.update(50_000L, inputManager.mods, true)
         }.register()
+        eventHandler { (screen): ScreenOpenEvent ->
+            if (screen == null) keyBinder.release()
+        }
 
         val m = Int2IntMap(8)
         m[UKeyboard.KEY_LSHIFT] = KeyModifiers.LSHIFT.value.toInt()
