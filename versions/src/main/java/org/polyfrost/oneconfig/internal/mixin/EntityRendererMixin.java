@@ -32,11 +32,19 @@ public class EntityRendererMixin {
                     //#if MC >= 1.16.5
                     //$$ from = @At(
                     //$$     value = "INVOKE",
+                    //#if MC >= 1.17.1
+                    //$$     target = "Lnet/minecraft/client/renderer/LevelRenderer;renderLevel(Lcom/mojang/blaze3d/vertex/PoseStack;FJZLnet/minecraft/client/Camera;Lnet/minecraft/client/renderer/GameRenderer;Lnet/minecraft/client/renderer/LightTexture;Lcom/mojang/math/Matrix4f;)V"
+                    //#else
                     //$$     target = "Lnet/minecraft/client/renderer/WorldRenderer;updateCameraAndRender(Lcom/mojang/blaze3d/matrix/MatrixStack;FJZLnet/minecraft/client/renderer/ActiveRenderInfo;Lnet/minecraft/client/renderer/GameRenderer;Lnet/minecraft/client/renderer/LightTexture;Lnet/minecraft/util/math/vector/Matrix4f;)V"
+                    //#endif
                     //$$ ),
                     //$$ to = @At(
                     //$$     value = "INVOKE",
+                    //#if MC >= 1.17.1
+                    //$$     target = "Lnet/minecraft/client/renderer/GameRenderer;renderItemInHand(Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/Camera;F)V"
+                    //#else
                     //$$     target = "Lnet/minecraft/client/renderer/GameRenderer;renderHand(Lcom/mojang/blaze3d/matrix/MatrixStack;Lnet/minecraft/client/renderer/ActiveRenderInfo;F)V"
+                    //#endif
                     //$$ )
                     //#else
                     from = @At(

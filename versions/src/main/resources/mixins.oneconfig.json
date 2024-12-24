@@ -16,7 +16,6 @@
     "ScoreboardMixin",
     "ShaderGroupAccessor",
     "SoundManagerMixin",
-    "SoundManagerAccessorMixin",
     "EntityRendererMixin",
     "WorldClientMixin",
     "SoundManagerMixin",

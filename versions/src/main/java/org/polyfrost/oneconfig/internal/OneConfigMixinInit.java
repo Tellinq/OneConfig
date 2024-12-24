@@ -99,6 +99,7 @@ public class OneConfigMixinInit implements IMixinConfigPlugin {
         } else {
             // legacy
             mixins.add("GuiScreenMixin");
+            mixins.add("SoundManagerAccessorMixin");
             mixins.add("hidpi.EntityRendererMixin");
         }
 
