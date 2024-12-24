@@ -220,6 +220,7 @@ private fun Drawable.addScaler(): Drawable {
         sb.x = x + vs.x - (sb.width / 2f)
         sb.y = y + vs.y - (sb.height / 2f)
         cur = this
+        polyUI.focus(scaleBlob)
         return@on false
     }
     return this

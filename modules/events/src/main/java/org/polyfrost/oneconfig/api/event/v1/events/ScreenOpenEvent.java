@@ -53,4 +53,9 @@ public class ScreenOpenEvent extends Event.Cancellable {
     public <T> T getScreen() {
         return (T) screen;
     }
+
+    @Nullable
+    public Object component1() {
+        return getScreen();
+    }
 }
