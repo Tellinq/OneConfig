@@ -22,6 +22,9 @@ net.minecraft.client.network.play.NetworkPlayerInfo net.minecraft.client.network
 net.minecraft.client.shader.ShaderDefault net.minecraft.client.shader.ShaderUniform
 net.minecraft.client.shader.ShaderInstance net.minecraft.client.shader.ShaderManager
 
+net.minecraft.client.renderer.GameRenderer net.minecraft.client.renderer.EntityRenderer
+net.minecraft.client.renderer.GameRenderer renderWorld() renderWorldPass()
+
 net.minecraft.client.world.ClientWorld net.minecraft.client.multiplayer.WorldClient
 
 net.minecraft.network.IPacket net.minecraft.network.Packet
