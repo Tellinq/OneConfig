@@ -26,4 +26,8 @@ public class SoundPlayedEvent implements Event {
         return (T) sound;
     }
 
+    public void setSound(Object sound) {
+        this.sound = sound;
+    }
+
 }
