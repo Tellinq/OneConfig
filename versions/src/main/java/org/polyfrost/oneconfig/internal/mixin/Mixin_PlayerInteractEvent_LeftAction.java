@@ -18,10 +18,27 @@ public class Mixin_PlayerInteractEvent_LeftAction {
     @Shadow public MovingObjectPosition objectMouseOver;
     @Shadow public EntityPlayerSP thePlayer;
 
+    @Shadow private int leftClickCounter;
     @Unique private PlayerInteractEvent lastAttackEvent;
 
-    @Inject(method = "clickMouse", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/entity/EntityPlayerSP;swingItem()V", shift = At.Shift.BEFORE), cancellable = true)
+    @Inject(
+            method = "clickMouse",
+            at = @At(
+                    //#if MC >= 1.12.2
+                    //$$ value = "HEAD"
+                    //#else
+                    value = "INVOKE",
+                    target = "Lnet/minecraft/client/entity/EntityPlayerSP;swingItem()V",
+                    shift = At.Shift.BEFORE
+                    //#endif
+            ),
+            cancellable = true
+    )
     private void onPlayerAttackCallback(CallbackInfo ci) {
+        if (this.leftClickCounter > 0) {
+            return;
+        }
+
         MovingObjectPosition rayCastedObject = this.objectMouseOver;
         PlayerInteractEvent.Type type = PlayerInteractEvent.Type.AIR;
         if (rayCastedObject != null) {

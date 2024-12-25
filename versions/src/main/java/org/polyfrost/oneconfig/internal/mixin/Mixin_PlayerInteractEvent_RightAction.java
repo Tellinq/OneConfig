@@ -17,7 +17,18 @@ public class Mixin_PlayerInteractEvent_RightAction {
     @Shadow public MovingObjectPosition objectMouseOver;
     @Shadow public EntityPlayerSP thePlayer;
 
-    @Inject(method = "rightClickMouse", at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/player/InventoryPlayer;getCurrentItem()Lnet/minecraft/item/ItemStack;"), cancellable = true)
+    @Inject(
+            method = "rightClickMouse",
+            at = @At(
+                    value = "INVOKE",
+                    //#if MC >= 1.12.2
+                    //$$ target = "Lnet/minecraft/client/entity/EntityPlayerSP;getHeldItem(Lnet/minecraft/util/EnumHand;)Lnet/minecraft/item/ItemStack;"
+                    //#else
+                    target = "Lnet/minecraft/entity/player/InventoryPlayer;getCurrentItem()Lnet/minecraft/item/ItemStack;"
+                    //#endif
+            ),
+            cancellable = true
+    )
     private void onPlayerInteractCallback(CallbackInfo ci) {
         MovingObjectPosition rayCastedObject = this.objectMouseOver;
         PlayerInteractEvent.Type type = PlayerInteractEvent.Type.AIR;

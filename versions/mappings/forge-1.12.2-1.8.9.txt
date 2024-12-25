@@ -15,4 +15,6 @@ net.minecraft.util.text.TextFormatting net.minecraft.util.EnumChatFormatting
 
 net.minecraft.client.renderer.entity.RenderLiving net.minecraft.client.renderer.entity.RendererLivingEntity
 
+net.minecraft.util.math.RayTraceResult net.minecraft.util.MovingObjectPosition
+
 org.objectweb.asm.commons.ClassRemapper org.objectweb.asm.commons.RemappingClassAdapter
