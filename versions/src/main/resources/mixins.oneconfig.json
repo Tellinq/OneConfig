@@ -11,6 +11,7 @@
     "CrashReportMixin",
     "GuiIngameMixin",
     "MinecraftMixin",
+    "Mixin_PlayerInteractEvent_LeftAction",
     "NetHandlerLoginClientMixin",
     "NetworkManagerMixin",
     "ScoreboardMixin",
