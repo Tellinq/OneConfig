@@ -33,7 +33,11 @@ public class EntityRendererMixin {
                     //$$ from = @At(
                     //$$     value = "INVOKE",
                     //#if MC >= 1.17.1
+                    //#if FABRIC
+                    //$$     target = "Lnet/minecraft/client/render/WorldRenderer;render(Lnet/minecraft/client/util/math/MatrixStack;FJZLnet/minecraft/client/render/Camera;Lnet/minecraft/client/render/GameRenderer;Lnet/minecraft/client/render/LightmapTextureManager;Lnet/minecraft/util/math/Matrix4f;)V"
+                    //#else
                     //$$     target = "Lnet/minecraft/client/renderer/LevelRenderer;renderLevel(Lcom/mojang/blaze3d/vertex/PoseStack;FJZLnet/minecraft/client/Camera;Lnet/minecraft/client/renderer/GameRenderer;Lnet/minecraft/client/renderer/LightTexture;Lcom/mojang/math/Matrix4f;)V"
+                    //#endif
                     //#else
                     //$$     target = "Lnet/minecraft/client/renderer/WorldRenderer;updateCameraAndRender(Lcom/mojang/blaze3d/matrix/MatrixStack;FJZLnet/minecraft/client/renderer/ActiveRenderInfo;Lnet/minecraft/client/renderer/GameRenderer;Lnet/minecraft/client/renderer/LightTexture;Lnet/minecraft/util/math/vector/Matrix4f;)V"
                     //#endif
@@ -41,7 +45,11 @@ public class EntityRendererMixin {
                     //$$ to = @At(
                     //$$     value = "INVOKE",
                     //#if MC >= 1.17.1
+                    //#if FABRIC
+                    //$$     target = "Lnet/minecraft/client/render/GameRenderer;renderHand(Lnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/render/Camera;F)V"
+                    //#else
                     //$$     target = "Lnet/minecraft/client/renderer/GameRenderer;renderItemInHand(Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/Camera;F)V"
+                    //#endif
                     //#else
                     //$$     target = "Lnet/minecraft/client/renderer/GameRenderer;renderHand(Lcom/mojang/blaze3d/matrix/MatrixStack;Lnet/minecraft/client/renderer/ActiveRenderInfo;F)V"
                     //#endif
