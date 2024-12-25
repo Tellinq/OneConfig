@@ -71,7 +71,7 @@ public abstract class ChatScreenMixin {
     }
 
     @Inject(method = m_complete, at = @At(value = "INVOKE", target = "Lnet/minecraft/client/network/ClientPlayNetworkHandler;sendPacket(Lnet/minecraft/network/Packet;)V"))
-    private void coammands$processAutoComplete(String string, String string2, CallbackInfo ci) {
+    private void commands$processAutoComplete(String string, String string2, CallbackInfo ci) {
         ClientCommandHandler.instance.autoComplete(string);
     }
 
