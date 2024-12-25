@@ -1,5 +1,9 @@
 package org.polyfrost.oneconfig.internal.mixin;
 
+//#if MC >= 1.18.2
+//$$ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
+//#endif
+
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.util.MovingObjectPosition;
@@ -34,7 +38,13 @@ public class Mixin_PlayerInteractEvent_LeftAction {
             ),
             cancellable = true
     )
-    private void onPlayerAttackCallback(CallbackInfo ci) {
+    private void onPlayerAttackCallback(
+            //#if MC >= 1.18.2
+            //$$ CallbackInfoReturnable<Boolean> cir
+            //#else
+            CallbackInfo ci
+            //#endif
+    ) {
         if (this.leftClickCounter > 0) {
             return;
         }
@@ -42,7 +52,13 @@ public class Mixin_PlayerInteractEvent_LeftAction {
         MovingObjectPosition rayCastedObject = this.objectMouseOver;
         PlayerInteractEvent.Type type = PlayerInteractEvent.Type.AIR;
         if (rayCastedObject != null) {
-            switch (rayCastedObject.typeOfHit) {
+            MovingObjectPosition.MovingObjectType typeOfHit =
+                    //#if MC >= 1.16.5
+                    //$$ rayCastedObject.getType();
+                    //#else
+                    rayCastedObject.typeOfHit;
+                    //#endif
+            switch (typeOfHit) {
                 case BLOCK:
                     type = PlayerInteractEvent.Type.BLOCK;
                     break;
@@ -55,7 +71,11 @@ public class Mixin_PlayerInteractEvent_LeftAction {
         lastAttackEvent = new PlayerInteractEvent(this.thePlayer, PlayerInteractEvent.Action.LEFT, type);
         EventManager.INSTANCE.post(lastAttackEvent);
         if (lastAttackEvent.cancelled) {
+            //#if MC >= 1.18.2
+            //$$ cir.setReturnValue(false);
+            //#else
             ci.cancel();
+            //#endif
         }
     }
 

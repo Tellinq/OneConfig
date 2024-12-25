@@ -1,3 +1,10 @@
+net.minecraft.client.Minecraft hitResult objectMouseOver
+net.minecraft.client.Minecraft startAttack() clickMouse()
+net.minecraft.client.Minecraft continueAttack() sendClickBlockToController()
+net.minecraft.client.Minecraft startUseItem() rightClickMouse()
+
+net.minecraft.world.phys.HitResult net.minecraft.util.math.RayTraceResult
+
 com.mojang.blaze3d.pipeline.RenderTarget blitToScreen() framebufferRender()
 com.mojang.blaze3d.pipeline.RenderTarget net.minecraft.client.shader.Framebuffer
 

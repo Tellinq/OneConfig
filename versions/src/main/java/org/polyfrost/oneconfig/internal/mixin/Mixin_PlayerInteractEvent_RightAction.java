@@ -21,7 +21,22 @@ public class Mixin_PlayerInteractEvent_RightAction {
             method = "rightClickMouse",
             at = @At(
                     value = "INVOKE",
-                    //#if MC >= 1.12.2
+                    //#if MC >= 1.16.5
+                    //#if FABRIC
+                    //$$ target = "Lnet/minecraft/client/network/ClientPlayerEntity;getStackInHand(Lnet/minecraft/util/Hand;)Lnet/minecraft/item/ItemStack;"
+                    //#else
+                    //#if MC >= 1.19.4
+                    //$$ target = "Lnet/minecraftforge/client/ForgeHooksClient;onClickInput(ILnet/minecraft/client/KeyMapping;Lnet/minecraft/world/InteractionHand;)Lnet/minecraftforge/client/event/InputEvent$InteractionKeyMappingTriggered;",
+                    //#elseif MC >= 1.18.2
+                    //$$ target = "Lnet/minecraftforge/client/ForgeHooksClient;onClickInput(ILnet/minecraft/client/KeyMapping;Lnet/minecraft/world/InteractionHand;)Lnet/minecraftforge/client/event/InputEvent$ClickInputEvent;",
+                    //#elseif MC >= 1.17.1
+                    //$$ target = "Lnet/minecraftforge/client/ForgeHooksClient;onClickInput(ILnet/minecraft/client/KeyMapping;Lnet/minecraft/world/InteractionHand;)Lnet/minecraftforge/client/event/InputEvent$ClickInputEvent;",
+                    //#else
+                    //$$ target = "Lnet/minecraftforge/client/ForgeHooksClient;onClickInput(ILnet/minecraft/client/settings/KeyBinding;Lnet/minecraft/util/Hand;)Lnet/minecraftforge/client/event/InputEvent$ClickInputEvent;",
+                    //#endif
+                    //$$ remap = false
+                    //#endif
+                    //#elseif MC >= 1.12.2
                     //$$ target = "Lnet/minecraft/client/entity/EntityPlayerSP;getHeldItem(Lnet/minecraft/util/EnumHand;)Lnet/minecraft/item/ItemStack;"
                     //#else
                     target = "Lnet/minecraft/entity/player/InventoryPlayer;getCurrentItem()Lnet/minecraft/item/ItemStack;"
@@ -33,7 +48,13 @@ public class Mixin_PlayerInteractEvent_RightAction {
         MovingObjectPosition rayCastedObject = this.objectMouseOver;
         PlayerInteractEvent.Type type = PlayerInteractEvent.Type.AIR;
         if (rayCastedObject != null) {
-            switch (rayCastedObject.typeOfHit) {
+            MovingObjectPosition.MovingObjectType typeOfHit =
+                    //#if MC >= 1.16.5
+                    //$$ rayCastedObject.getType();
+                    //#else
+                    rayCastedObject.typeOfHit;
+                    //#endif
+            switch (typeOfHit) {
                 case BLOCK:
                     type = PlayerInteractEvent.Type.BLOCK;
                     break;
