@@ -23,7 +23,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 //#else
 @Mixin(RendererLivingEntity.class)
 //#endif
-public class RendererLivingEntityMixin<T extends EntityLivingBase> {
+public class Mixin_RenderLivingEntityEvent<T extends EntityLivingBase> {
 
     @Inject(
             //#if MC >= 1.17.1
@@ -34,6 +34,8 @@ public class RendererLivingEntityMixin<T extends EntityLivingBase> {
             //#endif
             //#elseif MC >= 1.16.5
             //$$ method = "render(Lnet/minecraft/entity/LivingEntity;FFLcom/mojang/blaze3d/matrix/MatrixStack;Lnet/minecraft/client/renderer/IRenderTypeBuffer;I)V",
+            //#elseif MC >= 1.12.2
+            //$$ method = "doRender(Lnet/minecraft/entity/EntityLiving;DDDFF)V",
             //#else
             method = "doRender(Lnet/minecraft/entity/EntityLivingBase;DDDFF)V",
             //#endif
@@ -87,6 +89,8 @@ public class RendererLivingEntityMixin<T extends EntityLivingBase> {
             //#endif
             //#elseif MC >= 1.16.5
             //$$ method = "render(Lnet/minecraft/entity/LivingEntity;FFLcom/mojang/blaze3d/matrix/MatrixStack;Lnet/minecraft/client/renderer/IRenderTypeBuffer;I)V",
+            //#elseif MC >= 1.12.2
+            //$$ method = "doRender(Lnet/minecraft/entity/EntityLiving;DDDFF)V",
             //#else
             method = "doRender(Lnet/minecraft/entity/EntityLivingBase;DDDFF)V",
             //#endif
