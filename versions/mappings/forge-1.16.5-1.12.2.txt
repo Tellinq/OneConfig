@@ -25,6 +25,8 @@ net.minecraft.client.shader.ShaderInstance net.minecraft.client.shader.ShaderMan
 net.minecraft.client.renderer.GameRenderer net.minecraft.client.renderer.EntityRenderer
 net.minecraft.client.renderer.GameRenderer renderWorld() renderWorldPass()
 
+net.minecraft.entity.LivingEntity net.minecraft.entity.EntityLivingBase
+
 net.minecraft.client.world.ClientWorld net.minecraft.client.multiplayer.WorldClient
 
 net.minecraft.network.IPacket net.minecraft.network.Packet

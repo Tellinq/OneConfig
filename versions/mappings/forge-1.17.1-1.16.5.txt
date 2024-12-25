@@ -101,6 +101,16 @@ net.minecraft.client.multiplayer.ClientPacketListener send() sendPacket()
 net.minecraft.client.multiplayer.ClientPacketListener suggestionsProvider clientSuggestionProvider
 net.minecraft.client.multiplayer.ClientSuggestionProvider minecraft mc
 
+net.minecraft.client.renderer.MultiBufferSource net.minecraft.client.renderer.IRenderTypeBuffer
+
+net.minecraft.world.entity.Entity getX() getPosX()
+net.minecraft.world.entity.Entity getY() getPosY()
+net.minecraft.world.entity.Entity getZ() getPosZ()
+
+net.minecraft.client.renderer.entity.LivingEntityRenderer net.minecraft.client.renderer.entity.LivingRenderer
+
+net.minecraft.world.entity.LivingEntity net.minecraft.entity.LivingEntity
+
 net.minecraft.client.player.LocalPlayer chat() sendChatMessage()
 net.minecraft.client.player.LocalPlayer net.minecraft.client.entity.player.ClientPlayerEntity
 

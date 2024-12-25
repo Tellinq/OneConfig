@@ -17,6 +17,7 @@
     "ShaderGroupAccessor",
     "SoundManagerMixin",
     "EntityRendererMixin",
+    "RendererLivingEntityMixin",
     "WorldClientMixin",
     "SoundManagerMixin",
     "compat.OptifineConfigMixin",
