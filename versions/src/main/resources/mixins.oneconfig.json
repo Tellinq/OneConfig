@@ -12,6 +12,7 @@
     "GuiIngameMixin",
     "MinecraftMixin",
     "Mixin_PlayerInteractEvent_LeftAction",
+    "Mixin_PlayerInteractEvent_RightAction",
     "NetHandlerLoginClientMixin",
     "NetworkManagerMixin",
     "ScoreboardMixin",

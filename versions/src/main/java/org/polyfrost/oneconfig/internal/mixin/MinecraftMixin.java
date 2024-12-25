@@ -28,12 +28,7 @@ package org.polyfrost.oneconfig.internal.mixin;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.WorldClient;
-import net.minecraft.client.entity.EntityPlayerSP;
-import net.minecraft.client.multiplayer.PlayerControllerMP;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.*;
-import net.minecraft.world.World;
+import net.minecraft.util.Timer;
 import org.polyfrost.oneconfig.api.event.v1.EventManager;
 import org.polyfrost.oneconfig.api.event.v1.events.*;
 import org.spongepowered.asm.mixin.Mixin;
@@ -51,6 +46,7 @@ import net.minecraftforge.fml.common.eventhandler.Event;
 
 @Mixin(Minecraft.class)
 public abstract class MinecraftMixin {
+
     @Shadow
     private Timer timer;
 
@@ -64,7 +60,7 @@ public abstract class MinecraftMixin {
 
     @Shadow public WorldClient theWorld;
 
-    @Shadow public MovingObjectPosition objectMouseOver;@Shadow public EntityPlayerSP thePlayer;@Unique
+    @Unique
     private static final String UPDATE_CAMERA_AND_RENDER =
             //#if MC>=11300
             //$$ "Lnet/minecraft/client/renderer/GameRenderer;updateCameraAndRender(FJZ)V";
@@ -184,30 +180,6 @@ public abstract class MinecraftMixin {
     //$$      }
     //$$  }
     //#endif
-
-
-
-    @Inject(method = "rightClickMouse", at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/player/InventoryPlayer;getCurrentItem()Lnet/minecraft/item/ItemStack;"), cancellable = true)
-    private void onPlayerInteractCallback(CallbackInfo ci) {
-        MovingObjectPosition rayCastedObject = this.objectMouseOver;
-        PlayerInteractEvent.Type type = PlayerInteractEvent.Type.AIR;
-        if (rayCastedObject != null) {
-            switch (rayCastedObject.typeOfHit) {
-                case BLOCK:
-                    type = PlayerInteractEvent.Type.BLOCK;
-                    break;
-                case ENTITY:
-                    type = PlayerInteractEvent.Type.ENTITY;
-                    break;
-            }
-        }
-
-        PlayerInteractEvent event = new PlayerInteractEvent(this.thePlayer, PlayerInteractEvent.Action.RIGHT, type);
-        EventManager.INSTANCE.post(event);
-        if (event.cancelled) {
-            ci.cancel();
-        }
-    }
 
     //#if MC<=11202
 
