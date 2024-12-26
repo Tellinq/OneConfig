@@ -39,7 +39,7 @@ import org.polyfrost.oneconfig.api.event.v1.events.RenderEvent;
 import org.polyfrost.oneconfig.api.event.v1.events.ScreenOpenEvent;
 import org.polyfrost.oneconfig.api.event.v1.invoke.EventHandler;
 import org.polyfrost.oneconfig.api.ui.v1.screen.BlurScreen;
-import org.polyfrost.oneconfig.internal.mixin.ShaderGroupAccessor;
+import org.polyfrost.oneconfig.internal.mixin.Mixin_ShaderListAccessor;
 
 import java.util.List;
 
@@ -106,7 +106,7 @@ public final class BlurHandler {
                 try {
                     ShaderGroup group = Minecraft.getMinecraft().entityRenderer.getShaderGroup();
                     if (group == null) return false;
-                    List<Shader> shaders = ((ShaderGroupAccessor) group).getListShaders();
+                    List<Shader> shaders = ((Mixin_ShaderListAccessor) group).getListShaders();
                     if (shaders == null) return false;
 
                     // Iterate through the list of shaders.

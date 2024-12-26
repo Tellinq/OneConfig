@@ -24,28 +24,46 @@
  * <https://polyfrost.org/legal/oneconfig/additional-terms>
  */
 
-package org.polyfrost.oneconfig.internal.mixin.compat;
+package org.polyfrost.oneconfig.internal.mixin.events;
 
-import gg.essential.vigilance.Vigilant;
-import gg.essential.vigilance.data.PropertyCollector;
-import gg.essential.vigilance.data.SortingBehavior;
-import org.spongepowered.asm.mixin.Dynamic;
+//#if MC < 1.19
+import net.minecraft.client.entity.EntityPlayerSP;
+import org.polyfrost.oneconfig.api.event.v1.EventManager;
+import org.polyfrost.oneconfig.api.event.v1.events.ChatSendEvent;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Pseudo;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.ModifyVariable;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-import java.io.File;
+@Mixin(EntityPlayerSP.class)
+public abstract class Mixin_ChatSendEvent {
 
-@Mixin(value = Vigilant.class, remap = false)
-@Pseudo
-public abstract class VigilantCompatMixin {
+    @Unique
+    private ChatSendEvent ocfg$chatEvent;
 
-    @Dynamic("OneConfig VCAL Processor")
-    @Inject(method = "<init>(Ljava/io/File;Ljava/lang/String;Lgg/essential/vigilance/data/PropertyCollector;Lgg/essential/vigilance/data/SortingBehavior;)V", at = @At("RETURN"), remap = false)
-    public void compat$vigilance(File file, String title, PropertyCollector collector, SortingBehavior par4, CallbackInfo ci) {
-        // todo rewrite
+    @Inject(method = "sendChatMessage", at = @At("HEAD"), cancellable = true)
+    public void chatCallback(String message, CallbackInfo ci) {
+        //#if MC >= 1.16
+        //$$ if (org.polyfrost.oneconfig.internal.libs.fabric.ClientCommandInternals.executeCommand(message)) {
+        //$$     ci.cancel();
+        //$$ }
+        //#endif
+
+        ocfg$chatEvent = new ChatSendEvent(message);
+
+        EventManager.INSTANCE.post(ocfg$chatEvent);
+
+        if (ocfg$chatEvent.cancelled) {
+            ci.cancel();
+        }
+    }
+
+    @ModifyVariable(method = "sendChatMessage", at = @At("HEAD"), ordinal = 0, argsOnly = true)
+    public String modifyMessage(String message) {
+        return ocfg$chatEvent.message;
     }
 
 }
+//#endif

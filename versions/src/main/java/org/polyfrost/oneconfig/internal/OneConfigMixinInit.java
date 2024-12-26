@@ -64,43 +64,47 @@ public class OneConfigMixinInit implements IMixinConfigPlugin {
 
         // Loader-specific mixins
         if (loader == LoaderPlatform.Loaders.FORGE) {
-            mixins.add("forge.EventBusMixin");
+            mixins.add("events.Mixin_ChatReceiveEvent_Forge");
             if (version < 11300) {
                 // legacy forge
                 mixins.add("compat.OneConfigV0CompatMixin");
-                mixins.add("forge.ASMModParserMixin");
-                mixins.add("forge.JarDiscovererMixin");
-                mixins.add("hidpi.ForgeSplashProgressMixin");
+                mixins.add("forge.Mixin_ASMModParser_IgnoreForgeJava9Spam");
+                mixins.add("forge.Mixin_JarDiscoverer_IgnoreForgeJava9Spam");
+                mixins.add("hidpi.Mixin_FixLoadingScreenHiDPI");
             }
         } else {
             // fabric specific
-            mixins.add("fabric.GameRendererAccessor");
-            mixins.add("fabric.NetHandlerPlayClientMixin");
+            mixins.add("fabric.Mixin_LoaderShaderInvoker");
+            mixins.add("fabric.Mixin_ChatReceiveEvent_Fabric");
             if (version < 11300) {
                 // legacy fabric
-                mixins.add("commands.ChatScreenMixin");
+                mixins.add("commands.Mixin_IncludeCommandSuggestions");
             }
             if (version > 12000) {
-                mixins.add("hypixel.CustomPayloadS2CPacketMixin");
+                mixins.add("hypixel.Mixin_CaptureHypixelPayloads");
             }
         }
 
         // Inter-loader mixins
         if (version >= 11600) {
-            mixins.add("KeyboardMixin");
-            mixins.add("MouseMixin");
-            mixins.add("commands.ClientPlayNetworkHandlerMixin");
-            mixins.add("commands.HelpCommandAccessor");
+            mixins.add("commands.Mixin_AppendCustomCommands");
+
             if (version < 11900) {
                 // 1.16, 1.17, 1.18
-                mixins.add("SchemasMixin");
-                mixins.add("EntityPlayerSPMixin");
+                mixins.add("Mixin_LazyDataFixerUpper");
+                mixins.add("events.Mixin_ChatSendEvent");
             }
         } else {
+            if (version <= 10809) {
+                mixins.add("Mixin_SoundHandlerAccessor");
+            }
+
             // legacy
-            mixins.add("GuiScreenMixin");
-            mixins.add("SoundManagerAccessorMixin");
-            mixins.add("hidpi.EntityRendererMixin");
+            mixins.add("events.Mixin_KeyInputEvent_Screen");
+            mixins.add("hidpi.Mixin_EnableHiDPI");
+            mixins.add("hidpi.Mixin_FixDisplaySizeHiDPI");
+            mixins.add("hidpi.Mixin_FixDisplaySizeHiDPI_Screen");
+            mixins.add("hidpi.Mixin_FixMousePositionHiDPI");
         }
 
         return mixins;

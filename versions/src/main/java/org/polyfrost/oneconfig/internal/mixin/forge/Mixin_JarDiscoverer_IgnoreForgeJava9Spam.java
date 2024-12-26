@@ -24,28 +24,33 @@
  * <https://polyfrost.org/legal/oneconfig/additional-terms>
  */
 
-package org.polyfrost.oneconfig.internal.mixin.compat;
+//#if FORGE && MC <= 1.12.2
+package org.polyfrost.oneconfig.internal.mixin.forge;
 
-import gg.essential.vigilance.Vigilant;
-import gg.essential.vigilance.data.PropertyCollector;
-import gg.essential.vigilance.data.SortingBehavior;
-import org.spongepowered.asm.mixin.Dynamic;
+import com.llamalad7.mixinextras.injector.v2.WrapWithCondition;
+import net.minecraftforge.fml.common.LoaderException;
+import net.minecraftforge.fml.common.discovery.JarDiscoverer;
+import org.apache.logging.log4j.Level;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Pseudo;
 import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-import java.io.File;
+@Mixin(value = JarDiscoverer.class, remap = false)
+public class Mixin_JarDiscoverer_IgnoreForgeJava9Spam {
 
-@Mixin(value = Vigilant.class, remap = false)
-@Pseudo
-public abstract class VigilantCompatMixin {
+    @WrapWithCondition(method =
+            //#if MC <= 1.8.9
+            "discover"
+            //#else
+            //$$ "findClassesASM"
+            //#endif
+            , at = @At(value = "INVOKE", target = "Lnet/minecraftforge/fml/common/FMLLog;log(Lorg/apache/logging/log4j/Level;Ljava/lang/Throwable;Ljava/lang/String;[Ljava/lang/Object;)V"))
+    private boolean ignoreException(Level level, Throwable ex, String format, Object[] data) {
+        if (ex instanceof LoaderException) {
+            return !(ex.getCause() instanceof IllegalArgumentException);
+        }
 
-    @Dynamic("OneConfig VCAL Processor")
-    @Inject(method = "<init>(Ljava/io/File;Ljava/lang/String;Lgg/essential/vigilance/data/PropertyCollector;Lgg/essential/vigilance/data/SortingBehavior;)V", at = @At("RETURN"), remap = false)
-    public void compat$vigilance(File file, String title, PropertyCollector collector, SortingBehavior par4, CallbackInfo ci) {
-        // todo rewrite
+        return true;
     }
 
 }
+//#endif

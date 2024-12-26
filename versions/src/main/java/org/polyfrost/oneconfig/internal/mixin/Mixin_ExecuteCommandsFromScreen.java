@@ -24,28 +24,23 @@
  * <https://polyfrost.org/legal/oneconfig/additional-terms>
  */
 
-package org.polyfrost.oneconfig.internal.mixin.compat;
+package org.polyfrost.oneconfig.internal.mixin;
 
-import gg.essential.vigilance.Vigilant;
-import gg.essential.vigilance.data.PropertyCollector;
-import gg.essential.vigilance.data.SortingBehavior;
-import org.spongepowered.asm.mixin.Dynamic;
+//#if MC <= 1.13
+import net.minecraft.client.gui.GuiScreen;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Pseudo;
-import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-import java.io.File;
+@Mixin(GuiScreen.class)
+public abstract class Mixin_ExecuteCommandsFromScreen {
 
-@Mixin(value = Vigilant.class, remap = false)
-@Pseudo
-public abstract class VigilantCompatMixin {
-
-    @Dynamic("OneConfig VCAL Processor")
-    @Inject(method = "<init>(Ljava/io/File;Ljava/lang/String;Lgg/essential/vigilance/data/PropertyCollector;Lgg/essential/vigilance/data/SortingBehavior;)V", at = @At("RETURN"), remap = false)
-    public void compat$vigilance(File file, String title, PropertyCollector collector, SortingBehavior par4, CallbackInfo ci) {
-        // todo rewrite
-    }
+    //#if MC <= 1.13 && FABRIC
+    //$$ @Inject(method = "sendMessage(Ljava/lang/String;Z)V", at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/player/ClientPlayerEntity;sendChatMessage(Ljava/lang/String;)V"), cancellable = true)
+    //$$ private void commands$execute(String text, boolean toHud, CallbackInfo ci) {
+    //$$    if (org.polyfrost.oneconfig.api.commands.v1.internal.ClientCommandHandler.instance.execute(net.minecraft.client.MinecraftClient.getInstance().player, text) != 0) {
+    //$$        ci.cancel();
+    //$$    }
+    //$$ }
+    //#endif
 
 }
+//#endif

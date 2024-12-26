@@ -1,0 +1,23 @@
+package org.polyfrost.oneconfig.internal.mixin.events;
+
+import net.minecraft.client.Minecraft;
+import org.polyfrost.oneconfig.api.event.v1.EventManager;
+import org.polyfrost.oneconfig.api.event.v1.events.InitializationEvent;
+import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+
+@Mixin(Minecraft.class)
+public class Mixin_InitializationEvent {
+
+    //#if MC >= 1.13
+    //$$ @Inject(method = "<init>", at = @At("RETURN"))
+    //#else
+    @Inject(method = "startGame", at = @At("RETURN"))
+    //#endif
+    private void completedInit(CallbackInfo ci) {
+        EventManager.INSTANCE.post(InitializationEvent.INSTANCE);
+    }
+
+}

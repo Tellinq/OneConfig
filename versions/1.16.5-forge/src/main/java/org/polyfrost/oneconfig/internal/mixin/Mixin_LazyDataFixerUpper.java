@@ -24,28 +24,33 @@
  * <https://polyfrost.org/legal/oneconfig/additional-terms>
  */
 
-package org.polyfrost.oneconfig.internal.mixin.compat;
+package org.polyfrost.oneconfig.internal.mixin;
 
-import gg.essential.vigilance.Vigilant;
-import gg.essential.vigilance.data.PropertyCollector;
-import gg.essential.vigilance.data.SortingBehavior;
-import org.spongepowered.asm.mixin.Dynamic;
+//#if MC < 1.19
+import com.mojang.datafixers.DataFixer;
+import com.mojang.datafixers.DataFixerBuilder;
+import net.minecraft.util.datafix.DataFixesManager;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Pseudo;
 import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import org.spongepowered.asm.mixin.injection.Redirect;
 
-import java.io.File;
+import java.util.concurrent.Executor;
 
-@Mixin(value = Vigilant.class, remap = false)
-@Pseudo
-public abstract class VigilantCompatMixin {
+/**
+ * Modified from LazyDFU under the MIT licence.
+ * Source: <a href="https://github.com/astei/lazydfu/blob/master/LICENSE">here</a>
+ */
+@Mixin(DataFixesManager.class)
+public abstract class Mixin_LazyDataFixerUpper {
 
-    @Dynamic("OneConfig VCAL Processor")
-    @Inject(method = "<init>(Ljava/io/File;Ljava/lang/String;Lgg/essential/vigilance/data/PropertyCollector;Lgg/essential/vigilance/data/SortingBehavior;)V", at = @At("RETURN"), remap = false)
-    public void compat$vigilance(File file, String title, PropertyCollector collector, SortingBehavior par4, CallbackInfo ci) {
-        // todo rewrite
+    @Redirect(method = "createFixer", at = @At(value = "NEW", target = "com/mojang/datafixers/DataFixerBuilder", remap = false))
+    private static DataFixerBuilder optimize$lazydfu(int dataVersion) {
+        return new DataFixerBuilder(dataVersion) {
+            @Override
+            public DataFixer build(Executor executor) {
+                return super.build(f -> {});
+            }
+        };
     }
-
 }
+//#endif

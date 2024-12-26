@@ -24,28 +24,19 @@
  * <https://polyfrost.org/legal/oneconfig/additional-terms>
  */
 
-package org.polyfrost.oneconfig.internal.mixin.compat;
+package org.polyfrost.oneconfig.internal.mixin;
 
-import gg.essential.vigilance.Vigilant;
-import gg.essential.vigilance.data.PropertyCollector;
-import gg.essential.vigilance.data.SortingBehavior;
-import org.spongepowered.asm.mixin.Dynamic;
+import net.minecraft.client.shader.Shader;
+import net.minecraft.client.shader.ShaderGroup;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Pseudo;
-import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import org.spongepowered.asm.mixin.gen.Accessor;
 
-import java.io.File;
+import java.util.List;
 
-@Mixin(value = Vigilant.class, remap = false)
-@Pseudo
-public abstract class VigilantCompatMixin {
+@Mixin(ShaderGroup.class)
+public interface Mixin_ShaderListAccessor {
 
-    @Dynamic("OneConfig VCAL Processor")
-    @Inject(method = "<init>(Ljava/io/File;Ljava/lang/String;Lgg/essential/vigilance/data/PropertyCollector;Lgg/essential/vigilance/data/SortingBehavior;)V", at = @At("RETURN"), remap = false)
-    public void compat$vigilance(File file, String title, PropertyCollector collector, SortingBehavior par4, CallbackInfo ci) {
-        // todo rewrite
-    }
+    @Accessor("listShaders")
+    List<Shader> getListShaders();
 
 }
