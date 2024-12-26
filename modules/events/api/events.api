@@ -99,6 +99,34 @@ public class org/polyfrost/oneconfig/api/event/v1/events/MouseInputEvent : org/p
 	public fun component2 ()I
 }
 
+public class org/polyfrost/oneconfig/api/event/v1/events/PlayerInteractEvent : org/polyfrost/oneconfig/api/event/v1/events/Event$Cancellable {
+	public fun <init> (Ljava/lang/Object;Lorg/polyfrost/oneconfig/api/event/v1/events/PlayerInteractEvent$Action;Lorg/polyfrost/oneconfig/api/event/v1/events/PlayerInteractEvent$Type;)V
+	public fun getAction ()Lorg/polyfrost/oneconfig/api/event/v1/events/PlayerInteractEvent$Action;
+	public fun getPlayer ()Ljava/lang/Object;
+	public fun getType ()Lorg/polyfrost/oneconfig/api/event/v1/events/PlayerInteractEvent$Type;
+}
+
+public final class org/polyfrost/oneconfig/api/event/v1/events/PlayerInteractEvent$Action : java/lang/Enum {
+	public static final field LEFT Lorg/polyfrost/oneconfig/api/event/v1/events/PlayerInteractEvent$Action;
+	public static final field RIGHT Lorg/polyfrost/oneconfig/api/event/v1/events/PlayerInteractEvent$Action;
+	public static fun valueOf (Ljava/lang/String;)Lorg/polyfrost/oneconfig/api/event/v1/events/PlayerInteractEvent$Action;
+	public static fun values ()[Lorg/polyfrost/oneconfig/api/event/v1/events/PlayerInteractEvent$Action;
+}
+
+public final class org/polyfrost/oneconfig/api/event/v1/events/PlayerInteractEvent$Type : java/lang/Enum {
+	public static final field AIR Lorg/polyfrost/oneconfig/api/event/v1/events/PlayerInteractEvent$Type;
+	public static final field BLOCK Lorg/polyfrost/oneconfig/api/event/v1/events/PlayerInteractEvent$Type;
+	public static final field ENTITY Lorg/polyfrost/oneconfig/api/event/v1/events/PlayerInteractEvent$Type;
+	public static fun valueOf (Ljava/lang/String;)Lorg/polyfrost/oneconfig/api/event/v1/events/PlayerInteractEvent$Type;
+	public static fun values ()[Lorg/polyfrost/oneconfig/api/event/v1/events/PlayerInteractEvent$Type;
+}
+
+public class org/polyfrost/oneconfig/api/event/v1/events/PostWorldRenderEvent : org/polyfrost/oneconfig/api/event/v1/events/Event {
+	public fun <init> (Lorg/polyfrost/universal/UMatrixStack;F)V
+	public fun getPartialTicks ()F
+	public fun getStack ()Lorg/polyfrost/universal/UMatrixStack;
+}
+
 public class org/polyfrost/oneconfig/api/event/v1/events/ReceivePacketEvent : org/polyfrost/oneconfig/api/event/v1/events/Event$Cancellable {
 	public fun <init> (Ljava/lang/Object;)V
 	public fun getPacket ()Ljava/lang/Object;
@@ -118,6 +146,23 @@ public class org/polyfrost/oneconfig/api/event/v1/events/RenderEvent$Start : org
 	public static final field INSTANCE Lorg/polyfrost/oneconfig/api/event/v1/events/RenderEvent$Start;
 }
 
+public abstract class org/polyfrost/oneconfig/api/event/v1/events/RenderLivingEntityEvent : org/polyfrost/oneconfig/api/event/v1/events/Event$Cancellable {
+	public fun <init> (Ljava/lang/Object;FDDD)V
+	public fun getEntity ()Ljava/lang/Object;
+	public fun getPartialTicks ()F
+	public fun getX ()D
+	public fun getY ()D
+	public fun getZ ()D
+}
+
+public class org/polyfrost/oneconfig/api/event/v1/events/RenderLivingEntityEvent$Post : org/polyfrost/oneconfig/api/event/v1/events/RenderLivingEntityEvent {
+	public fun <init> (Ljava/lang/Object;FDDD)V
+}
+
+public class org/polyfrost/oneconfig/api/event/v1/events/RenderLivingEntityEvent$Pre : org/polyfrost/oneconfig/api/event/v1/events/RenderLivingEntityEvent {
+	public fun <init> (Ljava/lang/Object;FDDD)V
+}
+
 public class org/polyfrost/oneconfig/api/event/v1/events/ResizeEvent : org/polyfrost/oneconfig/api/event/v1/events/Event {
 	public final field newHeight I
 	public final field newWidth I
@@ -128,6 +173,7 @@ public class org/polyfrost/oneconfig/api/event/v1/events/ResizeEvent : org/polyf
 
 public class org/polyfrost/oneconfig/api/event/v1/events/ScreenOpenEvent : org/polyfrost/oneconfig/api/event/v1/events/Event$Cancellable {
 	public fun <init> (Ljava/lang/Object;)V
+	public fun component1 ()Ljava/lang/Object;
 	public fun getScreen ()Ljava/lang/Object;
 }
 
@@ -136,8 +182,20 @@ public class org/polyfrost/oneconfig/api/event/v1/events/SendPacketEvent : org/p
 	public fun getPacket ()Ljava/lang/Object;
 }
 
+public class org/polyfrost/oneconfig/api/event/v1/events/ServerJoinEvent : org/polyfrost/oneconfig/api/event/v1/events/Event {
+	public static final field INSTANCE Lorg/polyfrost/oneconfig/api/event/v1/events/ServerJoinEvent;
+}
+
 public class org/polyfrost/oneconfig/api/event/v1/events/ShutdownEvent : org/polyfrost/oneconfig/api/event/v1/events/Event {
 	public static final field INSTANCE Lorg/polyfrost/oneconfig/api/event/v1/events/ShutdownEvent;
+}
+
+public class org/polyfrost/oneconfig/api/event/v1/events/SoundPlayedEvent : org/polyfrost/oneconfig/api/event/v1/events/Event {
+	public fun <init> (Ljava/lang/String;Ljava/lang/Object;Ljava/lang/Object;)V
+	public fun getCategory ()Ljava/lang/Object;
+	public fun getName ()Ljava/lang/String;
+	public fun getSound ()Ljava/lang/Object;
+	public fun setSound (Ljava/lang/Object;)V
 }
 
 public abstract interface class org/polyfrost/oneconfig/api/event/v1/events/TickEvent : org/polyfrost/oneconfig/api/event/v1/events/Event {
@@ -152,6 +210,11 @@ public class org/polyfrost/oneconfig/api/event/v1/events/TickEvent$Start : org/p
 }
 
 public class org/polyfrost/oneconfig/api/event/v1/events/WorldLoadEvent : org/polyfrost/oneconfig/api/event/v1/events/Event {
+	public fun <init> (Ljava/lang/Object;)V
+	public fun getWorld ()Ljava/lang/Object;
+}
+
+public class org/polyfrost/oneconfig/api/event/v1/events/WorldUnloadEvent : org/polyfrost/oneconfig/api/event/v1/events/Event {
 	public fun <init> (Ljava/lang/Object;)V
 	public fun getWorld ()Ljava/lang/Object;
 }
