@@ -35,7 +35,11 @@ public class Mixin_RenderLivingEntityEvent<T extends EntityLivingBase> {
             //#elseif MC >= 1.16.5
             //$$ method = "render(Lnet/minecraft/entity/LivingEntity;FFLcom/mojang/blaze3d/matrix/MatrixStack;Lnet/minecraft/client/renderer/IRenderTypeBuffer;I)V",
             //#elseif MC >= 1.12.2
+            //#if FORGE
             //$$ method = "doRender(Lnet/minecraft/entity/EntityLiving;DDDFF)V",
+            //#else
+            //$$ method = "render(Lnet/minecraft/entity/LivingEntity;DDDFF)V",
+            //#endif
             //#else
             method = "doRender(Lnet/minecraft/entity/EntityLivingBase;DDDFF)V",
             //#endif
@@ -90,7 +94,11 @@ public class Mixin_RenderLivingEntityEvent<T extends EntityLivingBase> {
             //#elseif MC >= 1.16.5
             //$$ method = "render(Lnet/minecraft/entity/LivingEntity;FFLcom/mojang/blaze3d/matrix/MatrixStack;Lnet/minecraft/client/renderer/IRenderTypeBuffer;I)V",
             //#elseif MC >= 1.12.2
+            //#if FORGE
             //$$ method = "doRender(Lnet/minecraft/entity/EntityLiving;DDDFF)V",
+            //#else
+            //$$ method = "render(Lnet/minecraft/entity/LivingEntity;DDDFF)V",
+            //#endif
             //#else
             method = "doRender(Lnet/minecraft/entity/EntityLivingBase;DDDFF)V",
             //#endif

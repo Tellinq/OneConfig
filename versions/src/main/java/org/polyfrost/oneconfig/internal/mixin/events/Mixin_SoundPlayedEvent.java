@@ -1,12 +1,15 @@
 package org.polyfrost.oneconfig.internal.mixin.events;
 
+//#if MC <= 1.8.9
+import net.minecraft.client.audio.SoundEventAccessorComposite;
+import org.polyfrost.oneconfig.internal.mixin.Mixin_SoundHandlerAccessor;
+//#endif
+
 import net.minecraft.client.audio.ISound;
 import net.minecraft.client.audio.SoundCategory;
-import net.minecraft.client.audio.SoundEventAccessorComposite;
 import net.minecraft.client.audio.SoundManager;
 import org.polyfrost.oneconfig.api.event.v1.EventManager;
 import org.polyfrost.oneconfig.api.event.v1.events.SoundPlayedEvent;
-import org.polyfrost.oneconfig.internal.mixin.Mixin_SoundHandlerAccessor;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;

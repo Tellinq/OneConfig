@@ -1,5 +1,9 @@
 package org.polyfrost.oneconfig.internal.mixin.events;
 
+//#if MC > 1.13
+//$$ import org.spongepowered.asm.mixin.Shadow;
+//#endif
+
 import net.minecraft.client.Minecraft;
 import org.polyfrost.oneconfig.api.event.v1.EventManager;
 import org.polyfrost.oneconfig.api.event.v1.events.ResizeEvent;
@@ -9,7 +13,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(Minecraft.class)
-public class Mixin_ResizeEvent {
+public abstract class Mixin_ResizeEvent {
 
     //#if MC <= 1.13
     @Inject(method = "resize", at = @At("HEAD"))

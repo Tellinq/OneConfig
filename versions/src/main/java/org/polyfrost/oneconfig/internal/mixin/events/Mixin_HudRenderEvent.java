@@ -3,7 +3,15 @@ package org.polyfrost.oneconfig.internal.mixin.events;
 //#if FORGE && MC <= 1.12.2
 import net.minecraftforge.client.GuiIngameForge;
 //#else
-//$$ import net.minecraft.client.gui.GuiIngame;
+//#if FORGE
+//$$ import net.minecraft.client.gui.IngameGui;
+//#else
+//$$ import net.minecraft.client.gui.hud.InGameHud;
+//#endif
+//$$
+//#if MC >= 1.13
+//$$ import com.mojang.blaze3d.matrix.MatrixStack;
+//#endif
 //#endif
 
 import org.polyfrost.oneconfig.api.event.v1.EventManager;
@@ -16,12 +24,23 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 //#if FORGE && MC <= 1.12.2
 @Mixin(GuiIngameForge.class)
+//#elseif FORGE
+//$$ @Mixin(IngameGui.class)
 //#else
-//$$ @Mixin(GuiIngame.class)
+//$$ @Mixin(InGameHud.class)
 //#endif
 public class Mixin_HudRenderEvent {
 
-    @Inject(method = "renderGameOverlay", at = @At("TAIL"))
+    @Inject(
+            //#if FORGE && MC <= 1.12.2
+            method = "renderGameOverlay",
+            //#elseif FORGE
+            //$$ method = "renderIngameGui",
+            //#else
+            //$$ method = "render",
+            //#endif
+            at = @At("TAIL")
+    )
     private void renderHudCallback(
             //#if MC >= 1.13
             //$$ MatrixStack matrixStack,

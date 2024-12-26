@@ -5,6 +5,8 @@ import net.minecraftforge.client.event.GuiOpenEvent;
 import net.minecraftforge.fml.common.eventhandler.Event;
 //#else
 //$$ import org.polyfrost.oneconfig.api.event.v1.events.ScreenOpenEvent;
+//$$ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+//$$ import org.spongepowered.asm.mixin.injection.Inject;
 //#endif
 
 import net.minecraft.client.Minecraft;

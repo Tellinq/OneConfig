@@ -65,7 +65,7 @@ public abstract class Mixin_ChatReceiveEvent_Fabric {
     private Text modifyMessage(ChatMessageS2CPacket packet) {
         //@formatter:off
         if (
-            //#if MC<=10809
+            //#if MC <= 1.8.9
             packet.getType() == 0
             //#else
             //$$ !packet.isNonChat()
