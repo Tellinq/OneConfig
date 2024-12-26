@@ -55,8 +55,10 @@ public abstract class Mixin_ChatReceiveEvent_Fabric {
     private Text modifyMessage(GameMessageS2CPacket packet) {
         //@formatter:off
         if (
-            //#if MC<11700
+            //#if MC < 1.17
             !packet.isNonChat()
+            //#elseif MC > 1.19
+            //$$ !packet.overlay()
             //#else
             //$$ packet.getLocation() == net.minecraft.network.MessageType.CHAT
             //#endif
