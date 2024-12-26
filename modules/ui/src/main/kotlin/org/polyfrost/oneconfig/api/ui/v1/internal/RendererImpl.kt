@@ -39,6 +39,7 @@ import org.polyfrost.polyui.data.Font
 import org.polyfrost.polyui.data.PolyImage
 import org.polyfrost.polyui.unit.Vec2
 import org.polyfrost.polyui.utils.*
+import org.polyfrost.universal.shader.BlendState
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
 import org.polyfrost.polyui.color.PolyColor as Color
@@ -105,6 +106,12 @@ class RendererImpl(
 
     private val errorHandler: (Throwable) -> Unit = { LOGGER.error("failed to load resource!", it) }
 
+    // GL state cache
+    private var blendState: BlendState? = null
+    private var depthState: Boolean? = null
+    private var activeTexture: Int? = null
+    private var textureState: Int? = null
+
     override fun init() {
         vg.maybeSetup()
 
@@ -136,6 +143,12 @@ class RendererImpl(
             GL11.glPushAttrib(GL11.GL_ALL_ATTRIB_BITS)
         }
 
+        blendState = BlendState.active()
+        depthState = GL11.glIsEnabled(GL11.GL_DEPTH_TEST)
+        activeTexture = UGraphics.getActiveTexture()
+        activeTexture?.let(UGraphics::setActiveTexture)
+        textureState = GL11.glGetInteger(GL11.GL_TEXTURE_BINDING_2D)
+
         vg.beginFrame(width, height, pixelRatio)
         isDrawing = true
     }
@@ -147,6 +160,11 @@ class RendererImpl(
         if (!isGl3) {
             GL11.glPopAttrib()
         }
+
+        blendState?.activate()
+        depthState?.let { if (it) UGraphics.enableDepth() else UGraphics.disableDepth() }
+        textureState?.let { GL11.glBindTexture(GL11.GL_TEXTURE_2D, it) }
+        activeTexture?.let(UGraphics::setActiveTexture)
 
         isDrawing = false
     }
