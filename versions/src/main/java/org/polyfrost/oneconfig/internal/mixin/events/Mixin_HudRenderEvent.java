@@ -10,7 +10,11 @@ import net.minecraftforge.client.GuiIngameForge;
 //#endif
 //$$
 //#if MC >= 1.20
+//#if FORGE
+//$$ import net.minecraft.client.gui.GuiGraphics;
+//#else
 //$$ import net.minecraft.client.gui.DrawContext;
+//#endif
 //#elseif MC >= 1.13
 //$$ import com.mojang.blaze3d.matrix.MatrixStack;
 //#endif
@@ -49,7 +53,11 @@ public class Mixin_HudRenderEvent {
     )
     private void renderHudCallback(
             //#if MC >= 1.20
+            //#if FORGE
+            //$$ GuiGraphics ctx,
+            //#else
             //$$ DrawContext ctx,
+            //#endif
             //#elseif MC >= 1.13
             //$$ MatrixStack matrixStack,
             //#endif
@@ -58,7 +66,11 @@ public class Mixin_HudRenderEvent {
     ) {
         UMatrixStack stack =
                 //#if MC >= 1.20
+                //#if FORGE
+                //$$ new UMatrixStack(ctx.pose());
+                //#else
                 //$$ new UMatrixStack(ctx.getMatrices());
+                //#endif
                 //#elseif MC >= 1.13
                 //$$ new UMatrixStack(matrixStack);
                 //#else
