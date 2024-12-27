@@ -32,6 +32,10 @@ com.mojang.blaze3d.vertex.Tesselator end() draw()
 com.mojang.blaze3d.vertex.Tesselator getBuilder() getBuffer()
 com.mojang.blaze3d.vertex.Tesselator net.minecraft.client.renderer.Tessellator
 
+net.minecraft.client.gui.Gui renderIngameGui() render()
+
+net.minecraft.client.Minecraft missTime leftClickCounter
+
 net.minecraft.client.sounds.SoundEngine net.minecraft.client.audio.SoundEngine
 
 net.minecraft.ChatFormatting net.minecraft.util.text.TextFormatting

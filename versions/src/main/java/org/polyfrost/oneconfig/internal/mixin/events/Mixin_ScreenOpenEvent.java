@@ -1,8 +1,12 @@
 package org.polyfrost.oneconfig.internal.mixin.events;
 
 //#if FORGE
+//#if MC >= 1.20.4
+//$$ import net.minecraft.client.gui.screens.Screen;
+//#else
 import net.minecraftforge.client.event.GuiOpenEvent;
 import net.minecraftforge.fml.common.eventhandler.Event;
+//#endif
 //#else
 //$$ import org.polyfrost.oneconfig.api.event.v1.events.ScreenOpenEvent;
 //$$ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
@@ -19,7 +23,31 @@ import org.spongepowered.asm.mixin.injection.ModifyArg;
 public class Mixin_ScreenOpenEvent {
 
     //#if FORGE
-    @ModifyArg(method = "displayGuiScreen", at = @At(value = "INVOKE", target = "Lnet/minecraftforge/fml/common/eventhandler/EventBus;post(Lnet/minecraftforge/fml/common/eventhandler/Event;)Z", remap = false))
+    @ModifyArg(
+            method = "displayGuiScreen",
+            at = @At(
+                    value = "INVOKE",
+                    //#if MC >= 1.20.4
+                    //$$ target = "Lnet/minecraftforge/client/event/ForgeEventFactoryClient;onScreenOpening(Lnet/minecraft/client/gui/screens/Screen;Lnet/minecraft/client/gui/screens/Screen;)Lnet/minecraft/client/gui/screens/Screen;",
+                    //#elseif MC >= 1.16.5
+                    //$$ target = "Lnet/minecraftforge/eventbus/api/IEventBus;post(Lnet/minecraftforge/eventbus/api/Event;)Z",
+                    //#else
+                    target = "Lnet/minecraftforge/fml/common/eventhandler/EventBus;post(Lnet/minecraftforge/fml/common/eventhandler/Event;)Z",
+                    //#endif
+                    remap = false
+            )
+    )
+    //#if MC >= 1.20.4
+    //$$ private Screen screenOpenCallback(Screen oldScreen, Screen newScreen) {
+    //$$     org.polyfrost.oneconfig.api.event.v1.events.ScreenOpenEvent event = new org.polyfrost.oneconfig.api.event.v1.events.ScreenOpenEvent(newScreen);
+    //$$     EventManager.INSTANCE.post(event);
+    //$$     if (event.cancelled) {
+    //$$         return oldScreen;
+    //$$     }
+    //$$
+    //$$     return event.getScreen();
+    //$$ }
+    //#else
     private Event screenOpenCallback(Event a) {
         if (a instanceof GuiOpenEvent) {
             // w: not imported because 1.18+ they renamed it to be the same (breh)
@@ -40,6 +68,7 @@ public class Mixin_ScreenOpenEvent {
         }
         return a;
     }
+    //#endif
     //#else
     //$$  @Inject(method = "openScreen", at = @At(value = "INVOKE", target =
     //#if MC >= 1.13

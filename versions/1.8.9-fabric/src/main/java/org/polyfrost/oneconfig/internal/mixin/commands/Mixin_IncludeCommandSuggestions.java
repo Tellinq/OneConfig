@@ -71,7 +71,13 @@ public abstract class Mixin_IncludeCommandSuggestions {
     }
 
     @Inject(method = m_complete, at = @At(value = "INVOKE", target = "Lnet/minecraft/client/network/ClientPlayNetworkHandler;sendPacket(Lnet/minecraft/network/Packet;)V"))
-    private void commands$processAutoComplete(String string, String string2, CallbackInfo ci) {
+    private void commands$processAutoComplete(
+            String string,
+            //#if MC <= 1.8.9
+            String string2,
+            //#endif
+            CallbackInfo ci
+    ) {
         ClientCommandHandler.instance.autoComplete(string);
     }
 

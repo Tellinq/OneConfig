@@ -17,14 +17,16 @@ public class Mixin_PostWorldRenderEvent {
             method = "renderWorldPass",
             at = @At(
                     value = "INVOKE",
-                    target = "Lnet/minecraft/profiler/Profiler;endStartSection(Ljava/lang/String;)V",
+                    target = "Lnet/minecraft/profiler/Profiler;endStartSection(Ljava/lang/String;)V"
                     //#if FABRIC
-                    //$$ ordinal = 1
+                    //#if MC <= 1.12.2
+                    //$$ , ordinal = 1
+                    //#endif
                     //#else
                     //#if MC >= 1.16.5
-                    //$$ ordinal = 1
+                    //$$ , ordinal = 1
                     //#else
-                    ordinal = 2
+                    , ordinal = 2
                     //#endif
                     //#endif
             ),
@@ -34,7 +36,11 @@ public class Mixin_PostWorldRenderEvent {
                     //$$     value = "INVOKE",
                     //#if MC >= 1.17.1
                     //#if FABRIC
+                    //#if MC >= 1.19.4
+                    //$$     target  "Lnet/minecraft/client/render/WorldRenderer;render(Lnet/minecraft/client/util/math/MatrixStack;FJZLnet/minecraft/client/render/Camera;Lnet/minecraft/client/render/GameRenderer;Lnet/minecraft/client/render/LightmapTextureManager;Lorg/joml/Matrix4f;)V"
+                    //#else
                     //$$     target = "Lnet/minecraft/client/render/WorldRenderer;render(Lnet/minecraft/client/util/math/MatrixStack;FJZLnet/minecraft/client/render/Camera;Lnet/minecraft/client/render/GameRenderer;Lnet/minecraft/client/render/LightmapTextureManager;Lnet/minecraft/util/math/Matrix4f;)V"
+                    //#endif
                     //#else
                     //$$     target = "Lnet/minecraft/client/renderer/LevelRenderer;renderLevel(Lcom/mojang/blaze3d/vertex/PoseStack;FJZLnet/minecraft/client/Camera;Lnet/minecraft/client/renderer/GameRenderer;Lnet/minecraft/client/renderer/LightTexture;Lcom/mojang/math/Matrix4f;)V"
                     //#endif

@@ -37,7 +37,11 @@ public class Mixin_MouseInputEvent {
     //#endif
     //$$         at = @At(
     //$$                 value = "INVOKE",
+    //#if MC >= 1.20.4
+    //$$                 target = "Lnet/minecraftforge/client/event/ForgeEventFactoryClient;onMouseButtonPre(III)Z",
+    //#else
     //$$                 target = "Lnet/minecraftforge/client/ForgeHooksClient;onRawMouseClicked(III)Z",
+    //#endif
     //$$                 remap = false
     //$$         ),
     //$$         remap = true
@@ -56,7 +60,18 @@ public class Mixin_MouseInputEvent {
 
     //@formatter:off
     //#if FORGE
-    @Inject(method = "runTick", at = @At(value = "INVOKE", target = "Lnet/minecraftforge/client/ForgeHooksClient;postMouseEvent()Z", remap = false))
+    @Inject(
+            //#if MC >= 1.12.2
+            //$$ method = "runTickMouse",
+            //#else
+            method = "runTick",
+            //#endif
+            at = @At(
+                    value = "INVOKE",
+                    target = "Lnet/minecraftforge/client/ForgeHooksClient;postMouseEvent()Z",
+                    remap = false
+            )
+    )
     //#else
     //#if MC==10809
     //$$ @Inject(method = "tick", at = @At(value = "INVOKE", target = "Lorg/lwjgl/input/Mouse;getEventButton()I", remap = false))

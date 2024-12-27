@@ -44,7 +44,18 @@ public abstract class Mixin_ChatReceiveEvent_Fabric {
     @Unique
     private ChatReceiveEvent ocfg$chatEvent = null;
 
-    @Inject(method = "onGameMessage", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/hud/InGameHud;addChatMessage(Lnet/minecraft/network/MessageType;Lnet/minecraft/text/Text;Ljava/util/UUID;)V"), cancellable = true)
+    @Inject(
+            method = "onGameMessage",
+            at = @At(
+                    value = "INVOKE",
+                    //#if MC >= 1.19
+                    //$$ target = "Lnet/minecraft/client/network/message/MessageHandler;onGameMessage(Lnet/minecraft/text/Text;Z)V"
+                    //#else
+                    target = "Lnet/minecraft/client/gui/hud/InGameHud;addChatMessage(Lnet/minecraft/network/MessageType;Lnet/minecraft/text/Text;Ljava/util/UUID;)V"
+                    //#endif
+            ),
+            cancellable = true
+    )
     private void chatCallback(GameMessageS2CPacket packet, CallbackInfo ci) {
         if (ocfg$chatEvent != null && ocfg$chatEvent.cancelled) {
             ci.cancel();

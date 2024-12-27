@@ -2,3 +2,5 @@ net.minecraft.util.profiler.Profiler net.minecraft.profiler.Profiler
 net.minecraft.util.registry.RegistryKey net.minecraft.util.RegistryKey
 
 net.minecraft.client.MinecraftClient getWindow() getMainWindow()
+
+net.minecraft.entity.LivingEntity net.minecraft.entity.EntityLiving

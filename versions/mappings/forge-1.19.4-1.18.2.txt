@@ -6,3 +6,5 @@ net.minecraftforge.client.event.ScreenOpenEvent getNewScreen() getScreen()
 net.minecraftforge.client.event.ScreenEvent$Opening net.minecraftforge.client.event.ScreenOpenEvent
 
 org.joml.Matrix4f com.mojang.math.Matrix4f
+
+net.minecraftforge.client.ForgeHooksClient onMouseButtonPre() onRawMouseClicked()

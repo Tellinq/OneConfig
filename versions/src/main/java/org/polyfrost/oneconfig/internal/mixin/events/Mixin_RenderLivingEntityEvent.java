@@ -8,7 +8,16 @@ package org.polyfrost.oneconfig.internal.mixin.events;
 import net.minecraft.client.renderer.entity.RendererLivingEntity;
 //#endif
 
+//#if MC >= 1.12.2
+//#if FORGE
+//$$ import net.minecraft.entity.EntityLiving;
+//#else
+//$$ import net.minecraft.entity.LivingEntity;
+//#endif
+//#else
 import net.minecraft.entity.EntityLivingBase;
+//#endif
+
 import net.minecraft.profiler.Profiler;
 import org.polyfrost.oneconfig.api.event.v1.EventManager;
 import org.polyfrost.oneconfig.api.event.v1.events.RenderLivingEntityEvent;
@@ -23,7 +32,18 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 //#else
 @Mixin(RendererLivingEntity.class)
 //#endif
-public class Mixin_RenderLivingEntityEvent<T extends EntityLivingBase> {
+public class Mixin_RenderLivingEntityEvent<
+        T extends
+                //#if MC >= 1.12.2
+                //#if FORGE
+                //$$ EntityLiving
+                //#else
+                //$$ LivingEntity
+                //#endif
+                //#else
+                EntityLivingBase
+                //#endif
+> {
 
     @Inject(
             //#if MC >= 1.17.1

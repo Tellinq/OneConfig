@@ -37,7 +37,11 @@ public class Mixin_PlayerInteractEvent_RightAction {
                     //$$ remap = false
                     //#endif
                     //#elseif MC >= 1.12.2
+                    //#if FORGE
                     //$$ target = "Lnet/minecraft/client/entity/EntityPlayerSP;getHeldItem(Lnet/minecraft/util/EnumHand;)Lnet/minecraft/item/ItemStack;"
+                    //#else
+                    //$$ target = "Lnet/minecraft/entity/player/ClientPlayerEntity;getStackInHand(Lnet/minecraft/util/Hand;)Lnet/minecraft/item/ItemStack;"
+                    //#endif
                     //#else
                     target = "Lnet/minecraft/entity/player/InventoryPlayer;getCurrentItem()Lnet/minecraft/item/ItemStack;"
                     //#endif

@@ -26,6 +26,7 @@ net.minecraft.client.renderer.GameRenderer net.minecraft.client.renderer.EntityR
 net.minecraft.client.renderer.GameRenderer renderWorld() renderWorldPass()
 
 net.minecraft.entity.LivingEntity net.minecraft.entity.EntityLivingBase
+net.minecraft.entity.LivingEntity net.minecraft.entity.EntityLiving
 
 net.minecraft.client.world.ClientWorld net.minecraft.client.multiplayer.WorldClient
 

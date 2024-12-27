@@ -32,13 +32,10 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.ModifyArg;
 
-@Mixin(targets =
-        //#if MC == 1.8.9
-        "net.minecraftforge.fml.client.SplashProgress$3"
-        //#else
-        //$$ "net.minecraftforge.fml.client.SplashProgress$2"
-        //#endif
-        , remap = false)
+@Mixin(
+        targets = "net.minecraftforge.fml.client.SplashProgress$3",
+        remap = false
+)
 public abstract class Mixin_FixLoadingScreenHiDPI {
 
     @ModifyArg(method = "run", at = @At(value = "INVOKE", target = "Lorg/lwjgl/opengl/GL11;glViewport(IIII)V"), index = 2)

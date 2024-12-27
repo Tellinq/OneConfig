@@ -27,17 +27,43 @@
 //#if FORGE && MC <= 1.12.2
 package org.polyfrost.oneconfig.internal.mixin.forge;
 
+//#if MC >= 1.12.2
+//$$ import org.apache.logging.log4j.Logger;
+//#else
+import org.apache.logging.log4j.Level;
+//#endif
+
 import com.llamalad7.mixinextras.injector.v2.WrapWithCondition;
 import net.minecraftforge.fml.common.discovery.asm.ASMModParser;
-import org.apache.logging.log4j.Level;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 
 @Mixin(value = ASMModParser.class, remap = false)
 public class Mixin_ASMModParser_IgnoreForgeJava9Spam {
 
-    @WrapWithCondition(method = "<init>", at = @At(value = "INVOKE", target = "Lnet/minecraftforge/fml/common/FMLLog;log(Lorg/apache/logging/log4j/Level;Ljava/lang/Throwable;Ljava/lang/String;[Ljava/lang/Object;)V"))
-    private boolean ignoreException(Level level, Throwable ex, String format, Object[] data) {
+    @WrapWithCondition(
+            method = "<init>",
+            at = @At(
+                    value = "INVOKE",
+                    //#if MC >= 1.12.2
+                    //$$ target = "Lorg/apache/logging/log4j/Logger;error(Ljava/lang/String;Ljava/lang/Throwable;)V"
+                    //#else
+                    target = "Lnet/minecraftforge/fml/common/FMLLog;log(Lorg/apache/logging/log4j/Level;Ljava/lang/Throwable;Ljava/lang/String;[Ljava/lang/Object;)V"
+                    //#endif
+            )
+    )
+    private boolean ignoreException(
+            //#if MC >= 1.12.2
+            //$$ Logger instance,
+            //$$ String s,
+            //$$ Throwable ex
+            //#else
+            Level level,
+            Throwable ex,
+            String format,
+            Object[] data
+            //#endif
+    ) {
         return !(ex instanceof IllegalArgumentException);
     }
 }

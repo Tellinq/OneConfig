@@ -27,6 +27,12 @@
 //#if FORGE && MC <= 1.12.2
 package org.polyfrost.oneconfig.internal.mixin.forge;
 
+//#if MC >= 1.12.2
+//$$ import org.apache.logging.log4j.Logger;
+//#else
+import org.apache.logging.log4j.Level;
+//#endif
+
 import com.llamalad7.mixinextras.injector.v2.WrapWithCondition;
 import net.minecraftforge.fml.common.LoaderException;
 import net.minecraftforge.fml.common.discovery.JarDiscoverer;
@@ -37,16 +43,38 @@ import org.spongepowered.asm.mixin.injection.At;
 @Mixin(value = JarDiscoverer.class, remap = false)
 public class Mixin_JarDiscoverer_IgnoreForgeJava9Spam {
 
-    @WrapWithCondition(method =
-            //#if MC <= 1.8.9
-            "discover"
+    @WrapWithCondition(
+            //#if MC > 1.8.9
+            //$$ method = "findClassesASM",
             //#else
-            //$$ "findClassesASM"
+            method = "discover",
             //#endif
-            , at = @At(value = "INVOKE", target = "Lnet/minecraftforge/fml/common/FMLLog;log(Lorg/apache/logging/log4j/Level;Ljava/lang/Throwable;Ljava/lang/String;[Ljava/lang/Object;)V"))
-    private boolean ignoreException(Level level, Throwable ex, String format, Object[] data) {
+            at = @At(
+                    value = "INVOKE",
+                    //#if MC > 1.8.9
+                    //$$ target = "Lorg/apache/logging/log4j/Logger;error(Ljava/lang/String;Ljava/lang/Object;Ljava/lang/Object;Ljava/lang/Object;)V"
+                    //#else
+                    target = "Lnet/minecraftforge/fml/common/FMLLog;log(Lorg/apache/logging/log4j/Level;Ljava/lang/Throwable;Ljava/lang/String;[Ljava/lang/Object;)V"
+                    //#endif
+            )
+    )
+    private boolean ignoreException(
+            //#if MC >= 1.12.2
+            //$$ Logger instance,
+            //$$ String s,
+            //$$ Object o1,
+            //$$ Object o2,
+            //$$ Object ex
+            //#else
+            Level level,
+            Throwable ex,
+            String format,
+            Object[] data
+            //#endif
+    ) {
         if (ex instanceof LoaderException) {
-            return !(ex.getCause() instanceof IllegalArgumentException);
+            LoaderException loaderException = (LoaderException) ex;
+            return !(loaderException.getCause() instanceof IllegalArgumentException);
         }
 
         return true;

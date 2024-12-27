@@ -9,7 +9,9 @@ import net.minecraftforge.client.GuiIngameForge;
 //$$ import net.minecraft.client.gui.hud.InGameHud;
 //#endif
 //$$
-//#if MC >= 1.13
+//#if MC >= 1.20
+//$$ import net.minecraft.client.gui.DrawContext;
+//#elseif MC >= 1.13
 //$$ import com.mojang.blaze3d.matrix.MatrixStack;
 //#endif
 //#endif
@@ -35,21 +37,29 @@ public class Mixin_HudRenderEvent {
             //#if FORGE && MC <= 1.12.2
             method = "renderGameOverlay",
             //#elseif FORGE
+            //#if MC >= 1.17
+            //$$ method = "render",
+            //#else
             //$$ method = "renderIngameGui",
+            //#endif
             //#else
             //$$ method = "render",
             //#endif
             at = @At("TAIL")
     )
     private void renderHudCallback(
-            //#if MC >= 1.13
+            //#if MC >= 1.20
+            //$$ DrawContext ctx,
+            //#elseif MC >= 1.13
             //$$ MatrixStack matrixStack,
             //#endif
             float partialTicks,
             CallbackInfo ci
     ) {
         UMatrixStack stack =
-                //#if MC >= 1.13
+                //#if MC >= 1.20
+                //$$ new UMatrixStack(ctx.getMatrices());
+                //#elseif MC >= 1.13
                 //$$ new UMatrixStack(matrixStack);
                 //#else
                 new UMatrixStack();
