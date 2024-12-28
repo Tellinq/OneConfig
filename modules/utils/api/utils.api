@@ -99,6 +99,7 @@ public abstract interface class org/polyfrost/oneconfig/api/platform/v1/PlayerPl
 	public abstract fun getPlayerName ()Ljava/lang/String;
 	public abstract fun getServerBrand ()Ljava/lang/String;
 	public abstract fun inMultiplayer ()Z
+	public abstract fun joinServer (Lorg/polyfrost/oneconfig/api/platform/v1/PlayerPlatform$Server;)V
 }
 
 public class org/polyfrost/oneconfig/api/platform/v1/PlayerPlatform$Server {

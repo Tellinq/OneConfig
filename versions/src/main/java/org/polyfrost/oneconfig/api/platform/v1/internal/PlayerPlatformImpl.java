@@ -26,9 +26,21 @@
 
 package org.polyfrost.oneconfig.api.platform.v1.internal;
 
+//#if MC >= 1.17.1
+//#if FORGE
+//$$ import net.minecraft.client.multiplayer.resolver.ServerAddress;
+//#else
+//$$ import net.minecraft.client.network.ServerAddress;
+//#endif
+//#endif
+
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.GuiMultiplayer;
+import net.minecraft.client.multiplayer.GuiConnecting;
 import net.minecraft.client.multiplayer.ServerData;
 import net.minecraft.util.Session;
+import org.jetbrains.annotations.NotNull;
+import org.polyfrost.oneconfig.api.platform.v1.Platform;
 import org.polyfrost.oneconfig.api.platform.v1.PlayerPlatform;
 
 public class PlayerPlatformImpl implements PlayerPlatform {
@@ -71,5 +83,47 @@ public class PlayerPlatformImpl implements PlayerPlatform {
         if (old == d) return cache;
         old = d;
         return cache = new Server(d.serverIP, d.serverName);
+    }
+
+    public void joinServer(@NotNull Server server) {
+        ServerData data = new ServerData(
+                server.name,
+                server.ip,
+                //#if MC >= 1.20.4
+                //#if FORGE
+                //$$ ServerData.Type.OTHER
+                //#else
+                //$$ ServerInfo.ServerType.OTHER
+                //#endif
+                //#else
+                false
+                //#endif
+        );
+
+        //#if MC >= 1.17.1
+        //$$ ServerAddress address = ServerAddress
+        //#if FORGE
+        //$$         .parseString(server.ip);
+        //#else
+        //$$         .parse(server.ip);
+        //#endif
+        //#if FORGE
+        //$$ ConnectScreen.startConnecting(
+        //$$     new JoinMultiplayerScreen(Platform.screen().current()),
+        //$$     Minecraft.getInstance(),
+        //#else
+        //$$ ConnectScreen.connect(
+        //$$     new MultiplayerScreen(Platform.screen().current()),
+        //$$     MinecraftClient.getInstance(),
+        //#endif
+        //$$     address,
+        //$$     data
+        //#if MC >= 1.20.4
+        //$$     , false
+        //#endif
+        //$$ );
+        //#else
+        Platform.screen().display(new GuiConnecting(new GuiMultiplayer(Platform.screen().current()), Minecraft.getMinecraft(), data));
+        //#endif
     }
 }

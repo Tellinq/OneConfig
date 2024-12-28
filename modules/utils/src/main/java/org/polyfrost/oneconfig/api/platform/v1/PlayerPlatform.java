@@ -26,6 +26,7 @@
 
 package org.polyfrost.oneconfig.api.platform.v1;
 
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 public interface PlayerPlatform {
@@ -44,6 +45,8 @@ public interface PlayerPlatform {
 
     @Nullable
     Server getCurrentServer();
+
+    void joinServer(@NotNull Server server);
 
     class Server {
         public final String ip, name;

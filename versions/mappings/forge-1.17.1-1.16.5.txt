@@ -38,6 +38,9 @@ net.minecraft.client.Minecraft missTime leftClickCounter
 
 net.minecraft.client.sounds.SoundEngine net.minecraft.client.audio.SoundEngine
 
+net.minecraft.client.gui.screens.ConnectScreen net.minecraft.client.gui.screen.ConnectingScreen
+net.minecraft.client.gui.screens.multiplayer.JoinMultiplayerScreen net.minecraft.client.gui.screen.MultiplayerScreen
+
 net.minecraft.ChatFormatting net.minecraft.util.text.TextFormatting
 net.minecraft.ChatFormatting stripFormatting() getTextWithoutFormattingCodes()
 
