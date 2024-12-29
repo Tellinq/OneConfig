@@ -47,6 +47,14 @@ repositories {
 
 val shadow by configurations.creating
 
+if (platform.isLegacyForge) { // Quick substitution for relaunch in dev env, so that mixinextras works properly (yay!)
+    configurations.all {
+        resolutionStrategy {
+            force(libs.asm.get())
+        }
+    }
+}
+
 dependencies {
     compileOnly("gg.essential:vigilance-1.8.9-forge:295") {
         isTransitive = false

@@ -46,6 +46,7 @@ fun Project.provideIncludedDependencies(version: Triple<Int, Int, Int>?, loader:
     if (version == null // legacy dep module
         || (version.first == 1 && version.second <= 12 && loader == "forge")) {
         deps.add(libs.findLibrary("mixin").get().get()) // PolyMixin
+        deps.add(libs.findLibrary("asm").get().get())
     }
     deps.add(libs.findLibrary("mixin-extras").get().get())
     val actualDeps = mutableListOf<OCDependency>()
