@@ -74,7 +74,7 @@ public class OneConfigMixinInit implements IMixinConfigPlugin {
             }
         } else {
             // fabric specific
-            mixins.add("fabric.Mixin_LoaderShaderInvoker");
+            mixins.add("fabric.Mixin_LoadShaderInvoker");
             mixins.add("fabric.Mixin_ChatReceiveEvent_Fabric");
             if (version < 11300) {
                 // legacy fabric
