@@ -140,18 +140,6 @@ tasks {
                 exclude("mcmod.info")
             }
         }
-
-        // Removes the test-related stuff from everything
-        doLast {
-            val mainResources = layout.buildDirectory.get().asFile.resolve("resources")
-                .resolve("main")
-            val fabricModJson = mainResources.resolve("fabric.mod.json")
-            if (fabricModJson.exists()) {
-                val lines = fabricModJson.readLines().toMutableList()
-                lines.removeIf { it.contains("TestMod") }
-                fabricModJson.writeText(lines.joinToString("\n"))
-            }
-        }
         exclude("**/**_Test.**")
         exclude("**/**_Test$**.**")
     }

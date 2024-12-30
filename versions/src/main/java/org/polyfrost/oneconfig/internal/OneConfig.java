@@ -90,6 +90,14 @@ public class OneConfig
 
 
     private void init() {
+        //#if FABRIC
+        //$$ try {
+        //$$     Class.forName("org.polyfrost.oneconfig.test.TestMod_Test", false, getClass().getClassLoader());
+        //$$     Class<?> test = Class.forName("org.polyfrost.oneconfig.test.TestMod_Test");
+        //$$     org.polyfrost.oneconfig.utils.v1.MHUtils.getMethodHandle(test, "onInitializeClient", void.class).getOrThrow().invoke(test.getConstructor().newInstance());
+        //$$ } catch (Throwable ignored) {
+        //$$ }
+        //#endif
         LoaderPlatform.ActiveMod self = Platform.loader().getLoadedMod("oneconfig");
         String v = self == null ? "LOCAL" : self.version;
         LOGGER.info("Loading OneConfig v{}", v);
