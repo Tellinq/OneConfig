@@ -77,14 +77,18 @@ nightconfig-yaml = { module = "com.electronwill.night-config:yaml", version.ref 
 nightconfig-json = { module = "com.electronwill.night-config:json", version.ref = "nightconfig" }
 
 kotlin-reflect = { module = "org.jetbrains.kotlin:kotlin-reflect", version.ref = "kotlin" }
-kotlin-stdlib = { module = "org.jetbrains.kotlin:kotlin-stdlib-jdk8", version.ref = "kotlin" }
-kotlinx-coroutines = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core-jvm", version.ref = "kotlinx-coroutines" }
+kotlin-stdlib = { module = "org.jetbrains.kotlin:kotlin-stdlib", version.ref = "kotlin" }
+kotlin-stdlib-jdk7 = { module = "org.jetbrains.kotlin:kotlin-stdlib-jdk7", version.ref = "kotlin" }
+kotlin-stdlib-jdk8 = { module = "org.jetbrains.kotlin:kotlin-stdlib-jdk8", version.ref = "kotlin" }
+kotlinx-coroutines = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "kotlinx-coroutines" }
+kotlinx-coroutines-jvm = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core-jvm", version.ref = "kotlinx-coroutines" }
+kotlinx-coroutines-jdk8 = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-jdk8", version.ref = "kotlinx-coroutines" }
 kotlinx-atomicfu = { module = "org.jetbrains.kotlinx:atomicfu-jvm", version.ref = "kotlinx-atomicfu" }
 fabric-language-kotlin = { module = "net.fabricmc:fabric-language-kotlin", version.ref = "fabric-language-kotlin" }
 
 [bundles]
-kotlin = ["kotlin-reflect", "kotlin-stdlib"]
-kotlinx = ["kotlinx-coroutines", "kotlinx-atomicfu"]
+kotlin = ["kotlin-reflect", "kotlin-stdlib", "kotlin-stdlib-jdk7", "kotlin-stdlib-jdk8"]
+kotlinx = ["kotlinx-coroutines", "kotlinx-coroutines-jvm", "kotlinx-coroutines-jdk8", "kotlinx-atomicfu"]
 lwjgl = ["lwjgl", "lwjgl-nvg", "lwjgl-opengl", "lwjgl-stb", "lwjgl-tinyfd"]
 nightconfig = ["nightconfig", "nightconfig-json", "nightconfig-toml", "nightconfig-yaml"]
 test-core = ["junit", "logging-impl"]

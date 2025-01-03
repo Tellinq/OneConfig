@@ -33,7 +33,6 @@ import net.minecraft.launchwrapper.LaunchClassLoader;
 import net.minecraftforge.fml.relauncher.CoreModManager;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.polyfrost.oneconfig.api.platform.v1.Platform;
 import org.spongepowered.asm.launch.MixinBootstrap;
 import org.spongepowered.asm.mixin.Mixins;
 
@@ -76,7 +75,7 @@ public class OneConfigTweaker implements ITweaker {
                     LOGGER.error("failed to setup mixin for {}", sourceFile.path.toString(), t);
                 }
             }
-        } else if (!Platform.loader().isDevelopmentEnvironment()) {
+        } else if (!isDevelopmentEnvironment()) {
             LOGGER.fatal("Not able to detect jar sources. mixin will NOT work!");
         }
 
@@ -260,6 +259,11 @@ public class OneConfigTweaker implements ITweaker {
     @Override
     public String[] getLaunchArguments() {
         return new String[0];
+    }
+
+    private static boolean isDevelopmentEnvironment() {
+        Object o = Launch.blackboard.get("fml.deobfuscatedEnvironment");
+        return o != null && (boolean) o;
     }
 
     private static class SourceFile {
