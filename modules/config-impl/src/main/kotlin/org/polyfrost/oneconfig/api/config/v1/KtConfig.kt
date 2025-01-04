@@ -26,12 +26,14 @@
 
 package org.polyfrost.oneconfig.api.config.v1
 
+import org.polyfrost.oneconfig.api.config.v1.Property.Display
 import org.polyfrost.polyui.color.PolyColor
 import org.polyfrost.polyui.color.rgba
 import org.polyfrost.polyui.input.KeyBinder
 import kotlin.properties.PropertyDelegateProvider
 import kotlin.properties.ReadWriteProperty
 import kotlin.reflect.KProperty
+import kotlin.reflect.KProperty0
 
 /**
  * Kotlin config class. allows to use the `by` keyword to create properties.
@@ -90,6 +92,18 @@ open class KtConfig(id: String, title: String, category: Category, icon: String?
             addMetadata("options", options)
         }
 
+    fun hideIf(option: KProperty<*>, condition: () -> Boolean) {
+        option.property.addDisplayCondition { if(condition()) Display.HIDDEN else Display.SHOWN }
+    }
+
+    fun hideIf(option: KProperty<*>, condition: KProperty0<Boolean>) {
+        option.property.addDisplayCondition { if(condition.get()) Display.HIDDEN else Display.SHOWN }
+    }
+
+    fun <T> addCallback(option: KProperty<T>, callback: (T?) -> Boolean) {
+        option.property.addCallback { callback(it) }
+    }
+
 
     /**
      * provider for the [PropertyDelegate]. for some reason this has to be a class to avoid having to pass the reference directly.
@@ -103,8 +117,8 @@ open class KtConfig(id: String, title: String, category: Category, icon: String?
         private val type: Class<T>,
         private val visualizer: Class<out Visualizer>,
         private val extra: (Property<T>.() -> Unit)? = null
-    ) : PropertyDelegateProvider<KtConfig, ReadWriteProperty<KtConfig, T?>> {
-        override operator fun provideDelegate(thisRef: KtConfig, property: KProperty<*>): ReadWriteProperty<KtConfig, T?> {
+    ) : PropertyDelegateProvider<KtConfig, ReadWriteProperty<KtConfig, T>> {
+        override operator fun provideDelegate(thisRef: KtConfig, property: KProperty<*>): ReadWriteProperty<KtConfig, T> {
             val p = Properties.simple(property.name, name ?: property.name, description, def, type)
             extra?.invoke(p)
             p.addMetadata("visualizer", visualizer)
@@ -118,10 +132,10 @@ open class KtConfig(id: String, title: String, category: Category, icon: String?
     /**
      * The actual delegate property. very simple.
      */
-    private class PropertyDelegate<T>(val property: Property<T>) : ReadWriteProperty<KtConfig, T?> {
-        override operator fun getValue(thisRef: KtConfig, property: KProperty<*>): T? = this.property.get()
+    private class PropertyDelegate<T>(val property: Property<T>) : ReadWriteProperty<KtConfig, T> {
+        override operator fun getValue(thisRef: KtConfig, property: KProperty<*>): T = this.property.get() as T
 
-        override operator fun setValue(thisRef: KtConfig, property: KProperty<*>, value: T?) {
+        override operator fun setValue(thisRef: KtConfig, property: KProperty<*>, value: T) {
             this.property.set(value)
         }
     }

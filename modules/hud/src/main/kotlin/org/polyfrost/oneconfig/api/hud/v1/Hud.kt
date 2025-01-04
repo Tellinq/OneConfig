@@ -231,7 +231,7 @@ abstract class Hud<T : Drawable> : Cloneable, Config("null", null, "null", null)
     }
 
     protected fun updateAndRecalculate() {
-        getBackground()?.recalculate()
+        if (update()) getBackground()?.recalculate()
     }
 
     /**

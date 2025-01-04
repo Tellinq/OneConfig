@@ -26,9 +26,15 @@
 
 package org.polyfrost.oneconfig.api.config.v1
 
-class KtConfigTest : KtConfig("super.json", "Super Config", Config.Category.QOL) {
+class KtConfigTest : KtConfig("super.json", "Super Config", Category.QOL) {
 
     var p by text("amazing", "actually so cool")
 
     var g by slider(0f, 100f, 5f, "great", "actually so cool")
+
+    var a: Boolean by switch(true, "amazing")
+
+    init {
+        hideIf(::g, ::a)
+    }
 }
