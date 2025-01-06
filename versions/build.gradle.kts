@@ -43,6 +43,7 @@ loom {
 repositories {
     maven("https://repo.polyfrost.org/releases")
     maven("https://repo.polyfrost.org/snapshots")
+    maven("https://repo.hypixel.net/repository/Hypixel/")
 }
 
 val shadow by configurations.creating
