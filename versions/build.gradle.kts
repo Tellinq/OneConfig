@@ -51,6 +51,17 @@ val shadow by configurations.creating
 if (platform.isLegacyForge) { // Quick substitution for relaunch in dev env, so that mixinextras works properly (yay!)
     configurations.all {
         resolutionStrategy {
+            dependencySubstitution {
+                all {
+                    if (requested is ModuleComponentSelector) {
+                        val module = (requested as ModuleComponentSelector)
+                        if (module.group == "org.ow2.asm" && module.version != libs.asm.get().version) {
+                            logger.warn("Substituting ${module.group}:${module.module}:${module.version} with ${libs.asm.get()}")
+                            useTarget(module.group + ":" + module.module + ":" + libs.asm.get().version)
+                        }
+                    }
+                }
+            }
             force(libs.asm.get())
         }
     }
