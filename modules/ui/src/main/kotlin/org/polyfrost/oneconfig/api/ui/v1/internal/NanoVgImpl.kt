@@ -197,7 +197,24 @@ class NanoVgImpl(
     }
 
     override fun createFont(name: String, buffer: ByteBuffer): Int {
-        return nvgCreateFontMem(handle, name, buffer, false)
+        val clz = Class.forName("org.lwjgl.nanovg.NanoVG")
+        try {
+            val method = clz.getDeclaredMethod("nvgCreateFontMem", Long::class.java, CharSequence::class.java, ByteBuffer::class.java, Boolean::class.java)
+            return method.invoke(null, handle, name, buffer, false) as Int
+        } catch (e: NoSuchMethodException) {
+            try {
+                // This is required because some time between LWJGL 3.2.3 and 3.3.0, the signature of nvgCreateFontMem changed
+                // from using an int to represent a bool to simply using a boolean. This is a workaround to make the code compatible
+                // with both versions of LWJGL.
+                val method = clz.getDeclaredMethod("nvgCreateFontMem", Long::class.java, CharSequence::class.java, ByteBuffer::class.java, Int::class.java)
+                return method.invoke(null, handle, name, buffer, 0) as Int
+            } catch (e: NoSuchMethodException) {
+                // Just prints all of the methods to see what's available
+                clz.declaredMethods.forEach { println(it) }
+
+                throw IllegalStateException("Failed to find nvgCreateFontMem method")
+            }
+        }
     }
 
     override fun fontSize(size: Float) {

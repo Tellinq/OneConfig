@@ -65,7 +65,6 @@ object KeybindManager {
 
         val m = Int2IntMap(8)
         m[UKeyboard.KEY_LSHIFT] = KeyModifiers.LSHIFT.value.toInt()
-        m[UKeyboard.KEY_LSHIFT] = KeyModifiers.LSHIFT.value.toInt()
         m[UKeyboard.KEY_RSHIFT] = KeyModifiers.RSHIFT.value.toInt()
         m[UKeyboard.KEY_LCONTROL] = KeyModifiers.LCONTROL.value.toInt()
         m[UKeyboard.KEY_RCONTROL] = KeyModifiers.RCONTROL.value.toInt()

@@ -87,6 +87,7 @@ public class OneConfigMixinInit implements IMixinConfigPlugin {
 
         // Inter-loader mixins
         if (version >= 11600) {
+            mixins.add("Mixin_ModernEntrypoint");
             mixins.add("commands.Mixin_AppendCustomCommands");
 
             if (version < 11900) {

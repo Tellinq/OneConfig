@@ -84,12 +84,12 @@ public class OneConfig
     //#else
     //$$ @Override
     //$$ public void onInitializeClient() {
-    //$$     init();
+    //$$     // Uhhhhhhhhhhhhhhhhhhhhhhhhhhh......................
     //$$ }
     //#endif
 
 
-    private void init() {
+    public void init() {
         //#if FABRIC
         //$$ try {
         //$$     Class.forName("org.polyfrost.oneconfig.test.TestMod_Test", false, getClass().getClassLoader());
