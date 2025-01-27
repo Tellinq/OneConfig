@@ -74,12 +74,15 @@ public class OneConfigMixinInit implements IMixinConfigPlugin {
             }
         } else {
             // fabric specific
+            mixins.add("Mixin_ModernEntrypoint");
             mixins.add("fabric.Mixin_LoadShaderInvoker");
             mixins.add("fabric.Mixin_ChatReceiveEvent_Fabric");
-            if (version < 11300) {
+            if (version <= 11300) {
                 // legacy fabric
                 mixins.add("commands.Mixin_IncludeCommandSuggestions");
+                mixins.add("Mixin_ExecuteCommandsFromScreen");
             }
+
             if (version > 12000) {
                 mixins.add("hypixel.Mixin_CaptureHypixelPayloads");
             }
@@ -87,7 +90,6 @@ public class OneConfigMixinInit implements IMixinConfigPlugin {
 
         // Inter-loader mixins
         if (version >= 11600) {
-            mixins.add("Mixin_ModernEntrypoint");
             mixins.add("commands.Mixin_AppendCustomCommands");
 
             if (version < 11900) {

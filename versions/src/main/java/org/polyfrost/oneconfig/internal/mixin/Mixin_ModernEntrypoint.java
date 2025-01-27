@@ -1,7 +1,7 @@
 package org.polyfrost.oneconfig.internal.mixin;
 
-//#if MC >= 1.16.5
-//$$ import net.minecraft.client.Minecraft;
+//#if FABRIC
+//$$ import net.minecraft.client.MinecraftClient;
 //$$ import org.polyfrost.oneconfig.internal.OneConfig;
 //$$ import org.spongepowered.asm.mixin.Mixin;
 //$$ import org.spongepowered.asm.mixin.Unique;
@@ -9,7 +9,7 @@ package org.polyfrost.oneconfig.internal.mixin;
 //$$ import org.spongepowered.asm.mixin.injection.Inject;
 //$$ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 //$$
-//$$ @Mixin(Minecraft.class)
+//$$ @Mixin(MinecraftClient.class)
 //$$ public class Mixin_ModernEntrypoint {
 //$$
 //$$     @Unique

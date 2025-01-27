@@ -61,7 +61,7 @@ object KeybindManager {
         }.register()
         eventHandler { (screen): ScreenOpenEvent ->
             if (screen == null) keyBinder.release()
-        }
+        }.register()
 
         val m = Int2IntMap(8)
         m[UKeyboard.KEY_LSHIFT] = KeyModifiers.LSHIFT.value.toInt()
