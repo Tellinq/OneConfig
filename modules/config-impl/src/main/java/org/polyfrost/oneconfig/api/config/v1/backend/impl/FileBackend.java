@@ -261,7 +261,7 @@ public class FileBackend extends Backend {
         String path = p.toString();
         int i = path.lastIndexOf('.');
         if (i == -1) {
-            LOGGER.warn("no serializer set for file {}, using YAML", path);
+            //LOGGER.warn("no serializer set for file {}, using YAML", path);
             return serializers.get(".yml");
         }
         return serializers.get(path.substring(i));

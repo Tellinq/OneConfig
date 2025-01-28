@@ -79,7 +79,10 @@ public interface LoaderPlatform {
         return sb.toString();
     }
 
-    boolean isDevelopmentEnvironment();
+    /**
+     * @return true if the current instance is in development mode.
+     */
+    boolean isDevelopment();
 
     Loaders getLoader();
 

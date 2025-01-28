@@ -68,19 +68,18 @@ public class OneConfigMixinInit implements IMixinConfigPlugin {
             if (version < 11300) {
                 // legacy forge
                 mixins.add("compat.OneConfigV0CompatMixin");
-                mixins.add("forge.Mixin_ASMModParser_IgnoreForgeJava9Spam");
-                mixins.add("forge.Mixin_JarDiscoverer_IgnoreForgeJava9Spam");
+                mixins.add("fixes.Mixin_ASMModParser_IgnoreForgeJava9Spam");
+                mixins.add("fixes.Mixin_JarDiscoverer_IgnoreForgeJava9Spam");
                 mixins.add("hidpi.Mixin_FixLoadingScreenHiDPI");
             }
         } else {
             // fabric specific
-            mixins.add("Mixin_ModernEntrypoint");
             mixins.add("fabric.Mixin_LoadShaderInvoker");
             mixins.add("fabric.Mixin_ChatReceiveEvent_Fabric");
             if (version <= 11300) {
                 // legacy fabric
+                mixins.add("commands.Mixin_ExecuteCommandsFromScreen");
                 mixins.add("commands.Mixin_IncludeCommandSuggestions");
-                mixins.add("Mixin_ExecuteCommandsFromScreen");
             }
 
             if (version > 12000) {

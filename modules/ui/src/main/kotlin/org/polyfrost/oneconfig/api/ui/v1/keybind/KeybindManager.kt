@@ -55,13 +55,16 @@ object KeybindManager {
         eventHandler { (key, char, state): KeyInputEvent ->
             if (state == 2) return@eventHandler
             translateKey(inputManager, key, char, state == 1)
-        }.register()
+        }
         eventHandler { _: TickEvent.End ->
             keyBinder.update(50_000L, inputManager.mods, true)
-        }.register()
+        }
+
+        // asm: this is an old fix which will be kept so that in the (rare) event that the keybind system fails for whatever reason,
+        // the user can try to fix it by opening a screen and trying again, and it should fix the issue.
         eventHandler { (screen): ScreenOpenEvent ->
             if (screen == null) keyBinder.release()
-        }.register()
+        }
 
         val m = Int2IntMap(8)
         m[UKeyboard.KEY_LSHIFT] = KeyModifiers.LSHIFT.value.toInt()
@@ -117,8 +120,8 @@ object KeybindManager {
         if (character != '\u0000' && !character.isISOControl() && character.isDefined()) {
             if (state) {
                 inputManager.keyTyped(character)
-                inputManager.keyDown(character.code)
-            } else inputManager.keyUp(character.code)
+                inputManager.keyDown(character.lowercaseChar().code)
+            } else inputManager.keyUp(character.lowercaseChar().code)
             return
         }
 

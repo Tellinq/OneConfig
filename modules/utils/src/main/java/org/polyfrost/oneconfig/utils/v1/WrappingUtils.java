@@ -37,7 +37,7 @@ import static org.polyfrost.oneconfig.utils.v1.ArrayCastUtils.*;
  * Various utilities for wrapping and unboxing of arrays, lists, etc.
  * see {@link ArrayCastUtils} for some more info.
  */
-public class WrappingUtils {
+public final class WrappingUtils {
     private static final Map<Class<?>, Class<?>> prim2Wrapper;
     private static final Map<Class<?>, Class<?>> wrapper2Prim;
 

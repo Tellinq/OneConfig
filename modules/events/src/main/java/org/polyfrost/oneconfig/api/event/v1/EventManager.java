@@ -28,10 +28,15 @@ package org.polyfrost.oneconfig.api.event.v1;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.jetbrains.annotations.ApiStatus;
+import org.jetbrains.annotations.Nullable;
 import org.polyfrost.oneconfig.api.event.v1.events.Event;
+import org.polyfrost.oneconfig.api.event.v1.events.InitializationEvent;
 import org.polyfrost.oneconfig.api.event.v1.invoke.EventCollector;
 import org.polyfrost.oneconfig.api.event.v1.invoke.EventHandler;
 import org.polyfrost.oneconfig.api.event.v1.invoke.impl.AnnotationEventMapper;
+import org.polyfrost.oneconfig.api.platform.v1.Platform;
+import org.polyfrost.oneconfig.utils.v1.TableHelper;
 
 import java.util.*;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -49,10 +54,40 @@ public final class EventManager {
     private final Deque<EventCollector> collectors = new ArrayDeque<>(2);
     private final Map<Object, List<EventHandler<?>>> cache = new WeakHashMap<>(5);
     private final Map<Class<? extends Event>, List<EventHandler<?>>> handlers = new HashMap<>(8);
+    @ApiStatus.Internal
+    @Nullable
+    public static final List<EventHandler<?>> devUnregistered;
 
+    static {
+        if (Platform.loader().isDevelopment()) {
+            devUnregistered = new ArrayList<>(5);
+        } else devUnregistered = null;
+    }
 
     private EventManager() {
         registerCollector(new AnnotationEventMapper());
+        if (Platform.loader().isDevelopment()) {
+            register(EventHandler.of(InitializationEvent.class, () -> {
+                if (devUnregistered != null && !devUnregistered.isEmpty()) {
+                    LOGGER.warn("Found {} handlers that were created but not registered: ", devUnregistered.size());
+                    for (EventHandler<?> handler : devUnregistered) {
+                        LOGGER.warn(handler);
+                    }
+                }
+                if (!handlers.isEmpty()) {
+                    String[] classes = new String[handlers.size() + 1];
+                    String[] handles = new String[handlers.size() + 1];
+                    classes[0] = "Event Class";
+                    handles[0] = "Handlers";
+                    int i = 1;
+                    for (Map.Entry<Class<? extends Event>, List<EventHandler<?>>> entry : handlers.entrySet()) {
+                        handles[i] = String.valueOf(entry.getValue().size());
+                        classes[i++] = entry.getKey().getName().replace("org.polyfrost.oneconfig.api.event.v1.events.", "builtin.");
+                    }
+                    LOGGER.info(TableHelper.makeTableFromColumns("Registered Event Handlers:", classes, handles));
+                }
+            }));
+        }
     }
 
     /**
@@ -113,6 +148,10 @@ public final class EventManager {
      * @param handler The handler to register.
      */
     public void register(EventHandler<?> handler) {
+        if (devUnregistered != null) {
+            devUnregistered.remove(handler);
+        }
+
         List<EventHandler<?>> handles = handlers.computeIfAbsent(handler.getEventClass(), k -> new CopyOnWriteArrayList<>());
         if (handles.isEmpty()) {
             handles.add(handler);

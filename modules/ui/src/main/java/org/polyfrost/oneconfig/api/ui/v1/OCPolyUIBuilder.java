@@ -44,7 +44,7 @@ public final class OCPolyUIBuilder extends PolyUIBuilder {
         Settings s = getSettings();
         s.enableInitCleanup(false);
         s.enableForceSettingInitialSize(true);
-        s.enableDebugMode(Platform.loader().isDevelopmentEnvironment());
+        s.enableDebugMode(Platform.loader().isDevelopment());
     }
 
     public OCPolyUIBuilder onClose(Consumer<PolyUI> onClose) {

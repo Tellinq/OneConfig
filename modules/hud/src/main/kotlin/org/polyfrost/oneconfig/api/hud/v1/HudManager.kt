@@ -123,7 +123,7 @@ object HudManager {
         val size = Vec2(if (sizeFile.exists()) sizeFile.readText().toLongOrNull() ?: 0L else 0L)
         val prevSize: Vec2
         if (size.isPositive) {
-            LOGGER.info("Size to restore: $size")
+            LOGGER.info("Found a size to restore: $size")
             prevSize = polyUI.size
             polyUI.resize(size.x, size.y)
         } else {
@@ -138,6 +138,7 @@ object HudManager {
 //        }
         val loader = HudManager::class.java.classLoader
         val used = HashSet<Class<Hud<*>>>(hudProviders.size)
+        val failed = HashMap<String, Int>(8)
         var i = 0
         ConfigManager.active().gatherAll("huds").forEach { data ->
             try {
@@ -156,13 +157,18 @@ object HudManager {
                 theHud.y = y - (hud.get().y - theHud.y)
                 i++
             } catch (e: ClassNotFoundException) {
-                LOGGER.warn("Didn't load HUD from ${data.id} as it's provider (${e.message?.substringAfter(':')}) wasn't found, was the mod removed?")
+                val cls = e.message?.substringAfter(':') ?: "unknown"
+                failed[cls] = failed.getOrDefault(cls, 0) + 1
             } catch (e: Exception) {
                 LOGGER.error("Failed to load HUD from ${data.id}", e)
             }
         }
+        if (failed.isNotEmpty()) {
+            LOGGER.warn("Failed to load HUDs from ${failed.size} providers as they weren't found: (maybe the mods were removed?)")
+            failed.forEach { (cls, amount) -> LOGGER.warn("  $cls: $amount HUDs") }
+        }
         if (prevSize.isPositive) polyUI.resize(prevSize.x, prevSize.y)
-        LOGGER.info("successfully loaded {} HUDs from {} providers", i, hudProviders.size)
+        LOGGER.info("successfully loaded {} HUDs from {} providers (total {} registered providers)", i, used.size, hudProviders.size)
         hudProviders.forEach { (cls, h) ->
             if (cls in used) return@forEach
             val default = h.defaultPosition()

@@ -93,7 +93,7 @@ public class LoaderPlatformImpl implements LoaderPlatform {
     //#endif
 
     @Override
-    public boolean isDevelopmentEnvironment() {
+    public boolean isDevelopment() {
         //#if FORGE && MC<11300
         return isDev;
         //#elseif FABRIC

@@ -24,24 +24,22 @@
  * <https://polyfrost.org/legal/oneconfig/additional-terms>
  */
 
-package org.polyfrost.oneconfig.internal.mixin;
+package org.polyfrost.oneconfig.internal.mixin.commands;
 
-//#if MC <= 1.13 && FABRIC
-//$$ import net.minecraft.client.gui.screen.Screen;
-//$$ import org.spongepowered.asm.mixin.Mixin;
-//$$ import org.spongepowered.asm.mixin.injection.At;
-//$$ import org.spongepowered.asm.mixin.injection.Inject;
-//$$ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-//$$
-//$$ @Mixin(Screen.class)
-//$$ public abstract class Mixin_ExecuteCommandsFromScreen {
-//$$
-//$$     @Inject(method = "sendMessage(Ljava/lang/String;Z)V", at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/player/ClientPlayerEntity;sendChatMessage(Ljava/lang/String;)V"), cancellable = true)
-//$$     private void commands$execute(String text, boolean toHud, CallbackInfo ci) {
-//$$        if (org.polyfrost.oneconfig.api.commands.v1.internal.ClientCommandHandler.instance.execute(net.minecraft.client.MinecraftClient.getInstance().player, text) != 0) {
-//$$            ci.cancel();
-//$$        }
-//$$     }
-//$$
-//$$ }
-//#endif
+import net.minecraft.client.gui.screen.Screen;
+import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+
+@Mixin(Screen.class)
+public abstract class Mixin_ExecuteCommandsFromScreen {
+
+    @Inject(method = "sendMessage(Ljava/lang/String;Z)V", at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/player/ClientPlayerEntity;sendChatMessage(Ljava/lang/String;)V"), cancellable = true)
+    private void commands$execute(String text, boolean toHud, CallbackInfo ci) {
+       if (org.polyfrost.oneconfig.api.commands.v1.internal.ClientCommandHandler.instance.execute(net.minecraft.client.MinecraftClient.getInstance().player, text) != 0) {
+           ci.cancel();
+       }
+    }
+
+}

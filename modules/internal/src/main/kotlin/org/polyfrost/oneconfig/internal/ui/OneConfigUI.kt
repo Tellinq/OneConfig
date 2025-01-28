@@ -196,6 +196,10 @@ object OneConfigUI {
         size = Vec2(54f, 18f),
     ).setPalette { brand.fg }
 
+    fun invalidateCache() {
+        window = null
+    }
+
 
     private val sidebarBtnAlign = Align(pad = Vec2(16f, 6f))
 

@@ -35,11 +35,12 @@ import net.minecraft.util.ResourceLocation;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.polyfrost.oneconfig.api.event.v1.EventManager;
-import org.polyfrost.oneconfig.api.event.v1.events.RenderEvent;
 import org.polyfrost.oneconfig.api.event.v1.events.ScreenOpenEvent;
+import org.polyfrost.oneconfig.api.event.v1.events.TickEvent;
 import org.polyfrost.oneconfig.api.event.v1.invoke.EventHandler;
 import org.polyfrost.oneconfig.api.ui.v1.screen.BlurScreen;
 import org.polyfrost.oneconfig.internal.mixin.Mixin_ShaderListAccessor;
+import org.polyfrost.polyui.animate.Animation;
 
 import java.util.List;
 
@@ -57,16 +58,14 @@ public final class BlurHandler {
     public static final BlurHandler INSTANCE = new BlurHandler();
     private static final Logger LOGGER = LogManager.getLogger("OneConfig/Blur");
     private final ResourceLocation blurShader = new ResourceLocation("shaders/post/fade_in_blur.json");
+    private final Animation animation = Animation.Type.Default.create(2_000_000_000, 0f, 5f);
     private ShaderUniform su;
-    private long start;
-    private float progress = 0;
 
     private BlurHandler() {
         EventHandler.ofRemoving(ScreenOpenEvent.class, e -> reloadBlur(e.getScreen())).register();
-        EventManager.register(RenderEvent.End.class, () -> {
+        EventManager.register(TickEvent.End.class, () -> {
             if (su == null) return;
-            if (progress >= 5f) return;
-            su.set(getBlurStrengthProgress());
+            su.set(animation.update(50_000_000L));
         });
     }
 
@@ -115,13 +114,13 @@ public final class BlurHandler {
                         ShaderUniform su = sm.getShaderUniform("Progress");
                         if (su == null) continue;
                         this.su = su;
+                        animation.reset();
+                        return false;
                     }
                     if (su == null) {
                         LOGGER.error("Failed to get ShaderUniform for blur on GUI {}. It has been disabled. Please report this!", gui.getClass().getName());
                         return true;
                     }
-                    this.start = System.currentTimeMillis();
-                    this.progress = 0;
                 } catch (Exception ex) {
                     LOGGER.error("An error occurred while updating OneConfig's blur. It has been disabled. Please report this!", ex);
                     return true;
@@ -144,15 +143,6 @@ public final class BlurHandler {
         }
         su = null;
         Minecraft.getMinecraft().entityRenderer.stopUseShader();
-    }
-
-    /**
-     * Returns the strength of the blur as determined by the duration the effect of the blur.
-     * <p>
-     * The strength of the blur does not go above 5.0F.
-     */
-    private float getBlurStrengthProgress() {
-        return Math.min((System.currentTimeMillis() - this.start) / 50F, 5.0F);
     }
 
     @SuppressWarnings("BooleanMethodIsAlwaysInverted")

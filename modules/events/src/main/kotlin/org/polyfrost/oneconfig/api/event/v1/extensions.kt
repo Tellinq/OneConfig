@@ -39,7 +39,7 @@ import kotlin.experimental.ExperimentalTypeInference
  * ```
  * eventHandler { event: KeyInputEvent ->
  *     println("Key event: $event")
- * }.register()
+ * }
  * ```
  */
 @OverloadResolutionByLambdaReturnType
@@ -49,7 +49,7 @@ inline fun <reified E : Event> eventHandler(crossinline handler: (E) -> Boolean)
     override fun handle(event: E) = handler(event)
 
     override fun getEventClass() = E::class.java
-}
+}.register()
 
 /**
  * Kotlin specific API for registering of event handlers. Intended usage:
@@ -57,7 +57,7 @@ inline fun <reified E : Event> eventHandler(crossinline handler: (E) -> Boolean)
  * ```
  * eventHandler { event: KeyInputEvent ->
  *     println("Key event: $event")
- * }.register()
+ * }
  * ```
  */
 @OverloadResolutionByLambdaReturnType
@@ -69,7 +69,7 @@ inline fun <reified E : Event> eventHandler(crossinline handler: (E) -> Unit) = 
     }
 
     override fun getEventClass() = E::class.java
-}
+}.register()
 
 /** makes code colored!! */
 @DslMarker

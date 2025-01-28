@@ -44,6 +44,12 @@ public abstract class EventHandler<E extends Event> implements Comparable<EventH
     public static final byte ERROR_THRESHOLD = 10;
     private byte errors = 0;
 
+    public EventHandler() {
+        if (EventManager.devUnregistered != null) {
+            EventManager.devUnregistered.add(this);
+        }
+    }
+
     /**
      * Create an event handler from a consumer, in a fabric-style way.
      *

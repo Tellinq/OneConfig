@@ -25,7 +25,7 @@
  */
 
 //#if FORGE && MC <= 1.12.2
-package org.polyfrost.oneconfig.internal.mixin.forge;
+package org.polyfrost.oneconfig.internal.mixin.fixes;
 
 //#if MC >= 1.12.2
 //$$ import org.apache.logging.log4j.Logger;

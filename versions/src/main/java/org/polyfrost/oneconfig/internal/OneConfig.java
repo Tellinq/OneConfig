@@ -84,12 +84,12 @@ public class OneConfig
     //#else
     //$$ @Override
     //$$ public void onInitializeClient() {
-    //$$     // Uhhhhhhhhhhhhhhhhhhhhhhhhhhh......................
+    //$$     init();
     //$$ }
     //#endif
 
 
-    public void init() {
+    private void init() {
         //#if FABRIC
         //$$ try {
         //$$     Class.forName("org.polyfrost.oneconfig.test.TestMod_Test", false, getClass().getClassLoader());
@@ -114,17 +114,21 @@ public class OneConfig
     }
 
     private static void registerCommands() {
-        CommandBuilder b = CommandBuilder.command("oneconfig", "ocfg", "ocfgv1").description("OneConfig main command");
+        CommandBuilder b = CommandBuilder.command("oneconfig", "ocfg", "twoconfig").description("OneConfig main command");
         b.then(runs().does((Runnable) OneConfigUI.INSTANCE::open).description("Opens the OneConfig GUI"));
         b.then(runs("updateCheck").does(() -> Multithreading.submit(() -> UChat.chat(MavenUpdateChecker.oneconfig().hasUpdate() ? "Update available!" : "No updates available"))).description("Check for updates"));
         b.then(runs("locraw").does(() -> UChat.chat(HypixelUtils.getLocation()))).description("Get your current location on Hypixel");
         b.then(runs("hud").does(() -> Platform.screen().display(HudManager.INSTANCE.getWithEditor())).description("Opens the OneConfig HUD editor"));
+        b.then(runs("delete").does(() -> {
+            OneConfigUI.INSTANCE.invalidateCache();
+            UChat.chat("OK");
+        })).description("Invalidate the OneConfig UI, forcing a reload. Use this if it is bugged and make sure to report an issue!");
         CommandManager.registerCommand(b.build());
     }
 
     private static void registerKeybinds() {
         OCKeybindHelper builder = OCKeybindHelper.builder();
-        if (Platform.loader().isDevelopmentEnvironment()) builder.inScreens();
+        if (Platform.loader().isDevelopment()) builder.inScreens();
         builder.mods(KeyModifiers.RSHIFT).does((s) -> {
             if (s) OneConfigUI.INSTANCE.open();
             return Unit.INSTANCE;

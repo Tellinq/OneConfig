@@ -25,7 +25,7 @@
  */
 
 //#if FORGE && MC <= 1.12.2
-package org.polyfrost.oneconfig.internal.mixin.forge;
+package org.polyfrost.oneconfig.internal.mixin.fixes;
 
 //#if MC >= 1.12.2
 //$$ import org.apache.logging.log4j.Logger;
@@ -36,7 +36,6 @@ import org.apache.logging.log4j.Level;
 import com.llamalad7.mixinextras.injector.v2.WrapWithCondition;
 import net.minecraftforge.fml.common.LoaderException;
 import net.minecraftforge.fml.common.discovery.JarDiscoverer;
-import org.apache.logging.log4j.Level;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 
