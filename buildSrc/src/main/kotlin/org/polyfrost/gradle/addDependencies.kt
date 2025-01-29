@@ -35,6 +35,16 @@ fun Project.provideIncludedDependencies(version: Triple<Int, Int, Int>?, loader:
     }
 
     deps.add(libs.findLibrary("copycat-image-awt").get().get())
+
+    if (version != null && version.second >= 16) {
+        // Modern (1.16+)
+        val lwjglBase = "org.lwjgl:lwjgl"
+        val lwjglVersion = if (version.second in 16..17) "3.2.2" else "3.3.2"
+
+        deps.add("$lwjglBase-tinyfd:$lwjglVersion")
+        deps.add("$lwjglBase-nanovg:$lwjglVersion")
+    }
+
     deps.add(libs.findLibrary("polyui").get().get())
     deps.add(libs.findLibrary("hypixel-modapi").get().get())
     deps.add(libs.findLibrary("hypixel-data").get().get())

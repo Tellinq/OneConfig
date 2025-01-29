@@ -28,16 +28,19 @@ package org.polyfrost.oneconfig.api.ui.v1.internal;
 
 //#if MC >= 1.16.5
 //$$ import org.lwjgl.opengl.GL;
+//$$ import org.polyfrost.oneconfig.api.platform.v1.Platform;
+//$$ import org.polyfrost.lwjgl.isolatedloader.Lwjgl3Downloader;
+//$$ import java.nio.file.Path;
 //#else
 import org.lwjgl.opengl.GLContext;
+import org.polyfrost.lwjgl.isolatedloader.Lwjgl3Manager;
+import org.polyfrost.lwjgl.isolatedloader.classloader.IsolatedClassLoader;
 //#endif
 
 import net.minecraft.client.Minecraft;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
-import org.polyfrost.lwjgl.isolatedloader.Lwjgl3Manager;
-import org.polyfrost.lwjgl.isolatedloader.classloader.IsolatedClassLoader;
 import org.polyfrost.oneconfig.api.ClassHasOverwrites;
 import org.polyfrost.oneconfig.api.ui.v1.api.LwjglApi;
 import org.polyfrost.oneconfig.api.ui.v1.api.NanoVgApi;
@@ -82,12 +85,21 @@ public class UIManagerImpl implements UIManager {
         //$$ System.setProperty("isolatedlwjgl3loader.earlyVersion3", "true");
         //#endif
 
-        Lwjgl3Manager.initialize(getClass().getClassLoader(), new String[] { "nanovg", "stb", "tinyfd" });
+        String[] lwjglModules = new String[]{"nanovg", "stb", "tinyfd"};
+
+        //#if MC >= 1.16.5
+        //$$ Set<Path> nativesPaths = Lwjgl3Downloader.downloadNatives(lwjglModules);
+        //$$ for (Path path : nativesPaths) {
+        //$$     Platform.loader().addToClasspath(path);
+        //$$ }
+        //#else
+        Lwjgl3Manager.initialize(getClass().getClassLoader(), lwjglModules);
 
         IsolatedClassLoader classLoader = Lwjgl3Manager.getClassLoader();
 
         classLoader.addLoadingException("kotlin.");
         classLoader.addLoadingException("org.polyfrost.oneconfig.api.ui.v1.api.");
+        //#endif
 
         try {
             boolean gl3 =
@@ -97,10 +109,17 @@ public class UIManagerImpl implements UIManager {
                 GLContext.getCapabilities().OpenGL30;
                 //#endif
 
+            //#if MC >= 1.16.5
+            //$$ lwjgl = new LwjglImpl();
+            //$$ nanoVg = new NanoVgImpl(gl3);
+            //$$ stb = new StbImpl();
+            //$$ tinyFD = new TinyFdImpl();
+            //#else
             lwjgl = Lwjgl3Manager.getIsolated(LwjglApi.class, LWJGL_IMPL_PACKAGE + "LwjglImpl");
             nanoVg = Lwjgl3Manager.getIsolated(NanoVgApi.class, LWJGL_IMPL_PACKAGE + "NanoVgImpl", gl3);
             stb = Lwjgl3Manager.getIsolated(StbApi.class, LWJGL_IMPL_PACKAGE + "StbImpl");
             tinyFD = Lwjgl3Manager.getIsolated(TinyFdApi.class, LWJGL_IMPL_PACKAGE + "TinyFdImpl");
+            //#endif
 
             renderer = new RendererImpl(gl3, lwjgl, nanoVg, stb);
         } catch (Exception e) {
