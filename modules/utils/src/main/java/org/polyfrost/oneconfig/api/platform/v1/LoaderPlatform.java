@@ -33,6 +33,8 @@ import java.nio.file.Path;
 import java.util.List;
 
 public interface LoaderPlatform {
+    void addToClasspath(@NotNull Path path);
+
     boolean isModLoaded(String id);
 
     @Nullable

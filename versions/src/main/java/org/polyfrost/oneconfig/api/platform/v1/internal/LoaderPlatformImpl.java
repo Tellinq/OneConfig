@@ -30,6 +30,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.polyfrost.oneconfig.api.platform.v1.LoaderPlatform;
 
+import java.nio.file.Path;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
@@ -37,9 +38,11 @@ import java.util.stream.Collectors;
 //#if FABRIC
 //$$ import net.fabricmc.loader.api.FabricLoader;
 //$$ import net.fabricmc.loader.api.ModContainer;
+//$$ import net.fabricmc.loader.impl.launch.FabricLauncherBase;
 //#else
 import net.minecraftforge.fml.common.Loader;
 import net.minecraftforge.fml.common.ModContainer;
+import net.minecraft.launchwrapper.Launch;
 //#endif
 //#if FORGE && MC>11202
 //$$ import net.minecraftforge.fml.ModList;
@@ -47,6 +50,31 @@ import net.minecraftforge.fml.common.ModContainer;
 //#endif
 
 public class LoaderPlatformImpl implements LoaderPlatform {
+    @Override
+    public void addToClasspath(@NotNull Path path) {
+        //#if FORGE
+        //#if MC>11202
+        //$$ throw new UnsupportedOperationException("TODO"); // hiiii init!!!
+        //#else
+        try {
+            Launch.classLoader.addURL(path.toUri().toURL());
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+        //#endif
+        //#else
+        //$$ try {
+        //$$     FabricLauncherBase.getLauncher().addToClassPath(path);
+        //$$ } catch (Exception e) {
+        //$$     try {
+        //$$         net.fabricmc.loader.launch.common.FabricLauncherBase.getLauncher().propose(path.toUri().toURL());
+        //$$     } catch (Exception e2) {
+        //$$         throw new RuntimeException(e2);
+        //$$     }
+        //$$ }
+        //#endif
+    }
+
     @Override
     public boolean isModLoaded(String id) {
         //#if FABRIC
