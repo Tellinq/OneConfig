@@ -221,7 +221,7 @@ public class org/polyfrost/oneconfig/api/event/v1/events/WorldUnloadEvent : org/
 }
 
 public abstract interface class org/polyfrost/oneconfig/api/event/v1/invoke/EventCollector {
-	public abstract fun collect (Ljava/lang/Object;)Ljava/util/List;
+	public abstract fun collect (Ljava/lang/Object;)Ljava/lang/Iterable;
 }
 
 public abstract class org/polyfrost/oneconfig/api/event/v1/invoke/EventHandler : java/lang/Comparable {
@@ -244,6 +244,7 @@ public abstract class org/polyfrost/oneconfig/api/event/v1/invoke/EventHandler :
 
 public class org/polyfrost/oneconfig/api/event/v1/invoke/impl/AnnotationEventMapper : org/polyfrost/oneconfig/api/event/v1/invoke/EventCollector {
 	public fun <init> ()V
+	public synthetic fun collect (Ljava/lang/Object;)Ljava/lang/Iterable;
 	public fun collect (Ljava/lang/Object;)Ljava/util/List;
 }
 

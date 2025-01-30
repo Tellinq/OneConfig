@@ -60,6 +60,7 @@ public abstract interface class org/polyfrost/oneconfig/api/platform/v1/I18nPlat
 }
 
 public abstract interface class org/polyfrost/oneconfig/api/platform/v1/LoaderPlatform {
+	public abstract fun addToClasspath (Ljava/nio/file/Path;)V
 	public fun getLoadedMod (Ljava/lang/String;)Lorg/polyfrost/oneconfig/api/platform/v1/LoaderPlatform$ActiveMod;
 	public abstract fun getLoadedMods ()Ljava/util/List;
 	public abstract fun getLoader ()Lorg/polyfrost/oneconfig/api/platform/v1/LoaderPlatform$Loaders;

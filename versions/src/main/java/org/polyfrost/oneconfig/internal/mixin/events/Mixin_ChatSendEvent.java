@@ -42,7 +42,15 @@ public abstract class Mixin_ChatSendEvent {
     @Unique
     private ChatSendEvent ocfg$chatEvent;
 
-    @Inject(method = "sendChatMessage", at = @At("HEAD"), cancellable = true)
+    @Unique
+    private static final String SEND_MESSAGE_SIGNATURE =
+            //#if FABRIC && MC > 1.19
+            //$$ "sendMessage(Lnet/minecraft/text/Text;)V";
+            //#else
+            "sendChatMessage";
+            //#endif
+
+    @Inject(method = SEND_MESSAGE_SIGNATURE, at = @At("HEAD"), cancellable = true)
     public void chatCallback(
             //#if MC < 1.19
             String message,
@@ -73,7 +81,7 @@ public abstract class Mixin_ChatSendEvent {
         }
     }
 
-    @ModifyVariable(method = "sendChatMessage", at = @At("HEAD"), ordinal = 0, argsOnly = true)
+    @ModifyVariable(method = SEND_MESSAGE_SIGNATURE, at = @At("HEAD"), ordinal = 0, argsOnly = true)
     public String modifyMessage(String message) {
         return ocfg$chatEvent.message;
     }
