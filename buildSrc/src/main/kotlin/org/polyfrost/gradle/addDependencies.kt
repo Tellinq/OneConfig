@@ -39,7 +39,7 @@ fun Project.provideIncludedDependencies(version: Triple<Int, Int, Int>?, loader:
     if (version != null && version.second >= 16) {
         // Modern (1.16+)
         val lwjglBase = "org.lwjgl:lwjgl"
-        val lwjglVersion = if (version.second in 16..17) "3.2.2" else "3.3.2"
+        val lwjglVersion = if (version.second in 16..17) "3.3.2" else "3.3.3"
 
         deps.add("$lwjglBase-tinyfd:$lwjglVersion")
         deps.add("$lwjglBase-nanovg:$lwjglVersion")

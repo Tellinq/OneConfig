@@ -81,8 +81,13 @@ public class UIManagerImpl implements UIManager {
         // Tells the isolated LWJGL3 loader that we want to download & load a slightly older LWJGL version
         // because these Minecraft versions explode otherwise. This is likely due to the natives being
         // moved in ~3.2.3
-        //#if MC >= 1.16.5 && MC <= 1.17.1
-        //$$ System.setProperty("isolatedlwjgl3loader.earlyVersion3", "true");
+        //#if MC >= 1.16.5
+        //$$ int major = org.lwjgl.Version.VERSION_MAJOR;
+        //$$ int minor = org.lwjgl.Version.VERSION_MINOR;
+        //$$ int patch = org.lwjgl.Version.VERSION_REVISION;
+        //$$ System.out.println("LWJGL version for this platform was explicitly set to " + major + "." + minor + "." + patch);
+        //$$ System.out.println("Weird: " + org.lwjgl.Version.getVersion());
+        //$$ System.setProperty("isolatedlwjgl3loader.lwjglVersion", major + "." + minor + "." + patch);
         //#endif
 
         String[] lwjglModules = new String[]{"nanovg", "stb", "tinyfd"};
