@@ -44,7 +44,7 @@ class HudVisualizer : ConfigVisualizer() {
             mapOf(
                 options.keys.first() to Group(
                     *options.values.first().values.first().toTypedArray(),
-                    alignment = alignVNoPad,
+                    alignment = alignCStartNoPad,
                 )
             )
         } else super.flattenSubcategories(options)

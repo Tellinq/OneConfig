@@ -26,6 +26,7 @@
 
 package org.polyfrost.oneconfig.api.ui.v1.keybind
 
+import org.apache.logging.log4j.LogManager
 import org.polyfrost.oneconfig.api.event.v1.eventHandler
 import org.polyfrost.oneconfig.api.event.v1.events.KeyInputEvent
 import org.polyfrost.oneconfig.api.event.v1.events.ScreenOpenEvent
@@ -40,6 +41,7 @@ import org.polyfrost.universal.UKeyboard
 
 @Suppress("UnstableApiUsage")
 object KeybindManager {
+    private val LOGGER = LogManager.getLogger("OneConfig/Keybinds")
     private val settings = Settings()
     private val keyBinder = KeyBinder(settings)
     val inputManager = InputManager(null, keyBinder, settings)
@@ -116,31 +118,40 @@ object KeybindManager {
     fun builder() = OCKeybindHelper()
 
     @JvmStatic
-    fun translateKey(inputManager: InputManager, key: Int, character: Char, state: Boolean) {
-        if (character != '\u0000' && !character.isISOControl() && character.isDefined()) {
-            if (state) {
-                inputManager.keyTyped(character)
-                inputManager.keyDown(character.lowercaseChar().code)
-            } else inputManager.keyUp(character.lowercaseChar().code)
-            return
-        }
+    fun translateKey(inputManager: InputManager, key: Int, char: Char, state: Boolean) {
+        // fix for modified characters not being sent in glfwCharCallback as glfwSetCharModsCallback is deprecated
+        // for more info (see PolyUI/nanovg-impl/GLFWWindow)
+        val character = if (!char.isValid() && key < 255 && inputManager.mods > 1.toByte() && state) (key + 32).toChar() else char
+        try {
+            if (character.isValid()) {
+                if (state) {
+                    inputManager.keyTyped(character)
+                    inputManager.keyDown(character.lowercaseChar().code)
+                } else inputManager.keyUp(character.lowercaseChar().code)
+                return
+            }
 
-        val k = keysMap[key]
-        if (k != null) {
-            if (state) inputManager.keyDown(k)
-            else inputManager.keyUp(k)
-            return
-        }
+            val k = keysMap[key]
+            if (k != null) {
+                if (state) inputManager.keyDown(k)
+                else inputManager.keyUp(k)
+                return
+            }
 
-        val m = modsMap[key].toByte()
-        if (m != 0.toByte()) {
-            if (state) inputManager.addModifier(m)
-            else inputManager.removeModifier(m)
-            return
-        }
+            val m = modsMap[key].toByte()
+            if (m != 0.toByte()) {
+                if (state) inputManager.addModifier(m)
+                else inputManager.removeModifier(m)
+                return
+            }
 
-        val raw = if (inputManager.mods > 1) key + 48 else key
-        if (state) inputManager.keyDown(raw)
-        else inputManager.keyUp(raw)
+            val raw = if (inputManager.mods > 1) key + 48 else key
+            if (state) inputManager.keyDown(raw)
+            else inputManager.keyUp(raw)
+        } catch (t: Throwable) {
+            LOGGER.error("Failed to process input key=$key, char=$character, state=$state", t)
+        }
     }
+
+    private fun Char.isValid() = this != '\u0000' && !this.isISOControl() && this.isDefined()
 }

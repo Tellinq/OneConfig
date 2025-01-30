@@ -59,7 +59,7 @@ public class PolyUIScreen extends UScreen implements BlurScreen {
     private final boolean pauses, blurs;
     private final Consumer<PolyUI> close;
 
-    //#if MC<=11300
+    //#if MC < 1.13
     private int mx, my;
     //#endif
 
@@ -93,7 +93,7 @@ public class PolyUIScreen extends UScreen implements BlurScreen {
 
     @Override
     public void onDrawScreen(@NotNull UMatrixStack matrices, int mouseX, int mouseY, float delta) {
-        //#if MC<11300
+        //#if MC < 1.13
         if (mouseX != mx || mouseY != my) {
             mx = mouseX;
             my = mouseY;
@@ -191,7 +191,7 @@ public class PolyUIScreen extends UScreen implements BlurScreen {
     public boolean uMouseScrolled(double delta) {
         try {
             float v = (float)
-                    //#if MC<13000
+                    //#if MC < 1.13
                     //$$ delta / 8f;
                     //#else
                     delta;
@@ -203,14 +203,14 @@ public class PolyUIScreen extends UScreen implements BlurScreen {
         return true;
     }
 
-    //#if MC>=11300
+    //#if MC >= 1.13
     //$$ @Override
     //#endif
     public boolean shouldCloseOnEsc() {
         return true;
     }
 
-    //#if MC<=11300
+    //#if MC < 1.13
     @Override
     //#endif
     public boolean doesGuiPauseGame() {
@@ -223,7 +223,7 @@ public class PolyUIScreen extends UScreen implements BlurScreen {
     }
 
 
-    //#if MC>=11300
+    //#if MC >= 1.13
     //$$ @Override
     //#endif
     @MustBeInvokedByOverriders
@@ -233,7 +233,7 @@ public class PolyUIScreen extends UScreen implements BlurScreen {
         float oy = (float) Platform.screen().windowHeight() / 2f - master.getHeight() / 2f;
 
         float mx, my;
-        //#if MC>=11300
+        //#if MC >= 1.13
         //$$ mx = (float) Minecraft.getInstance().mouseHelper.getMouseX();
         //$$ my = (float) Minecraft.getInstance().mouseHelper.getMouseY();
         //#else

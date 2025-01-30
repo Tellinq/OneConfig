@@ -26,8 +26,6 @@
 
 package org.polyfrost.oneconfig.api.event.v1.invoke;
 
-import java.util.List;
-
 @FunctionalInterface
 public interface EventCollector {
     /**
@@ -35,5 +33,5 @@ public interface EventCollector {
      *
      * @return a list of handlers, or null if the object cannot be collected by this collector
      */
-    List<EventHandler<?>> collect(Object object);
+    Iterable<EventHandler<?>> collect(Object object);
 }

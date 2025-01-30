@@ -34,23 +34,18 @@ import org.polyfrost.oneconfig.api.config.v1.Visualizer
 import org.polyfrost.polyui.animate.Animations
 import org.polyfrost.polyui.color.PolyColor
 import org.polyfrost.polyui.color.rgba
-import org.polyfrost.polyui.component.Component
 import org.polyfrost.polyui.component.Drawable
 import org.polyfrost.polyui.component.extensions.*
 import org.polyfrost.polyui.component.impl.*
 import org.polyfrost.polyui.data.PolyImage
 import org.polyfrost.polyui.event.Event
-import org.polyfrost.polyui.operations.ComponentOp
 import org.polyfrost.polyui.operations.Resize
 import org.polyfrost.polyui.operations.Rotate
 import org.polyfrost.polyui.unit.Align
 import org.polyfrost.polyui.unit.Vec2
 import org.polyfrost.polyui.unit.by
 import org.polyfrost.polyui.unit.seconds
-import org.polyfrost.polyui.utils.fastEach
-import org.polyfrost.polyui.utils.image
-import org.polyfrost.polyui.utils.levenshteinDistance
-import org.polyfrost.polyui.utils.mapToArray
+import org.polyfrost.polyui.utils.*
 import java.lang.ref.WeakReference
 import kotlin.math.PI
 
@@ -58,18 +53,25 @@ open class ConfigVisualizer {
     private val LOGGER = LogManager.getLogger("OneConfig/Config")
     protected val configs = HashMap<Tree, Drawable>()
     protected val optBg = rgba(39, 49, 55, 0.2f)
-    protected val alignCV = Align(cross = Align.Cross.Start, mode = Align.Mode.Vertical)
-    protected val alignVNoPad = Align(cross = Align.Cross.Start, mode = Align.Mode.Vertical, pad = Vec2.ZERO)
+    protected val alignCStart = Align(cross = Align.Cross.Start, maxRowSize = 1)
+    protected val alignCStartNoPad = Align(cross = Align.Cross.Start, maxRowSize = 1, pad = Vec2.ZERO)
     protected val stdAlign = Align(main = Align.Main.SpaceBetween, pad = Vec2(16f, 8f))
     protected val stdAccord = Align(main = Align.Main.SpaceBetween, pad = Vec2.ZERO)
     protected val ic2text = Align(pad = Vec2(8f, 0f))
-    protected val stdOpt = Align(cross = Align.Cross.Start, mode = Align.Mode.Vertical, pad = Vec2(0f, 8f))
+    protected val stdOpt = Align(cross = Align.Cross.Start, pad = Vec2(0f, 8f), maxRowSize = 1)
     protected val accordOpt = Align(cross = Align.Cross.Start, pad = Vec2(22f, 12f))
 
     /**
      * For information, see [create].
      */
     fun get(config: Tree) = configs.getOrPut(config) { create(config) }
+
+    /**
+     * Clears the cache of all created config screens.
+     */
+    fun clearCache() {
+        configs.clear()
+    }
 
     fun getMatching(str: String): List<Drawable> {
         val it = str.trim()
@@ -148,10 +150,10 @@ open class ConfigVisualizer {
                     Group(
                         Text(header, fontSize = 22f),
                         *opts.toTypedArray(),
-                        alignment = alignCV,
+                        alignment = alignCStart,
                     )
                 },
-                alignment = alignCV,
+                alignment = alignCStart,
             )
         }
     }
@@ -211,30 +213,22 @@ open class ConfigVisualizer {
         val e: Property<*>? = tree.getProp("enabled")
         val toWrap: Drawable
         var enabled: Property<Boolean>? = null
+        var contentHeight = -1f
         // asm: signature as it prevents re-wrapping of function
         val openInsn: Drawable.(Any?) -> Unit = {
             open = !open
             val arrow = if (enabled != null) this[1][1] else this[1]
-            Rotate(arrow, if (!open) PI else 0.0, false, Animations.Default.create(0.2.seconds)).add()
-            val value = parent[1].height
-            val anim = Animations.Default.create(0.4.seconds)
-            val operation = Resize(parent, width = 0f, height = if (open) -value else value, add = true, anim)
-            addOperation(
-                object : ComponentOp.Animatable<Component>(parent, anim, onFinish = {
-                    this[1].renders = !open
-                    this[1].isEnabled = !open
-                }) {
-                    override fun apply(value: Float) {
-                        operation.apply()
-                        // asm: instruct parent (options list) to replace all its children so that they move with it closing
-                        self.parent.position()
-                        // asm: instruct all children of this accordion to update their visibility based on THIS, NOT its parent
-                        self[1].children!!.fastEach { option ->
-                            option.renders = option.intersects(self.x, self.y, self.width, self.height)
-                        }
-                    }
-                },
-            )
+            val anim = Animations.Default.create(0.6.seconds)
+            Rotate(arrow, if (!open) PI else 0.0, false, anim).add()
+            val content = parent[1]
+            if (contentHeight == -1f) contentHeight = content.height
+            Resize(parent, width = 0f, height = if (open) -contentHeight else contentHeight, add = true, animation = anim).add()
+            Resize(content, width = 0f, height = if (open) -contentHeight else contentHeight, add = true, animation = anim).add()
+            // won't ever open properly unless it renders at least once (tee hee) :)
+            if (!open) {
+                content.height = 1f
+                content.renders = true
+            }
         }
 
         if (e != null && e.type == Boolean::class.java && e.getVisualizer() == null) {
@@ -259,15 +253,15 @@ open class ConfigVisualizer {
             wrap(toWrap, title, desc, icon).also {
                 it.color = PolyColor.TRANSPARENT
                 it.onClick(openInsn)
-            },
+            }.namedId("AccordionHeader"),
             Group(
                 size = Vec2(1078f, 0f),
                 alignment = accordOpt,
                 children = options.toTypedArray(),
             ).namedId("AccordionContent"),
             color = optBg,
-            alignment = alignVNoPad,
-        ).namedId("AccordionHeader")
+            alignment = alignCStartNoPad,
+        ).namedId("AccordionContainer")
         return out
     }
 

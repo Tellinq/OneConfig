@@ -52,7 +52,7 @@ public final class EventManager {
     public static final EventManager INSTANCE = new EventManager();
     private static final Logger LOGGER = LogManager.getLogger("OneConfig/Events");
     private final Deque<EventCollector> collectors = new ArrayDeque<>(2);
-    private final Map<Object, List<EventHandler<?>>> cache = new WeakHashMap<>(5);
+    private final Map<Object, Iterable<EventHandler<?>>> cache = new WeakHashMap<>(5);
     private final Map<Class<? extends Event>, List<EventHandler<?>>> handlers = new HashMap<>(8);
     @ApiStatus.Internal
     @Nullable
@@ -126,11 +126,13 @@ public final class EventManager {
      */
     public void register(Object object, boolean removable) {
         for (EventCollector m : collectors) {
-            List<EventHandler<?>> h = m.collect(object);
-            if (h == null || h.isEmpty()) continue;
+            Iterable<EventHandler<?>> h = m.collect(object);
+            if (h == null) continue;
+            Iterator<EventHandler<?>> iter = h.iterator();
+            if (!iter.hasNext()) continue;
             if (removable) cache.put(object, h);
-            for (EventHandler<?> handler : h) {
-                register(handler);
+            while (iter.hasNext()) {
+                register(iter.next());
             }
         }
     }
@@ -187,7 +189,7 @@ public final class EventManager {
      * <br><b>This method only works if the object was registered with removable true!</b>
      */
     public boolean unregister(Object object) {
-        Collection<EventHandler<?>> h = cache.remove(object);
+        Iterable<EventHandler<?>> h = cache.remove(object);
         if (h == null) return false;
         boolean state = true;
         for (EventHandler<?> handler : h) {

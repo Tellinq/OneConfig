@@ -17,13 +17,13 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(Minecraft.class)
-public class Mixin_PlayerInteractEvent_LeftAction {
+public abstract class Mixin_PlayerInteractEvent_LeftAction {
 
     @Shadow public MovingObjectPosition objectMouseOver;
     @Shadow public EntityPlayerSP thePlayer;
 
     @Shadow private int leftClickCounter;
-    @Unique private PlayerInteractEvent lastAttackEvent;
+    @Unique private PlayerInteractEvent ocfg$lastAttackEvent;
 
     @Inject(
             method = "clickMouse",
@@ -68,9 +68,9 @@ public class Mixin_PlayerInteractEvent_LeftAction {
             }
         }
 
-        lastAttackEvent = new PlayerInteractEvent(this.thePlayer, PlayerInteractEvent.Action.LEFT, type);
-        EventManager.INSTANCE.post(lastAttackEvent);
-        if (lastAttackEvent.cancelled) {
+        ocfg$lastAttackEvent = new PlayerInteractEvent(this.thePlayer, PlayerInteractEvent.Action.LEFT, type);
+        EventManager.INSTANCE.post(ocfg$lastAttackEvent);
+        if (ocfg$lastAttackEvent.cancelled) {
             //#if MC >= 1.18.2
             //$$ cir.setReturnValue(false);
             //#else
@@ -81,12 +81,12 @@ public class Mixin_PlayerInteractEvent_LeftAction {
 
     @Inject(method = "sendClickBlockToController", at = @At("HEAD"), cancellable = true)
     private void onBlockClickPacketCallback(boolean leftClick, CallbackInfo ci) {
-        if (lastAttackEvent != null && lastAttackEvent.getAction() == PlayerInteractEvent.Action.LEFT && lastAttackEvent.cancelled) {
+        if (ocfg$lastAttackEvent != null && ocfg$lastAttackEvent.getAction() == PlayerInteractEvent.Action.LEFT && ocfg$lastAttackEvent.cancelled) {
             ci.cancel();
         }
 
         if (!leftClick) {
-            lastAttackEvent = null;
+            ocfg$lastAttackEvent = null;
         }
     }
 

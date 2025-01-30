@@ -26,7 +26,6 @@
 
 package org.polyfrost.oneconfig.internal.mixin.events;
 
-//#if MC < 1.19
 import net.minecraft.client.entity.EntityPlayerSP;
 import org.polyfrost.oneconfig.api.event.v1.EventManager;
 import org.polyfrost.oneconfig.api.event.v1.events.ChatSendEvent;
@@ -44,7 +43,21 @@ public abstract class Mixin_ChatSendEvent {
     private ChatSendEvent ocfg$chatEvent;
 
     @Inject(method = "sendChatMessage", at = @At("HEAD"), cancellable = true)
-    public void chatCallback(String message, CallbackInfo ci) {
+    public void chatCallback(
+            //#if MC < 1.19
+            String message,
+            //#else
+            //#if FABRIC
+            //$$ net.minecraft.text.Text text,
+            //#else
+            //$$ net.minecraft.network.chat.Component text,
+            //#endif
+            //#endif
+            CallbackInfo ci
+    ) {
+        //#if MC >= 1.19
+        //$$ String message = text.getString();
+        //#endif
         //#if MC >= 1.16
         //$$ if (org.polyfrost.oneconfig.internal.libs.fabric.ClientCommandInternals.executeCommand(message)) {
         //$$     ci.cancel();
@@ -66,4 +79,3 @@ public abstract class Mixin_ChatSendEvent {
     }
 
 }
-//#endif

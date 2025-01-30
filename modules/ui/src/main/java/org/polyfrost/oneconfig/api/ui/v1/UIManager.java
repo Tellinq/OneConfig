@@ -26,19 +26,23 @@
 
 package org.polyfrost.oneconfig.api.ui.v1;
 
+import org.apache.logging.log4j.LogManager;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.polyfrost.oneconfig.api.event.v1.EventDelay;
 import org.polyfrost.oneconfig.api.event.v1.EventManager;
 import org.polyfrost.oneconfig.api.event.v1.events.HudRenderEvent;
 import org.polyfrost.oneconfig.api.event.v1.events.ResizeEvent;
+import org.polyfrost.oneconfig.api.event.v1.events.WorldLoadEvent;
 import org.polyfrost.oneconfig.api.platform.v1.Platform;
 import org.polyfrost.oneconfig.api.ui.v1.api.TinyFdApi;
 import org.polyfrost.polyui.PolyUI;
-import org.polyfrost.polyui.component.Component;
 import org.polyfrost.polyui.Settings;
+import org.polyfrost.polyui.component.Component;
 import org.polyfrost.polyui.renderer.Renderer;
 import org.polyfrost.polyui.renderer.Window;
+import org.polyfrost.universal.UChat;
 import org.polyfrost.universal.UMatrixStack;
 
 import java.util.ServiceLoader;
@@ -72,11 +76,11 @@ public interface UIManager {
     /**
      * Wrap this PolyUI instance in a Minecraft screen object, ready to be displayed to the user. {@link org.polyfrost.oneconfig.api.platform.v1.ScreenPlatform#display(Object) Platform.screen().display(this)}
      *
-     * @param polyUI             the PolyUI instance to use
+     * @param polyUI        the PolyUI instance to use
      * @param designedWidth the resolution that this PolyUI instance was designed to use
-     * @param pauses             weather to pause the game when the screen is opened
-     * @param blurs              if true blur will be used on the background
-     * @param onClose            callback to run when the screen is closed
+     * @param pauses        weather to pause the game when the screen is opened
+     * @param blurs         if true blur will be used on the background
+     * @param onClose       callback to run when the screen is closed
      * @return a Minecraft screen object. Will be a GuiScreen or Screen depending on the Minecraft version.
      */
     Object createPolyUIScreen(@NotNull PolyUI polyUI, float designedWidth, float designedHeight, boolean pauses, boolean blurs, @Nullable Consumer<PolyUI> onClose);
@@ -92,19 +96,25 @@ public interface UIManager {
      */
     @ApiStatus.Internal
     default PolyUI createDefault() {
-        Settings settings = new Settings();
-        settings.enableDebugMode(false);
-        settings.enableInitCleanup(false);
-        PolyUI p = new PolyUI(new Component[0], getRenderer(), settings, 1920f, 1080f);
-        p.getMaster().setRawResize(true);
-        p.setWindow(createWindow());
-        p.resize(Platform.screen().windowWidth(), Platform.screen().windowHeight(), false);
-        EventManager.register(HudRenderEvent.class, ev -> {
-            UMatrixStack stack = ev.matrices;
-            Platform.screen().setSmuggledMatrixStack(stack);
-            stack.runWithGlobalState(p::render);
-        });
-        EventManager.register(ResizeEvent.class, ev -> p.resize(ev.newWidth, ev.newHeight, false));
-        return p;
+        try {
+            Settings settings = new Settings();
+            settings.enableDebugMode(false);
+            settings.enableInitCleanup(false);
+            PolyUI p = new PolyUI(new Component[0], getRenderer(), settings, 1920f, 1080f);
+            p.getMaster().setRawResize(true);
+            p.setWindow(createWindow());
+            p.resize(Platform.screen().windowWidth(), Platform.screen().windowHeight(), false);
+            EventManager.register(HudRenderEvent.class, ev -> {
+                UMatrixStack stack = ev.matrices;
+                Platform.screen().setSmuggledMatrixStack(stack);
+                stack.runWithGlobalState(p::render);
+            });
+            EventManager.register(ResizeEvent.class, ev -> p.resize(ev.newWidth, ev.newHeight, false));
+            return p;
+        } catch (Throwable t) {
+            LogManager.getLogger("OneConfig/UI").error("Failed to load renderer!", t);
+            EventManager.register(WorldLoadEvent.class, () -> EventDelay.tick(20, () -> UChat.chat("&cFailed to load the renderer for OneConfig. This means the UI, HUD and Notifications will not work. Please report this to https://discord.gg/polyfrost and attach your log.")));
+            return null;
+        }
     }
 }

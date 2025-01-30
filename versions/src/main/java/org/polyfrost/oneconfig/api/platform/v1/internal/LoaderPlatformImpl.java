@@ -42,11 +42,12 @@ import java.util.stream.Collectors;
 //#else
 import net.minecraftforge.fml.common.Loader;
 import net.minecraftforge.fml.common.ModContainer;
-import net.minecraft.launchwrapper.Launch;
-//#endif
-//#if FORGE && MC>11202
+//#if MC>11202
 //$$ import net.minecraftforge.fml.ModList;
 //$$ import net.minecraftforge.fml.ModLoadingContext;
+//#else
+import net.minecraft.launchwrapper.Launch;
+//#endif
 //#endif
 
 public class LoaderPlatformImpl implements LoaderPlatform {

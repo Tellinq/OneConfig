@@ -32,6 +32,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.polyfrost.oneconfig.api.commands.v1.CommandManager;
 import org.polyfrost.oneconfig.api.commands.v1.factories.builder.CommandBuilder;
+import org.polyfrost.oneconfig.api.config.v1.internal.ConfigVisualizer;
 import org.polyfrost.oneconfig.api.event.v1.EventManager;
 import org.polyfrost.oneconfig.api.event.v1.events.InitializationEvent;
 import org.polyfrost.oneconfig.api.hud.v1.HudManager;
@@ -115,13 +116,14 @@ public class OneConfig
 
     private static void registerCommands() {
         CommandBuilder b = CommandBuilder.command("oneconfig", "ocfg", "twoconfig").description("OneConfig main command");
-        b.then(runs().does((Runnable) OneConfigUI.INSTANCE::open).description("Opens the OneConfig GUI"));
+        b.then(runs().does((Runnable) OneConfigUI.INSTANCE::open).description("Opens the OneConfig UI"));
         b.then(runs("updateCheck").does(() -> Multithreading.submit(() -> UChat.chat(MavenUpdateChecker.oneconfig().hasUpdate() ? "Update available!" : "No updates available"))).description("Check for updates"));
         b.then(runs("locraw").does(() -> UChat.chat(HypixelUtils.getLocation()))).description("Get your current location on Hypixel");
         b.then(runs("hud").does(() -> Platform.screen().display(HudManager.INSTANCE.getWithEditor())).description("Opens the OneConfig HUD editor"));
         b.then(runs("delete").does(() -> {
             OneConfigUI.INSTANCE.invalidateCache();
-            UChat.chat("OK");
+            ConfigVisualizer.INSTANCE.clearCache();
+            UChat.chat("Deleted OneConfig UI. Please make a report if you were having issues!");
         })).description("Invalidate the OneConfig UI, forcing a reload. Use this if it is bugged and make sure to report an issue!");
         CommandManager.registerCommand(b.build());
     }
@@ -130,7 +132,15 @@ public class OneConfig
         OCKeybindHelper builder = OCKeybindHelper.builder();
         if (Platform.loader().isDevelopment()) builder.inScreens();
         builder.mods(KeyModifiers.RSHIFT).does((s) -> {
-            if (s) OneConfigUI.INSTANCE.open();
+            if (s) {
+                try {
+                    OneConfigUI.INSTANCE.open();
+                } catch (Throwable t) {
+                    UChat.chat("&cFailed to open OneConfig UI: " + t.getMessage() + ". Please report this!");
+                    // propagate for proper error handling
+                    throw t;
+                }
+            }
             return Unit.INSTANCE;
         });
 

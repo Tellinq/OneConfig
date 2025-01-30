@@ -22,7 +22,6 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 public class Mixin_KeyInputEvent {
 
     //#if MC >= 1.16.5
-    //#if FORGE
     //$$ @ModifyVariable(method = "onKeyEvent", at = @At(value = "STORE"), ordinal = 0)
     //$$ private boolean keyCallback(boolean original, long windowPointer, int key, int scanCode, int action, int modifiers) {
     //$$     EventManager.INSTANCE.post(new KeyInputEvent(key, (char) 0, action));
@@ -34,7 +33,6 @@ public class Mixin_KeyInputEvent {
     //$$     EventManager.INSTANCE.post(new KeyInputEvent(0, key, 1));
     //$$     return original;
     //$$ }
-    //#endif
     //#else
 
     //@formatter:off
