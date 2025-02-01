@@ -11,6 +11,8 @@ import org.gradle.kotlin.dsl.getByType
  * @param loader The mod loader being used.
  */
 fun Project.provideIncludedDependencies(version: Triple<Int, Int, Int>?, loader: String): List<OCDependency> { // Either a String or ExternalModuleDependency
+    project.logger.lifecycle("===> Adding dependencies for Minecraft ${version?.toMCVer()} & $loader")
+
     val libs = project
         .extensions
         .getByType<VersionCatalogsExtension>()
@@ -37,6 +39,8 @@ fun Project.provideIncludedDependencies(version: Triple<Int, Int, Int>?, loader:
     deps.add(libs.findLibrary("copycat-image-awt").get().get())
 
     if (version != null && version.second >= 16) {
+        logger.lifecycle("===> Adding LWJGL dependencies for Minecraft ${version.toMCVer()} & $loader")
+
         // Modern (1.16+)
         val lwjglBase = "org.lwjgl:lwjgl"
         val lwjglVersion = if (version.second in 16..17) "3.3.2" else "3.3.3"
