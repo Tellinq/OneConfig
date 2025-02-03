@@ -43,7 +43,12 @@ fun Project.provideIncludedDependencies(version: Triple<Int, Int, Int>?, loader:
 
         // Modern (1.16+)
         val lwjglBase = "org.lwjgl:lwjgl"
-        val lwjglVersion = if (version.second in 16..17) "3.3.2" else "3.3.3"
+        val lwjglVersion = when (version.second) {
+            in 16..18 -> "3.2.2"
+            19 -> "3.3.1"
+            20 -> "3.3.2"
+            else -> error("Unsupported Minecraft version: ${version.toMCVer()}")
+        }
 
         deps.add("$lwjglBase-tinyfd:$lwjglVersion")
         deps.add("$lwjglBase-nanovg:$lwjglVersion")
