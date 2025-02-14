@@ -210,6 +210,17 @@ public class org/polyfrost/oneconfig/api/event/v1/events/TickEvent$Start : org/p
 	public static final field INSTANCE Lorg/polyfrost/oneconfig/api/event/v1/events/TickEvent$Start;
 }
 
+public abstract interface class org/polyfrost/oneconfig/api/event/v1/events/WindowFocusEvent : org/polyfrost/oneconfig/api/event/v1/events/Event {
+}
+
+public class org/polyfrost/oneconfig/api/event/v1/events/WindowFocusEvent$Gained : org/polyfrost/oneconfig/api/event/v1/events/WindowFocusEvent {
+	public static final field INSTANCE Lorg/polyfrost/oneconfig/api/event/v1/events/WindowFocusEvent$Gained;
+}
+
+public class org/polyfrost/oneconfig/api/event/v1/events/WindowFocusEvent$Lost : org/polyfrost/oneconfig/api/event/v1/events/WindowFocusEvent {
+	public static final field INSTANCE Lorg/polyfrost/oneconfig/api/event/v1/events/WindowFocusEvent$Lost;
+}
+
 public class org/polyfrost/oneconfig/api/event/v1/events/WorldLoadEvent : org/polyfrost/oneconfig/api/event/v1/events/Event {
 	public fun <init> (Ljava/lang/Object;)V
 	public fun getWorld ()Ljava/lang/Object;
