@@ -74,7 +74,7 @@ public class Mixin_HudRenderEvent {
                 //#elseif MC >= 1.13
                 //$$ new UMatrixStack(matrixStack);
                 //#else
-                new UMatrixStack();
+                UMatrixStack.Compat.INSTANCE.get();
                 //#endif
 
         EventManager.INSTANCE.post(new HudRenderEvent(stack, partialTicks));

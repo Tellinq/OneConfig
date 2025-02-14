@@ -31,6 +31,7 @@ import org.polyfrost.oneconfig.api.event.v1.eventHandler
 import org.polyfrost.oneconfig.api.event.v1.events.KeyInputEvent
 import org.polyfrost.oneconfig.api.event.v1.events.ScreenOpenEvent
 import org.polyfrost.oneconfig.api.event.v1.events.TickEvent
+import org.polyfrost.oneconfig.api.event.v1.events.WindowFocusEvent
 import org.polyfrost.polyui.Settings
 import org.polyfrost.polyui.input.InputManager
 import org.polyfrost.polyui.input.KeyBinder
@@ -66,6 +67,9 @@ object KeybindManager {
         // the user can try to fix it by opening a screen and trying again, and it should fix the issue.
         eventHandler { (screen): ScreenOpenEvent ->
             if (screen == null) keyBinder.release()
+        }
+        eventHandler { _: WindowFocusEvent.Lost ->
+            keyBinder.release()
         }
 
         val m = Int2IntMap(8)

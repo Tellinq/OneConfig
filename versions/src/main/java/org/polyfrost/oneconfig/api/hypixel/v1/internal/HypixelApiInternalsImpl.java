@@ -41,6 +41,7 @@ import org.polyfrost.oneconfig.api.event.v1.EventDelay;
 import org.polyfrost.oneconfig.api.event.v1.EventManager;
 import org.polyfrost.oneconfig.api.event.v1.events.HypixelLocationEvent;
 import org.polyfrost.oneconfig.api.event.v1.events.ReceivePacketEvent;
+import org.polyfrost.oneconfig.api.platform.v1.Platform;
 
 /**
  * Heavily adapted from Hypixel/ForgeModAPI under the MIT licence.
@@ -60,7 +61,7 @@ public final class HypixelApiInternalsImpl implements HypixelApiInternals {
         HypixelModAPI.getInstance().setPacketSender((packet) -> {
             NetHandlerPlayClient net = Minecraft.getMinecraft().getNetHandler();
             if (net == null) {
-                LOGGER.warn("dropping packet {} because no net handler is available, retrying in 1s", packet);
+                if (Platform.loader().isDevelopment()) LOGGER.warn("dropping packet {} because no net handler is available, retrying in 1s", packet);
                 EventDelay.tick(20, () -> HypixelModAPI.getInstance().sendPacket(packet));
                 return false;
             }

@@ -87,7 +87,7 @@ public class Mixin_PostWorldRenderEvent {
                 //#if MC >= 1.16.5
                 //$$ new UMatrixStack(matrixStack);
                 //#else
-                new UMatrixStack();
+                UMatrixStack.Compat.INSTANCE.get();
                 //#endif
         EventManager.INSTANCE.post(new PostWorldRenderEvent(stack, partialTicks));
     }

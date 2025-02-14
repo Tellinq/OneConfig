@@ -35,6 +35,8 @@ import org.polyfrost.oneconfig.api.commands.v1.factories.builder.CommandBuilder;
 import org.polyfrost.oneconfig.api.config.v1.internal.ConfigVisualizer;
 import org.polyfrost.oneconfig.api.event.v1.EventManager;
 import org.polyfrost.oneconfig.api.event.v1.events.InitializationEvent;
+import org.polyfrost.oneconfig.api.event.v1.events.TickEvent;
+import org.polyfrost.oneconfig.api.event.v1.events.WindowFocusEvent;
 import org.polyfrost.oneconfig.api.hud.v1.HudManager;
 import org.polyfrost.oneconfig.api.hypixel.v1.HypixelUtils;
 import org.polyfrost.oneconfig.api.platform.v1.LoaderPlatform;
@@ -50,6 +52,8 @@ import org.polyfrost.polyui.component.Drawable;
 import org.polyfrost.polyui.input.KeyModifiers;
 import org.polyfrost.polyui.input.Translator;
 import org.polyfrost.universal.UChat;
+
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import static org.polyfrost.oneconfig.api.commands.v1.factories.builder.CommandBuilder.runs;
 
@@ -149,6 +153,18 @@ public class OneConfig
 
     private static void registerEventHandlers() {
         EventManager.register(InitializationEvent.class, e -> HudManager.INSTANCE.initialize());
+        //#if MC < 1.13
+        // this is cringe but is better than the alternative of checking every frame in a mixin (that's how vanilla does it lol)
+        AtomicBoolean active = new AtomicBoolean(false);
+        EventManager.register(TickEvent.End.class, e -> {
+            boolean current = org.lwjgl.opengl.Display.isActive();
+            if (current != active.get()) {
+                active.set(current);
+                if (current) EventManager.INSTANCE.post(WindowFocusEvent.Gained.INSTANCE);
+                else EventManager.INSTANCE.post(WindowFocusEvent.Lost.INSTANCE);
+            }
+        });
+        //#endif
     }
 
     /**

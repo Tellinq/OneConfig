@@ -89,6 +89,8 @@ public class OneConfigMixinInit implements IMixinConfigPlugin {
 
         // Inter-loader mixins
         if (version >= 11600) {
+            // modern
+            mixins.add("events.Mixin_ModernWindowFocusEvent");
             mixins.add("commands.Mixin_AppendCustomCommands");
 
             if (version < 11900) {
