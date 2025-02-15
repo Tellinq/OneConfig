@@ -1,7 +1,7 @@
 import org.polyfrost.gradle.provideIncludedDependencies
 
 plugins {
-    id("org.polyfrost.loom")
+    id("gg.essential.loom")
 }
 
 dependencies {
@@ -14,4 +14,8 @@ dependencies {
             include(dep)
         }
     }
+}
+
+tasks.remapSourcesJar {
+    enabled = false
 }

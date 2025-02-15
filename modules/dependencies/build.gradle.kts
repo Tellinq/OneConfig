@@ -1,6 +1,6 @@
 allprojects {
     with(tasks) {
-        arrayOf("javadocJar", "sourcesJar").forEach {
+        arrayOf("javadocJar", "sourcesJar", "remapSourcesJar").forEach {
             findByName(it)?.enabled = false
         }
     }

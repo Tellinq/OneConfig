@@ -24,12 +24,33 @@
  * <https://polyfrost.org/legal/oneconfig/additional-terms>
  */
 
-dependencies {
-    api(project(":modules:config-impl"))
-    api(project(":modules:ui"))
-    api(project(":modules:events"))
-    compileOnly("org.polyfrost:universalcraft-1.8.9-forge:${libs.versions.universalcraft.get()}")
-    compileOnly("dev.deftu:omnicore-1.8.9-forge:${libs.versions.omnicore.get()}")
+package org.polyfrost.oneconfig.internal.mixin;
+
+//#if MC < 1.19
+import com.mojang.datafixers.DataFixer;
+import com.mojang.datafixers.DataFixerBuilder;
+import net.minecraft.util.datafix.DataFixers;
+import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Redirect;
+
+import java.util.concurrent.Executor;
+
+/**
+ * Modified from LazyDFU under the MIT licence.
+ * Source: <a href="https://github.com/astei/lazydfu/blob/master/LICENSE">here</a>
+ */
+@Mixin(DataFixers.class)
+public abstract class Mixin_LazyDataFixerUpper {
+
+    @Redirect(method = "createFixerUpper", at = @At(value = "NEW", target = "com/mojang/datafixers/DataFixerBuilder", remap = false))
+    private static DataFixerBuilder optimize$lazydfu(int dataVersion) {
+        return new DataFixerBuilder(dataVersion) {
+            @Override
+            public DataFixer build(Executor executor) {
+                return super.build(f -> {});
+            }
+        };
+    }
 }
-
-
+//#endif

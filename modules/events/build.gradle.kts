@@ -26,6 +26,7 @@
 
 dependencies {
     compileOnly("org.polyfrost:universalcraft-1.8.9-forge:${libs.versions.universalcraft.get()}")
+    compileOnly("dev.deftu:omnicore-1.8.9-forge:${libs.versions.omnicore.get()}")
     api(project(":modules:utils"))
 }
 

@@ -47,6 +47,7 @@ fun Project.provideIncludedDependencies(version: Triple<Int, Int, Int>?, loader:
             in 16..18 -> "3.2.2"
             19 -> "3.3.1"
             20 -> "3.3.2"
+            21 -> "3.3.3"
             else -> error("Unsupported Minecraft version: ${version.toMCVer()}")
         }
 
@@ -76,6 +77,7 @@ fun Project.provideIncludedDependencies(version: Triple<Int, Int, Int>?, loader:
     }
     if (version != null) {
         actualDeps.add(OCDependency("org.polyfrost:universalcraft-${version.toMCVer()}-$loader:${libs.findVersion("universalcraft").get().displayName}", true))
+        actualDeps.add(OCDependency("dev.deftu:omnicore-${version.toMCVer()}-$loader:${libs.findVersion("omnicore").get().displayName}", true))
     }
     return actualDeps
 }

@@ -24,12 +24,31 @@
  * <https://polyfrost.org/legal/oneconfig/additional-terms>
  */
 
-dependencies {
-    api(project(":modules:config-impl"))
-    api(project(":modules:ui"))
-    api(project(":modules:events"))
-    compileOnly("org.polyfrost:universalcraft-1.8.9-forge:${libs.versions.universalcraft.get()}")
-    compileOnly("dev.deftu:omnicore-1.8.9-forge:${libs.versions.omnicore.get()}")
+package org.polyfrost.oneconfig.internal.bootstrap;
+
+//#if FORGE && MC >= 1.13
+import net.minecraft.launchwrapper.Launch;
+//#endif
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+
+public class Bootstrap {
+    //#if FORGE && MC >= 1.13
+    private org.polyfrost.oneconfig.internal.legacy.OneConfigTweaker tweaker = new org.polyfrost.oneconfig.internal.legacy.OneConfigTweaker();
+    //#endif
+
+    public void init() {
+        //#if FORGE && MC >= 1.13
+        Map<String, String> launchArgs = ((Map<String, String>) Launch.blackboard.get("launchArgs"));
+        List<String> args = new ArrayList<>();
+        for (Map.Entry<String, String> entry : launchArgs.entrySet()) {
+            args.add(entry.getKey());
+            args.add(entry.getValue());
+        }
+        tweaker.acceptOptions(args, Launch.minecraftHome, Launch.assetsDir, launchArgs.get("--version"));
+        tweaker.injectIntoClassLoader(net.minecraft.launchwrapper.Launch.classLoader);
+        //#endif
+    }
 }
-
-

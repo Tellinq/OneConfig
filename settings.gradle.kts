@@ -1,13 +1,30 @@
-@file:Suppress("UnstableApiUsage")
+@file:Suppress("PropertyName")
+
+import groovy.lang.MissingPropertyException
 
 pluginManagement {
     repositories {
-        gradlePluginPortal()
+        // Releases
+        maven("https://maven.deftu.dev/releases")
+        maven("https://maven.fabricmc.net")
+        maven("https://maven.architectury.dev/")
+        maven("https://maven.minecraftforge.net")
+        maven("https://repo.essential.gg/repository/maven-public")
+        maven("https://server.bbkr.space/artifactory/libs-release/")
+        maven("https://jitpack.io/")
+
+        // Snapshots
+        maven("https://maven.deftu.dev/snapshots")
         mavenLocal()
+
+        // Default
+        gradlePluginPortal()
         mavenCentral()
-        maven("https://repo.polyfrost.org/releases") {
-            name = "Polyfrost Releases"
-        }
+    }
+
+    plugins {
+        kotlin("jvm") version("2.0.0")
+        id("dev.deftu.gradle.multiversion-root") version("2.22.0")
     }
 }
 
@@ -24,11 +41,13 @@ plugins {
     id("org.gradle.toolchains.foojay-resolver-convention") version ("0.8.+")
 }
 
-val name: String by settings
-rootProject.name = name
-if (rootDir.name != name) {
+val projectName: String = extra["project.name"]?.toString()
+    ?: throw MissingPropertyException("mod.name has not been set.")
+
+rootProject.name = projectName
+if (rootDir.name != projectName) {
     logger.error("""
-        Root directory name (${rootDir.absolutePath}) does not match project name ($name)! 
+        Root directory name (${rootDir.absolutePath}) does not match project name ($projectName)! 
         This may cause issues with indexing and other tools (see https://youtrack.jetbrains.com/issue/IDEA-317606#focus=Comments-27-7257761.0-0 and https://stackoverflow.com/questions/77878944 ). 
         If you are experiencing issues, please rename the root directory to match the project name, re-import the project, and invalidate caches if you are on IntelliJ.
     """.trimIndent())
@@ -37,12 +56,6 @@ if (rootDir.name != name) {
 include(":modules")
 project(":modules").apply {
     buildFileName = "root.gradle.kts"
-}
-
-include(":platform")
-project(":platform").apply {
-    projectDir = file("versions/")
-    buildFileName = "preprocessor.gradle.kts"
 }
 
 listOf(
@@ -61,7 +74,9 @@ listOf(
     include(":modules:$module")
 }
 
-// FOR ALL NEW VERSIONS MAKE SURE TO INCLUDE THEM IN preprocessor.gradle.kts !
+// FOR ALL NEW VERSIONS MAKE SURE TO INCLUDE THEM IN root..gradle.kts !
+include(":minecraft")
+project(":minecraft").buildFileName = "root.gradle.kts"
 listOf(
     "1.8.9-forge",
     "1.8.9-fabric",
@@ -73,15 +88,22 @@ listOf(
     "1.17.1-fabric",
     "1.18.2-forge",
     "1.18.2-fabric",
+    "1.19.2-forge",
+    "1.19.2-fabric",
     "1.19.4-forge",
     "1.19.4-fabric",
+    "1.20.1-forge",
+    "1.20.1-fabric",
     "1.20.4-fabric",
-    "1.20.4-forge"
+    "1.20.4-forge",
+    "1.20.6-fabric",
+//    "1.21.1-fabric",
+//    "1.21.4-fabric"
 ).forEach { version ->
-    val proj = ":platform:$version"
+    val proj = ":minecraft:$version"
     include(proj)
     project(proj).apply {
-        projectDir = file("versions/$version")
-        buildFileName = "../build.gradle.kts"
+        projectDir = file("minecraft/versions/$version")
+        buildFileName = "../../build.gradle.kts"
     }
 }

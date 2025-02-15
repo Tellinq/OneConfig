@@ -3,23 +3,29 @@
 // Shared build logic between all OneConfig modules to reduce boilerplate.
 
 plugins {
-    id(libs.plugins.kotlinx.api.validator.get().pluginId)
+    alias(libs.plugins.kotlinx.api.validator)
     alias(libs.plugins.jetbrains.idea.ext)
+    id("maven-publish")
+    id("signing")
 }
 
 val rootModuleProject = project
 
 subprojects {
-    apply(plugin = "java-library")
     apply(plugin = "kotlin")
+    apply(plugin = rootProject.libs.plugins.dgt.java.get().pluginId)
+    apply(plugin = rootProject.libs.plugins.dgt.kotlin.get().pluginId)
+    apply(plugin = rootProject.libs.plugins.dgt.publishing.maven.get().pluginId)
     apply(plugin = "jvm-test-suite")
 
-    if (project.parent?.name == "dependencies")
+    if (project.parent?.name == "dependencies") {
         this.group = "${project.group}.dependencies"
+    }
 
     repositories {
         maven("https://repo.polyfrost.org/releases")
         maven("https://repo.polyfrost.org/snapshots")
+        maven("https://maven.deftu.dev/releases")
     }
 
     dependencies {
@@ -98,7 +104,6 @@ subprojects {
         }
     }
 }
-
 apiValidation {
     for (project in subprojects) {
         ignoredPackages.add("org.polyfrost.oneconfig.api.${project.name}.v1.internal")
@@ -109,3 +114,4 @@ apiValidation {
     ignoredProjects.add("legacy")
     ignoredProjects.add("bundled")
 }
+
