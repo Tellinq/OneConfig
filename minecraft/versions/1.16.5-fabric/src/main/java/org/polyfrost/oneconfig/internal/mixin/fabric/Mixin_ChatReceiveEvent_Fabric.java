@@ -71,7 +71,7 @@ public abstract class Mixin_ChatReceiveEvent_Fabric {
             //#elseif MC > 1.19
             //$$ !packet.overlay()
             //#else
-            //$$ packet.getLocation() == net.minecraft.network.MessageType.CHAT
+            //$$ packet.getLocation() == net.minecraft.network.MessageType.field_11737
             //#endif
         ) {
             ocfg$chatEvent = new ChatReceiveEvent(packet.getMessage());

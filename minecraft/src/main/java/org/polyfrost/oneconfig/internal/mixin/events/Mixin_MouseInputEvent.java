@@ -1,7 +1,7 @@
 package org.polyfrost.oneconfig.internal.mixin.events;
 
 //#if MC >= 1.16.5
-//$$ import net.minecraft.client.MouseHelper;
+//$$ import net.minecraft.client.MouseHandler;
 //$$ import org.spongepowered.asm.mixin.injection.At;
 //#if FORGE
 //$$ import org.spongepowered.asm.mixin.injection.Inject;
@@ -21,7 +21,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 //#if MC >= 1.16.5
-//$$ @Mixin(MouseHelper.class)
+//$$ @Mixin(MouseHandler.class)
 //#else
 @Mixin(Minecraft.class)
 //#endif
@@ -30,11 +30,7 @@ public class Mixin_MouseInputEvent {
     //#if MC >= 1.16.5
     //#if FORGE
     //$$ @Inject(
-    //#if MC > 1.17
     //$$         method = "onPress",
-    //#else
-    //$$         method = "mouseButtonCallback",
-    //#endif
     //$$         at = @At(
     //$$                 value = "INVOKE",
     //#if MC >= 1.20.4

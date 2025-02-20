@@ -26,7 +26,7 @@
 
 package org.polyfrost.oneconfig.internal.bootstrap;
 
-//#if FORGE && MC >= 1.13
+//#if FORGE && MC <= 1.12.2
 import net.minecraft.launchwrapper.Launch;
 //#endif
 
@@ -35,12 +35,12 @@ import java.util.List;
 import java.util.Map;
 
 public class Bootstrap {
-    //#if FORGE && MC >= 1.13
+    //#if FORGE && MC <= 1.12.2
     private org.polyfrost.oneconfig.internal.legacy.OneConfigTweaker tweaker = new org.polyfrost.oneconfig.internal.legacy.OneConfigTweaker();
     //#endif
 
     public void init() {
-        //#if FORGE && MC >= 1.13
+        //#if FORGE && MC <= 1.12.2
         Map<String, String> launchArgs = ((Map<String, String>) Launch.blackboard.get("launchArgs"));
         List<String> args = new ArrayList<>();
         for (Map.Entry<String, String> entry : launchArgs.entrySet()) {

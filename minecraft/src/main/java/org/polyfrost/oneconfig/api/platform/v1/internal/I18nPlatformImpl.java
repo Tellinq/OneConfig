@@ -43,7 +43,7 @@ public class I18nPlatformImpl implements I18nPlatform {
         //@formatter:off
         String s =
             //#if MC>=11600
-            //$$ net.minecraft.client.util.InputMappings.getInputByCode(key, scanCode).toString();
+            //$$ com.mojang.blaze3d.platform.InputConstants.getKey(key, scanCode).toString();
             //#else
             net.minecraft.client.settings.GameSettings.getKeyDisplayString(key);
             //#endif

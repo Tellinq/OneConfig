@@ -79,7 +79,7 @@ public class Mixin_PostWorldRenderEvent {
             float partialTicks,
             long finishTimeNano,
             //#if MC >= 1.16.5
-            //$$ com.mojang.blaze3d.matrix.MatrixStack matrixStack,
+            //$$ com.mojang.blaze3d.vertex.PoseStack matrixStack,
             //#endif
             CallbackInfo ci
     ) {

@@ -87,8 +87,8 @@ public class GLPlatformImpl implements GLPlatform {
         return fr.drawString(text, x, y, color, shadow);
         //#else
         //$$ if(shadow) {
-        //$$    return fr.drawStringWithShadow(stack.toMC(), text, x, y, color);
-        //$$ } else return fr.drawString(stack.toMC(), text, x, y, color);
+        //$$    return fr.drawShadow(stack.toMC(), text, x, y, color);
+        //$$ } else return fr.draw(stack.toMC(), text, x, y, color);
         //#endif
     }
 

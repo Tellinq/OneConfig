@@ -18,8 +18,10 @@ import org.spongepowered.asm.mixin.injection.ModifyVariable;
 @Mixin(SoundManager.class)
 public class Mixin_SoundPlayedEvent {
 
+    //#if MC <= 1.12.2
     @Shadow
     private boolean loaded;
+    //#endif
 
     @ModifyVariable(
             method = "playSound",
@@ -27,9 +29,11 @@ public class Mixin_SoundPlayedEvent {
             argsOnly = true
     )
     private ISound onPlaySoundCallback(ISound value) {
+        //#if MC <= 1.12.2
         if (!this.loaded) {
             return value;
         }
+        //#endif
 
         //#if MC <= 1.8.9
         SoundEventAccessorComposite accessor = ((Mixin_SoundHandlerAccessor) this).getSndHandler().getSound(value.getSoundLocation());

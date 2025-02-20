@@ -234,8 +234,8 @@ public class PolyUIScreen extends UScreen implements BlurScreen {
 
         float mx, my;
         //#if MC >= 1.13
-        //$$ mx = (float) Minecraft.getInstance().mouseHelper.getMouseX();
-        //$$ my = (float) Minecraft.getInstance().mouseHelper.getMouseY();
+        //$$ mx = (float) Minecraft.getInstance().mouseHandler.xpos();
+        //$$ my = (float) Minecraft.getInstance().mouseHandler.ypos();
         //#else
         mx = org.lwjgl.input.Mouse.getX();
         my = Platform.screen().windowHeight() - org.lwjgl.input.Mouse.getY() - 1;

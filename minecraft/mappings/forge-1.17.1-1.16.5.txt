@@ -38,6 +38,8 @@ net.minecraft.client.Minecraft missTime leftClickCounter
 
 net.minecraft.client.sounds.SoundEngine net.minecraft.client.audio.SoundEngine
 
+net.minecraft.sounds.SoundSource net.minecraft.sounds.SoundSource
+
 net.minecraft.client.gui.screens.ConnectScreen net.minecraft.client.gui.screen.ConnectingScreen
 net.minecraft.client.gui.screens.multiplayer.JoinMultiplayerScreen net.minecraft.client.gui.screen.MultiplayerScreen
 
@@ -110,10 +112,6 @@ net.minecraft.client.multiplayer.ClientPacketListener commands commandDispatcher
 net.minecraft.client.multiplayer.ClientPacketListener getSuggestionsProvider() getSuggestionProvider()
 net.minecraft.client.multiplayer.ClientPacketListener handleCommands() handleCommandList()
 net.minecraft.client.multiplayer.ClientPacketListener handleLogin() handleJoinGame()
-net.minecraft.client.multiplayer.ClientPacketListener net.minecraft.client.network.play.ClientPlayNetHandler
-net.minecraft.client.multiplayer.ClientPacketListener send() sendPacket()
-net.minecraft.client.multiplayer.ClientPacketListener suggestionsProvider clientSuggestionProvider
-net.minecraft.client.multiplayer.ClientSuggestionProvider minecraft mc
 
 net.minecraft.client.renderer.MultiBufferSource net.minecraft.client.renderer.IRenderTypeBuffer
 
@@ -187,8 +185,6 @@ net.minecraft.network.protocol.game.ClientboundCommandsPacket net.minecraft.netw
 net.minecraft.network.protocol.game.ClientboundLoginPacket net.minecraft.network.play.server.SJoinGamePacket
 net.minecraft.network.protocol.game.ClientboundCustomPayloadPacket getData() getBufferData()
 net.minecraft.network.protocol.game.ClientboundCustomPayloadPacket getIdentifier() getChannelName()
-net.minecraft.network.protocol.game.ClientboundCustomPayloadPacket net.minecraft.network.play.server.SCustomPayloadPlayPacket
-net.minecraft.network.protocol.game.ServerboundCustomPayloadPacket net.minecraft.network.play.client.CCustomPayloadPacket
 
 net.minecraft.resources.ResourceLocation net.minecraft.util.ResourceLocation
 

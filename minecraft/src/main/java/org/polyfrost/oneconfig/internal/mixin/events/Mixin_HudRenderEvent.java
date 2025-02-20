@@ -4,7 +4,7 @@ package org.polyfrost.oneconfig.internal.mixin.events;
 import net.minecraftforge.client.GuiIngameForge;
 //#else
 //#if FORGE
-//$$ import net.minecraft.client.gui.IngameGui;
+//$$ import net.minecraft.client.gui.Gui;
 //#else
 //$$ import net.minecraft.client.gui.hud.InGameHud;
 //#endif
@@ -16,7 +16,7 @@ import net.minecraftforge.client.GuiIngameForge;
 //$$ import net.minecraft.client.gui.DrawContext;
 //#endif
 //#elseif MC >= 1.13
-//$$ import com.mojang.blaze3d.matrix.MatrixStack;
+//$$ import com.mojang.blaze3d.vertex.PoseStack;
 //#endif
 //#endif
 
@@ -31,7 +31,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 //#if FORGE && MC <= 1.12.2
 @Mixin(GuiIngameForge.class)
 //#elseif FORGE
-//$$ @Mixin(IngameGui.class)
+//$$ @Mixin(Gui.class)
 //#else
 //$$ @Mixin(InGameHud.class)
 //#endif
@@ -40,12 +40,6 @@ public class Mixin_HudRenderEvent {
     @Inject(
             //#if FORGE && MC <= 1.12.2
             method = "renderGameOverlay",
-            //#elseif FORGE
-            //#if MC >= 1.17
-            //$$ method = "render",
-            //#else
-            //$$ method = "renderIngameGui",
-            //#endif
             //#else
             //$$ method = "render",
             //#endif
@@ -59,7 +53,7 @@ public class Mixin_HudRenderEvent {
             //$$ DrawContext ctx,
             //#endif
             //#elseif MC >= 1.13
-            //$$ MatrixStack matrixStack,
+            //$$ PoseStack matrixStack,
             //#endif
             float partialTicks,
             CallbackInfo ci

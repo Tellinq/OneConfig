@@ -76,8 +76,8 @@ public final class HypixelApiInternalsImpl implements HypixelApiInternals {
                             //#endif
                             //#if MC <= 1.12.2
                             packet.getIdentifier(),
-                            //#elseif MC >= 1.20.4
-                            //$$ new net.minecraft.util.ResourceLocation(packet.getIdentifier()),
+                            //#elseif MC >= 1.20.4 || MC == 1.16.5
+                            //$$ new net.minecraft.resources.ResourceLocation(packet.getIdentifier()),
                             //#endif
                             buf
                             //#if MC >= 1.20.4

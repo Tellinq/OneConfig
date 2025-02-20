@@ -45,7 +45,7 @@ public class ScreenPlatformImpl implements ScreenPlatform {
     //$$ private static final net.minecraft.client.gui.components.Button btn = new net.minecraft.client.gui.components.Button.Builder(net.minecraft.network.chat.Component.empty(), (b) -> {}).build();
     //#endif
     //#else
-    //$$ private static final net.minecraft.client.gui.widget.button.Button btn = new net.minecraft.client.gui.widget.button.Button(-1, -1, -1, -1, null, (b) -> {});
+    //$$ private static final net.minecraft.client.gui.components.Button btn = new net.minecraft.client.gui.components.Button(-1, -1, -1, -1, null, (b) -> {});
     //#endif
     private UMatrixStack smuggled = new UMatrixStack();
 
@@ -76,7 +76,7 @@ public class ScreenPlatformImpl implements ScreenPlatform {
     @Override
     public int viewportWidth() {
         //#if MC>=11502
-        //$$ return Minecraft.getInstance().getMainWindow().getFramebufferWidth();
+        //$$ return Minecraft.getInstance().getWindow().getScreenWidth();
         //#else
         return Minecraft.getMinecraft().displayWidth;
         //#endif
@@ -85,7 +85,7 @@ public class ScreenPlatformImpl implements ScreenPlatform {
     @Override
     public int viewportHeight() {
         //#if MC>=11502
-        //$$ return Minecraft.getInstance().getMainWindow().getFramebufferHeight();
+        //$$ return Minecraft.getInstance().getWindow().getScreenHeight();
         //#else
         return Minecraft.getMinecraft().displayHeight;
         //#endif
@@ -94,7 +94,7 @@ public class ScreenPlatformImpl implements ScreenPlatform {
     @Override
     public int windowWidth() {
         //#if MC>=11502
-        //$$ return Minecraft.getInstance().getMainWindow().getWidth();
+        //$$ return Minecraft.getInstance().getWindow().getWidth();
         //#else
         return (int) (Minecraft.getMinecraft().displayWidth / org.lwjgl.opengl.Display.getPixelScaleFactor());
         //#endif
@@ -103,7 +103,7 @@ public class ScreenPlatformImpl implements ScreenPlatform {
     @Override
     public int windowHeight() {
         //#if MC>=11502
-        //$$ return Minecraft.getInstance().getMainWindow().getHeight();
+        //$$ return Minecraft.getInstance().getWindow().getHeight();
         //#else
         return (int) (Minecraft.getMinecraft().displayHeight / org.lwjgl.opengl.Display.getPixelScaleFactor());
         //#endif

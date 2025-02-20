@@ -51,7 +51,7 @@ preprocess {
 
     forge12004.link(forge12001, file("mappings/forge-1.20.4-1.20.1.txt"))
     forge12001.link(forge11904, file("mappings/forge-1.20.1-1.19.4.txt"))
-    forge11904.link(forge11902, file("mappings/forge-1.19.4-1.19.2.txt"))
+    forge11904.link(forge11902)
     forge11902.link(forge11802, file("mappings/forge-1.19.2-1.18.2.txt"))
     forge11802.link(forge11701, file("mappings/forge-1.18.2-1.17.1.txt"))
     forge11701.link(forge11605, file("mappings/forge-1.17.1-1.16.5.txt"))

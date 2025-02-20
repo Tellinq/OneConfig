@@ -11,3 +11,5 @@ org.objectweb.asm.tree.LineNumberNode org.spongepowered.asm.lib.tree.LineNumberN
 org.objectweb.asm.tree.MethodInsnNode org.spongepowered.asm.lib.tree.MethodInsnNode
 org.objectweb.asm.tree.MethodNode org.spongepowered.asm.lib.tree.MethodNode
 org.objectweb.asm.tree.VarInsnNode org.spongepowered.asm.lib.tree.VarInsnNode
+
+ net.minecraft.entity.EntityLiving net.minecraft.entity.mob.MobEntity

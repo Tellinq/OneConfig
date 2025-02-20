@@ -83,9 +83,6 @@ public class PlatformCommandFactoryImpl implements PlatformCommandFactory {
         argTypeMap.put(String.class, StringArgumentType::word);
         //#if MC < 1.19
         argTypeMap.put(ItemStack.class, ItemArgument::item);
-        //#elseif MC <= 1.19.2
-        //$$ net.minecraft.command.CommandRegistryAccess a = new net.minecraft.command.CommandRegistryAccess(net.minecraft.util.registry.BuiltinRegistries.DYNAMIC_REGISTRY_MANAGER);
-        //$$ argTypeMap.put(ItemStack.class, () -> ItemStackArgumentType.itemStack(a));
         //#else
         //#if FABRIC
         //$$ net.minecraft.command.CommandRegistryAccess a = net.minecraft.server.command.CommandManager.createRegistryAccess(
