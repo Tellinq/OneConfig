@@ -86,9 +86,9 @@ public final class EventDelay {
     }
 
     /**
-     * {@link #of(Class, int, Runnable)} with RenderEvent.End.
+     * {@link #of(Class, int, Runnable)} with RenderEvent.Post.
      */
     public static void render(int ticks, Runnable function) {
-        of(RenderEvent.End.class, ticks, function);
+        of(RenderEvent.Post.class, ticks, function);
     }
 }

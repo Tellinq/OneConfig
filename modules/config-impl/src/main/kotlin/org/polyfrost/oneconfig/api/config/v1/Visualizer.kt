@@ -249,15 +249,22 @@ fun interface Visualizer {
     class TextVisualizer : Visualizer {
         override fun visualize(prop: Property<*>): Drawable {
             val placeholder = prop.getMetadata("placeholder") ?: "polyui.textinput.placeholder"
+            val validate = prop.getMetadata<String?>("validate")
+            val regex = if (validate != null) Regex(validate) else null
             val s = BoxedTextInput(
                 image = "assets/oneconfig/ico/text.svg".image(),
                 placeholder = placeholder,
                 size = Vec2(200f, 32f),
                 initialValue = prop.getAs(),
             ).onChange { text: String ->
+                if (regex != null && !regex.matches(text)) {
+                    shake()
+                    return@onChange true
+                }
                 prop.setAs(text)
                 false
             }
+            if (validate != null) s.addHoverInfo(Text("Must match regex: $validate"))
             return s
         }
     }

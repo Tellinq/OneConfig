@@ -121,7 +121,7 @@ open class ConfigVisualizer {
         initialPage: String = "General",
     ): Drawable {
         val now = System.nanoTime()
-        val options = HashMap<String, HashMap<String, ArrayList<Drawable>>>(4)
+        val options = LinkedHashMap<String, HashMap<String, ArrayList<Drawable>>>(4)
 
         // asm: step 1: sort the tree into a map of:
         // categories
@@ -171,7 +171,7 @@ open class ConfigVisualizer {
         val category = node.getMetadata<String>("category")?.strv() ?: "General"
         val subcategory = node.getMetadata<String>("subcategory")?.strv() ?: "General"
 
-        val list = options.getOrPut(category) { HashMap(4) }.getOrPut(subcategory) { ArrayList(8) }
+        val list = options.getOrPut(category) { LinkedHashMap(4) }.getOrPut(subcategory) { ArrayList(8) }
         if (node is Property<*>) {
             val vis = node.getVisualizer() ?: return
             list.add(wrap(vis.visualize(node), node.title, node.description, icon).addHideHandler(node).linkTo(node))

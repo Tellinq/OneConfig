@@ -41,6 +41,11 @@ public @interface Text {
 
     String icon() default "";
 
+    /**
+     * Insert a regex expression which will be used to validate the text written in the box.
+     */
+    String validate() default "";
+
     String category() default "General";
 
     String subcategory() default "General";

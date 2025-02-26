@@ -267,6 +267,7 @@ public abstract interface annotation class org/polyfrost/oneconfig/api/config/v1
 	public abstract fun placeholder ()Ljava/lang/String;
 	public abstract fun subcategory ()Ljava/lang/String;
 	public abstract fun title ()Ljava/lang/String;
+	public abstract fun validate ()Ljava/lang/String;
 }
 
 public class org/polyfrost/oneconfig/api/config/v1/backend/impl/FileBackend : org/polyfrost/oneconfig/api/config/v1/backend/Backend {
@@ -308,6 +309,91 @@ public abstract class org/polyfrost/oneconfig/api/config/v1/collect/impl/Reflect
 	protected abstract fun handleField (Ljava/lang/reflect/Field;Ljava/lang/Object;Lorg/polyfrost/oneconfig/api/config/v1/Tree;)V
 	protected abstract fun handleInnerClass (Ljava/lang/Class;Ljava/lang/Object;ILorg/polyfrost/oneconfig/api/config/v1/Tree;)V
 	protected abstract fun handleMethod (Ljava/lang/reflect/Method;Ljava/lang/Object;Lorg/polyfrost/oneconfig/api/config/v1/Tree;)V
+}
+
+public final class org/polyfrost/oneconfig/api/config/v1/dsl/ConfigDSL {
+	public static final field Companion Lorg/polyfrost/oneconfig/api/config/v1/dsl/ConfigDSL$Companion;
+	public fun <init> ()V
+	public fun <init> (Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)V
+	public synthetic fun <init> (Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public final fun accordion (Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)Lorg/polyfrost/oneconfig/api/config/v1/dsl/ConfigDSL;
+	public static synthetic fun accordion$default (Lorg/polyfrost/oneconfig/api/config/v1/dsl/ConfigDSL;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;ILjava/lang/Object;)Lorg/polyfrost/oneconfig/api/config/v1/dsl/ConfigDSL;
+	public final fun button (Ljava/lang/Runnable;)Lorg/polyfrost/oneconfig/api/config/v1/dsl/ConfigDSL$RunnableProp;
+	public final fun checkbox (Z)Lorg/polyfrost/oneconfig/api/config/v1/dsl/ConfigDSL$Prop;
+	public final fun color (Lorg/polyfrost/polyui/color/PolyColor;)Lorg/polyfrost/oneconfig/api/config/v1/dsl/ConfigDSL$ColorProp;
+	public static final fun config (Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Lkotlin/jvm/functions/Function1;)V
+	public final fun dropdown (I[Ljava/lang/String;)Lorg/polyfrost/oneconfig/api/config/v1/dsl/ConfigDSL$Prop;
+	public final fun getTree ()Lorg/polyfrost/oneconfig/api/config/v1/Tree;
+	public final fun keybind (Lorg/polyfrost/polyui/input/KeyBinder$Bind;)Lorg/polyfrost/oneconfig/api/config/v1/dsl/ConfigDSL$Prop;
+	public final fun number (F)Lorg/polyfrost/oneconfig/api/config/v1/dsl/ConfigDSL$FloatProp;
+	public final fun number (I)Lorg/polyfrost/oneconfig/api/config/v1/dsl/ConfigDSL$IntProp;
+	public final fun radiobutton (I[Ljava/lang/String;)Lorg/polyfrost/oneconfig/api/config/v1/dsl/ConfigDSL$Prop;
+	public final fun slider (F)Lorg/polyfrost/oneconfig/api/config/v1/dsl/ConfigDSL$FloatProp;
+	public final fun slider (I)Lorg/polyfrost/oneconfig/api/config/v1/dsl/ConfigDSL$IntProp;
+	public final fun subconfig (Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)Lorg/polyfrost/oneconfig/api/config/v1/dsl/ConfigDSL;
+	public static synthetic fun subconfig$default (Lorg/polyfrost/oneconfig/api/config/v1/dsl/ConfigDSL;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;ILjava/lang/Object;)Lorg/polyfrost/oneconfig/api/config/v1/dsl/ConfigDSL;
+	public final fun switch (Z)Lorg/polyfrost/oneconfig/api/config/v1/dsl/ConfigDSL$Prop;
+	public final fun text (Ljava/lang/String;)Lorg/polyfrost/oneconfig/api/config/v1/dsl/ConfigDSL$TextProp;
+}
+
+public final class org/polyfrost/oneconfig/api/config/v1/dsl/ConfigDSL$ColorProp : org/polyfrost/oneconfig/api/config/v1/dsl/ConfigDSL$Prop {
+	public fun <init> (Lorg/polyfrost/polyui/color/PolyColor;)V
+	public final fun getAlpha ()Z
+	public final fun setAlpha (Z)V
+}
+
+public final class org/polyfrost/oneconfig/api/config/v1/dsl/ConfigDSL$Companion {
+	public final fun config (Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Lkotlin/jvm/functions/Function1;)V
+	public static synthetic fun config$default (Lorg/polyfrost/oneconfig/api/config/v1/dsl/ConfigDSL$Companion;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Lkotlin/jvm/functions/Function1;ILjava/lang/Object;)V
+}
+
+public final class org/polyfrost/oneconfig/api/config/v1/dsl/ConfigDSL$FloatProp : org/polyfrost/oneconfig/api/config/v1/dsl/ConfigDSL$Prop {
+	public fun <init> (F)V
+	public final fun getMax ()F
+	public final fun getMin ()F
+	public final fun getUnit ()Ljava/lang/String;
+	public final fun setMax (F)V
+	public final fun setMin (F)V
+	public final fun setUnit (Ljava/lang/String;)V
+}
+
+public final class org/polyfrost/oneconfig/api/config/v1/dsl/ConfigDSL$IntProp : org/polyfrost/oneconfig/api/config/v1/dsl/ConfigDSL$Prop {
+	public fun <init> (I)V
+	public final fun getMax ()I
+	public final fun getMin ()I
+	public final fun getUnit ()Ljava/lang/String;
+	public final fun setMax (I)V
+	public final fun setMin (I)V
+	public final fun setUnit (Ljava/lang/String;)V
+}
+
+public class org/polyfrost/oneconfig/api/config/v1/dsl/ConfigDSL$Prop {
+	public fun <init> (Ljava/lang/Object;Ljava/lang/Class;)V
+	public final fun get (Ljava/lang/String;)Ljava/lang/Object;
+	public final fun getDescription ()Ljava/lang/String;
+	public final fun getId ()Ljava/lang/String;
+	public final fun getProperty ()Lorg/polyfrost/oneconfig/api/config/v1/Property;
+	public final fun getTitle ()Ljava/lang/String;
+	public final fun getValue ()Ljava/lang/Object;
+	public final fun set (Ljava/lang/String;Ljava/lang/Object;)V
+	public final fun setDescription (Ljava/lang/String;)V
+	public final fun setId (Ljava/lang/String;)V
+	public final fun setTitle (Ljava/lang/String;)V
+	public final fun setValue (Ljava/lang/Object;)V
+}
+
+public final class org/polyfrost/oneconfig/api/config/v1/dsl/ConfigDSL$RunnableProp : org/polyfrost/oneconfig/api/config/v1/dsl/ConfigDSL$Prop {
+	public fun <init> (Ljava/lang/Runnable;)V
+	public final fun getAction ()Ljava/lang/Runnable;
+	public final fun getText ()Ljava/lang/String;
+	public final fun setAction (Ljava/lang/Runnable;)V
+	public final fun setText (Ljava/lang/String;)V
+}
+
+public final class org/polyfrost/oneconfig/api/config/v1/dsl/ConfigDSL$TextProp : org/polyfrost/oneconfig/api/config/v1/dsl/ConfigDSL$Prop {
+	public fun <init> (Ljava/lang/String;)V
+	public final fun getPlaceholder ()Ljava/lang/String;
+	public final fun setPlaceholder (Ljava/lang/String;)V
 }
 
 public class org/polyfrost/oneconfig/api/config/v1/serialize/adapter/impl/PolyColorAdapter : org/polyfrost/oneconfig/api/config/v1/serialize/adapter/Adapter {

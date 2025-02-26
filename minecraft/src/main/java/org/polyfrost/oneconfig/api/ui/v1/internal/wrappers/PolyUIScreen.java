@@ -73,6 +73,10 @@ public class PolyUIScreen extends OmniScreen implements BlurScreen {
         this.blurs = blurs;
         this.pauses = pauses;
         this.close = onClose;
+    }
+
+    @Override
+    public void initScreen(int width, int height) {
         adjustResolution(Platform.screen().windowWidth(), Platform.screen().windowHeight(), false);
     }
 

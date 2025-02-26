@@ -81,6 +81,7 @@ public class OneConfigMixinInit implements IMixinConfigPlugin {
         //#endif
 
         //#if MC >= 1.16
+        //$$ mixins.add("events.Mixin_ModernWindowFocusEvent");
         //$$ mixins.add("commands.Mixin_AppendCustomCommands");
         //#if MC < 1.19
         //$$ mixins.add("Mixin_LazyDataFixerUpper");

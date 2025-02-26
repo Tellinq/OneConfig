@@ -75,20 +75,22 @@ public final class EventManager {
                         LOGGER.warn(handler);
                     }
                 }
-                if (!handlers.isEmpty()) {
-                    String[] classes = new String[handlers.size() + 1];
-                    String[] handles = new String[handlers.size() + 1];
-                    classes[0] = "Event Class";
-                    handles[0] = "Handlers";
-                    int i = 1;
-                    for (Map.Entry<Class<? extends Event>, List<EventHandler<?>>> entry : handlers.entrySet()) {
-                        handles[i] = String.valueOf(entry.getValue().size());
-                        classes[i++] = entry.getKey().getName().replace("org.polyfrost.oneconfig.api.event.v1.events.", "builtin.");
-                    }
-                    LOGGER.info(TableHelper.makeTableFromColumns("Registered Event Handlers:", classes, handles));
-                }
+                if (!handlers.isEmpty()) LOGGER.info(getRegisteredHandlersDebugTable());
             }));
         }
+    }
+
+    public String getRegisteredHandlersDebugTable() {
+        String[] classes = new String[handlers.size() + 1];
+        String[] handles = new String[handlers.size() + 1];
+        classes[0] = "Event Class";
+        handles[0] = "Handlers";
+        int i = 1;
+        for (Map.Entry<Class<? extends Event>, List<EventHandler<?>>> entry : handlers.entrySet()) {
+            handles[i] = String.valueOf(entry.getValue().size());
+            classes[i++] = entry.getKey().getName().replace("org.polyfrost.oneconfig.api.event.v1.events.", "builtin.");
+        }
+        return TableHelper.makeTableFromColumns("Registered Event Handlers:", classes, handles);
     }
 
     /**

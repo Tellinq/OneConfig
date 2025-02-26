@@ -26,23 +26,23 @@
 
 package org.polyfrost.oneconfig.api.event.v1.events;
 
-public class ReceivePacketEvent extends Event.Cancellable {
-    private final Object packet;
+// dispatching handled in OneConfig.java for legacy as needs version specific handling heheheheeeeee
 
-    public ReceivePacketEvent(Object packet) {
-        this.packet = packet;
+/**
+ * Events relating to window focus.
+ */
+public interface WindowFocusEvent extends Event {
+    class Gained implements WindowFocusEvent {
+        public static final Gained INSTANCE = new Gained();
+
+        private Gained() {
+        }
     }
 
-    /**
-     * Due to differences across Minecraft versions, this is a Duck method, meaning that it will return the expected type for that minecraft version.
-     * <ul>
-     *     <li>For legacy forge, this will be a IPacket.</li>
-     *     <li>For modern forge, this will be a Packet.</li>
-     *     <li>For fabric, this will be a Packet.</li>
-     * </ul>
-     */
-    @SuppressWarnings("unchecked")
-    public <T> T getPacket() {
-        return (T) packet;
+    class Lost implements WindowFocusEvent {
+        public static final Lost INSTANCE = new Lost();
+
+        private Lost() {
+        }
     }
 }

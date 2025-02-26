@@ -36,7 +36,7 @@ import org.polyfrost.oneconfig.api.event.v1.EventDelay;
 import org.polyfrost.oneconfig.api.event.v1.EventManager;
 import org.polyfrost.oneconfig.api.event.v1.events.HudRenderEvent;
 import org.polyfrost.oneconfig.api.event.v1.events.ResizeEvent;
-import org.polyfrost.oneconfig.api.event.v1.events.WorldLoadEvent;
+import org.polyfrost.oneconfig.api.event.v1.events.WorldEvent;
 import org.polyfrost.oneconfig.api.platform.v1.Platform;
 import org.polyfrost.oneconfig.api.ui.v1.api.TinyFdApi;
 import org.polyfrost.polyui.PolyUI;
@@ -113,7 +113,7 @@ public interface UIManager {
             return p;
         } catch (Throwable t) {
             LogManager.getLogger("OneConfig/UI").error("Failed to load renderer!", t);
-            EventManager.register(WorldLoadEvent.class, () -> EventDelay.tick(20, () -> OmniChat.showChatMessage("&cFailed to load the renderer for OneConfig. This means the UI, HUD and Notifications will not work. Please report this to https://discord.gg/polyfrost and attach your log.")));
+            EventManager.register(WorldEvent.Load.class, () -> EventDelay.tick(20, () -> OmniChat.showChatMessage("&cFailed to load the renderer for OneConfig. This means the UI, HUD and Notifications will not work. Please report this to https://discord.gg/polyfrost and attach your log.")));
             return null;
         }
     }

@@ -40,17 +40,17 @@ public abstract class RenderEvent implements Event {
         return deltaTicks;
     }
 
-    public static class Start extends RenderEvent {
-        public static final Start INSTANCE = new Start();
+    public static class Pre extends RenderEvent {
+        public static final Pre INSTANCE = new Pre();
 
-        private Start() {
+        private Pre() {
         }
     }
 
-    public static class End extends RenderEvent {
-        public static final End INSTANCE = new End();
+    public static class Post extends RenderEvent {
+        public static final Post INSTANCE = new Post();
 
-        private End() {
+        private Post() {
         }
     }
 }

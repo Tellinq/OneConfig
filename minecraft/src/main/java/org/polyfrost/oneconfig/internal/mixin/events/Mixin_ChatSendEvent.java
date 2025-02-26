@@ -28,7 +28,7 @@ package org.polyfrost.oneconfig.internal.mixin.events;
 
 import net.minecraft.client.entity.EntityPlayerSP;
 import org.polyfrost.oneconfig.api.event.v1.EventManager;
-import org.polyfrost.oneconfig.api.event.v1.events.ChatSendEvent;
+import org.polyfrost.oneconfig.api.event.v1.events.ChatEvent;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
@@ -40,7 +40,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 public abstract class Mixin_ChatSendEvent {
 
     @Unique
-    private ChatSendEvent ocfg$chatEvent;
+    private ChatEvent.Send ocfg$chatEvent;
 
     @Unique
     private static final String SEND_MESSAGE_SIGNATURE =
@@ -72,7 +72,7 @@ public abstract class Mixin_ChatSendEvent {
         //$$ }
         //#endif
 
-        ocfg$chatEvent = new ChatSendEvent(message);
+        ocfg$chatEvent = new ChatEvent.Send(message);
 
         EventManager.INSTANCE.post(ocfg$chatEvent);
 
