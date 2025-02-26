@@ -3,16 +3,14 @@ package org.polyfrost.oneconfig.internal.mixin.events;
 //#if MC >= 1.16.5
 //$$ import com.mojang.blaze3d.vertex.PoseStack;
 //$$ import net.minecraft.client.renderer.MultiBufferSource;
-//$$ import net.minecraft.client.renderer.entity.LivingEntityRenderer;
-//#else
-import net.minecraft.client.renderer.entity.RendererLivingEntity;
 //#endif
 
 import dev.deftu.omnicore.client.OmniClient;
+import net.minecraft.client.renderer.entity.RendererLivingEntity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.profiler.Profiler;
 import org.polyfrost.oneconfig.api.event.v1.EventManager;
-import org.polyfrost.oneconfig.api.event.v1.events.RenderLivingEntityEvent;
+import org.polyfrost.oneconfig.api.event.v1.events.RenderLivingEvent;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -22,7 +20,11 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 public class Mixin_RenderLivingEntityEvent<T extends EntityLivingBase> {
 
     @Inject(
+            //#if MC >= 1.16.5
+            //$$ method = "render(Lnet/minecraft/world/entity/LivingEntity;FFLcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/MultiBufferSource;I)V",
+            //#else
             method = "doRender(Lnet/minecraft/entity/EntityLivingBase;DDDFF)V",
+            //#endif
             at = @At("HEAD"),
             cancellable = true
     )
@@ -55,7 +57,7 @@ public class Mixin_RenderLivingEntityEvent<T extends EntityLivingBase> {
         //$$ double y = entity.getY();
         //$$ double z = entity.getZ();
         //#endif
-        RenderLivingEntityEvent event = new RenderLivingEntityEvent.Pre(entity, partialTicks, x, y, z);
+        RenderLivingEvent event = new RenderLivingEvent.Pre(entity, partialTicks, x, y, z);
         EventManager.INSTANCE.post(event);
         if (event.cancelled) {
             ci.cancel();
@@ -65,7 +67,11 @@ public class Mixin_RenderLivingEntityEvent<T extends EntityLivingBase> {
     }
 
     @Inject(
+            //#if MC >= 1.16.5
+            //$$ method = "render(Lnet/minecraft/world/entity/LivingEntity;FFLcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/MultiBufferSource;I)V",
+            //#else
             method = "doRender(Lnet/minecraft/entity/EntityLivingBase;DDDFF)V",
+            //#endif
             at = @At("TAIL")
     )
     private void onPostEntityRenderCallback(
@@ -97,7 +103,7 @@ public class Mixin_RenderLivingEntityEvent<T extends EntityLivingBase> {
         //$$ double y = entity.getY();
         //$$ double z = entity.getZ();
         //#endif
-        RenderLivingEntityEvent event = new RenderLivingEntityEvent.Post(entity, partialTicks, x, y, z);
+        RenderLivingEvent event = new RenderLivingEvent.Post(entity, partialTicks, x, y, z);
         EventManager.INSTANCE.post(event);
         // Can't cancel when the method has already returned lol
 

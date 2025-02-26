@@ -32,6 +32,7 @@ import com.mojang.brigadier.exceptions.BuiltInExceptionProvider;
 import com.mojang.brigadier.exceptions.CommandExceptionType;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.brigadier.tree.CommandNode;
+import dev.deftu.omnicore.client.OmniChat;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientSuggestionProvider;
 import net.minecraft.network.chat.Component;
@@ -42,7 +43,6 @@ import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.Nullable;
 import org.polyfrost.oneconfig.api.commands.v1.internal.RegisterCommandsEvent;
 import org.polyfrost.oneconfig.api.event.v1.EventManager;
-import org.polyfrost.universal.UChat;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -102,11 +102,11 @@ public final class ClientCommandInternals {
             }
 
             LOGGER.warn("Syntax exception for client-sided command '{}'", command, e);
-            UChat.chat("&c" + getErrorMessage(e));
+            OmniChat.showChatMessage("&c" + getErrorMessage(e));
             return true;
         } catch (Exception e) {
             LOGGER.warn("Error while executing client-sided command '{}'", command, e);
-            UChat.chat("&c" + e.getLocalizedMessage());
+            OmniChat.showChatMessage("&c" + e.getLocalizedMessage());
             return true;
         } finally {
             profiler.pop();

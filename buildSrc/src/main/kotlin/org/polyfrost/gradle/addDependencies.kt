@@ -23,6 +23,7 @@ fun Project.provideIncludedDependencies(version: Triple<Int, Int, Int>?, loader:
     deps.addAll(libs.findBundle("nightconfig").get().get())
     deps.add(libs.findLibrary("snakeyaml").get().get())
     deps.add(libs.findLibrary("isolated-lwjgl3-loader").get().get())
+    deps.add(libs.findLibrary("textile").get().get())
     deps.add(libs.findLibrary("polyio").get().get())
     val copycat = libs.findLibrary("copycat").get().get()
     deps.add(copycat)
@@ -76,6 +77,7 @@ fun Project.provideIncludedDependencies(version: Triple<Int, Int, Int>?, loader:
         actualDeps.add(OCDependency(dep))
     }
     if (version != null) {
+        actualDeps.add(OCDependency("dev.deftu:textile-${version.toMCVer()}-$loader:${libs.findVersion("textile").get().displayName}", true))
         actualDeps.add(OCDependency("dev.deftu:omnicore-${version.toMCVer()}-$loader:${libs.findVersion("omnicore").get().displayName}", true))
     }
     return actualDeps

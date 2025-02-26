@@ -76,7 +76,7 @@ public class PolyUIScreen extends OmniScreen implements BlurScreen {
     }
 
     @Override
-    public void initScreen(int width, int height) {
+    public void handleInitialize(int width, int height) {
         adjustResolution(Platform.screen().windowWidth(), Platform.screen().windowHeight(), false);
     }
 
@@ -125,7 +125,7 @@ public class PolyUIScreen extends OmniScreen implements BlurScreen {
 
     @Override
     @MustBeInvokedByOverriders
-    public final void onResize(Minecraft client, int width, int height) {
+    public final void handleResize(int width, int height) {
         float w = (float) Platform.screen().windowWidth();
         float h = (float) Platform.screen().windowHeight();
         adjustResolution(w, h, false);

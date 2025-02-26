@@ -36,6 +36,7 @@ import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.brigadier.suggestion.Suggestions;
 import com.mojang.brigadier.suggestion.SuggestionsBuilder;
 import com.mojang.brigadier.tree.CommandNode;
+import dev.deftu.omnicore.client.OmniChat;
 import net.minecraft.client.multiplayer.ClientSuggestionProvider;
 import net.minecraft.commands.arguments.EntityArgument;
 import net.minecraft.commands.arguments.GameProfileArgument;
@@ -54,7 +55,6 @@ import org.polyfrost.oneconfig.api.commands.v1.Node;
 import org.polyfrost.oneconfig.api.commands.v1.arguments.ArgumentParser;
 import org.polyfrost.oneconfig.api.commands.v1.factories.PlatformCommandFactory;
 import org.polyfrost.oneconfig.api.event.v1.invoke.EventHandler;
-import org.polyfrost.universal.UChat;
 
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
@@ -246,7 +246,7 @@ public class PlatformCommandFactoryImpl implements PlatformCommandFactory {
         LiteralArgumentBuilder<ClientSuggestionProvider> help = literal("help");
         help.executes(context -> {
             for (String s : command.getHelp()) {
-                UChat.chat(s);
+                OmniChat.showChatMessage(s);
             }
             return 0;
         });

@@ -59,6 +59,7 @@ public class PlatformCommandFactoryImpl implements PlatformCommandFactory {
 
     @Override
     public boolean createCommand(CommandTree tree) {
+        //#if FORGE
         ClientCommandHandler.instance.registerCommand(new CommandBase() {
             @Override
             public String getCommandName() {
@@ -132,6 +133,7 @@ public class PlatformCommandFactoryImpl implements PlatformCommandFactory {
                 return tree.autocomplete(args);
             }
         });
+        //#endif
         return true;
     }
 }

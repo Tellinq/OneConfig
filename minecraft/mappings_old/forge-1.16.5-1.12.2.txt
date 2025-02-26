@@ -33,19 +33,11 @@ net.minecraft.client.multiplayer.ClientLevel net.minecraft.client.multiplayer.Wo
 net.minecraft.client.sounds.SoundManager net.minecraft.client.audio.SoundManager
 net.minecraft.client.sounds.SoundManager play() playSound()
 
-net.minecraft.network.chat.Component net.minecraft.util.text.ITextComponent
-net.minecraft.network.chat.Component getContents() getUnformattedText()
-
 net.minecraft.client.renderer.GameRenderer net.minecraft.client.renderer.EntityRenderer
 net.minecraft.client.renderer.GameRenderer loadEffect() loadShader()
 net.minecraft.client.renderer.GameRenderer currentEffect() getShaderGroup()
 net.minecraft.client.renderer.GameRenderer render() renderWorldPass()
 
-net.minecraft.client.renderer.EffectInstance net.minecraft.client.shader.ShaderManager
-net.minecraft.client.renderer.EffectInstance getUniform() getShaderUniform()
-
-net.minecraft.client.renderer.PostPass net.minecraft.client.shader.Shader
-net.minecraft.client.renderer.PostPass getEffect() getShaderManager()
 
 net.minecraft.client.gui.components.Button net.minecraft.client.gui.GuiButton
 net.minecraft.client.gui.components.Button playDownSound() playPressSound()

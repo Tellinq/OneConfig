@@ -26,6 +26,7 @@
 
 package org.polyfrost.oneconfig.api.hypixel.v1.internal;
 
+import dev.deftu.omnicore.common.OmniLoader;
 import io.netty.buffer.Unpooled;
 import net.hypixel.modapi.HypixelModAPI;
 import net.hypixel.modapi.serializer.PacketSerializer;
@@ -61,7 +62,7 @@ public final class HypixelApiInternalsImpl implements HypixelApiInternals {
         HypixelModAPI.getInstance().setPacketSender((packet) -> {
             NetHandlerPlayClient net = Minecraft.getMinecraft().getNetHandler();
             if (net == null) {
-                if (Platform.loader().isDevelopment()) LOGGER.warn("dropping packet {} because no net handler is available, retrying in 1s", packet);
+                if (OmniLoader.isDevelopment()) LOGGER.warn("dropping packet {} because no net handler is available, retrying in 1s", packet);
                 EventDelay.tick(20, () -> HypixelModAPI.getInstance().sendPacket(packet));
                 return false;
             }

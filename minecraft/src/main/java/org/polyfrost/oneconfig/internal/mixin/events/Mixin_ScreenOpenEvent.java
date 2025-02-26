@@ -4,7 +4,13 @@ package org.polyfrost.oneconfig.internal.mixin.events;
 //#if MC >= 1.20.4
 //$$ import net.minecraft.client.gui.screens.Screen;
 //#else
+//#if MC >= 1.19.2
+//$$ import net.minecraftforge.client.event.ScreenEvent;
+//#elseif MC >= 1.18.2
+//$$ import net.minecraftforge.client.event.ScreenOpenEvent;
+//#else
 import net.minecraftforge.client.event.GuiOpenEvent;
+//#endif
 import net.minecraftforge.fml.common.eventhandler.Event;
 //#endif
 //#else
@@ -49,15 +55,26 @@ public class Mixin_ScreenOpenEvent {
     //$$ }
     //#else
     private Event screenOpenCallback(Event a) {
+        //#if MC >= 1.19.2
+        //$$ if (a instanceof ScreenEvent.Opening) {
+        //$$     ScreenEvent.Opening forgeEvent = (ScreenEvent.Opening) a;
+        //#elseif MC >= 1.18.2
+        //$$ if (a instanceof ScreenOpenEvent) {
+        //$$     ScreenOpenEvent forgeEvent = (ScreenOpenEvent) a;
+        //#else
         if (a instanceof GuiOpenEvent) {
-            // w: not imported because 1.18+ they renamed it to be the same (breh)
             GuiOpenEvent forgeEvent = (GuiOpenEvent) a;
+        //#endif
+
+            // w: not imported because 1.18+ they renamed it to be the same (breh)
             org.polyfrost.oneconfig.api.event.v1.events.ScreenOpenEvent event =
                     new org.polyfrost.oneconfig.api.event.v1.events.ScreenOpenEvent(forgeEvent.
-                            //#if MC<=10809
-                            gui
-                            //#else
+                            //#if MC >= 1.18.2
+                            //$$ getScreen()
+                            //#elseif MC >= 1.12.2
                             //$$ getGui()
+                            //#else
+                            gui
                             //#endif
                     );
             EventManager.INSTANCE.post(event);
