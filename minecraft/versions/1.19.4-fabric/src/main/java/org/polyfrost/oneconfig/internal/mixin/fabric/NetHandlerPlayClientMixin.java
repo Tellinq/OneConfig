@@ -75,7 +75,7 @@ public class NetHandlerPlayClientMixin {
 
     @Inject(method = "onChatMessage", at = @At("HEAD"), cancellable = true)
     private void chatRecieveCallback(ChatMessageS2CPacket packet, CallbackInfo ci) {
-        ChatReceiveEvent ev = new ChatReceiveEvent(packet.unsignedContent());
+        ChatReceiveEvent ev = new ChatReceiveEvent(packet.comp_1103());
         EventManager.INSTANCE.post(ev);
         if (ev.cancelled) {
             ci.cancel();

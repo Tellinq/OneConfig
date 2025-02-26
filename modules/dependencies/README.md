@@ -33,7 +33,7 @@ of handling dependencies, with varying levels of complexity:
 - **On NeoForge / modern Forge with JiJ:** We can use the same system as
   Fabric.
 
-In addition, the `UniversalCraft` library is per-MC version, adding a new
+In addition, the `OmniCore` library is per-MC version, adding a new
 level of complexity, and we require the `PolyMixin` library for
 1.12.2 and below.
 

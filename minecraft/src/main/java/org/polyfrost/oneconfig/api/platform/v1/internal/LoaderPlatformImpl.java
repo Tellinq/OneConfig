@@ -27,30 +27,22 @@
 package org.polyfrost.oneconfig.api.platform.v1.internal;
 
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import org.polyfrost.oneconfig.api.platform.v1.LoaderPlatform;
 
 import java.nio.file.Path;
-import java.util.Collections;
-import java.util.List;
-import java.util.Objects;
-import java.util.stream.Collectors;
+
 //#if FABRIC
-//$$ import net.fabricmc.loader.api.FabricLoader;
-//$$ import net.fabricmc.loader.api.ModContainer;
 //$$ import net.fabricmc.loader.impl.launch.FabricLauncherBase;
 //#else
-import net.minecraftforge.fml.common.Loader;
-import net.minecraftforge.fml.common.ModContainer;
-//#if MC>11202
-//$$ import net.minecraftforge.fml.ModList;
-//$$ import net.minecraftforge.fml.ModLoadingContext;
+//#if MC >= 1.15.2
+//$$ // TODO
 //#else
 import net.minecraft.launchwrapper.Launch;
 //#endif
 //#endif
 
 public class LoaderPlatformImpl implements LoaderPlatform {
+
     @Override
     public void addToClasspath(@NotNull Path path) {
         //#if FORGE
@@ -76,106 +68,4 @@ public class LoaderPlatformImpl implements LoaderPlatform {
         //#endif
     }
 
-    @Override
-    public boolean isModLoaded(String id) {
-        //#if FABRIC
-        //$$ return FabricLoader.getInstance().isModLoaded(id);
-        //#elseif MC>=11600
-        //$$ return ModList.get().isLoaded(id);
-        //#else
-        return Loader.isModLoaded(id);
-        //#endif
-    }
-
-    @Override
-    public int getMinecraftVersion() {
-        //#if MC==12004
-        //$$ return 12004;
-        //#elseif MC==11904
-        //$$ return 11904;
-        //#elseif MC==11801
-        //$$ return 11801;
-        //#elseif MC==11701
-        //$$ return 11701;
-        //#elseif MC==11605
-        //$$ return 11605;
-        //#elseif MC==11202
-        //$$ return 11202;
-        //#else
-        return 10809;
-        //#endif
-    }
-
-    //#if FORGE && MC<11300
-    private static final boolean isDev;
-
-    static {
-        boolean dev;
-        try {
-            Class.forName("net.minecraft.block.BlockDirt", false, LoaderPlatformImpl.class.getClassLoader());
-            dev = true;
-        } catch (Exception ignored) {
-            dev = false;
-        }
-        isDev = dev;
-    }
-    //#endif
-
-    @Override
-    public boolean isDevelopment() {
-        //#if FORGE && MC<11300
-        return isDev;
-        //#elseif FABRIC
-        //$$ return net.fabricmc.loader.api.FabricLoader.getInstance().isDevelopmentEnvironment();
-        //#else
-        //$$ return !net.minecraftforge.fml.loading.FMLLoader.isProduction();
-        //#endif
-    }
-
-    @Override
-    public Loaders getLoader() {
-        //#if FORGE
-        return Loaders.FORGE;
-        //#else
-        //$$ return Loaders.FABRIC;
-        //#endif
-    }
-
-    @Override
-    public @NotNull List<ActiveMod> getLoadedMods() {
-        try {
-            return
-                    //#if FORGE
-                    //#if MC<=11202
-                    Loader.instance().getActiveModList().stream().map
-                            //#else
-                            //$$ ModList.get().applyForEachModContainer
-                            //#endif
-                            //#else
-                            //$$ FabricLoader.getInstance().getAllMods().stream().map
-                            //#endif
-                                    (this::toActiveMod).filter(Objects::nonNull).collect(Collectors.toList());
-        } catch (Exception e) {
-            return Collections.emptyList();
-        }
-    }
-
-    @Override
-    public ActiveMod toActiveMod(@Nullable Object in) {
-        try {
-            ModContainer container = (ModContainer) in;
-            if (container == null) return null;
-            //#if FORGE
-            //#if MC==11202
-            return new ActiveMod(container.getName(), container.getModId(), container.getVersion(), container.getSource().toPath());
-            //#else
-            //$$ return new ActiveMod(container.getModInfo().getDisplayName(), container.getModId(), container.getModInfo().getVersion().getQualifier(), ModList.get().getModFileById(container.getModId()).getFile().getFilePath());
-            //#endif
-            //#else
-            //$$ return new ActiveMod(container.getMetadata().getName(), container.getMetadata().getId(), container.getMetadata().getVersion().getFriendlyString(), container.getRootPaths().get(0));
-            //#endif
-        } catch (Exception e) {
-            return null;
-        }
-    }
 }

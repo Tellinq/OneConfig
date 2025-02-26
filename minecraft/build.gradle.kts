@@ -2,7 +2,8 @@
 // Shared build logic for all versions of OneConfig.
 
 import dev.deftu.gradle.utils.GameSide
-import dev.deftu.gradle.utils.MinecraftVersion
+import dev.deftu.gradle.utils.version.MinecraftReleaseVersion
+import dev.deftu.gradle.utils.version.MinecraftVersions
 import dev.deftu.gradle.utils.includeOrShade
 import org.polyfrost.gradle.provideIncludedDependencies
 import java.text.SimpleDateFormat
@@ -72,7 +73,8 @@ dependencies {
         isTransitive = false
     }
 
-    provideIncludedDependencies(Triple(mcData.version.major, mcData.version.minor, mcData.version.patch), mcData.loader.friendlyString).forEach {
+    val mcVersion = mcData.version as MinecraftReleaseVersion
+    provideIncludedDependencies(Triple(mcVersion.major, mcVersion.minor, mcVersion.patch), mcData.loader.friendlyString).forEach {
         if (it.dep is String) {
             shade(it.dep as String, it.mod)
         } else {
@@ -82,7 +84,7 @@ dependencies {
 
     annotationProcessor(libs.mixin.extras)
 
-    for (dep in listOf("-nanovg").run { if (mcData.version < MinecraftVersion.VERSION_1_13) this else this + listOf("-tinyfd", "-stb", "") }) {
+    for (dep in listOf("-nanovg").run { if (mcData.version < MinecraftVersions.VERSION_1_13) this else this + listOf("-tinyfd", "-stb", "") }) {
         val lwjglDep = "org.lwjgl:lwjgl$dep:${libs.versions.lwjgl.get()}"
         compileOnlyApi(lwjglDep) {
             isTransitive = false

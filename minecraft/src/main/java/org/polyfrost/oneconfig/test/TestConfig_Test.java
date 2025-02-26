@@ -26,6 +26,7 @@
 
 package org.polyfrost.oneconfig.test;
 
+import dev.deftu.omnicore.client.OmniChat;
 import kotlin.Unit;
 import org.polyfrost.oneconfig.api.config.v1.Config;
 import org.polyfrost.oneconfig.api.config.v1.annotations.Number;
@@ -37,7 +38,6 @@ import org.polyfrost.polyui.color.PolyColor;
 import org.polyfrost.polyui.input.KeyBinder;
 import org.polyfrost.polyui.input.KeyModifiers;
 import org.polyfrost.polyui.unit.Align;
-import org.polyfrost.universal.UChat;
 
 @SuppressWarnings("unused")
 public class TestConfig_Test extends Config {
@@ -106,7 +106,7 @@ public class TestConfig_Test extends Config {
 
     @Button(title = "Test")
     private static void main() {
-        UChat.chat("button pressed");
+        OmniChat.showChatMessage("button pressed");
     }
 
     @Accordion(title = "an accordion", description = "AAAAAAAAAAAAAAAAAAAAAAAAAAH", index = 4)

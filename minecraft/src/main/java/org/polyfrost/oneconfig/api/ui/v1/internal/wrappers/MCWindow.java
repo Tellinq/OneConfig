@@ -27,6 +27,7 @@
 package org.polyfrost.oneconfig.api.ui.v1.internal.wrappers;
 
 import dev.deftu.clipboard.Clipboard;
+import dev.deftu.omnicore.client.OmniGameOptions;
 import net.minecraft.client.Minecraft;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
@@ -36,13 +37,13 @@ import org.polyfrost.polyui.PolyUI;
 import org.polyfrost.polyui.renderer.Window;
 import org.polyfrost.polyui.data.Cursor;
 
-//#if MC>=11300
+//#if MC >= 1.13
 //$$ import static org.lwjgl.glfw.GLFW.*;
 //#endif
 
 @ApiStatus.Internal
 public class MCWindow extends Window {
-    //#if MC>=11300
+    //#if MC >= 1.13
     //$$ private final long handle;
     //#endif
 
@@ -104,7 +105,6 @@ public class MCWindow extends Window {
     @NotNull
     @Override
     public String getKeyName(int i) {
-        String k = Platform.i18n().getKeyName(i, 0);
-        return k == null ? "Unknown" : k;
+        return OmniGameOptions.OmniKeyBindingSettings.getDisplayName(i, 0);
     }
 }

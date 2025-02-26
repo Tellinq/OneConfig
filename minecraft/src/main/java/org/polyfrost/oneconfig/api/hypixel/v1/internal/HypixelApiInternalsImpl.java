@@ -93,10 +93,14 @@ public final class HypixelApiInternalsImpl implements HypixelApiInternals {
             }
 
             S3FPacketCustomPayload packet = ev.getPacket();
-            //#if MC >= 1.20.4
+            //#if MC >= 1.20.6
+            //$$ String identifier = packet.comp_1646().getId().comp_2242().toString();
+            //#elseif MC >= 1.20.4
+            //#if FORGE
             //$$ String identifier = packet.payload().id().toString();
-            //#elseif MC > 1.20
-            //$$ String identifier = packet.getChannel().toString();
+            //#else
+            //$$ String identifier = packet.comp_1646().comp_1678().toString();
+            //#endif
             //#else
             //noinspection StringOperationCanBeSimplified
             String identifier = packet.getChannelName().toString();
@@ -108,7 +112,7 @@ public final class HypixelApiInternalsImpl implements HypixelApiInternals {
             try {
                 PacketSerializer s = new PacketSerializer(
                         //#if MC >= 1.20.4 && FABRIC
-                        //$$ ((Payload) packet.payload()).data()
+                        //$$ ((Payload) packet.comp_1646()).data()
                         //#else
                         packet.getBufferData()
                         //#endif
@@ -142,9 +146,15 @@ public final class HypixelApiInternalsImpl implements HypixelApiInternals {
     //$$         }
     //$$     }
     //$$
-    //$$     public net.minecraft.util.Identifier id() {
+    //#if MC >= 1.20.6
+    //$$     public Id<Payload> getId() {
+    //$$         return new Id<>(this.id);
+    //$$     }
+    //#else
+    //$$     public net.minecraft.util.Identifier comp_1678() {
     //$$         return this.id;
     //$$     }
+    //#endif
     //$$
     //$$     public io.netty.buffer.ByteBuf data() {
     //$$         return this.data;

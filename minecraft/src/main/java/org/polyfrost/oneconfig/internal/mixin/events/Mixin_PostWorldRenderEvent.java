@@ -1,9 +1,9 @@
 package org.polyfrost.oneconfig.internal.mixin.events;
 
+import dev.deftu.omnicore.client.render.OmniMatrixStack;
 import net.minecraft.client.renderer.EntityRenderer;
 import org.polyfrost.oneconfig.api.event.v1.EventManager;
 import org.polyfrost.oneconfig.api.event.v1.events.PostWorldRenderEvent;
-import org.polyfrost.universal.UMatrixStack;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -83,11 +83,11 @@ public class Mixin_PostWorldRenderEvent {
             //#endif
             CallbackInfo ci
     ) {
-        UMatrixStack stack =
+        OmniMatrixStack stack =
                 //#if MC >= 1.16.5
-                //$$ new UMatrixStack(matrixStack);
+                //$$ new OmniMatrixStack(matrixStack);
                 //#else
-                new UMatrixStack();
+                new OmniMatrixStack();
                 //#endif
         EventManager.INSTANCE.post(new PostWorldRenderEvent(stack, partialTicks));
     }

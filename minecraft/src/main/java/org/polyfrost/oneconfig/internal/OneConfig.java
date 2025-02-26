@@ -27,6 +27,8 @@
 package org.polyfrost.oneconfig.internal;
 
 import dev.deftu.clipboard.Clipboard;
+import dev.deftu.omnicore.client.OmniChat;
+import dev.deftu.omnicore.common.OmniLoader;
 import kotlin.Unit;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -49,7 +51,6 @@ import org.polyfrost.polyui.PolyUI;
 import org.polyfrost.polyui.component.Drawable;
 import org.polyfrost.polyui.input.KeyModifiers;
 import org.polyfrost.polyui.input.Translator;
-import org.polyfrost.universal.UChat;
 
 import static org.polyfrost.oneconfig.api.commands.v1.factories.builder.CommandBuilder.runs;
 
@@ -99,8 +100,8 @@ public class OneConfig
         //$$ } catch (Throwable ignored) {
         //$$ }
         //#endif
-        LoaderPlatform.ActiveMod self = Platform.loader().getLoadedMod("oneconfig");
-        String v = self == null ? "LOCAL" : self.version;
+        OmniLoader.ModInfo self = OmniLoader.getModInfo("oneconfig");
+        String v = self == null ? "LOCAL" : self.getVersion();
         LOGGER.info("Loading OneConfig v{}", v);
         BlurHandler.init();
 
@@ -117,26 +118,26 @@ public class OneConfig
     private static void registerCommands() {
         CommandBuilder b = CommandBuilder.command("oneconfig", "ocfg", "twoconfig").description("OneConfig main command");
         b.then(runs().does((Runnable) OneConfigUI.INSTANCE::open).description("Opens the OneConfig UI"));
-        b.then(runs("updateCheck").does(() -> Multithreading.submit(() -> UChat.chat(MavenUpdateChecker.oneconfig().hasUpdate() ? "Update available!" : "No updates available"))).description("Check for updates"));
-        b.then(runs("locraw").does(() -> UChat.chat(HypixelUtils.getLocation()))).description("Get your current location on Hypixel");
+        b.then(runs("updateCheck").does(() -> Multithreading.submit(() -> OmniChat.showChatMessage(MavenUpdateChecker.oneconfig().hasUpdate() ? "Update available!" : "No updates available"))).description("Check for updates"));
+        b.then(runs("locraw").does(() -> OmniChat.showChatMessage(HypixelUtils.getLocation().toString()))).description("Get your current location on Hypixel");
         b.then(runs("hud").does(() -> Platform.screen().display(HudManager.INSTANCE.getWithEditor())).description("Opens the OneConfig HUD editor"));
         b.then(runs("delete").does(() -> {
             OneConfigUI.INSTANCE.invalidateCache();
             ConfigVisualizer.INSTANCE.clearCache();
-            UChat.chat("Deleted OneConfig UI. Please make a report if you were having issues!");
+            OmniChat.showChatMessage("Deleted OneConfig UI. Please make a report if you were having issues!");
         })).description("Invalidate the OneConfig UI, forcing a reload. Use this if it is bugged and make sure to report an issue!");
         CommandManager.registerCommand(b.build());
     }
 
     private static void registerKeybinds() {
         OCKeybindHelper builder = OCKeybindHelper.builder();
-        if (Platform.loader().isDevelopment()) builder.inScreens();
+        if (OmniLoader.isDevelopment()) builder.inScreens();
         builder.mods(KeyModifiers.RSHIFT).does((s) -> {
             if (s) {
                 try {
                     OneConfigUI.INSTANCE.open();
                 } catch (Throwable t) {
-                    UChat.chat("&cFailed to open OneConfig UI: " + t.getMessage() + ". Please report this!");
+                    OmniChat.showChatMessage("&cFailed to open OneConfig UI: " + t.getMessage() + ". Please report this!");
                     // propagate for proper error handling
                     throw t;
                 }

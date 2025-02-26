@@ -26,31 +26,11 @@
 
 package org.polyfrost.oneconfig.api.platform.v1.internal;
 
-import net.minecraft.client.resources.I18n;
 import net.minecraft.util.EnumChatFormatting;
 import net.minecraft.util.IChatComponent;
 import org.polyfrost.oneconfig.api.platform.v1.I18nPlatform;
 
 public class I18nPlatformImpl implements I18nPlatform {
-
-    @Override
-    public String format(String key, Object... args) {
-        return I18n.format(key, args);
-    }
-
-    @Override
-    public String getKeyName(int key, int scanCode) {
-        //@formatter:off
-        String s =
-            //#if MC>=11600
-            //$$ com.mojang.blaze3d.platform.InputConstants.getKey(key, scanCode).toString();
-            //#else
-            net.minecraft.client.settings.GameSettings.getKeyDisplayString(key);
-            //#endif
-        //@formatter:on
-        if (s == null) return "Unknown";
-        else return s.length() == 1 ? s.toUpperCase() : s;
-    }
 
     @Override
     public String getUnformattedText(Object component) {
@@ -61,4 +41,5 @@ public class I18nPlatformImpl implements I18nPlatform {
         } else s = component.toString();
         return EnumChatFormatting.getTextWithoutFormattingCodes(s);
     }
+
 }

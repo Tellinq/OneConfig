@@ -76,7 +76,6 @@ fun Project.provideIncludedDependencies(version: Triple<Int, Int, Int>?, loader:
         actualDeps.add(OCDependency(dep))
     }
     if (version != null) {
-        actualDeps.add(OCDependency("org.polyfrost:universalcraft-${version.toMCVer()}-$loader:${libs.findVersion("universalcraft").get().displayName}", true))
         actualDeps.add(OCDependency("dev.deftu:omnicore-${version.toMCVer()}-$loader:${libs.findVersion("omnicore").get().displayName}", true))
     }
     return actualDeps

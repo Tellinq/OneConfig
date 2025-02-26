@@ -26,6 +26,7 @@
 
 package org.polyfrost.oneconfig.api.commands.v1.internal;
 
+import dev.deftu.omnicore.client.OmniChat;
 import net.minecraft.command.CommandBase;
 import net.minecraft.util.BlockPos;
 import org.apache.logging.log4j.LogManager;
@@ -36,7 +37,6 @@ import org.polyfrost.oneconfig.api.commands.v1.CommandTree;
 import org.polyfrost.oneconfig.api.commands.v1.arguments.PlayerArgumentParser;
 import org.polyfrost.oneconfig.api.commands.v1.exceptions.CommandExecutionException;
 import org.polyfrost.oneconfig.api.commands.v1.factories.PlatformCommandFactory;
-import org.polyfrost.universal.UChat;
 
 import java.util.Arrays;
 import java.util.List;
@@ -54,7 +54,7 @@ public class PlatformCommandFactoryImpl implements PlatformCommandFactory {
     }
 
     private static void chat(String s) {
-        UChat.chat(s);
+        OmniChat.showChatMessage(s);
     }
 
     @Override

@@ -26,12 +26,14 @@
 
 package org.polyfrost.oneconfig.api.ui.v1.internal.wrappers;
 
+import dev.deftu.omnicore.client.OmniKeyboard;
+import dev.deftu.omnicore.client.OmniScreen;
+import dev.deftu.omnicore.client.render.OmniMatrixStack;
 import net.minecraft.client.Minecraft;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.MustBeInvokedByOverriders;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import org.polyfrost.oneconfig.api.platform.v1.Platform;
 import org.polyfrost.oneconfig.api.ui.v1.Notifications;
 import org.polyfrost.oneconfig.api.ui.v1.UIManager;
@@ -39,9 +41,6 @@ import org.polyfrost.oneconfig.api.ui.v1.screen.BlurScreen;
 import org.polyfrost.polyui.PolyUI;
 import org.polyfrost.polyui.component.Drawable;
 import org.polyfrost.polyui.data.Cursor;
-import org.polyfrost.universal.UKeyboard;
-import org.polyfrost.universal.UMatrixStack;
-import org.polyfrost.universal.UScreen;
 
 import java.util.function.Consumer;
 
@@ -49,7 +48,8 @@ import static org.lwjgl.opengl.GL11.glViewport;
 import static org.polyfrost.oneconfig.api.ui.v1.keybind.KeybindManager.translateKey;
 
 @SuppressWarnings("unused")
-public class PolyUIScreen extends UScreen implements BlurScreen {
+public class PolyUIScreen extends OmniScreen implements BlurScreen {
+
     private static final Logger LOGGER = LogManager.getLogger("OneConfig/PolyUIScreen");
 
     @NotNull
@@ -92,7 +92,7 @@ public class PolyUIScreen extends UScreen implements BlurScreen {
     }
 
     @Override
-    public void onDrawScreen(@NotNull UMatrixStack matrices, int mouseX, int mouseY, float delta) {
+    public void handleRender(@NotNull OmniMatrixStack matrices, int mouseX, int mouseY, float delta) {
         //#if MC < 1.13
         if (mouseX != mx || mouseY != my) {
             mx = mouseX;
@@ -129,66 +129,60 @@ public class PolyUIScreen extends UScreen implements BlurScreen {
 
     @Override
     @MustBeInvokedByOverriders
-    public boolean uKeyPressed(int keyCode, int scanCode, @Nullable UKeyboard.Modifiers modifiers) {
-        if (keyCode == UKeyboard.KEY_ESCAPE && shouldCloseOnEsc()) {
+    public boolean handleKeyPress(int keyCode, int scancode, char typedChar, OmniKeyboard.@NotNull KeyboardModifiers modifiers, OmniScreen.@NotNull KeyPressTrigger trigger) {
+        if (keyCode == OmniKeyboard.KEY_ESCAPE && shouldCloseOnEsc()) {
             Platform.screen().close();
             return true;
         }
+
         try {
-            translateKey(polyUI.getInputManager(), keyCode, (char) 0, true);
+            translateKey(polyUI.getInputManager(), keyCode, typedChar, true);
         } catch (Exception e) {
             death(e);
         }
+
         return true;
     }
 
     @Override
     @MustBeInvokedByOverriders
-    public boolean uKeyReleased(int keyCode, int scanCode, @Nullable UKeyboard.Modifiers modifiers) {
+    public boolean handleKeyRelease(int keyCode, int scancode, char typedChar, OmniKeyboard.KeyboardModifiers modifiers) {
         try {
-            translateKey(polyUI.getInputManager(), keyCode, (char) 0, false);
+            translateKey(polyUI.getInputManager(), keyCode, typedChar, false);
         } catch (Exception e) {
             death(e);
         }
+
         return true;
     }
 
     @Override
     @MustBeInvokedByOverriders
-    public boolean uCharTyped(char c, @Nullable UKeyboard.Modifiers modifiers) {
-        try {
-            translateKey(polyUI.getInputManager(), 0, c, true);
-        } catch (Exception e) {
-            death(e);
-        }
-        return true;
-    }
-
-    @Override
-    @MustBeInvokedByOverriders
-    public boolean uMouseClicked(double mouseX, double mouseY, int mouseButton) {
+    public boolean handleMouseClick(double mouseX, double mouseY, int mouseButton) {
         try {
             polyUI.getInputManager().mousePressed(mouseButton);
         } catch (Exception e) {
             death(e);
         }
+
         return true;
     }
 
     @Override
     @MustBeInvokedByOverriders
-    public boolean uMouseReleased(double mouseX, double mouseY, int mouseButton) {
+    public boolean handleMouseReleased(double mouseX, double mouseY, int mouseButton) {
         try {
             polyUI.getInputManager().mouseReleased(mouseButton);
         } catch (Exception e) {
             death(e);
         }
+
         return true;
     }
 
     @Override
     @MustBeInvokedByOverriders
-    public boolean uMouseScrolled(double delta) {
+    public boolean handleMouseScrolled(double delta) {
         try {
             float v = (float)
                     //#if MC < 1.13
@@ -200,6 +194,7 @@ public class PolyUIScreen extends UScreen implements BlurScreen {
         } catch (Exception e) {
             death(e);
         }
+
         return true;
     }
 
@@ -210,10 +205,8 @@ public class PolyUIScreen extends UScreen implements BlurScreen {
         return true;
     }
 
-    //#if MC < 1.13
     @Override
-    //#endif
-    public boolean doesGuiPauseGame() {
+    public boolean doesPauseGame() {
         return pauses;
     }
 
@@ -250,7 +243,7 @@ public class PolyUIScreen extends UScreen implements BlurScreen {
 
     @Override
     @MustBeInvokedByOverriders
-    public void onScreenClose() {
+    public void handleClose() {
         polyUI.getInputManager().unfocus();
         if (close != null) close.accept(polyUI);
         // noinspection DataFlowIssue
@@ -262,4 +255,5 @@ public class PolyUIScreen extends UScreen implements BlurScreen {
         LOGGER.error("Unexpected error", e);
         Notifications.enqueue(Notifications.Type.Error, "An unexpected error occurred with this screen.\nPlease report this to the developer!");
     }
+
 }

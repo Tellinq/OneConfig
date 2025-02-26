@@ -26,6 +26,8 @@
 
 package org.polyfrost.oneconfig.api.platform.v1;
 
+import dev.deftu.omnicore.OmniCore;
+import dev.deftu.omnicore.common.OmniLoader;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -33,37 +35,15 @@ import java.nio.file.Path;
 import java.util.List;
 
 public interface LoaderPlatform {
+
     void addToClasspath(@NotNull Path path);
-
-    boolean isModLoaded(String id);
-
-    @Nullable
-    ActiveMod toActiveMod(@Nullable Object in);
-
-    @NotNull
-    List<ActiveMod> getLoadedMods();
-
-    @Nullable
-    default ActiveMod getLoadedMod(String id) {
-        for (ActiveMod mod : getLoadedMods()) {
-            if (mod == null) continue;
-            if (id.equals(mod.id)) return mod;
-        }
-        return null;
-    }
-
-    /**
-     * return the minecraft version of the current instance, as per the preprocessor standard.
-     * for example, if the minecraft version is 1.16.5, this will return 11605.
-     */
-    int getMinecraftVersion();
 
     /**
      * return a string representing the loader and the minecraft version of the current instance, as per the preprocessor standard.
      * for example, if the loader is Forge and the minecraft version is 1.16.5, this will return "1.16.5-forge".
      */
     default String getLoaderString() {
-        char[] ver = String.valueOf(getMinecraftVersion()).toCharArray();
+        char[] ver = OmniCore.getMinecraftVersion().toCharArray();
         StringBuilder sb = new StringBuilder();
         sb.append(ver[0]).append('.');
         if(ver[1] == '0') {
@@ -77,33 +57,8 @@ public interface LoaderPlatform {
         } else {
             sb.append(ver[3]).append(ver[4]);
         }
-        sb.append('-').append(getLoader().name().toLowerCase());
+        sb.append('-').append(OmniLoader.getLoaderType().name().toLowerCase());
         return sb.toString();
     }
 
-    /**
-     * @return true if the current instance is in development mode.
-     */
-    boolean isDevelopment();
-
-    Loaders getLoader();
-
-    enum Loaders {
-        FORGE,
-        FABRIC
-    }
-
-    class ActiveMod {
-        public final String name;
-        public final String id;
-        public final String version;
-        public final Path source;
-
-        public ActiveMod(String name, String id, String version, Path source) {
-            this.name = name;
-            this.id = id;
-            this.version = version;
-            this.source = source;
-        }
-    }
 }

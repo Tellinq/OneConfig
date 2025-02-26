@@ -29,6 +29,5 @@ dependencies {
     compileOnly(libs.bundles.lwjgl)
     testImplementation(libs.lwjgl.tinyfd)
     api(project(":modules:events"))
-    compileOnly("org.polyfrost:universalcraft-1.8.9-forge:${libs.versions.universalcraft.get()}")
     compileOnly("dev.deftu:omnicore-1.8.9-forge:${libs.versions.omnicore.get()}")
 }

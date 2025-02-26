@@ -8,65 +8,21 @@ package org.polyfrost.oneconfig.internal.mixin.events;
 import net.minecraft.client.renderer.entity.RendererLivingEntity;
 //#endif
 
-//#if MC >= 1.12.2
-//#if FORGE && MC <= 1.12.2
-//$$ import net.minecraft.entity.EntityLiving;
-//#else
-//#if FORGE
-//$$ import net.minecraft.world.entity.LivingEntity;
-//#else
-//$$ import net.minecraft.entity.LivingEntity;
-//#endif
-//#endif
-//#else
+import dev.deftu.omnicore.client.OmniClient;
 import net.minecraft.entity.EntityLivingBase;
-//#endif
-
 import net.minecraft.profiler.Profiler;
 import org.polyfrost.oneconfig.api.event.v1.EventManager;
 import org.polyfrost.oneconfig.api.event.v1.events.RenderLivingEntityEvent;
-import org.polyfrost.universal.UMinecraft;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-//#if MC >= 1.16.5
-//$$ @Mixin(LivingEntityRenderer.class)
-//#else
 @Mixin(RendererLivingEntity.class)
-//#endif
-public class Mixin_RenderLivingEntityEvent<
-        T extends
-                //#if MC >= 1.12.2
-                //#if FORGE && MC <= 1.12.2
-                //$$ EntityLiving
-                //#else
-                //$$ LivingEntity
-                //#endif
-                //#else
-                EntityLivingBase
-                //#endif
-> {
+public class Mixin_RenderLivingEntityEvent<T extends EntityLivingBase> {
 
     @Inject(
-            //#if MC >= 1.17.1
-            //#if FABRIC
-            //$$ method = "render(Lnet/minecraft/entity/LivingEntity;FFLnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/render/VertexConsumerProvider;I)V",
-            //#else
-            //$$ method = "render(Lnet/minecraft/world/entity/LivingEntity;FFLcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/MultiBufferSource;I)V",
-            //#endif
-            //#elseif MC >= 1.16.5
-            //$$ method = "render(Lnet/minecraft/world/entity/LivingEntity;FFLcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/MultiBufferSource;I)V",
-            //#elseif MC >= 1.12.2
-            //#if FORGE
-            //$$ method = "doRender(Lnet/minecraft/entity/EntityLiving;DDDFF)V",
-            //#else
-            //$$ method = "render(Lnet/minecraft/entity/LivingEntity;DDDFF)V",
-            //#endif
-            //#else
             method = "doRender(Lnet/minecraft/entity/EntityLivingBase;DDDFF)V",
-            //#endif
             at = @At("HEAD"),
             cancellable = true
     )
@@ -86,7 +42,7 @@ public class Mixin_RenderLivingEntityEvent<
             //#endif
             CallbackInfo ci
     ) {
-        Profiler profiler = UMinecraft.getMinecraft()
+        Profiler profiler = OmniClient.getInstance()
                 //#if MC >= 1.16.5
                 //$$ .getProfiler();
                 //#else
@@ -109,23 +65,7 @@ public class Mixin_RenderLivingEntityEvent<
     }
 
     @Inject(
-            //#if MC >= 1.17.1
-            //#if FABRIC
-            //$$ method = "render(Lnet/minecraft/entity/LivingEntity;FFLnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/render/VertexConsumerProvider;I)V",
-            //#else
-            //$$ method = "render(Lnet/minecraft/world/entity/LivingEntity;FFLcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/MultiBufferSource;I)V",
-            //#endif
-            //#elseif MC >= 1.16.5
-            //$$ method = "render(Lnet/minecraft/world/entity/LivingEntity;FFLcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/MultiBufferSource;I)V",
-            //#elseif MC >= 1.12.2
-            //#if FORGE
-            //$$ method = "doRender(Lnet/minecraft/entity/EntityLiving;DDDFF)V",
-            //#else
-            //$$ method = "render(Lnet/minecraft/entity/LivingEntity;DDDFF)V",
-            //#endif
-            //#else
             method = "doRender(Lnet/minecraft/entity/EntityLivingBase;DDDFF)V",
-            //#endif
             at = @At("TAIL")
     )
     private void onPostEntityRenderCallback(
@@ -144,7 +84,7 @@ public class Mixin_RenderLivingEntityEvent<
             //#endif
             CallbackInfo ci
     ) {
-        Profiler profiler = UMinecraft.getMinecraft()
+        Profiler profiler = OmniClient.getInstance()
                 //#if MC >= 1.16.5
                 //$$ .getProfiler();
                 //#else

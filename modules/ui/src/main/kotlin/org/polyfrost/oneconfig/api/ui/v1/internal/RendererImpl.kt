@@ -26,12 +26,14 @@
 
 package org.polyfrost.oneconfig.api.ui.v1.internal
 
+import dev.deftu.omnicore.client.render.OmniRenderState
+import dev.deftu.omnicore.client.render.OmniTextureManager
+import dev.deftu.omnicore.client.shaders.BlendState
 import org.apache.logging.log4j.LogManager
 import org.lwjgl.opengl.GL11
 import org.polyfrost.oneconfig.api.ui.v1.api.LwjglApi
 import org.polyfrost.oneconfig.api.ui.v1.api.NanoVgApi
 import org.polyfrost.oneconfig.api.ui.v1.api.StbApi
-import org.polyfrost.universal.UGraphics
 import org.polyfrost.polyui.PolyUI
 import org.polyfrost.polyui.color.PolyColor
 import org.polyfrost.polyui.renderer.Renderer
@@ -39,7 +41,6 @@ import org.polyfrost.polyui.data.Font
 import org.polyfrost.polyui.data.PolyImage
 import org.polyfrost.polyui.unit.Vec2
 import org.polyfrost.polyui.utils.*
-import org.polyfrost.universal.shader.BlendState
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
 import org.polyfrost.polyui.color.PolyColor as Color
@@ -138,15 +139,15 @@ class RendererImpl(
         if (isDrawing) throw IllegalStateException("Already drawing")
 
         queue.fastRemoveIfReversed { it(); true }
-        UGraphics.disableAlpha()
+        OmniRenderState.disableAlpha()
         if (!isGl3) {
             GL11.glPushAttrib(GL11.GL_ALL_ATTRIB_BITS)
         }
 
         blendState = BlendState.active()
         depthState = GL11.glIsEnabled(GL11.GL_DEPTH_TEST)
-        activeTexture = UGraphics.getActiveTexture()
-        activeTexture?.let(UGraphics::setActiveTexture)
+        activeTexture = OmniTextureManager.getActiveTexture()
+        activeTexture?.let(OmniTextureManager::setActiveTexture)
         textureState = GL11.glGetInteger(GL11.GL_TEXTURE_BINDING_2D)
 
         vg.beginFrame(width, height, pixelRatio)
@@ -162,9 +163,9 @@ class RendererImpl(
         }
 
         blendState?.activate()
-        depthState?.let { if (it) UGraphics.enableDepth() else UGraphics.disableDepth() }
+        depthState?.let { if (it) OmniRenderState.enableDepth() else OmniRenderState.disableDepth() }
         textureState?.let { GL11.glBindTexture(GL11.GL_TEXTURE_2D, it) }
-        activeTexture?.let(UGraphics::setActiveTexture)
+        activeTexture?.let(OmniTextureManager::setActiveTexture)
 
         isDrawing = false
     }

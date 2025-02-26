@@ -26,16 +26,11 @@
 
 package org.polyfrost.oneconfig.api.platform.v1;
 
+import dev.deftu.omnicore.client.render.OmniMatrixStack;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Nullable;
-import org.polyfrost.universal.UMatrixStack;
 
 public interface ScreenPlatform {
-    boolean isInChat();
-
-    boolean isInDebug();
-
-    void playClickSound();
 
     int viewportWidth();
 
@@ -50,7 +45,7 @@ public interface ScreenPlatform {
      */
     @ApiStatus.Internal
     @ApiStatus.Obsolete
-    void setSmuggledMatrixStack(UMatrixStack stack);
+    void setSmuggledMatrixStack(OmniMatrixStack stack);
 
     /**
      * Return a special smuggled UMatrixStack that represents the current stack of the screen at the time of calling.
@@ -58,7 +53,7 @@ public interface ScreenPlatform {
      */
     @ApiStatus.Internal
     @ApiStatus.Obsolete
-    UMatrixStack getSmuggledMatrixStack();
+    OmniMatrixStack getSmuggledMatrixStack();
 
     default float pixelRatio() {
         return (float) viewportWidth() / windowWidth();

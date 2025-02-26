@@ -36,17 +36,12 @@ public final class Platform {
     }
 
     private static LoaderPlatform loaderPlatform;
-    private static PlayerPlatform playerPlatform;
     private static GLPlatform glPlatform;
     private static ScreenPlatform screenPlatform;
     private static I18nPlatform i18nPlatform;
 
     public static LoaderPlatform loader() {
         return loaderPlatform == null ? loaderPlatform = load(LoaderPlatform.class) : loaderPlatform;
-    }
-
-    public static PlayerPlatform player() {
-        return playerPlatform == null ? playerPlatform = load(PlayerPlatform.class) : playerPlatform;
     }
 
     public static GLPlatform gl() {
@@ -64,4 +59,5 @@ public final class Platform {
     private static <T> T load(Class<T> cls) {
         return ServiceLoader.load(cls, cls.getClassLoader()).iterator().next();
     }
+
 }

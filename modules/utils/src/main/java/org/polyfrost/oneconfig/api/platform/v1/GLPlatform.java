@@ -26,14 +26,7 @@
 
 package org.polyfrost.oneconfig.api.platform.v1;
 
-import org.polyfrost.universal.UMatrixStack;
-
 public interface GLPlatform {
-    void drawRect(UMatrixStack stack, double x, double y, double x2, double y2, int color);
-
-    float drawText(UMatrixStack stack, String text, float x, float y, int color, boolean shadow);
-
-    int getStringWidth(String text);
 
     /**
      * Return the given function address for the specified function with the given name.
@@ -42,4 +35,5 @@ public interface GLPlatform {
      * @implNote delegates to package-private {@code GLContext.getFunctionAddress(addr)} on legacy and {@code GLFW.getProcAddress(addr)} on modern.
      */
     long getFunctionAddress(String addr);
+
 }

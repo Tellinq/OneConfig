@@ -26,52 +26,16 @@
 
 package org.polyfrost.oneconfig.api.platform.v1.internal;
 
+import dev.deftu.omnicore.client.render.OmniMatrixStack;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiChat;
 import net.minecraft.client.gui.GuiScreen;
 import org.jetbrains.annotations.Nullable;
 import org.polyfrost.oneconfig.api.event.v1.EventDelay;
-import org.polyfrost.oneconfig.api.platform.v1.Platform;
 import org.polyfrost.oneconfig.api.platform.v1.ScreenPlatform;
-import org.polyfrost.universal.UMatrixStack;
 
 public class ScreenPlatformImpl implements ScreenPlatform {
-    //#if MC<11300
-    private static final net.minecraft.client.gui.GuiButton btn = new net.minecraft.client.gui.GuiButton(-1, -1, -1, "");
-    //#elseif MC>=11904
-    //#if FABRIC
-    //$$ private static final net.minecraft.client.gui.widget.ButtonWidget btn = new net.minecraft.client.gui.widget.ButtonWidget.Builder(net.minecraft.text.Text.empty(), (b) -> {}).build();
-    //#else
-    //$$ private static final net.minecraft.client.gui.components.Button btn = new net.minecraft.client.gui.components.Button.Builder(net.minecraft.network.chat.Component.empty(), (b) -> {}).build();
-    //#endif
-    //#else
-    //$$ private static final net.minecraft.client.gui.components.Button btn = new net.minecraft.client.gui.components.Button(-1, -1, -1, -1, null, (b) -> {});
-    //#endif
-    private UMatrixStack smuggled = new UMatrixStack();
 
-    @Override
-    public boolean isInChat() {
-        return Platform.screen().current() instanceof GuiChat;
-    }
-
-    @Override
-    public boolean isInDebug() {
-        //@formatter:off
-        return Minecraft.getMinecraft()
-                //#if MC < 1.20.4
-                .gameSettings.showDebugInfo;
-                //#elseif FABRIC
-                //$$ .getDebugHud().shouldShowDebugHud();
-                //#else
-                //$$ .getDebugOverlay().showDebugScreen();
-                //#endif
-        //@formatter:on
-    }
-
-    @Override
-    public void playClickSound() {
-        btn.playPressSound(Minecraft.getMinecraft().getSoundHandler());
-    }
+    private OmniMatrixStack smuggled = new OmniMatrixStack();
 
     @Override
     public int viewportWidth() {
@@ -110,13 +74,13 @@ public class ScreenPlatformImpl implements ScreenPlatform {
     }
 
     @Override
-    public void setSmuggledMatrixStack(UMatrixStack stack) {
+    public void setSmuggledMatrixStack(OmniMatrixStack stack) {
         if (stack == null) return;
         this.smuggled = stack;
     }
 
     @Override
-    public UMatrixStack getSmuggledMatrixStack() {
+    public OmniMatrixStack getSmuggledMatrixStack() {
         return smuggled;
     }
 
@@ -131,4 +95,5 @@ public class ScreenPlatformImpl implements ScreenPlatform {
     public <T> @Nullable T current() {
         return (T) Minecraft.getMinecraft().currentScreen;
     }
+
 }

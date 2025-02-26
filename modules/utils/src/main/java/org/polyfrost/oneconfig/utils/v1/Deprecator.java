@@ -55,7 +55,7 @@ public final class Deprecator {
         } catch (Exception e) {
             String culprit = LogScanner.identifyCallerFromStacktrace(e)
                     .stream()
-                    .map(activeMod -> activeMod.name)
+                    .map(activeMod -> activeMod.getName())
                     .findFirst()
                     .orElse("Unknown");
 

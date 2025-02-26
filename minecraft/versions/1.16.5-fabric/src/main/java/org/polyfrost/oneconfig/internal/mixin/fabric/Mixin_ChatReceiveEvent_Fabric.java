@@ -69,7 +69,7 @@ public abstract class Mixin_ChatReceiveEvent_Fabric {
             //#if MC < 1.17
             !packet.isNonChat()
             //#elseif MC > 1.19
-            //$$ !packet.overlay()
+            //$$ !packet.comp_906()
             //#else
             //$$ packet.getLocation() == net.minecraft.network.MessageType.field_11737
             //#endif

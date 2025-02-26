@@ -84,6 +84,8 @@ public class PlatformCommandFactoryImpl implements PlatformCommandFactory {
         //#if MC < 1.19
         argTypeMap.put(ItemStack.class, ItemArgument::item);
         //#else
+        // This just disables the item argument for now, since it's too much work to fix for a bit...
+        //#if MC < 1.19
         //#if FABRIC
         //$$ net.minecraft.command.CommandRegistryAccess a = net.minecraft.server.command.CommandManager.createRegistryAccess(
         //$$        net.minecraft.registry.BuiltinRegistries.createWrapperLookup());
@@ -92,6 +94,7 @@ public class PlatformCommandFactoryImpl implements PlatformCommandFactory {
         //$$ net.minecraft.commands.CommandBuildContext a = net.minecraft.commands.Commands.createValidationContext(
         //$$        net.minecraft.data.registries.VanillaRegistries.createLookup());
         //$$ argTypeMap.put(ItemStack.class, () -> ItemArgument.item(a));
+        //#endif
         //#endif
         //#endif
 

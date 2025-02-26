@@ -20,9 +20,9 @@ import net.minecraftforge.client.GuiIngameForge;
 //#endif
 //#endif
 
+import dev.deftu.omnicore.client.render.OmniMatrixStack;
 import org.polyfrost.oneconfig.api.event.v1.EventManager;
 import org.polyfrost.oneconfig.api.event.v1.events.HudRenderEvent;
-import org.polyfrost.universal.UMatrixStack;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -58,17 +58,17 @@ public class Mixin_HudRenderEvent {
             float partialTicks,
             CallbackInfo ci
     ) {
-        UMatrixStack stack =
+        OmniMatrixStack stack =
                 //#if MC >= 1.20
                 //#if FORGE
-                //$$ new UMatrixStack(ctx.pose());
+                //$$ new OmniMatrixStack(ctx.pose());
                 //#else
-                //$$ new UMatrixStack(ctx.getMatrices());
+                //$$ new OmniMatrixStack(ctx.getMatrices());
                 //#endif
                 //#elseif MC >= 1.13
-                //$$ new UMatrixStack(matrixStack);
+                //$$ new OmniMatrixStack(matrixStack);
                 //#else
-                new UMatrixStack();
+                new OmniMatrixStack();
                 //#endif
 
         EventManager.INSTANCE.post(new HudRenderEvent(stack, partialTicks));

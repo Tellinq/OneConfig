@@ -27,8 +27,6 @@
 package org.polyfrost.oneconfig.internal;
 
 import org.objectweb.asm.tree.ClassNode;
-import org.polyfrost.oneconfig.api.platform.v1.LoaderPlatform;
-import org.polyfrost.oneconfig.api.platform.v1.Platform;
 import org.spongepowered.asm.mixin.extensibility.IMixinConfigPlugin;
 import org.spongepowered.asm.mixin.extensibility.IMixinInfo;
 
@@ -59,55 +57,45 @@ public class OneConfigMixinInit implements IMixinConfigPlugin {
     @Override
     public List<String> getMixins() {
         List<String> mixins = new ArrayList<>();
-        LoaderPlatform.Loaders loader = Platform.loader().getLoader();
-        int version = Platform.loader().getMinecraftVersion();
 
-        // Loader-specific mixins
-        if (loader == LoaderPlatform.Loaders.FORGE) {
-            mixins.add("events.Mixin_ChatReceiveEvent_Forge");
-            if (version < 11300) {
-                // legacy forge
-                mixins.add("compat.OneConfigV0CompatMixin");
-                mixins.add("fixes.Mixin_ASMModParser_IgnoreForgeJava9Spam");
-                mixins.add("fixes.Mixin_JarDiscoverer_IgnoreForgeJava9Spam");
-                mixins.add("hidpi.Mixin_FixLoadingScreenHiDPI");
-            }
-        } else {
-            // fabric specific
-            mixins.add("fabric.Mixin_LoadShaderInvoker");
-            mixins.add("fabric.Mixin_ChatReceiveEvent_Fabric");
-            if (version <= 11300) {
-                // legacy fabric
-                mixins.add("commands.Mixin_ExecuteCommandsFromScreen");
-                mixins.add("commands.Mixin_IncludeCommandSuggestions");
-            }
+        //#if FORGE
+        mixins.add("events.Mixin_ChatReceiveEvent_Forge");
+        //#if MC < 1.13
+        mixins.add("compat.OneConfigV0CompatMixin");
+        mixins.add("fixes.Mixin_ASMModParser_IgnoreForgeJava9Spam");
+        mixins.add("fixes.Mixin_JarDiscoverer_IgnoreForgeJava9Spam");
+        mixins.add("hidpi.Mixin_FixLoadingScreenHiDPI");
+        //#endif
+        //#else
+        mixins.add("fabric.Mixin_LoadShaderInvoker");
+        mixins.add("fabric.Mixin_ChatReceiveEvent_Fabric");
 
-            if (version > 12000) {
-                mixins.add("hypixel.Mixin_CaptureHypixelPayloads");
-            }
-        }
+        //#if MC <= 1.13
+        mixins.add("commands.Mixin_ExecuteCommandsFromScreen");
+        mixins.add("commands.Mixin_IncludeCommandSuggestions");
+        //#endif
 
-        // Inter-loader mixins
-        if (version >= 11600) {
-            mixins.add("commands.Mixin_AppendCustomCommands");
+        //#if MC > 1.12
+        mixins.add("hypixel.Mixin_CaptureHypixelPayloads");
+        //#endif
+        //#endif
 
-            if (version < 11900) {
-                // 1.16, 1.17, 1.18
-                mixins.add("Mixin_LazyDataFixerUpper");
-                mixins.add("events.Mixin_ChatSendEvent");
-            }
-        } else {
-            if (version <= 10809) {
-                mixins.add("Mixin_SoundHandlerAccessor");
-            }
-
-            // legacy
-            mixins.add("events.Mixin_KeyInputEvent_Screen");
-            mixins.add("hidpi.Mixin_EnableHiDPI");
-            mixins.add("hidpi.Mixin_FixDisplaySizeHiDPI");
-            mixins.add("hidpi.Mixin_FixDisplaySizeHiDPI_Screen");
-            mixins.add("hidpi.Mixin_FixMousePositionHiDPI");
-        }
+        //#if MC >= 1.16
+        //$$ mixins.add("commands.Mixin_AppendCustomCommands");
+        //#if MC < 1.19
+        //$$ mixins.add("Mixin_LazyDataFixerUpper");
+        //$$ mixins.add("events.Mixin_ChatSendEvent");
+        //#endif
+        //#else
+        mixins.add("events.Mixin_KeyInputEvent_Screen");
+        mixins.add("hidpi.Mixin_EnableHiDPI");
+        mixins.add("hidpi.Mixin_FixDisplaySizeHiDPI");
+        mixins.add("hidpi.Mixin_FixDisplaySizeHiDPI_Screen");
+        mixins.add("hidpi.Mixin_FixMousePositionHiDPI");
+        //#if MC <= 1.8.9
+        mixins.add("Mixin_SoundHandlerAccessor");
+        //#endif
+        //#endif
 
         return mixins;
     }

@@ -26,6 +26,7 @@
 
 package org.polyfrost.oneconfig.api.event.v1;
 
+import dev.deftu.omnicore.common.OmniLoader;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.ApiStatus;
@@ -59,14 +60,14 @@ public final class EventManager {
     public static final List<EventHandler<?>> devUnregistered;
 
     static {
-        if (Platform.loader().isDevelopment()) {
+        if (OmniLoader.isDevelopment()) {
             devUnregistered = new ArrayList<>(5);
         } else devUnregistered = null;
     }
 
     private EventManager() {
         registerCollector(new AnnotationEventMapper());
-        if (Platform.loader().isDevelopment()) {
+        if (OmniLoader.isDevelopment()) {
             register(EventHandler.of(InitializationEvent.class, () -> {
                 if (devUnregistered != null && !devUnregistered.isEmpty()) {
                     LOGGER.warn("Found {} handlers that were created but not registered: ", devUnregistered.size());

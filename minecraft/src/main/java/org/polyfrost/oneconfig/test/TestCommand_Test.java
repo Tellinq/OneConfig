@@ -27,16 +27,16 @@
 package org.polyfrost.oneconfig.test;
 
 import com.mojang.authlib.GameProfile;
+import dev.deftu.omnicore.client.OmniChat;
 import org.polyfrost.oneconfig.api.commands.v1.factories.annotated.Command;
 import org.polyfrost.oneconfig.api.commands.v1.factories.annotated.Parameter;
-import org.polyfrost.universal.UChat;
 
 @Command(value = {"test", "t"}, description = "Description of the test command")
 public class TestCommand_Test {
 
     @Command
     private static void main() {  // /test
-        UChat.chat("Main command");
+        OmniChat.showChatMessage("Main command");
     }
 
     private static void joinAndChat(Object... stuff) {
@@ -44,30 +44,30 @@ public class TestCommand_Test {
         for (Object thing : stuff) {
             builder.append(thing).append(' ');
         }
-        UChat.chat(builder.toString().trim());
+        OmniChat.showChatMessage(builder.toString().trim());
     }
 
     @Command
     private void playerTest(GameProfile profile) {
-        UChat.chat("Player test: " + profile.getName());
-        UChat.chat(profile.getId());
+        OmniChat.showChatMessage("Player test: " + profile.getName());
+        OmniChat.showChatMessage(profile.getId().toString());
     }
 
     @Command(value = {"subcommand", "s"}, description = "Subcommand 1.", greedy = true)
     private static class TestSubCommand {
         private static void main(int a, float b, @Parameter(value = "GREEDY c") String c) { // /test subcommand <a> <b> <c>
-            UChat.chat("Integer main: " + (a + b) + " " + c);
+            OmniChat.showChatMessage("Integer main: " + (a + b) + " " + c);
         }
 
         @Command(value = {"yesNo"}, description = "A method description")
         private void yes(@Parameter("first number") double a, double b, @Parameter("named c") String c) { // /test subcommand <a> <b> <c>
-            UChat.chat("Double main: " + a + " " + b + " " + c);
+            OmniChat.showChatMessage("Double main: " + a + " " + b + " " + c);
         }
 
         @Command(value = {"subSub", "ss"}, description = "SubSubcommand 1.")
         private static class TestSubSubCommand {
             private void wow(int a, float b, @Parameter("named c") String c) { // /test subSub <a> <b> <c>
-                UChat.chat("Integer subSub: " + (a + b) + " " + c);
+                OmniChat.showChatMessage("Integer subSub: " + (a + b) + " " + c);
             }
         }
     }
