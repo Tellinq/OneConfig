@@ -29,8 +29,7 @@ package org.polyfrost.oneconfig.internal.mixin.fabric;
 import net.minecraft.client.network.ClientPlayNetworkHandler;
 import net.minecraft.network.packet.s2c.play.ChatMessageS2CPacket;
 import org.polyfrost.oneconfig.api.event.v1.EventManager;
-import org.polyfrost.oneconfig.api.event.v1.events.ChatReceiveEvent;
-import org.polyfrost.oneconfig.api.event.v1.events.ChatSendEvent;
+import org.polyfrost.oneconfig.api.event.v1.events.ChatEvent;
 import org.polyfrost.oneconfig.internal.libs.fabric.ClientCommandInternals;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
@@ -43,7 +42,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 @Mixin(ClientPlayNetworkHandler.class)
 public class NetHandlerPlayClientMixin {
     @Unique
-    private ChatSendEvent ocfg$sendChatEvent;
+    private ChatEvent.Send ocfg$sendChatEvent;
 
     @Inject(method = "sendCommand", at = @At("HEAD"), cancellable = true)
     private void commands$execute(String command, CallbackInfoReturnable<Boolean> cir) {
@@ -61,7 +60,7 @@ public class NetHandlerPlayClientMixin {
 
     @Inject(method = "sendChatMessage", at = @At("HEAD"), cancellable = true)
     private void chatCallback(String message, CallbackInfo ci) {
-        ocfg$sendChatEvent = new ChatSendEvent(message);
+        ocfg$sendChatEvent = new ChatEvent.Send(message);
         EventManager.INSTANCE.post(ocfg$sendChatEvent);
         if (ocfg$sendChatEvent.cancelled) {
             ci.cancel();
@@ -74,8 +73,8 @@ public class NetHandlerPlayClientMixin {
     }
 
     @Inject(method = "onChatMessage", at = @At("HEAD"), cancellable = true)
-    private void chatRecieveCallback(ChatMessageS2CPacket packet, CallbackInfo ci) {
-        ChatReceiveEvent ev = new ChatReceiveEvent(packet.unsignedContent());
+    private void chatReceiveCallback(ChatMessageS2CPacket packet, CallbackInfo ci) {
+        ChatEvent.Receive ev = new ChatEvent.Receive(packet.unsignedContent());
         EventManager.INSTANCE.post(ev);
         if (ev.cancelled) {
             ci.cancel();

@@ -31,7 +31,7 @@ import net.minecraftforge.client.event.ClientChatReceivedEvent;
 import net.minecraftforge.fml.common.eventhandler.Event;
 import net.minecraftforge.fml.common.eventhandler.EventBus;
 import org.polyfrost.oneconfig.api.event.v1.EventManager;
-import org.polyfrost.oneconfig.api.event.v1.events.ChatReceiveEvent;
+import org.polyfrost.oneconfig.api.event.v1.events.ChatEvent;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -41,7 +41,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 public abstract class Mixin_ChatReceiveEvent_Forge {
 
     @Inject(method = "post", at = @At(value = "HEAD"), remap = false)
-    private void recieveEventCallback(Event e, CallbackInfoReturnable<Boolean> cir) {
+    private void receiveEventCallback(Event e, CallbackInfoReturnable<Boolean> cir) {
         if (!(e instanceof ClientChatReceivedEvent)) {
             return;
         }
@@ -52,7 +52,7 @@ public abstract class Mixin_ChatReceiveEvent_Forge {
             return;
         }
 
-        ChatReceiveEvent ev = new ChatReceiveEvent(event.message);
+        ChatEvent.Receive ev = new ChatEvent.Receive(event.message);
         //#else
         //#if MC < 1.19
         //$$ if (event.getType() != net.minecraft.util.text.ChatType.CHAT) {

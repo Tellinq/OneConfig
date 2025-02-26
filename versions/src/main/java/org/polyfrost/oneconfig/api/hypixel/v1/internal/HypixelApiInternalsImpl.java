@@ -40,7 +40,7 @@ import org.jetbrains.annotations.ApiStatus;
 import org.polyfrost.oneconfig.api.event.v1.EventDelay;
 import org.polyfrost.oneconfig.api.event.v1.EventManager;
 import org.polyfrost.oneconfig.api.event.v1.events.HypixelLocationEvent;
-import org.polyfrost.oneconfig.api.event.v1.events.ReceivePacketEvent;
+import org.polyfrost.oneconfig.api.event.v1.events.PacketEvent;
 import org.polyfrost.oneconfig.api.platform.v1.Platform;
 
 /**
@@ -88,7 +88,7 @@ public final class HypixelApiInternalsImpl implements HypixelApiInternals {
             );
             return true;
         });
-        EventManager.register(ReceivePacketEvent.class, (ev) -> {
+        EventManager.register(PacketEvent.Receive.class, (ev) -> {
             if (!(ev.getPacket() instanceof S3FPacketCustomPayload)) {
                 return;
             }

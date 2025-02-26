@@ -1,12 +1,12 @@
 package org.polyfrost.oneconfig.api.event.v1.events;
 
-public abstract class RenderLivingEntityEvent extends Event.Cancellable {
+public abstract class RenderLivingEvent extends Event.Cancellable {
 
     private final Object entity;
     private final float partialTicks;
     private final double x, y, z;
 
-    public RenderLivingEntityEvent(Object entity, float partialTicks, double x, double y, double z) {
+    public RenderLivingEvent(Object entity, float partialTicks, double x, double y, double z) {
         this.entity = entity;
         this.partialTicks = partialTicks;
         this.x = x;
@@ -34,13 +34,13 @@ public abstract class RenderLivingEntityEvent extends Event.Cancellable {
         return z;
     }
 
-    public static class Pre extends RenderLivingEntityEvent {
+    public static class Pre extends RenderLivingEvent {
         public Pre(Object entity, float partialTicks, double x, double y, double z) {
             super(entity, partialTicks, x, y, z);
         }
     }
 
-    public static class Post extends RenderLivingEntityEvent {
+    public static class Post extends RenderLivingEvent {
         public Post(Object entity, float partialTicks, double x, double y, double z) {
             super(entity, partialTicks, x, y, z);
         }

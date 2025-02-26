@@ -20,7 +20,7 @@ import net.minecraft.entity.EntityLivingBase;
 
 import net.minecraft.profiler.Profiler;
 import org.polyfrost.oneconfig.api.event.v1.EventManager;
-import org.polyfrost.oneconfig.api.event.v1.events.RenderLivingEntityEvent;
+import org.polyfrost.oneconfig.api.event.v1.events.RenderLivingEvent;
 import org.polyfrost.universal.UMinecraft;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
@@ -95,7 +95,7 @@ public class Mixin_RenderLivingEntityEvent<
         //$$ double y = entity.getPosY();
         //$$ double z = entity.getPosZ();
         //#endif
-        RenderLivingEntityEvent event = new RenderLivingEntityEvent.Pre(entity, partialTicks, x, y, z);
+        RenderLivingEvent event = new RenderLivingEvent.Pre(entity, partialTicks, x, y, z);
         EventManager.INSTANCE.post(event);
         if (event.cancelled) {
             ci.cancel();
@@ -153,7 +153,7 @@ public class Mixin_RenderLivingEntityEvent<
         //$$ double y = entity.getPosY();
         //$$ double z = entity.getPosZ();
         //#endif
-        RenderLivingEntityEvent event = new RenderLivingEntityEvent.Post(entity, partialTicks, x, y, z);
+        RenderLivingEvent event = new RenderLivingEvent.Post(entity, partialTicks, x, y, z);
         EventManager.INSTANCE.post(event);
         // Can't cancel when the method has already returned lol
 
