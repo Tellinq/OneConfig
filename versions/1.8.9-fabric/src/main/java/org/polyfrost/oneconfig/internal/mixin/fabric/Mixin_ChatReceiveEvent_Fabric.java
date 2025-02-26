@@ -30,7 +30,7 @@ import net.minecraft.client.network.ClientPlayNetworkHandler;
 import net.minecraft.network.packet.s2c.play.ChatMessageS2CPacket;
 import net.minecraft.text.Text;
 import org.polyfrost.oneconfig.api.event.v1.EventManager;
-import org.polyfrost.oneconfig.api.event.v1.events.ChatReceiveEvent;
+import org.polyfrost.oneconfig.api.event.v1.events.ChatEvent;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
@@ -52,7 +52,7 @@ public abstract class Mixin_ChatReceiveEvent_Fabric {
     //@formatter:on
 
     @Unique
-    private ChatReceiveEvent ocfg$chatEvent = null;
+    private ChatEvent.Receive ocfg$chatEvent = null;
 
     @Inject(method = "onChatMessage", at = @At(value = "INVOKE", target = ONECONFIG$METHOD_TARGET), cancellable = true)
     private void chatCallback(ChatMessageS2CPacket packet, CallbackInfo ci) {
@@ -71,7 +71,7 @@ public abstract class Mixin_ChatReceiveEvent_Fabric {
             //$$ !packet.isNonChat()
             //#endif
         ) {
-            ocfg$chatEvent = new ChatReceiveEvent(packet.getMessage());
+            ocfg$chatEvent = new ChatEvent.Receive(packet.getMessage());
             EventManager.INSTANCE.post(ocfg$chatEvent);
             return ocfg$chatEvent.getMessage();
         }

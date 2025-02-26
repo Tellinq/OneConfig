@@ -59,7 +59,7 @@ public abstract class Mixin_ChatReceiveEvent_Forge {
         //$$     return;
         //$$ }
         //#endif
-        //$$ ChatReceiveEvent ev = new ChatReceiveEvent(event.getMessage());
+        //$$ ChatEvent.Receive ev = new ChatEvent.Receive(event.getMessage());
         //#endif
 
         EventManager.INSTANCE.post(ev);
