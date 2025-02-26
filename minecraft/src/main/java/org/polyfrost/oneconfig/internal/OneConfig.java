@@ -41,7 +41,6 @@ import org.polyfrost.oneconfig.api.event.v1.events.TickEvent;
 import org.polyfrost.oneconfig.api.event.v1.events.WindowFocusEvent;
 import org.polyfrost.oneconfig.api.hud.v1.HudManager;
 import org.polyfrost.oneconfig.api.hypixel.v1.HypixelUtils;
-import org.polyfrost.oneconfig.api.platform.v1.LoaderPlatform;
 import org.polyfrost.oneconfig.api.platform.v1.Platform;
 import org.polyfrost.oneconfig.api.ui.v1.UIManager;
 import org.polyfrost.oneconfig.api.ui.v1.internal.BlurHandler;
@@ -61,11 +60,15 @@ import static org.polyfrost.oneconfig.api.commands.v1.factories.builder.CommandB
 /**
  * The main class of OneConfig.
  */
-//#if FORGE
-//#if MC<=11202
+//#if FORGE-LIKE
+//#if MC <= 1.12.2
 @net.minecraftforge.fml.common.Mod(modid = "oneconfig")
 //#else
+//#if NEOFORGE
+//$$ @net.neoforged.fml.common.Mod("oneconfig")
+//#else
 //$$ @net.minecraftforge.fml.common.Mod("oneconfig")
+//#endif
 //#endif
 //#endif
 public class OneConfig
@@ -76,8 +79,8 @@ public class OneConfig
     public static final OneConfig INSTANCE = new OneConfig();
     private static final Logger LOGGER = LogManager.getLogger("OneConfig");
 
-    //#if FORGE
-    //#if MC<=11202
+    //#if FORGE-LIKE
+    //#if MC <= 1.12.2
     @net.minecraftforge.fml.common.Mod.EventHandler
     private void onInit(net.minecraftforge.fml.common.event.FMLPostInitializationEvent ev) {
         init();

@@ -1,6 +1,6 @@
 package org.polyfrost.oneconfig.internal.mixin.events;
 
-//#if FORGE
+//#if FORGE-LIKE
 //#if MC >= 1.20.4
 //$$ import net.minecraft.client.gui.screens.Screen;
 //#else
@@ -28,7 +28,7 @@ import org.spongepowered.asm.mixin.injection.ModifyArg;
 @Mixin(Minecraft.class)
 public class Mixin_ScreenOpenEvent {
 
-    //#if FORGE
+    //#if FORGE-LIKE
     @ModifyArg(
             method = "displayGuiScreen",
             at = @At(

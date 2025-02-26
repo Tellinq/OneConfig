@@ -26,14 +26,13 @@
 
 package org.polyfrost.oneconfig.api.hypixel.v1.internal;
 
+import dev.deftu.omnicore.client.OmniClientPackets;
+import dev.deftu.omnicore.common.OmniIdentifier;
 import dev.deftu.omnicore.common.OmniLoader;
-import io.netty.buffer.Unpooled;
 import net.hypixel.modapi.HypixelModAPI;
 import net.hypixel.modapi.serializer.PacketSerializer;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.network.NetHandlerPlayClient;
-import net.minecraft.network.PacketBuffer;
-import net.minecraft.network.play.client.C17PacketCustomPayload;
 import net.minecraft.network.play.server.S3FPacketCustomPayload;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -42,7 +41,10 @@ import org.polyfrost.oneconfig.api.event.v1.EventDelay;
 import org.polyfrost.oneconfig.api.event.v1.EventManager;
 import org.polyfrost.oneconfig.api.event.v1.events.HypixelLocationEvent;
 import org.polyfrost.oneconfig.api.event.v1.events.PacketEvent;
-import org.polyfrost.oneconfig.api.platform.v1.Platform;
+
+//#if MC >= 1.20.4 || MC == 1.16.5
+//$$ import dev.deftu.omnicore.common.OmniIdentifier;
+//#endif
 
 /**
  * Heavily adapted from Hypixel/ForgeModAPI under the MIT licence.
@@ -66,27 +68,11 @@ public final class HypixelApiInternalsImpl implements HypixelApiInternals {
                 EventDelay.tick(20, () -> HypixelModAPI.getInstance().sendPacket(packet));
                 return false;
             }
-            PacketBuffer buf = new PacketBuffer(Unpooled.buffer());
-            packet.write(new PacketSerializer(buf));
-            net.addToSendQueue(new C17PacketCustomPayload(
-                            //#if MC >= 1.20.4
-                            //#if FORGE
-                            //$$ new net.minecraft.network.protocol.common.custom.DiscardedPayload(
-                            //#else
-                            //$$ new Payload(
-                            //#endif
-                            //#endif
-                            //#if MC <= 1.12.2
-                            packet.getIdentifier(),
-                            //#elseif MC >= 1.20.4 || MC == 1.16.5
-                            //$$ new net.minecraft.resources.ResourceLocation(packet.getIdentifier()),
-                            //#endif
-                            buf
-                            //#if MC >= 1.20.4
-                            //$$ )
-                            //#endif
-                    )
-            );
+
+            OmniClientPackets.INSTANCE.send(OmniIdentifier.create(packet.getIdentifier()), (buf) -> {
+                packet.write(new PacketSerializer(buf));
+            });
+
             return true;
         });
         EventManager.register(PacketEvent.Receive.class, (ev) -> {
@@ -98,7 +84,7 @@ public final class HypixelApiInternalsImpl implements HypixelApiInternals {
             //#if MC >= 1.20.6
             //$$ String identifier = packet.comp_1646().getId().comp_2242().toString();
             //#elseif MC >= 1.20.4
-            //#if FORGE
+            //#if FORGE-LIKE
             //$$ String identifier = packet.payload().id().toString();
             //#else
             //$$ String identifier = packet.comp_1646().comp_1678().toString();
@@ -113,8 +99,8 @@ public final class HypixelApiInternalsImpl implements HypixelApiInternals {
 
             try {
                 PacketSerializer s = new PacketSerializer(
-                        //#if MC >= 1.20.4 && FABRIC
-                        //$$ ((Payload) packet.comp_1646()).data()
+                        //#if MC >= 1.20.4 && FABRIC || NEOFORGE
+                        //$$ ((Payload) packet.payload()).data()
                         //#else
                         packet.getBufferData()
                         //#endif
@@ -131,18 +117,18 @@ public final class HypixelApiInternalsImpl implements HypixelApiInternals {
         EventManager.INSTANCE.post(HypixelLocationEvent.INSTANCE);
     }
 
-    //#if MC >= 1.20.4 && FABRIC
-    //$$ public static final class Payload implements net.minecraft.network.packet.CustomPayload {
-    //$$     private final net.minecraft.util.Identifier id;
+    //#if MC >= 1.20.4 && FABRIC || NEOFORGE
+    //$$ public static final class Payload implements net.minecraft.network.protocol.common.custom.CustomPacketPayload {
+    //$$     private final net.minecraft.resources.ResourceLocation id;
     //$$     private final io.netty.buffer.ByteBuf data;
     //$$
-    //$$     public Payload(net.minecraft.util.Identifier id, io.netty.buffer.ByteBuf data) {
+    //$$     public Payload(net.minecraft.resources.ResourceLocation id, io.netty.buffer.ByteBuf data) {
     //$$         this.id = id;
     //$$         this.data = data.copy();
     //$$         data.skipBytes(data.readableBytes());
     //$$     }
     //$$
-    //$$     public void write(net.minecraft.network.PacketByteBuf arg) {
+    //$$     public void write(net.minecraft.network.FriendlyByteBuf arg) {
     //$$         if (this.data != null) {
     //$$             arg.writeBytes(this.data.slice());
     //$$         }
@@ -153,7 +139,7 @@ public final class HypixelApiInternalsImpl implements HypixelApiInternals {
     //$$         return new Id<>(this.id);
     //$$     }
     //#else
-    //$$     public net.minecraft.util.Identifier comp_1678() {
+    //$$     public net.minecraft.resources.ResourceLocation id() {
     //$$         return this.id;
     //$$     }
     //#endif

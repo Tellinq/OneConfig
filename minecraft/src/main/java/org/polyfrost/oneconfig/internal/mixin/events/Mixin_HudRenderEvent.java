@@ -3,14 +3,14 @@ package org.polyfrost.oneconfig.internal.mixin.events;
 //#if FORGE && MC <= 1.12.2
 import net.minecraftforge.client.GuiIngameForge;
 //#else
-//#if FORGE
+//#if FORGE-LIKE
 //$$ import net.minecraft.client.gui.Gui;
 //#else
 //$$ import net.minecraft.client.gui.hud.InGameHud;
 //#endif
 //$$
 //#if MC >= 1.20
-//#if FORGE
+//#if FORGE-LIKE
 //$$ import net.minecraft.client.gui.GuiGraphics;
 //#else
 //$$ import net.minecraft.client.gui.DrawContext;
@@ -30,7 +30,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 //#if FORGE && MC <= 1.12.2
 @Mixin(GuiIngameForge.class)
-//#elseif FORGE
+//#elseif FORGE-LIKE
 //$$ @Mixin(Gui.class)
 //#else
 //$$ @Mixin(InGameHud.class)
@@ -47,7 +47,7 @@ public class Mixin_HudRenderEvent {
     )
     private void renderHudCallback(
             //#if MC >= 1.20
-            //#if FORGE
+            //#if FORGE-LIKE
             //$$ GuiGraphics ctx,
             //#else
             //$$ DrawContext ctx,
@@ -60,7 +60,7 @@ public class Mixin_HudRenderEvent {
     ) {
         OmniMatrixStack stack =
                 //#if MC >= 1.20
-                //#if FORGE
+                //#if FORGE-LIKE
                 //$$ new OmniMatrixStack(ctx.pose());
                 //#else
                 //$$ new OmniMatrixStack(ctx.getMatrices());

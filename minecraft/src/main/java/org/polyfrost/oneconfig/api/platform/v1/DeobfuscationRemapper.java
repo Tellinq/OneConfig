@@ -1,11 +1,15 @@
 package org.polyfrost.oneconfig.api.platform.v1;
 
-//#if FORGE
+//#if FORGE-LIKE
 //#if MC <= 1.12.2
 import net.minecraftforge.fml.common.asm.transformers.deobf.FMLDeobfuscatingRemapper;
 //#else
 //#if MC >= 1.17.1
+//#if NEOFORGE
+//$$ import net.neoforged.fml.util.ObfuscationReflectionHelper;
+//#else
 //$$ import net.minecraftforge.fml.util.ObfuscationReflectionHelper;
+//#endif
 //#else
 //$$ import net.minecraftforge.fml.common.ObfuscationReflectionHelper;
 //#endif
@@ -31,7 +35,7 @@ public class DeobfuscationRemapper extends Remapper {
     //#endif
 
     public String map(String typeName) {
-        //#if FORGE
+        //#if FORGE-LIKE
         //#if MC <= 1.12.2
         return FMLDeobfuscatingRemapper.INSTANCE.map(typeName);
         //#else
@@ -44,7 +48,7 @@ public class DeobfuscationRemapper extends Remapper {
 
     @Override
     public String mapMethodName(String owner, String name, String desc) {
-        //#if FORGE
+        //#if FORGE-LIKE
         //#if MC <= 1.12.2
         return FMLDeobfuscatingRemapper.INSTANCE.mapMethodName(owner, name, desc);
         //#else
@@ -57,7 +61,7 @@ public class DeobfuscationRemapper extends Remapper {
 
     @Override
     public String mapFieldName(String owner, String name, String desc) {
-        //#if FORGE
+        //#if FORGE-LIKE
         //#if MC <= 1.12.2
         return FMLDeobfuscatingRemapper.INSTANCE.mapFieldName(owner, name, desc);
         //#else
@@ -70,7 +74,7 @@ public class DeobfuscationRemapper extends Remapper {
 
     @Override
     public String mapSignature(String signature, boolean typeSignature) {
-        //#if FORGE
+        //#if FORGE-LIKE
         //#if MC <= 1.12.2
         return FMLDeobfuscatingRemapper.INSTANCE.mapSignature(signature, typeSignature);
         //#else

@@ -45,8 +45,8 @@ public class LoaderPlatformImpl implements LoaderPlatform {
 
     @Override
     public void addToClasspath(@NotNull Path path) {
-        //#if FORGE
-        //#if MC>11202
+        //#if FORGE-LIKE
+        //#if MC > 1.12.2
         //$$ throw new UnsupportedOperationException("TODO"); // hiiii init!!!
         //#else
         try {
