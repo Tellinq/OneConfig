@@ -32,10 +32,12 @@ import com.mojang.brigadier.builder.RequiredArgumentBuilder;
 import com.mojang.brigadier.tree.LiteralCommandNode;
 import dev.deftu.omnicore.client.OmniClientCommands;
 import org.polyfrost.oneconfig.api.commands.v1.factories.CommandFactory;
-import org.polyfrost.oneconfig.api.commands.v1.factories.annotated.AnnotationCommandFactory;
 import org.polyfrost.oneconfig.api.commands.v1.factories.annotated.Command;
 
-import java.util.*;
+import java.util.HashSet;
+import java.util.IdentityHashMap;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * Handles the registration of OneConfig commands.
@@ -47,12 +49,11 @@ public class CommandManager {
      * The singleton instance of the command manager.
      */
     public static final CommandManager INSTANCE = new CommandManager();
-    private final Set<CommandFactory> factories = new HashSet<>();
+    private final Set<CommandFactory<?>> factories = new HashSet<>();
     private final Map<Class<?>, ArgumentType<?>> argumentTypes = new IdentityHashMap<>();
 
 
     private CommandManager() {
-        registerFactory(new AnnotationCommandFactory());
         argumentTypes.put(int.class, IntegerArgumentType.integer());
         argumentTypes.put(String.class, StringArgumentType.string());
         argumentTypes.put(boolean.class, BoolArgumentType.bool());
@@ -61,43 +62,46 @@ public class CommandManager {
         argumentTypes.put(long.class, LongArgumentType.longArg());
     }
 
-    public static void registerCommand(LiteralArgumentBuilder<ClientCommandSource> builder) {
-        OmniClientCommands.INSTANCE.register(builder);
+    public static <S> void register(LiteralArgumentBuilder<S> builder) {
+        register(builder.build());
     }
 
-    public static void registerCommand(LiteralCommandNode<ClientCommandSource> node) {
-        OmniClientCommands.INSTANCE.register(node);
+    public static <S> void register(LiteralCommandNode<S> node) {
+//         OmniClientCommands.INSTANCE.register((LiteralCommandNode) node);
     }
 
     public static boolean register(Object obj) {
-        LiteralCommandNode<ClientCommandSource>[] nodes = INSTANCE.create(obj);
+        LiteralCommandNode<?>[] nodes = INSTANCE.create(obj);
         if (nodes == null) return false;
-        for (LiteralCommandNode<ClientCommandSource> node : nodes) {
-            registerCommand(node);
+        for (LiteralCommandNode<?> node : nodes) {
+            register(node);
         }
         return true;
     }
 
-    public LiteralCommandNode<ClientCommandSource>[] create(Object obj) {
-        for (CommandFactory factory : factories) {
-            LiteralCommandNode<ClientCommandSource>[] nodes = factory.create(obj);
+    public LiteralCommandNode<?>[] create(Object obj) {
+        for (CommandFactory<?> factory : factories) {
+            LiteralCommandNode<?>[] nodes = factory.create(obj);
             if (nodes != null) return nodes;
         }
         return null;
     }
 
-    public static LiteralArgumentBuilder<ClientCommandSource> literal(String name) {
-        return OmniClientCommands.INSTANCE.literal(name);
+    public static <S> LiteralArgumentBuilder<S> literal(String name) {
+        // todo broken !
+//        return (LiteralArgumentBuilder<S>) OmniClientCommands.INSTANCE.literal(name);
+        return null;
     }
 
-    public static <T> RequiredArgumentBuilder<ClientCommandSource, T> argument(String name, ArgumentType<T> type) {
-        return OmniClientCommands.INSTANCE.argument(name, type);
+    public static <S, T> RequiredArgumentBuilder<S, T> argument(String name, ArgumentType<T> type) {
+//        return (RequiredArgumentBuilder<S, T>) OmniClientCommands.INSTANCE.argument(name, type);
+        return null;
     }
 
     /**
      * Register a factory which can be used to create commands from objects in the {@link #create(Object)} method.
      */
-    public void registerFactory(CommandFactory factory) {
+    public void registerFactory(CommandFactory<?> factory) {
         factories.add(factory);
     }
 

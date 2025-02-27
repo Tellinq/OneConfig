@@ -52,7 +52,7 @@ public class TestMod_Test
     //#endif
     {
         System.err.println("TestMod::init");
-        CommandManager.registerCommand(new TestCommand_Test());
+        CommandManager.register(new TestCommand_Test());
         new TestConfig_Test();
     }
 }

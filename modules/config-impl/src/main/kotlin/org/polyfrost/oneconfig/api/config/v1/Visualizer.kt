@@ -63,8 +63,13 @@ fun interface Visualizer {
             if (p !is PolyColor.Mutable) {
                 prop.setAsReferential(p.mutable())
             }
-            return Block(color = prop.getAs(), size = Vec2(58f, 32f)).withBoarder(3f, color = { page.border20 })
+            val s = Block(color = prop.getAs(), size = Vec2(58f, 32f)).withBoarder(3f, color = { page.border20 })
                 .onClick { ColorPicker(prop.getAs<PolyColor.Mutable>().ref(), null, null, polyUI); true }
+            prop.addCallback {
+                s.color = it as PolyColor
+                false
+            }
+            return s
         }
     }
 
@@ -75,7 +80,7 @@ fun interface Visualizer {
                 require(options.isEmpty()) { "Dropdowns should not have options when used with enums (offender=${prop.id})" }
                 val constants = prop.type.enumConstants
                 val index = constants.indexOf(prop.get())
-                return Dropdown(
+                val s = Dropdown(
                     optPadding = 24f,
                     initial = index,
                     entries = constants.mapToArray {
@@ -86,10 +91,12 @@ fun interface Visualizer {
                     prop.setAs(constants[i])
                     false
                 }
+                // todo setback not supported currently on dropdowns
+                return s
             } else {
                 require(prop.type == Int::class.java) { "Dropdowns can only be used with enums or integers (offender=${prop.id}, type=${prop.type})" }
                 require(options.size >= 2) { "Dropdowns must have at least two options (offender=${prop.id})" }
-                return Dropdown(
+                val s = Dropdown(
                     optPadding = 24f,
                     initial = prop.getAs(),
                     entries = options.mapToArray { null to it },
@@ -97,6 +104,7 @@ fun interface Visualizer {
                     prop.setAs(i)
                     false
                 }
+                return s
             }
         }
     }
@@ -160,6 +168,10 @@ fun interface Visualizer {
                     prop.setAs(if (integral) it.amount.toInt() else it.amount.toFloat())
                 }
             }
+            prop.addCallback {
+                (s[1][0] as TextInput).text = it.toString()
+                false
+            }
             return s
         }
     }
@@ -184,6 +196,10 @@ fun interface Visualizer {
                         prop.setAs(values[amount])
                         false
                     }
+                prop.addCallback {
+                    r.setRadiobuttonEntry(values.indexOf(it as Enum<*>))
+                    false
+                }
                 return r
             } else {
                 require(prop.type == Int::class.java) { "Radio buttons ${prop.id} can only be used with enum or integer types (type=${prop.type}" }
@@ -215,6 +231,11 @@ fun interface Visualizer {
                     prop.setAs(amount)
                     false
                 }
+            prop.addCallback {
+                val value = (it as Number).toFloat()
+                s.setSliderValue(value, min, max, false)
+                false
+            }
             return s
         }
     }
@@ -222,7 +243,7 @@ fun interface Visualizer {
     class SwitchVisualizer : Visualizer {
         override fun visualize(prop: Property<*>): Drawable {
             val state = prop.getAs<Boolean>()
-            return Switch(
+            val s = Switch(
                 lateralStretch = 2f,
                 size = 21f,
                 state = state,
@@ -230,19 +251,29 @@ fun interface Visualizer {
                 prop.setAs(new)
                 false
             }
+            prop.addCallback {
+                s.toggle(it as Boolean)
+                false
+            }
+            return s
         }
     }
 
     class CheckboxVisualizer : Visualizer {
         override fun visualize(prop: Property<*>): Drawable {
             val state = prop.getAs<Boolean>()
-            return Checkbox(
+            val s = Checkbox(
                 size = 24f,
                 state = state,
             ).onChange { new: Boolean ->
                 prop.setAs(new)
                 false
             }
+            prop.addCallback {
+                s.toggle(it as Boolean)
+                false
+            }
+            return s
         }
     }
 
@@ -265,6 +296,11 @@ fun interface Visualizer {
                 false
             }
             if (validate != null) s.addHoverInfo(Text("Must match regex: $validate"))
+            prop.addCallback {
+                it as String
+                (s[1][0] as Text).text = it
+                false
+            }
             return s
         }
     }

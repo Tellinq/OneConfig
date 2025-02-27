@@ -26,14 +26,16 @@
 
 package org.polyfrost.oneconfig.internal;
 
+import com.mojang.brigadier.builder.LiteralArgumentBuilder;
+import com.mojang.brigadier.tree.CommandNode;
 import dev.deftu.clipboard.Clipboard;
 import dev.deftu.omnicore.client.OmniChat;
+import dev.deftu.omnicore.client.OmniClientCommands;
 import dev.deftu.omnicore.common.OmniLoader;
 import kotlin.Unit;
+import net.minecraft.command.ICommandSender;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.polyfrost.oneconfig.api.commands.v1.CommandManager;
-import org.polyfrost.oneconfig.api.commands.v1.factories.builder.CommandBuilder;
 import org.polyfrost.oneconfig.api.config.v1.internal.ConfigVisualizer;
 import org.polyfrost.oneconfig.api.event.v1.EventManager;
 import org.polyfrost.oneconfig.api.event.v1.events.InitializationEvent;
@@ -54,8 +56,6 @@ import org.polyfrost.polyui.input.KeyModifiers;
 import org.polyfrost.polyui.input.Translator;
 
 import java.util.concurrent.atomic.AtomicBoolean;
-
-import static org.polyfrost.oneconfig.api.commands.v1.factories.builder.CommandBuilder.runs;
 
 /**
  * The main class of OneConfig.
@@ -110,6 +110,7 @@ public class OneConfig
         OmniLoader.ModInfo self = OmniLoader.getModInfo("oneconfig");
         String v = self == null ? "LOCAL" : self.getVersion();
         LOGGER.info("Loading OneConfig v{}", v);
+        OmniClientCommands.INSTANCE.initialize();
         BlurHandler.init();
 
         preloadCopycat();
@@ -123,17 +124,34 @@ public class OneConfig
     }
 
     private static void registerCommands() {
-        CommandBuilder b = CommandBuilder.command("oneconfig", "ocfg", "twoconfig").description("OneConfig main command");
-        b.then(runs().does((Runnable) OneConfigUI.INSTANCE::open).description("Opens the OneConfig UI"));
-        b.then(runs("updateCheck").does(() -> Multithreading.submit(() -> OmniChat.showChatMessage(MavenUpdateChecker.oneconfig().hasUpdate() ? "Update available!" : "No updates available"))).description("Check for updates"));
-        b.then(runs("locraw").does(() -> OmniChat.showChatMessage(HypixelUtils.getLocation().toString()))).description("Get your current location on Hypixel");
-        b.then(runs("hud").does(() -> Platform.screen().display(HudManager.INSTANCE.getWithEditor())).description("Opens the OneConfig HUD editor"));
-        b.then(runs("delete").does(() -> {
+        LiteralArgumentBuilder<ICommandSender> b = OmniClientCommands.INSTANCE.literal("oneconfig");
+        b.executes(cmd -> {
+            OneConfigUI.INSTANCE.open();
+            return 1;
+        });
+        b.then(OmniClientCommands.INSTANCE.literal("updateCheck").executes(cmd -> {
+            Multithreading.submit(() -> OmniChat.showChatMessage(MavenUpdateChecker.oneconfig().hasUpdate() ? "Update available!" : "No updates available"));
+            return 1;
+        }));
+        b.then(OmniClientCommands.INSTANCE.literal("locraw").executes(cmd -> {
+            OmniChat.showChatMessage(HypixelUtils.getLocation().toString());
+            return 1;
+        }));
+        b.then(OmniClientCommands.INSTANCE.literal("hud").executes(cmd -> {
+            Platform.screen().display(HudManager.INSTANCE.getWithEditor());
+            return 1;
+        }));
+        b.then(OmniClientCommands.INSTANCE.literal("delete").executes(cmd -> {
             OneConfigUI.INSTANCE.invalidateCache();
             ConfigVisualizer.INSTANCE.clearCache();
             OmniChat.showChatMessage("Deleted OneConfig UI. Please make a report if you were having issues!");
-        })).description("Invalidate the OneConfig UI, forcing a reload. Use this if it is bugged and make sure to report an issue!");
-        CommandManager.registerCommand(b.build());
+            return 1;
+        }));
+
+        CommandNode<ICommandSender> node = b.build();
+        OmniClientCommands.INSTANCE.register(b);
+        OmniClientCommands.INSTANCE.register(OmniClientCommands.INSTANCE.literal("ocfg").redirect(node));
+        OmniClientCommands.INSTANCE.register(OmniClientCommands.INSTANCE.literal("twoconfig").redirect(node));
     }
 
     private static void registerKeybinds() {

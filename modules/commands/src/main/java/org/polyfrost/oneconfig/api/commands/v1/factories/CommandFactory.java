@@ -28,16 +28,15 @@ package org.polyfrost.oneconfig.api.commands.v1.factories;
 
 import com.mojang.brigadier.tree.LiteralCommandNode;
 import org.jetbrains.annotations.NotNull;
-import org.polyfrost.oneconfig.api.commands.v1.ClientCommandSource;
 
 
 @FunctionalInterface
-public interface CommandFactory {
+public interface CommandFactory<S> {
     /**
      * Create a command from the given object.
      *
      * @param obj the object to create the command from
      * @return the command, or null if this factory cannot create a command from the given object. Ideally this is fail-fast.
      */
-    LiteralCommandNode<ClientCommandSource>[] create(@NotNull Object obj);
+    LiteralCommandNode<S>[] create(@NotNull Object obj);
 }

@@ -27,22 +27,26 @@
 package org.polyfrost.oneconfig.api.commands.v1.factories.annotated;
 
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
+import com.mojang.brigadier.tree.CommandNode;
 import com.mojang.brigadier.tree.LiteralCommandNode;
+import dev.deftu.omnicore.client.OmniChat;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
-import org.polyfrost.oneconfig.api.commands.v1.ClientCommandSource;
 import org.polyfrost.oneconfig.api.commands.v1.CommandManager;
 import org.polyfrost.oneconfig.api.commands.v1.factories.CommandFactory;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
 
-public class AnnotationCommandFactory implements CommandFactory {
+public class AnnotationCommandFactory<S> implements CommandFactory<S> {
+    private static final Logger LOGGER = LogManager.getLogger("OneConfig/BrigaiderTranslator");
 
-    private static void create(LiteralArgumentBuilder<ClientCommandSource> tree, Object it) {
+    private void create(LiteralArgumentBuilder<S> tree, Object it) {
         for (Method m : it.getClass().getDeclaredMethods()) {
             if (m.isAnnotationPresent(Command.class)) {
                 // todo
-                LiteralArgumentBuilder<ClientCommandSource> methodBuilder = null;
+                LiteralArgumentBuilder<S> methodBuilder = null;
 
                 String[] paramNames = new String[m.getParameterCount()];
                 Class<?>[] paramTypes = m.getParameterTypes();
@@ -59,7 +63,14 @@ public class AnnotationCommandFactory implements CommandFactory {
                     for (int i = 0; i < paramTypes.length; i++) {
                         args[i] = ctx.getArgument(paramNames[i], paramTypes[i]);
                     }
-                    return m.invoke(it, args);
+                    try {
+                        m.invoke(it, args);
+                        return 0;
+                    } catch (Exception e) {
+                        OmniChat.showChatMessage("An error occurred while executing this command!\nPlease report this to the developer: " + e.getMessage());
+                        LOGGER.error("Failed to execute command!", e);
+                        return 1;
+                    }
                 });
                 tree.then(methodBuilder.build());
             }
@@ -67,8 +78,8 @@ public class AnnotationCommandFactory implements CommandFactory {
         for (Class<?> cls : it.getClass().getDeclaredClasses()) {
             if (cls.isAnnotationPresent(Command.class)) {
                 Command c = cls.getAnnotation(Command.class);
-                LiteralArgumentBuilder<ClientCommandSource> classBuilder = CommandManager.literal(c.value().length == 0 ? cls.getSimpleName() : c.value()[0]);
-                LiteralCommandNode<ClientCommandSource> classNode = classBuilder.build();
+                LiteralArgumentBuilder<S> classBuilder = CommandManager.literal(c.value().length == 0 ? cls.getSimpleName() : c.value()[0]);
+                LiteralCommandNode<S> classNode = classBuilder.build();
                 tree.then(classBuilder.build());
             }
         }
@@ -76,14 +87,14 @@ public class AnnotationCommandFactory implements CommandFactory {
 
 
     @Override
-    public LiteralCommandNode<ClientCommandSource>[] create(@NotNull Object obj) {
+    public LiteralCommandNode<S>[] create(@NotNull Object obj) {
         Command c = obj.getClass().getAnnotation(Command.class);
         if (c == null) return null;
-        LiteralArgumentBuilder<ClientCommandSource> builder = CommandManager.literal(c.value().length == 0 ? obj.getClass().getSimpleName() : c.value()[0]);
-        LiteralCommandNode<ClientCommandSource>[] nodes = new LiteralCommandNode[Math.max(1, c.value().length)];
+        LiteralArgumentBuilder<S> builder = CommandManager.literal(c.value().length == 0 ? obj.getClass().getSimpleName() : c.value()[0]);
+        LiteralCommandNode<S>[] nodes = new LiteralCommandNode[Math.max(1, c.value().length)];
         nodes[0] = builder.build();
         for (int i = 1; i < c.value().length; i++) {
-            nodes[i] = CommandManager.literal(c.value()[i]).redirect(builder).build();
+             nodes[i] = CommandManager.literal(c.value()[i]).redirect((CommandNode) builder.build()).build();
         }
         return nodes;
     }
