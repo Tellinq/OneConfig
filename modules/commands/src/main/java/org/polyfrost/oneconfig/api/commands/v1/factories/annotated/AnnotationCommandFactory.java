@@ -26,101 +26,65 @@
 
 package org.polyfrost.oneconfig.api.commands.v1.factories.annotated;
 
-import org.jetbrains.annotations.Contract;
+import com.mojang.brigadier.builder.LiteralArgumentBuilder;
+import com.mojang.brigadier.tree.LiteralCommandNode;
 import org.jetbrains.annotations.NotNull;
-import org.polyfrost.oneconfig.api.commands.v1.CommandTree;
-import org.polyfrost.oneconfig.api.commands.v1.Executable;
-import org.polyfrost.oneconfig.api.commands.v1.arguments.ArgumentParser;
-import org.polyfrost.oneconfig.api.commands.v1.exceptions.WrongArgumentsException;
+import org.polyfrost.oneconfig.api.commands.v1.ClientCommandSource;
+import org.polyfrost.oneconfig.api.commands.v1.CommandManager;
 import org.polyfrost.oneconfig.api.commands.v1.factories.CommandFactory;
-import org.polyfrost.oneconfig.utils.v1.MHUtils;
 
-import java.lang.invoke.MethodHandle;
-import java.lang.invoke.WrongMethodTypeException;
 import java.lang.reflect.Method;
-import java.util.Map;
-import java.util.function.Function;
+import java.lang.reflect.Parameter;
 
 public class AnnotationCommandFactory implements CommandFactory {
 
-    static void create(Map<Class<?>, ArgumentParser<?>> parsers, CommandTree tree, Object it) {
+    private static void create(LiteralArgumentBuilder<ClientCommandSource> tree, Object it) {
         for (Method m : it.getClass().getDeclaredMethods()) {
             if (m.isAnnotationPresent(Command.class)) {
-                tree.put(map(it, m, parsers));
+                // todo
+                LiteralArgumentBuilder<ClientCommandSource> methodBuilder = null;
+
+                String[] paramNames = new String[m.getParameterCount()];
+                Class<?>[] paramTypes = m.getParameterTypes();
+                Parameter[] params = m.getParameters();
+                for (int i = 0; i < paramNames.length; i++) {
+                    paramNames[i] = params[i].getName();
+                    methodBuilder = methodBuilder.then(
+                            CommandManager.argument(paramNames[i], CommandManager.getArgumentType(paramTypes[i]))
+                    );
+                }
+
+                methodBuilder.executes((ctx) -> {
+                    Object[] args = new Object[paramTypes.length];
+                    for (int i = 0; i < paramTypes.length; i++) {
+                        args[i] = ctx.getArgument(paramNames[i], paramTypes[i]);
+                    }
+                    return m.invoke(it, args);
+                });
+                tree.then(methodBuilder.build());
             }
         }
         for (Class<?> cls : it.getClass().getDeclaredClasses()) {
             if (cls.isAnnotationPresent(Command.class)) {
                 Command c = cls.getAnnotation(Command.class);
-                CommandTree sub = new CommandTree(c.value().length == 0 ? new String[]{cls.getSimpleName()} : c.value(), c.description().isEmpty() ? null : c.description());
-                Object instance = MHUtils.instantiate(cls, true).getOrThrow();
-                create(parsers, sub, instance);
-                tree.put(sub);
+                LiteralArgumentBuilder<ClientCommandSource> classBuilder = CommandManager.literal(c.value().length == 0 ? cls.getSimpleName() : c.value()[0]);
+                LiteralCommandNode<ClientCommandSource> classNode = classBuilder.build();
+                tree.then(classBuilder.build());
             }
         }
     }
 
-    static Executable map(Object it, Method method, Map<Class<?>, ArgumentParser<?>> parsers) {
-        Command c = method.getAnnotation(Command.class);
-        MethodHandle m = MHUtils.getMethodHandle(method, it).getOrThrow();
-        String[] names = c.value();
-        if (names.length == 0) names = new String[]{method.getName()};
-
-        return new Executable(names, c.description().isEmpty() ? null : c.description(), createParameterInfos(method, parsers), c.greedy(), getFunction(m));
-    }
-
-    @Contract(pure = true)
-    static @NotNull Function<Object[], Object> getFunction(MethodHandle mh) {
-        return args -> {
-            try {
-                return mh.invokeWithArguments(args);
-            } catch (WrongMethodTypeException | ClassCastException e) {
-                // should've been caught earlier
-                throw new WrongArgumentsException("InternalError while executing command: CommandTree method argument mismatch!", e);
-            } catch (Throwable e) {
-                throw sneakyThrow(e);
-            }
-        };
-    }
-
-    public static RuntimeException sneakyThrow(Throwable t) {
-        return sneakyThrow0(t);
-    }
-
-    @SuppressWarnings("unchecked")
-    private static <T extends Throwable> T sneakyThrow0(Throwable t) throws T {
-        throw (T) t;
-    }
-
-    static Executable.Param createParameterInfo(java.lang.reflect.Parameter parameter, Map<Class<?>, ArgumentParser<?>> parsers) {
-        String name = "";
-        String desc = "";
-        int arity = 1;
-        if (parameter.isAnnotationPresent(Parameter.class)) {
-            Parameter p = parameter.getAnnotation(Parameter.class);
-            name = p.value();
-            desc = p.description();
-            arity = p.arity();
-        }
-        if (name.isEmpty()) name = parameter.getType().getSimpleName();
-        return Executable.Param.create(name, desc.isEmpty() ? null : desc, parameter.getType(), arity, parsers);
-    }
-
-    static Executable.Param[] createParameterInfos(Method method, Map<Class<?>, ArgumentParser<?>> parsers) {
-        java.lang.reflect.Parameter[] parameters = method.getParameters();
-        Executable.Param[] infos = new Executable.Param[parameters.length];
-        for (int i = 0; i < parameters.length; i++) {
-            infos[i] = createParameterInfo(parameters[i], parsers);
-        }
-        return infos;
-    }
 
     @Override
-    public CommandTree create(@NotNull Map<Class<?>, ArgumentParser<?>> parsers, @NotNull Object obj) {
+    public LiteralCommandNode<ClientCommandSource>[] create(@NotNull Object obj) {
         Command c = obj.getClass().getAnnotation(Command.class);
         if (c == null) return null;
-        CommandTree tree = new CommandTree(c.value().length == 0 ? new String[]{obj.getClass().getSimpleName()} : c.value(), c.description().isEmpty() ? null : c.description());
-        create(parsers, tree, obj);
-        return tree;
+        LiteralArgumentBuilder<ClientCommandSource> builder = CommandManager.literal(c.value().length == 0 ? obj.getClass().getSimpleName() : c.value()[0]);
+        LiteralCommandNode<ClientCommandSource>[] nodes = new LiteralCommandNode[Math.max(1, c.value().length)];
+        nodes[0] = builder.build();
+        for (int i = 1; i < c.value().length; i++) {
+            nodes[i] = CommandManager.literal(c.value()[i]).redirect(builder).build();
+        }
+        return nodes;
     }
 }

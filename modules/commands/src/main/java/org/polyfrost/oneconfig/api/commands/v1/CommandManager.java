@@ -26,12 +26,12 @@
 
 package org.polyfrost.oneconfig.api.commands.v1;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-import org.jetbrains.annotations.ApiStatus;
-import org.polyfrost.oneconfig.api.commands.v1.arguments.ArgumentParser;
+import com.mojang.brigadier.arguments.*;
+import com.mojang.brigadier.builder.LiteralArgumentBuilder;
+import com.mojang.brigadier.builder.RequiredArgumentBuilder;
+import com.mojang.brigadier.tree.LiteralCommandNode;
+import dev.deftu.omnicore.client.OmniClientCommands;
 import org.polyfrost.oneconfig.api.commands.v1.factories.CommandFactory;
-import org.polyfrost.oneconfig.api.commands.v1.factories.PlatformCommandFactory;
 import org.polyfrost.oneconfig.api.commands.v1.factories.annotated.AnnotationCommandFactory;
 import org.polyfrost.oneconfig.api.commands.v1.factories.annotated.Command;
 
@@ -43,43 +43,55 @@ import java.util.*;
  * @see Command
  */
 public class CommandManager {
-    private static final Logger LOGGER = LogManager.getLogger("OneConfig/Commands");
     /**
      * The singleton instance of the command manager.
      */
     public static final CommandManager INSTANCE = new CommandManager();
-    private static final PlatformCommandFactory platform;
-    /**
-     * use {@link #registerParser(ArgumentParser)} to register a parser
-     */
-    @ApiStatus.Internal
-    public final Map<Class<?>, ArgumentParser<?>> parsers = new HashMap<>();
     private final Set<CommandFactory> factories = new HashSet<>();
+    private final Map<Class<?>, ArgumentType<?>> argumentTypes = new IdentityHashMap<>();
 
-    static {
-        PlatformCommandFactory p;
-        try {
-            p = ServiceLoader.load(PlatformCommandFactory.class, PlatformCommandFactory.class.getClassLoader()).iterator().next();
-        } catch (Throwable t) {
-            LOGGER.error("failed to load platform command manager!", t);
-            p = null;
-        }
-        platform = p;
-    }
 
     private CommandManager() {
-        parsers.putAll(ArgumentParser.defaultParsers);
         registerFactory(new AnnotationCommandFactory());
+        argumentTypes.put(int.class, IntegerArgumentType.integer());
+        argumentTypes.put(String.class, StringArgumentType.string());
+        argumentTypes.put(boolean.class, BoolArgumentType.bool());
+        argumentTypes.put(float.class, FloatArgumentType.floatArg());
+        argumentTypes.put(double.class, DoubleArgumentType.doubleArg());
+        argumentTypes.put(long.class, LongArgumentType.longArg());
     }
 
-    public static boolean registerCommand(CommandTree tree) {
-        if (tree == null) return false;
-        platformCreate(tree);
+    public static void registerCommand(LiteralArgumentBuilder<ClientCommandSource> builder) {
+        OmniClientCommands.INSTANCE.register(builder);
+    }
+
+    public static void registerCommand(LiteralCommandNode<ClientCommandSource> node) {
+        OmniClientCommands.INSTANCE.register(node);
+    }
+
+    public static boolean register(Object obj) {
+        LiteralCommandNode<ClientCommandSource>[] nodes = INSTANCE.create(obj);
+        if (nodes == null) return false;
+        for (LiteralCommandNode<ClientCommandSource> node : nodes) {
+            registerCommand(node);
+        }
         return true;
     }
 
-    public static boolean registerCommand(Object obj) {
-        return INSTANCE.create(obj);
+    public LiteralCommandNode<ClientCommandSource>[] create(Object obj) {
+        for (CommandFactory factory : factories) {
+            LiteralCommandNode<ClientCommandSource>[] nodes = factory.create(obj);
+            if (nodes != null) return nodes;
+        }
+        return null;
+    }
+
+    public static LiteralArgumentBuilder<ClientCommandSource> literal(String name) {
+        return OmniClientCommands.INSTANCE.literal(name);
+    }
+
+    public static <T> RequiredArgumentBuilder<ClientCommandSource, T> argument(String name, ArgumentType<T> type) {
+        return OmniClientCommands.INSTANCE.argument(name, type);
     }
 
     /**
@@ -89,49 +101,12 @@ public class CommandManager {
         factories.add(factory);
     }
 
-    /**
-     * Register a parser which can be used to parse arguments needed by commands.
-     */
-    public void registerParser(ArgumentParser<?> parser) {
-        parsers.put(parser.getType(), parser);
+    public void registerArgumentType(Class<?> type, ArgumentType<?> argumentType) {
+        argumentTypes.put(type, argumentType);
     }
 
-    public void registerParser(ArgumentParser<?>... parsers) {
-        for (ArgumentParser<?> p : parsers) {
-            registerParser(p);
-        }
-    }
-
-    /**
-     * Create a command from the provided object.
-     * <br>
-     * The details of this process are down to the registered {@link CommandFactory} instances.
-     *
-     * @return true if a command was created, false otherwise (meaning no factory was able to process the given object into a command)
-     */
-    public boolean create(Object obj) {
-        return createTree(obj) != null;
-    }
-
-    /**
-     * Create a command from the given object
-     *
-     * @see #create(Object)
-     */
-    public CommandTree createTree(Object obj) {
-        for (CommandFactory f : factories) {
-            CommandTree tree = f.create(parsers, obj);
-            if (tree == null) continue;
-            return platformCreate(tree);
-        }
-        LOGGER.warn("no factory was able to process {} into a command tree, so it was ignored", obj.getClass());
-        return null;
-    }
-
-    private static CommandTree platformCreate(CommandTree tree) {
-        tree.init();
-        if (platform != null) platform.createCommand(tree);
-        else LOGGER.warn("didn't create command with platform as it is missing (check logs)");
-        return tree;
+    @SuppressWarnings("unchecked")
+    public static <T> ArgumentType<T> getArgumentType(Class<T> type) {
+        return (ArgumentType<T>) INSTANCE.argumentTypes.get(type);
     }
 }
