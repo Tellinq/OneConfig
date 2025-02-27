@@ -2,8 +2,6 @@ net.minecraftforge.eventbus.EventBus net.minecraftforge.fml.common.eventhandler.
 net.minecraftforge.eventbus.api.Event net.minecraftforge.fml.common.eventhandler.Event
 net.minecraftforge.eventbus.api.SubscribeEvent net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
-net.minecraft.util.profiling.ProfilerFiller net.minecraft.profiler.Profiler
-
 net.minecraft.client.renderer.EffectInstance net.minecraft.client.shader.ShaderManager
 net.minecraft.client.renderer.EffectInstance getUniform() getShaderUniform()
 
