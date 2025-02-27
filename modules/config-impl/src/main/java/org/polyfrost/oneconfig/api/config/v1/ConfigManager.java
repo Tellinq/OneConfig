@@ -32,6 +32,7 @@ import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.annotations.UnmodifiableView;
+import org.polyfrost.oneconfig.api.config.v1.backend.Backend;
 import org.polyfrost.oneconfig.api.config.v1.backend.impl.FileBackend;
 import org.polyfrost.oneconfig.api.config.v1.collect.PropertyCollector;
 import org.polyfrost.oneconfig.api.config.v1.collect.impl.OneConfigCollector;
@@ -54,6 +55,7 @@ public final class ConfigManager {
     private static final List<PropertyCollector> collectors = new ArrayList<>(1);
     private static final ConfigManager internal = new ConfigManager(Paths.get("oneconfig"), NightConfigSerializer.ALL);
     private static final ConfigManager core = new ConfigManager(Paths.get("config"), NightConfigSerializer.ALL);
+    private static final ConfigManager backup = new ConfigManager(Paths.get("oneconfig", "backup"), NightConfigSerializer.ALL);
     private static ConfigManager active;
 
     static {
@@ -61,7 +63,7 @@ public final class ConfigManager {
         registerCollector(new OneConfigCollector());
     }
 
-    private final FileBackend backend;
+    final FileBackend backend;
     private volatile boolean shutdown = false;
 
 
@@ -79,6 +81,16 @@ public final class ConfigManager {
     }
 
     /**
+     * Returns a reference to config manager which contains the backup configs, which is mounted onto the ./OneConfig/backup directory.
+     * <b>internal use only!</b>
+     * <br>used for the restore to default buttons.
+     */
+    @ApiStatus.Internal
+    public static ConfigManager backup() {
+        return backup;
+    }
+
+    /**
      * Returns a reference to the active config manager, which is mounted to the current active profile.
      */
     public static synchronized ConfigManager active() {
@@ -91,7 +103,7 @@ public final class ConfigManager {
                 tree("profiles.json").put(
                         Properties.simple("activeProfile", "Active Profile", "The profile which is currently open.", "")
                 )
-        ).getProp("activeProfile").getAs();
+        ).get().getProp("activeProfile").getAs();
         openProfile(activeProfile);
     }
 
@@ -171,7 +183,7 @@ public final class ConfigManager {
         return backend.folder;
     }
 
-    public Tree register(Tree t) {
+    public Backend.RegistrationResult register(Tree t) {
         return backend.register(t);
     }
 
@@ -187,7 +199,7 @@ public final class ConfigManager {
     public Tree register(@NotNull Object o, @NotNull String id) {
         Tree t = collect(o, id);
         if (t == null) return null;
-        return backend.register(t);
+        return register(t).get();
     }
 
     private ConfigManager withHook() {

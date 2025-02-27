@@ -33,7 +33,6 @@ import dev.deftu.omnicore.client.OmniChat;
 import dev.deftu.omnicore.client.OmniClientCommands;
 import dev.deftu.omnicore.common.OmniLoader;
 import kotlin.Unit;
-import net.minecraft.command.ICommandSender;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.polyfrost.oneconfig.api.config.v1.internal.ConfigVisualizer;
@@ -123,8 +122,9 @@ public class OneConfig
         LOGGER.info("OneConfig initialized!");
     }
 
+    @SuppressWarnings({"unchecked", "rawtypes"})
     private static void registerCommands() {
-        LiteralArgumentBuilder<ICommandSender> b = OmniClientCommands.INSTANCE.literal("oneconfig");
+        LiteralArgumentBuilder b = OmniClientCommands.INSTANCE.literal("oneconfig");
         b.executes(cmd -> {
             OneConfigUI.INSTANCE.open();
             return 1;
@@ -148,7 +148,7 @@ public class OneConfig
             return 1;
         }));
 
-        CommandNode<ICommandSender> node = b.build();
+        CommandNode node = b.build();
         OmniClientCommands.INSTANCE.register(b);
         OmniClientCommands.INSTANCE.register(OmniClientCommands.INSTANCE.literal("ocfg").redirect(node));
         OmniClientCommands.INSTANCE.register(OmniClientCommands.INSTANCE.literal("twoconfig").redirect(node));

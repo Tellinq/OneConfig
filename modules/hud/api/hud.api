@@ -12,6 +12,9 @@ public abstract class org/polyfrost/oneconfig/api/hud/v1/Hud : org/polyfrost/one
 	public final fun getBackground ()Lorg/polyfrost/polyui/component/impl/Block;
 	public final fun getHidden ()Z
 	public final fun getHud ()Lorg/polyfrost/polyui/component/Drawable;
+	public final fun getShowInF3 ()Z
+	public final fun getShowInScreens ()Z
+	public final fun getShowInTab ()Z
 	public fun hasBackground ()Z
 	public fun id ()Ljava/lang/String;
 	public fun initialize ()V
@@ -22,6 +25,9 @@ public abstract class org/polyfrost/oneconfig/api/hud/v1/Hud : org/polyfrost/one
 	public synthetic fun makeTree (Ljava/lang/String;)Lorg/polyfrost/oneconfig/api/config/v1/Tree;
 	public fun multipleInstancesAllowed ()Z
 	public final fun setHidden (Z)V
+	public final fun setShowInF3 (Z)V
+	public final fun setShowInScreens (Z)V
+	public final fun setShowInTab (Z)V
 	public abstract fun title ()Ljava/lang/String;
 	public abstract fun update ()Z
 	protected final fun updateAndRecalculate ()V

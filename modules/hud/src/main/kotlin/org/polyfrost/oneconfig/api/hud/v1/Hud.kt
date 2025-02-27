@@ -33,6 +33,7 @@ import org.polyfrost.oneconfig.api.config.v1.ConfigManager
 import org.polyfrost.oneconfig.api.config.v1.Properties.ktProperty
 import org.polyfrost.oneconfig.api.config.v1.Properties.simple
 import org.polyfrost.oneconfig.api.config.v1.Tree
+import org.polyfrost.oneconfig.api.config.v1.annotations.Switch
 import org.polyfrost.oneconfig.api.hud.v1.HudManager.LOGGER
 import org.polyfrost.polyui.color.PolyColor
 import org.polyfrost.polyui.component.Component
@@ -64,6 +65,15 @@ import kotlin.random.Random
  */
 @Suppress("EqualsOrHashCode")
 abstract class Hud<T : Drawable> : Cloneable, Config("null", null, "null", null) {
+    @Switch(title = "Show in Tab")
+    var showInF3 = true
+
+    @Switch(title = "Show in Tab")
+    var showInTab = true
+
+    @Switch(title = "Show in GUIs")
+    var showInScreens = true
+
     // effectively lateinit because of how this works (great reason ik)
     // tree is null unless this is saved
     final override fun makeTree(id: String) = null

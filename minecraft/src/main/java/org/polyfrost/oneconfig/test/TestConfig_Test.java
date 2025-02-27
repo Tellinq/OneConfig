@@ -105,7 +105,7 @@ public class TestConfig_Test extends Config {
     }
 
     @Button(title = "Test")
-    private static void main() {
+    private void main() {
         OmniChat.showChatMessage("button pressed");
     }
 

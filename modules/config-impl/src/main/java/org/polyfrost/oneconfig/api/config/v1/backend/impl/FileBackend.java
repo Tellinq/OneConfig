@@ -180,7 +180,7 @@ public class FileBackend extends Backend {
     }
 
     @Override
-    protected boolean save0(@NotNull Tree tree) {
+    public boolean save0(@NotNull Tree tree) {
         Path p = folder.resolve(tree.getID());
         FileSerializer<String> serializer = getSerializer(p);
         if (serializer == null) {

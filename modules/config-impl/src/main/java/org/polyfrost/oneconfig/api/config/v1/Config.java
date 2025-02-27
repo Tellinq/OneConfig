@@ -50,6 +50,7 @@ public abstract class Config {
             tree.setTitle(title);
             tree.addMetadata("icon", iconPath);
             tree.addMetadata("category", category);
+            ConfigManager.backup().backend.save0(tree);
             ConfigManager.active().register(tree);
         }
     }
@@ -70,6 +71,17 @@ public abstract class Config {
     protected void addDependency(String option, String name, Supplier<Property.Display> condition) {
         Property<?> opt = getProperty(option).addDisplayCondition(condition);
         if (name != null) opt.getOrPutMetadata("dependencyNames", () -> new ArrayList<String>(3)).add(name);
+    }
+
+    protected void restoreDefaults() {
+        tree.overwrite(ConfigManager.backup().get(tree.getID()));
+    }
+
+    protected void restoreProperty(String option) {
+        Property<?> prop = getProperty(option);
+        // first operation will be slow as the tree will have to be loaded from the disc, but this is intended as to not waste memory
+        // once one property is restored/restore all is used, the backup tree will be in memory and so will be fast to restore more
+        prop.overwrite(getProperty(ConfigManager.backup().get(tree.getID()), option));
     }
 
     protected void addDependency(String option, String condition) {
@@ -147,6 +159,10 @@ public abstract class Config {
 
     protected Property<?> getProperty(String option) {
         if (tree == null) throw notInitialized();
+        return getProperty(tree, option);
+    }
+
+    protected static Property<?> getProperty(Tree tree, String option) {
         Property<?> p = option.indexOf('.') >= 0 ? tree.getProp(option.split("\\.")) : tree.getProp(option);
         if (p == null) throw new IllegalArgumentException("Config does not contain property: " + option);
         return p;
