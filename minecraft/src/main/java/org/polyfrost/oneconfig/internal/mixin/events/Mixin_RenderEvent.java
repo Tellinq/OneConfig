@@ -29,14 +29,24 @@ public class Mixin_RenderEvent {
     @Inject(method = "runGameLoop", at = @At(value = "INVOKE", target = UPDATE_CAMERA_AND_RENDER))
     private void renderTickStartCallback(CallbackInfo ci) {
         RenderEvent e = RenderEvent.Pre.INSTANCE;
-        e.deltaTicks = this.timer.renderPartialTicks;
+        e.deltaTicks = this.timer
+                //#if MC >= 1.21.1
+                //$$ .getRealtimeDeltaTicks();
+                //#else
+                .renderPartialTicks;
+                //#endif
         EventManager.INSTANCE.post(e);
     }
 
     @Inject(method = "runGameLoop", at = @At(value = "INVOKE", target = UPDATE_CAMERA_AND_RENDER, shift = At.Shift.AFTER))
     private void renderTickEndCallback(CallbackInfo ci) {
         RenderEvent e = RenderEvent.Post.INSTANCE;
-        e.deltaTicks = this.timer.renderPartialTicks;
+        e.deltaTicks = this.timer
+                //#if MC >= 1.21.1
+                //$$ .getRealtimeDeltaTicks();
+                //#else
+                .renderPartialTicks;
+                //#endif
         EventManager.INSTANCE.post(e);
     }
 

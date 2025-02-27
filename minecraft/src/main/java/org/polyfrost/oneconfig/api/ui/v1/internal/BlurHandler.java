@@ -26,6 +26,7 @@
 
 package org.polyfrost.oneconfig.api.ui.v1.internal;
 
+import dev.deftu.omnicore.common.OmniIdentifier;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.shader.Shader;
 import net.minecraft.client.shader.ShaderGroup;
@@ -44,6 +45,10 @@ import org.polyfrost.polyui.animate.Animation;
 
 import java.util.List;
 
+//#if MC >= 1.21.4
+//$$ import net.minecraft.client.render.DefaultFramebufferSet;
+//#endif
+
 /**
  * An adapted & optimized implementation of the BlurMC mod by tterrag1098, later modified by boomboompower.
  * <p>
@@ -57,7 +62,7 @@ import java.util.List;
 public final class BlurHandler {
     public static final BlurHandler INSTANCE = new BlurHandler();
     private static final Logger LOGGER = LogManager.getLogger("OneConfig/Blur");
-    private final ResourceLocation blurShader = new ResourceLocation("shaders/post/fade_in_blur.json");
+    private final ResourceLocation blurShader = OmniIdentifier.create("shaders/post/fade_in_blur.json");
     private final Animation animation = Animation.Type.Default.create(2_000_000_000, 0f, 5f);
     private ShaderUniform su;
 
@@ -99,11 +104,15 @@ public final class BlurHandler {
                 //#if FABRIC
                 //$$ ((org.polyfrost.oneconfig.internal.mixin.fabric.Mixin_LoadShaderInvoker) MinecraftClient.getInstance().gameRenderer).invokeLoadShader(this.blurShader);
                 //#else
+                //#if MC >= 1.21.4
+                //$$ Minecraft.getInstance().gameRenderer.setPostEffect(this.blurShader);
+                //#else
                 Minecraft.getMinecraft().entityRenderer.loadShader(this.blurShader);
+                //#endif
                 //#endif
 
                 try {
-                    ShaderGroup group = Minecraft.getMinecraft().entityRenderer.getShaderGroup();
+                    ShaderGroup group = getShaderGroup();
                     if (group == null) return false;
                     List<Shader> shaders = ((Mixin_ShaderListAccessor) group).getListShaders();
                     if (shaders == null) return false;
@@ -133,24 +142,43 @@ public final class BlurHandler {
     }
 
     private void tryStop() {
-        ShaderGroup sg = Minecraft.getMinecraft().entityRenderer.getShaderGroup();
+        ShaderGroup sg = getShaderGroup();
         if (sg == null) return;
-        String name = sg.getShaderGroupName();
+        String name =
+                //#if MC >= 1.21.4
+                //$$ MinecraftClient.getInstance().gameRenderer.getPostProcessorId().toString();
+                //#else
+                sg.getShaderGroupName();
+                //#endif
 
         // Only stop our specific blur ;)
         if (!name.endsWith("fade_in_blur.json")) {
             return;
         }
+
         su = null;
+        //#if MC >= 1.21.4
+        //$$ MinecraftClient.getInstance().gameRenderer.clearPostProcessor();
+        //#else
         Minecraft.getMinecraft().entityRenderer.stopUseShader();
+        //#endif
     }
 
     @SuppressWarnings("BooleanMethodIsAlwaysInverted")
     public boolean isShaderActive() {
-        return Minecraft.getMinecraft().entityRenderer.getShaderGroup() != null
+        return getShaderGroup() != null
                 //#if MC<=11202
                 && net.minecraft.client.renderer.OpenGlHelper.shadersSupported
                 //#endif
                 ;
+    }
+
+    private ShaderGroup getShaderGroup() {
+        return Minecraft.getMinecraft()
+                //#if MC >= 1.21.4
+                //$$ .getShaderLoader().loadPostEffect(this.blurShader, DefaultFramebufferSet.MAIN_ONLY);
+                //#else
+                .entityRenderer.getShaderGroup();
+                //#endif
     }
 }

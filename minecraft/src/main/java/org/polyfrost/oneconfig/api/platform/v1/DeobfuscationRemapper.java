@@ -13,7 +13,9 @@ import net.minecraftforge.fml.common.asm.transformers.deobf.FMLDeobfuscatingRema
 //#else
 //$$ import net.minecraftforge.fml.common.ObfuscationReflectionHelper;
 //#endif
+//#if MC < 1.20.6
 //$$ import cpw.mods.modlauncher.api.INameMappingService;
+//#endif
 //#endif
 //#else
 //$$ import net.fabricmc.loader.api.FabricLoader;
@@ -39,7 +41,11 @@ public class DeobfuscationRemapper extends Remapper {
         //#if MC <= 1.12.2
         return FMLDeobfuscatingRemapper.INSTANCE.map(typeName);
         //#else
+        //#if MC >= 1.20.6
+        //$$ throw new UnsupportedOperationException("Remapping of class names is not yet supported in 1.20.6+"); // TODO
+        //#else
         //$$ return ObfuscationReflectionHelper.remapName(INameMappingService.Domain.CLASS, typeName);
+        //#endif
         //#endif
         //#else
         //$$ return RESOLVER.mapClassName(INTERMEDIARY, typeName);
@@ -52,7 +58,11 @@ public class DeobfuscationRemapper extends Remapper {
         //#if MC <= 1.12.2
         return FMLDeobfuscatingRemapper.INSTANCE.mapMethodName(owner, name, desc);
         //#else
+        //#if MC >= 1.20.6
+        //$$ throw new UnsupportedOperationException("Remapping of class names is not yet supported in 1.20.6+"); // TODO
+        //#else
         //$$ return ObfuscationReflectionHelper.remapName(INameMappingService.Domain.METHOD, name);
+        //#endif
         //#endif
         //#else
         //$$ return RESOLVER.mapMethodName(INTERMEDIARY, owner, name, desc);
@@ -65,7 +75,11 @@ public class DeobfuscationRemapper extends Remapper {
         //#if MC <= 1.12.2
         return FMLDeobfuscatingRemapper.INSTANCE.mapFieldName(owner, name, desc);
         //#else
+        //#if MC >= 1.20.6
+        //$$ throw new UnsupportedOperationException("Remapping of class names is not yet supported in 1.20.6+"); // TODO
+        //#else
         //$$ return ObfuscationReflectionHelper.remapName(INameMappingService.Domain.FIELD, name);
+        //#endif
         //#endif
         //#else
         //$$ return RESOLVER.mapFieldName(INTERMEDIARY, owner, name, desc);

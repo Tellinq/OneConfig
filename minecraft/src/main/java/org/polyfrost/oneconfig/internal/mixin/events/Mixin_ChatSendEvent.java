@@ -67,9 +67,9 @@ public abstract class Mixin_ChatSendEvent {
         //$$ String message = text.getString();
         //#endif
         //#if MC >= 1.16
-        //$$ if (org.polyfrost.oneconfig.internal.libs.fabric.ClientCommandInternals.executeCommand(message)) {
-        //$$     ci.cancel();
-        //$$ }
+        //$$ // if (org.polyfrost.oneconfig.internal.libs.fabric.ClientCommandInternals.executeCommand(message)) {
+        //$$ //     ci.cancel();
+        //$$ // }
         //#endif
 
         ocfg$chatEvent = new ChatEvent.Send(message);

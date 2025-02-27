@@ -1,10 +1,5 @@
 package org.polyfrost.oneconfig.internal.mixin.events;
 
-//#if MC >= 1.16.5
-//$$ import com.mojang.blaze3d.vertex.PoseStack;
-//$$ import net.minecraft.client.renderer.MultiBufferSource;
-//#endif
-
 import dev.deftu.omnicore.client.OmniClient;
 import net.minecraft.client.renderer.entity.RendererLivingEntity;
 import net.minecraft.entity.EntityLivingBase;
@@ -15,6 +10,15 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+
+//#if MC >= 1.16.5
+//$$ import com.mojang.blaze3d.vertex.PoseStack;
+//$$ import net.minecraft.client.renderer.MultiBufferSource;
+//#endif
+
+//#if MC >= 1.21.4
+//$$ import net.minecraft.util.profiler.Profilers;
+//#endif
 
 @Mixin(RendererLivingEntity.class)
 public class Mixin_RenderLivingEntityEvent<T extends EntityLivingBase> {
@@ -44,11 +48,16 @@ public class Mixin_RenderLivingEntityEvent<T extends EntityLivingBase> {
             //#endif
             CallbackInfo ci
     ) {
-        Profiler profiler = OmniClient.getInstance()
-                //#if MC >= 1.16.5
-                //$$ .getProfiler();
+        Profiler profiler =
+                //#if MC >= 1.21.4
+                //$$ Profilers.get();
                 //#else
-                .mcProfiler;
+                OmniClient.getInstance()
+                        //#if MC >= 1.16.5
+                        //$$ .getProfiler();
+                        //#else
+                        .mcProfiler;
+                        //#endif
                 //#endif
         profiler.startSection("oneconfig_renderlivingentity_event_pre");
 
@@ -90,11 +99,16 @@ public class Mixin_RenderLivingEntityEvent<T extends EntityLivingBase> {
             //#endif
             CallbackInfo ci
     ) {
-        Profiler profiler = OmniClient.getInstance()
-                //#if MC >= 1.16.5
-                //$$ .getProfiler();
+        Profiler profiler =
+                //#if MC >= 1.21.4
+                //$$ Profilers.get();
                 //#else
-                .mcProfiler;
+                OmniClient.getInstance()
+                    //#if MC >= 1.16.5
+                    //$$ .getProfiler();
+                    //#else
+                    .mcProfiler;
+                    //#endif
                 //#endif
         profiler.startSection("oneconfig_renderlivingentity_event_post");
 
