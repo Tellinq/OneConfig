@@ -27,10 +27,7 @@
 package org.polyfrost.oneconfig.api.config.v1.internal
 
 import org.apache.logging.log4j.LogManager
-import org.polyfrost.oneconfig.api.config.v1.Node
-import org.polyfrost.oneconfig.api.config.v1.Property
-import org.polyfrost.oneconfig.api.config.v1.Tree
-import org.polyfrost.oneconfig.api.config.v1.Visualizer
+import org.polyfrost.oneconfig.api.config.v1.*
 import org.polyfrost.polyui.animate.Animations
 import org.polyfrost.polyui.color.PolyColor
 import org.polyfrost.polyui.color.rgba
@@ -309,8 +306,10 @@ open class ConfigVisualizer {
 
     private fun Drawable.addResetMenu(root: Tree, prop: Property<*>) = this.events {
         Event.Mouse.Clicked(1) then {
-            PopupMenu(Text("Restore Default").setDestructivePalette().onClick {
-//                Tree.evaluateName()
+            PopupMenu(Text("Restore Default").setDestructivePalette().withStates().onClick {
+                prop.overwrite(ConfigManager.backup().get(root.id).get(Tree.evaluatePath(root, prop).split('.')))
+                polyUI.unfocus()
+                false
             }, polyUI = polyUI)
             false
         }

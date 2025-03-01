@@ -175,6 +175,18 @@ public class Tree extends Node implements Serializable {
         return n;
     }
 
+    @Nullable
+    public Node get(@NotNull Iterable<String> id) {
+        Tree t = this;
+        Node n = null;
+        for (String s : id) {
+            n = t.get(s);
+            if (n instanceof Tree) t = (Tree) n;
+            else return n;
+        }
+        return n;
+    }
+
     public Tree getChild(@NotNull String... id) {
         Node n = get(id);
         return n instanceof Tree ? (Tree) n : null;
@@ -305,21 +317,22 @@ public class Tree extends Node implements Serializable {
      * Figure out what the path from the given root to the given node is.
      */
     public static String evaluatePath(Tree root, Node node) {
+        if (node == null || root == null) return null;
         StringBuilder sb = new StringBuilder(32);
         _evaluatePath(sb, root, node);
         return sb.toString();
+
     }
 
     private static boolean _evaluatePath(StringBuilder sb, Tree root, Node node) {
-        // todo make sure this works and implement the actual reset thingy in config visualizer
         if (root == node) {
-            if(sb.length() > 0) sb.append('.');
+            if (sb.length() > 0) sb.append('.');
             sb.append(node.getID());
             return true;
         }
         for (Map.Entry<String, Node> e : root.theMap.entrySet()) {
             if (e.getValue() == node) {
-                if(sb.length() > 0) sb.append('.');
+                if (sb.length() > 0) sb.append('.');
                 sb.append(e.getKey());
                 return true;
             }

@@ -26,15 +26,13 @@
 
 package org.polyfrost.oneconfig.internal.ui.pages
 
+import org.polyfrost.oneconfig.api.config.v1.ConfigManager
 import org.polyfrost.oneconfig.api.config.v1.Tree
 import org.polyfrost.oneconfig.api.config.v1.internal.ConfigVisualizer
 import org.polyfrost.oneconfig.internal.ui.OneConfigUI
 import org.polyfrost.polyui.component.Drawable
 import org.polyfrost.polyui.component.extensions.*
-import org.polyfrost.polyui.component.impl.Block
-import org.polyfrost.polyui.component.impl.Group
-import org.polyfrost.polyui.component.impl.Image
-import org.polyfrost.polyui.component.impl.Text
+import org.polyfrost.polyui.component.impl.*
 import org.polyfrost.polyui.data.PolyImage
 import org.polyfrost.polyui.unit.Align
 import org.polyfrost.polyui.unit.Vec2
@@ -80,6 +78,12 @@ fun ModsPage(trees: Collection<Tree>): Drawable {
                 alignment = modBoxAlign,
             ).onClick { _ ->
                 OneConfigUI.openPage(ConfigVisualizer.INSTANCE.get(it), (this[1][0] as Text).text)
+            }.onRightClick { _ ->
+                PopupMenu(Text("Restore Defaults").setDestructivePalette().withStates().onClick { _ ->
+                    it.overwrite(ConfigManager.backup().get(it.id))
+                    polyUI.unfocus()
+                    false
+                }, polyUI = polyUI)
             }.namedId("ModCard")
         }.toTypedArray(),
         visibleSize = Vec2(1130f, 635f),
