@@ -109,7 +109,7 @@ public class OneConfig
         OmniLoader.ModInfo self = OmniLoader.getModInfo("oneconfig");
         String v = self == null ? "LOCAL" : self.getVersion();
         LOGGER.info("Loading OneConfig v{}", v);
-        OmniClientCommands.INSTANCE.initialize();
+        OmniClientCommands.initialize();
         BlurHandler.init();
 
         preloadCopycat();
@@ -124,24 +124,24 @@ public class OneConfig
 
     @SuppressWarnings({"unchecked", "rawtypes"})
     private static void registerCommands() {
-        LiteralArgumentBuilder b = OmniClientCommands.INSTANCE.literal("oneconfig");
+        LiteralArgumentBuilder b = OmniClientCommands.literal("oneconfig");
         b.executes(cmd -> {
             OneConfigUI.INSTANCE.open();
             return 1;
         });
-        b.then(OmniClientCommands.INSTANCE.literal("updateCheck").executes(cmd -> {
+        b.then(OmniClientCommands.literal("updateCheck").executes(cmd -> {
             Multithreading.submit(() -> OmniChat.showChatMessage(MavenUpdateChecker.oneconfig().hasUpdate() ? "Update available!" : "No updates available"));
             return 1;
         }));
-        b.then(OmniClientCommands.INSTANCE.literal("locraw").executes(cmd -> {
+        b.then(OmniClientCommands.literal("locraw").executes(cmd -> {
             OmniChat.showChatMessage(HypixelUtils.getLocation().toString());
             return 1;
         }));
-        b.then(OmniClientCommands.INSTANCE.literal("hud").executes(cmd -> {
+        b.then(OmniClientCommands.literal("hud").executes(cmd -> {
             Platform.screen().display(HudManager.INSTANCE.getWithEditor());
             return 1;
         }));
-        b.then(OmniClientCommands.INSTANCE.literal("delete").executes(cmd -> {
+        b.then(OmniClientCommands.literal("delete").executes(cmd -> {
             OneConfigUI.INSTANCE.invalidateCache();
             ConfigVisualizer.INSTANCE.clearCache();
             OmniChat.showChatMessage("Deleted OneConfig UI. Please make a report if you were having issues!");
@@ -149,9 +149,9 @@ public class OneConfig
         }));
 
         CommandNode node = b.build();
-        OmniClientCommands.INSTANCE.register(b);
-        OmniClientCommands.INSTANCE.register(OmniClientCommands.INSTANCE.literal("ocfg").redirect(node));
-        OmniClientCommands.INSTANCE.register(OmniClientCommands.INSTANCE.literal("twoconfig").redirect(node));
+        OmniClientCommands.register(b);
+        OmniClientCommands.register(OmniClientCommands.literal("ocfg").redirect(node));
+        OmniClientCommands.register(OmniClientCommands.literal("twoconfig").redirect(node));
     }
 
     private static void registerKeybinds() {

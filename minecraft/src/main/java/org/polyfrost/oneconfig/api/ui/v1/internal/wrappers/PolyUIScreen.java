@@ -73,8 +73,10 @@ public class PolyUIScreen extends OmniScreen implements BlurScreen {
         this.blurs = blurs;
         this.pauses = pauses;
         this.close = onClose;
+        //#if MC <= 1.12.2
         // todo temp fix
         this.mc = Minecraft.getMinecraft();
+        //#endif
     }
 
     @Override

@@ -1,5 +1,6 @@
 package org.polyfrost.oneconfig.internal.mixin.events;
 
+import dev.deftu.omnicore.client.render.OmniGameRendering;
 import org.objectweb.asm.Opcodes;
 import org.polyfrost.oneconfig.api.event.v1.EventManager;
 import org.polyfrost.oneconfig.api.event.v1.HudEvent;
@@ -26,7 +27,7 @@ public abstract class Mixin_DebugOpenEvent {
     //$$ @Inject(method = "keyPress", at = @At(value = "FIELD", target = "Lnet/minecraft/client/Options;renderDebug:Z", opcode = Opcodes.PUTFIELD, shift = At.Shift.AFTER))
     //#endif
     private void onDebugOpen(CallbackInfo ci) {
-        if (this.gameSettings.showDebugInfo) {
+        if (OmniGameRendering.isDebugRendering()) {
             EventManager.INSTANCE.post(HudEvent.Debug.OPENED);
         } else EventManager.INSTANCE.post(HudEvent.Debug.CLOSED);
     }
