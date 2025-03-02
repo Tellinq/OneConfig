@@ -53,24 +53,16 @@ public class Mixin_HudRenderEvent {
             //$$ DrawContext ctx,
             //#endif
             //#elseif MC >= 1.13
-            //$$ PoseStack matrixStack,
+            //$$ PoseStack ctx,
             //#endif
             float partialTicks,
             CallbackInfo ci
     ) {
-        OmniMatrixStack stack =
-                //#if MC >= 1.20
-                //#if FORGE-LIKE
-                //$$ new OmniMatrixStack(ctx.pose());
-                //#else
-                //$$ new OmniMatrixStack(ctx.getMatrices());
+        OmniMatrixStack stack = OmniMatrixStack.vanilla(
+                //#if MC >= 1.16.5
+                //$$ ctx
                 //#endif
-                //#elseif MC >= 1.13
-                //$$ new OmniMatrixStack(matrixStack);
-                //#else
-                // todo OmniMatrixStack.Compat.INSTACE.get()
-                new OmniMatrixStack();
-                //#endif
+        );
 
         EventManager.INSTANCE.post(new HudRenderEvent(stack, partialTicks));
     }

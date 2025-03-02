@@ -2,6 +2,11 @@ net.minecraftforge.eventbus.EventBus net.minecraftforge.fml.common.eventhandler.
 net.minecraftforge.eventbus.api.Event net.minecraftforge.fml.common.eventhandler.Event
 net.minecraftforge.eventbus.api.SubscribeEvent net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
+net.minecraft.client.Minecraft runTick() runGameLoop()
+
+net.minecraft.client.renderer.GameRenderer net.minecraft.client.renderer.EntityRenderer
+net.minecraft.client.renderer.GameRenderer renderLevel() renderWorldPass()
+
 net.minecraft.client.renderer.EffectInstance net.minecraft.client.shader.ShaderManager
 net.minecraft.client.renderer.EffectInstance getUniform() getShaderUniform()
 
