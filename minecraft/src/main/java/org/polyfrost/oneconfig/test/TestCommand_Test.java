@@ -29,7 +29,6 @@ package org.polyfrost.oneconfig.test;
 import com.mojang.authlib.GameProfile;
 import dev.deftu.omnicore.client.OmniChat;
 import org.polyfrost.oneconfig.api.commands.v1.factories.annotated.Command;
-import org.polyfrost.oneconfig.api.commands.v1.factories.annotated.Parameter;
 
 @Command(value = {"test", "t"}, description = "Description of the test command")
 public class TestCommand_Test {
@@ -55,18 +54,18 @@ public class TestCommand_Test {
 
     @Command(value = {"subcommand", "s"}, description = "Subcommand 1.", greedy = true)
     private static class TestSubCommand {
-        private static void main(int a, float b, @Parameter(value = "GREEDY c") String c) { // /test subcommand <a> <b> <c>
+        private static void main(int a, float b, String c) { // /test subcommand <a> <b> <c>
             OmniChat.showChatMessage("Integer main: " + (a + b) + " " + c);
         }
 
         @Command(value = {"yesNo"}, description = "A method description")
-        private void yes(@Parameter("first number") double a, double b, @Parameter("named c") String c) { // /test subcommand <a> <b> <c>
+        private void yes(double a, double b, String c) { // /test subcommand <a> <b> <c>
             OmniChat.showChatMessage("Double main: " + a + " " + b + " " + c);
         }
 
         @Command(value = {"subSub", "ss"}, description = "SubSubcommand 1.")
         private static class TestSubSubCommand {
-            private void wow(int a, float b, @Parameter("named c") String c) { // /test subSub <a> <b> <c>
+            private void wow(int a, float b, String c) { // /test subSub <a> <b> <c>
                 OmniChat.showChatMessage("Integer subSub: " + (a + b) + " " + c);
             }
         }

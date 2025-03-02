@@ -30,6 +30,21 @@ public final class org/polyfrost/oneconfig/api/event/v1/EventManager {
 	public final fun unregister ([Lorg/polyfrost/oneconfig/api/event/v1/invoke/EventHandler;)V
 }
 
+public abstract class org/polyfrost/oneconfig/api/event/v1/HudEvent : org/polyfrost/oneconfig/api/event/v1/events/Event {
+	public final field opened Z
+	public fun component1 ()Z
+}
+
+public final class org/polyfrost/oneconfig/api/event/v1/HudEvent$Debug : org/polyfrost/oneconfig/api/event/v1/HudEvent {
+	public static final field CLOSED Lorg/polyfrost/oneconfig/api/event/v1/HudEvent$Debug;
+	public static final field OPENED Lorg/polyfrost/oneconfig/api/event/v1/HudEvent$Debug;
+}
+
+public final class org/polyfrost/oneconfig/api/event/v1/HudEvent$Tab : org/polyfrost/oneconfig/api/event/v1/HudEvent {
+	public static final field CLOSED Lorg/polyfrost/oneconfig/api/event/v1/HudEvent$Tab;
+	public static final field OPENED Lorg/polyfrost/oneconfig/api/event/v1/HudEvent$Tab;
+}
+
 public abstract class org/polyfrost/oneconfig/api/event/v1/events/ChatEvent : org/polyfrost/oneconfig/api/event/v1/events/Event$Cancellable {
 	public fun <init> ()V
 }

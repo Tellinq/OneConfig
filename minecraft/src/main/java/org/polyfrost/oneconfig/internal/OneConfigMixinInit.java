@@ -70,11 +70,6 @@ public class OneConfigMixinInit implements IMixinConfigPlugin {
         mixins.add("fabric.Mixin_LoadShaderInvoker");
         mixins.add("fabric.Mixin_ChatReceiveEvent_Fabric");
 
-        //#if MC <= 1.13
-        mixins.add("commands.Mixin_ExecuteCommandsFromScreen");
-        mixins.add("commands.Mixin_IncludeCommandSuggestions");
-        //#endif
-
         //#if MC > 1.12
         mixins.add("hypixel.Mixin_CaptureHypixelPayloads");
         //#endif
@@ -82,7 +77,6 @@ public class OneConfigMixinInit implements IMixinConfigPlugin {
 
         //#if MC >= 1.16
         //$$ mixins.add("events.Mixin_ModernWindowFocusEvent");
-        //$$ mixins.add("commands.Mixin_AppendCustomCommands");
         //#if MC < 1.19
         //$$ mixins.add("Mixin_LazyDataFixerUpper");
         //$$ mixins.add("events.Mixin_ChatSendEvent");

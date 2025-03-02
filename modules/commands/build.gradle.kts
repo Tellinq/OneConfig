@@ -26,4 +26,6 @@
 
 dependencies {
     api(project(":modules:utils"))
+    compileOnly("com.mojang:brigadier:1.0.18")
+    compileOnly("dev.deftu:omnicore-1.8.9-forge:${libs.versions.omnicore.get()}")
 }

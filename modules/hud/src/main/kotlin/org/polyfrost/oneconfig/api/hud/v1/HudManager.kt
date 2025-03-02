@@ -29,6 +29,8 @@ package org.polyfrost.oneconfig.api.hud.v1
 import org.apache.logging.log4j.LogManager
 import org.jetbrains.annotations.ApiStatus
 import org.polyfrost.oneconfig.api.config.v1.ConfigManager
+import org.polyfrost.oneconfig.api.event.v1.HudEvent
+import org.polyfrost.oneconfig.api.event.v1.eventHandler
 import org.polyfrost.oneconfig.api.hud.v1.internal.HudsPage
 import org.polyfrost.oneconfig.api.hud.v1.internal.alignC
 import org.polyfrost.oneconfig.api.hud.v1.internal.build
@@ -180,6 +182,24 @@ object HudManager {
             polyUI.master.addChild(theHud, recalculate = false)
             LOGGER.info("Added HUD {} to {} (default)", hud.title(), default)
         }
+
+        // add callbacks
+        eventHandler { (opened): HudEvent.Tab ->
+//            for (hud in hudProviders.values) {
+//                if (opened) {
+//                    if (!hud.hidden && !hud.showInF3) hud.hidden = true
+//                } else {
+//                    if (hud.hidden && !hud.showInF3) hud.hidden = false
+//                }
+//            }
+        }
+//        eventHandler { (screen): ScreenOpenEvent ->
+//
+//        }
+//        eventHandler { (opened): HudEvent.Debug ->
+//
+//        }
+
         LOGGER.info("HUD load took {}ms", (System.nanoTime() - now) / 1_000_000.0)
     }
 

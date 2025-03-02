@@ -101,6 +101,9 @@ dependencies {
             isTransitive = false
         }
     }
+    if (mcData.isLegacyForge || mcData.isLegacyFabric) {
+        shade("com.mojang:brigadier:1.0.18")
+    }
 }
 
 fun DependencyHandlerScope.shade(dependency: String, isMod: Boolean = false) {

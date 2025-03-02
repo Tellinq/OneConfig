@@ -101,6 +101,7 @@ public class org/polyfrost/oneconfig/api/config/v1/Tree : org/polyfrost/oneconfi
 	public fun contentToString ()Ljava/lang/String;
 	public fun deepEquals (Ljava/lang/Object;)Z
 	public fun equals (Ljava/lang/Object;)Z
+	public static fun evaluatePath (Lorg/polyfrost/oneconfig/api/config/v1/Tree;Lorg/polyfrost/oneconfig/api/config/v1/Node;)Ljava/lang/String;
 	public fun get (Ljava/lang/String;)Lorg/polyfrost/oneconfig/api/config/v1/Node;
 	public fun get ([Ljava/lang/String;)Lorg/polyfrost/oneconfig/api/config/v1/Node;
 	public fun getChild (Ljava/lang/String;)Lorg/polyfrost/oneconfig/api/config/v1/Tree;
@@ -136,13 +137,23 @@ public abstract class org/polyfrost/oneconfig/api/config/v1/backend/Backend {
 	public final fun load (Lorg/polyfrost/oneconfig/api/config/v1/Tree;)Z
 	protected abstract fun load0 (Ljava/lang/String;)Lorg/polyfrost/oneconfig/api/config/v1/Tree;
 	protected fun putSafe (Lorg/polyfrost/oneconfig/api/config/v1/Tree;)V
-	public final fun register (Lorg/polyfrost/oneconfig/api/config/v1/Tree;)Lorg/polyfrost/oneconfig/api/config/v1/Tree;
+	public final fun register (Lorg/polyfrost/oneconfig/api/config/v1/Tree;)Lorg/polyfrost/oneconfig/api/config/v1/backend/Backend$RegistrationResult;
 	protected fun requestUpdate (Ljava/lang/String;)V
 	public final fun save (Ljava/lang/String;)Z
 	public final fun save (Lorg/polyfrost/oneconfig/api/config/v1/Tree;)Z
 	protected abstract fun save0 (Lorg/polyfrost/oneconfig/api/config/v1/Tree;)Z
 	public final fun saveAll ()V
 	public final fun saveAll (Ljava/lang/String;)V
+}
+
+public final class org/polyfrost/oneconfig/api/config/v1/backend/Backend$RegistrationResult {
+	public static final field LOADED B
+	public static final field MERGED B
+	public static final field NEW B
+	public final field state B
+	public final field tree Lorg/polyfrost/oneconfig/api/config/v1/Tree;
+	public fun <init> (Lorg/polyfrost/oneconfig/api/config/v1/Tree;B)V
+	public fun get ()Lorg/polyfrost/oneconfig/api/config/v1/Tree;
 }
 
 public abstract interface class org/polyfrost/oneconfig/api/config/v1/collect/PropertyCollector {
