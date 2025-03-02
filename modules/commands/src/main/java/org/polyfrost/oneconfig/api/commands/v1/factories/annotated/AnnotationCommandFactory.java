@@ -30,6 +30,7 @@ import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.tree.CommandNode;
 import com.mojang.brigadier.tree.LiteralCommandNode;
 import dev.deftu.omnicore.client.OmniChat;
+import dev.deftu.omnicore.client.OmniClientCommandSource;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
@@ -39,14 +40,14 @@ import org.polyfrost.oneconfig.api.commands.v1.factories.CommandFactory;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
 
-public class AnnotationCommandFactory<S> implements CommandFactory<S> {
+public class AnnotationCommandFactory implements CommandFactory {
     private static final Logger LOGGER = LogManager.getLogger("OneConfig/BrigaiderTranslator");
 
-    private void create(LiteralArgumentBuilder<S> tree, Object it) {
+    private void create(LiteralArgumentBuilder<OmniClientCommandSource> tree, Object it) {
         for (Method m : it.getClass().getDeclaredMethods()) {
             if (m.isAnnotationPresent(Command.class)) {
                 // todo
-                LiteralArgumentBuilder<S> methodBuilder = null;
+                LiteralArgumentBuilder<OmniClientCommandSource> methodBuilder = null;
 
                 String[] paramNames = new String[m.getParameterCount()];
                 Class<?>[] paramTypes = m.getParameterTypes();
@@ -78,8 +79,8 @@ public class AnnotationCommandFactory<S> implements CommandFactory<S> {
         for (Class<?> cls : it.getClass().getDeclaredClasses()) {
             if (cls.isAnnotationPresent(Command.class)) {
                 Command c = cls.getAnnotation(Command.class);
-                LiteralArgumentBuilder<S> classBuilder = CommandManager.literal(c.value().length == 0 ? cls.getSimpleName() : c.value()[0]);
-                LiteralCommandNode<S> classNode = classBuilder.build();
+                LiteralArgumentBuilder<OmniClientCommandSource> classBuilder = CommandManager.literal(c.value().length == 0 ? cls.getSimpleName() : c.value()[0]);
+                LiteralCommandNode<OmniClientCommandSource> classNode = classBuilder.build();
                 tree.then(classBuilder.build());
             }
         }
@@ -87,14 +88,14 @@ public class AnnotationCommandFactory<S> implements CommandFactory<S> {
 
 
     @Override
-    public LiteralCommandNode<S>[] create(@NotNull Object obj) {
+    public LiteralCommandNode<OmniClientCommandSource>[] create(@NotNull Object obj) {
         Command c = obj.getClass().getAnnotation(Command.class);
         if (c == null) return null;
-        LiteralArgumentBuilder<S> builder = CommandManager.literal(c.value().length == 0 ? obj.getClass().getSimpleName() : c.value()[0]);
-        LiteralCommandNode<S>[] nodes = new LiteralCommandNode[Math.max(1, c.value().length)];
+        LiteralArgumentBuilder<OmniClientCommandSource> builder = CommandManager.literal(c.value().length == 0 ? obj.getClass().getSimpleName() : c.value()[0]);
+        LiteralCommandNode<OmniClientCommandSource>[] nodes = new LiteralCommandNode[Math.max(1, c.value().length)];
         nodes[0] = builder.build();
         for (int i = 1; i < c.value().length; i++) {
-             nodes[i] = CommandManager.literal(c.value()[i]).redirect((CommandNode) builder.build()).build();
+             nodes[i] = CommandManager.literal(c.value()[i]).redirect(builder.build()).build();
         }
         return nodes;
     }
