@@ -72,17 +72,17 @@ public class CommandManager {
     }
 
     public static boolean register(Object obj) {
-        LiteralCommandNode<?>[] nodes = INSTANCE.create(obj);
+        LiteralCommandNode<OmniClientCommandSource>[] nodes = INSTANCE.create(obj);
         if (nodes == null) return false;
-        for (LiteralCommandNode<?> node : nodes) {
+        for (LiteralCommandNode<OmniClientCommandSource> node : nodes) {
             register(node);
         }
         return true;
     }
 
-    public LiteralCommandNode<?>[] create(Object obj) {
+    public LiteralCommandNode<OmniClientCommandSource>[] create(Object obj) {
         for (CommandFactory factory : factories) {
-            LiteralCommandNode<?>[] nodes = factory.create(obj);
+            LiteralCommandNode<OmniClientCommandSource>[] nodes = factory.create(obj);
             if (nodes != null) return nodes;
         }
         return null;
@@ -103,7 +103,7 @@ public class CommandManager {
         factories.add(factory);
     }
 
-    public void registerArgumentType(Class<?> type, ArgumentType<?> argumentType) {
+    public <T> void registerArgumentType(Class<T> type, ArgumentType<T> argumentType) {
         argumentTypes.put(type, argumentType);
     }
 
