@@ -221,7 +221,7 @@ public final class ConfigManager {
     private synchronized void onClose() {
         if (shutdown) return;
         shutdown = true;
-        LOGGER.info("shutdown requested; saving all configs in {}", backend.folder.getFileName());
+        LOGGER.info("shutdown requested; saving all configs in ./{}", backend.folder.getFileName());
         backend.saveAll();
     }
 }

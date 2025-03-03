@@ -26,62 +26,63 @@
 
 package org.polyfrost.oneconfig.api.commands.v1.factories.annotated;
 
+import com.mojang.brigadier.builder.ArgumentBuilder;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
-import com.mojang.brigadier.tree.CommandNode;
 import com.mojang.brigadier.tree.LiteralCommandNode;
-import dev.deftu.omnicore.client.OmniChat;
 import dev.deftu.omnicore.client.OmniClientCommandSource;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
-import org.polyfrost.oneconfig.api.commands.v1.CommandManager;
 import org.polyfrost.oneconfig.api.commands.v1.factories.CommandFactory;
+import org.polyfrost.oneconfig.utils.v1.MHUtils;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
+
+import static org.polyfrost.oneconfig.api.commands.v1.CommandManager.*;
 
 public class AnnotationCommandFactory implements CommandFactory {
     private static final Logger LOGGER = LogManager.getLogger("OneConfig/BrigaiderTranslator");
 
     private void create(LiteralArgumentBuilder<OmniClientCommandSource> tree, Object it) {
         for (Method m : it.getClass().getDeclaredMethods()) {
-            if (m.isAnnotationPresent(Command.class)) {
-                // todo
-                LiteralArgumentBuilder<OmniClientCommandSource> methodBuilder = null;
-
+            Command cmd = m.getAnnotation(Command.class);
+            if (cmd != null) {
                 String[] paramNames = new String[m.getParameterCount()];
                 Class<?>[] paramTypes = m.getParameterTypes();
                 Parameter[] params = m.getParameters();
-                for (int i = 0; i < paramNames.length; i++) {
+                ArgumentBuilder<OmniClientCommandSource, ?> theMethod = argument(paramNames[0], getArgumentType(paramTypes[0]));
+                for (int i = 1; i < paramNames.length; i++) {
                     paramNames[i] = params[i].getName();
-                    methodBuilder = methodBuilder.then(
-                            CommandManager.argument(paramNames[i], CommandManager.getArgumentType(paramTypes[i]))
+                    theMethod = theMethod.then(
+                            argument(paramNames[i], getArgumentType(paramTypes[i]))
                     );
                 }
 
-                methodBuilder.executes((ctx) -> {
+                theMethod.executes((ctx) -> {
                     Object[] args = new Object[paramTypes.length];
                     for (int i = 0; i < paramTypes.length; i++) {
                         args[i] = ctx.getArgument(paramNames[i], paramTypes[i]);
                     }
                     try {
                         m.invoke(it, args);
-                        return 0;
-                    } catch (Exception e) {
-                        OmniChat.showChatMessage("An error occurred while executing this command!\nPlease report this to the developer: " + e.getMessage());
-                        LOGGER.error("Failed to execute command!", e);
                         return 1;
+                    } catch (Exception e) {
+                        ctx.getSource().showError("An error occurred while executing this command!\nPlease report this to the developer: " + e.getMessage());
+                        LOGGER.error("Failed to execute command!", e);
+                        return -1;
                     }
                 });
-                tree.then(methodBuilder.build());
+                tree.then(literal(m.getName()).then(theMethod));
+                for (String s : cmd.value()) {
+                    tree.then(literal(s).then(theMethod));
+                }
             }
         }
         for (Class<?> cls : it.getClass().getDeclaredClasses()) {
             if (cls.isAnnotationPresent(Command.class)) {
-                Command c = cls.getAnnotation(Command.class);
-                LiteralArgumentBuilder<OmniClientCommandSource> classBuilder = CommandManager.literal(c.value().length == 0 ? cls.getSimpleName() : c.value()[0]);
-                LiteralCommandNode<OmniClientCommandSource> classNode = classBuilder.build();
-                tree.then(classBuilder.build());
+                LiteralArgumentBuilder<OmniClientCommandSource> subTree = literal(cls.getName());
+                create(subTree, MHUtils.instantiate(cls, true));
             }
         }
     }
@@ -89,13 +90,15 @@ public class AnnotationCommandFactory implements CommandFactory {
 
     @Override
     public LiteralCommandNode<OmniClientCommandSource>[] create(@NotNull Object obj) {
-        Command c = obj.getClass().getAnnotation(Command.class);
+        Class<?> cls = obj.getClass();
+        Command c = cls.getAnnotation(Command.class);
         if (c == null) return null;
-        LiteralArgumentBuilder<OmniClientCommandSource> builder = CommandManager.literal(c.value().length == 0 ? obj.getClass().getSimpleName() : c.value()[0]);
-        LiteralCommandNode<OmniClientCommandSource>[] nodes = new LiteralCommandNode[Math.max(1, c.value().length)];
+        LiteralArgumentBuilder<OmniClientCommandSource> builder = literal(cls.getName());
+        create(builder, obj);
+        LiteralCommandNode<OmniClientCommandSource>[] nodes = new LiteralCommandNode[Math.max(1, c.value().length + 1)];
         nodes[0] = builder.build();
         for (int i = 1; i < c.value().length; i++) {
-             nodes[i] = CommandManager.literal(c.value()[i]).redirect(builder.build()).build();
+            nodes[i] = literal(c.value()[i]).redirect(builder.build()).build();
         }
         return nodes;
     }

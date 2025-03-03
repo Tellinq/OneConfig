@@ -30,7 +30,7 @@ import com.mojang.authlib.GameProfile;
 import dev.deftu.omnicore.client.OmniChat;
 import org.polyfrost.oneconfig.api.commands.v1.factories.annotated.Command;
 
-@Command(value = {"test", "t"}, description = "Description of the test command")
+@Command(value = {"test", "t"})
 public class TestCommand_Test {
 
     @Command
@@ -52,18 +52,18 @@ public class TestCommand_Test {
         OmniChat.showChatMessage(profile.getId().toString());
     }
 
-    @Command(value = {"subcommand", "s"}, description = "Subcommand 1.", greedy = true)
+    @Command(value = {"subcommand", "s"})
     private static class TestSubCommand {
         private static void main(int a, float b, String c) { // /test subcommand <a> <b> <c>
             OmniChat.showChatMessage("Integer main: " + (a + b) + " " + c);
         }
 
-        @Command(value = {"yesNo"}, description = "A method description")
+        @Command(value = {"yesNo"})
         private void yes(double a, double b, String c) { // /test subcommand <a> <b> <c>
             OmniChat.showChatMessage("Double main: " + a + " " + b + " " + c);
         }
 
-        @Command(value = {"subSub", "ss"}, description = "SubSubcommand 1.")
+        @Command(value = {"subSub", "ss"})
         private static class TestSubSubCommand {
             private void wow(int a, float b, String c) { // /test subSub <a> <b> <c>
                 OmniChat.showChatMessage("Integer subSub: " + (a + b) + " " + c);

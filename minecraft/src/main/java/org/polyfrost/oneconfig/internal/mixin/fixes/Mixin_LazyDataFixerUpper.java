@@ -24,23 +24,34 @@
  * <https://polyfrost.org/legal/oneconfig/additional-terms>
  */
 
-package org.polyfrost.oneconfig.api.commands.v1.factories.annotated;
-
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
-
-/**
- * Use this annotation to mark a class as a command or a method as a subcommand.
- * <br><b>This is required for a method/class to be registered as part of a command.</b>
- */
-@Retention(RetentionPolicy.RUNTIME)
-@Target({ElementType.TYPE, ElementType.METHOD})
-public @interface Command {
-    /**
-     * command names used to index this command and in help message
-     */
-    String[] value() default {};
-
-}
+//#if MC < 1.19 && MC > 1.13
+//$$ package org.polyfrost.oneconfig.internal.mixin.fixes;
+//$$
+//$$
+//$$ import com.mojang.datafixers.DataFixer;
+//$$ import com.mojang.datafixers.DataFixerBuilder;
+//$$ import net.minecraft.util.datafix.DataFixers;
+//$$ import org.spongepowered.asm.mixin.Mixin;
+//$$ import org.spongepowered.asm.mixin.injection.At;
+//$$ import org.spongepowered.asm.mixin.injection.Redirect;
+//$$
+//$$ import java.util.concurrent.Executor;
+//$$
+//$$ /**
+//$$  * Modified from LazyDFU under the MIT licence.
+//$$  * Source: <a href="https://github.com/astei/lazydfu/blob/master/LICENSE">here</a>
+//$$  */
+//$$ @Mixin(DataFixers.class)
+//$$ public abstract class Mixin_LazyDataFixerUpper {
+//$$
+//$$     @Redirect(method = "createFixerUpper", at = @At(value = "NEW", target = "com/mojang/datafixers/DataFixerBuilder", remap = false))
+//$$     private static DataFixerBuilder optimize$lazydfu(int dataVersion) {
+//$$         return new DataFixerBuilder(dataVersion) {
+//$$             @Override
+//$$             public DataFixer build(Executor executor) {
+//$$                 return super.build(f -> {});
+//$$             }
+//$$         };
+//$$     }
+//$$ }
+//#endif

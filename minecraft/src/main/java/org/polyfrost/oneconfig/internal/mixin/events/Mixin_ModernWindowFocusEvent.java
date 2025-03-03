@@ -24,23 +24,24 @@
  * <https://polyfrost.org/legal/oneconfig/additional-terms>
  */
 
-package org.polyfrost.oneconfig.api.commands.v1.factories.annotated;
+package org.polyfrost.oneconfig.internal.mixin.events;
 
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
-
-/**
- * Use this annotation to mark a class as a command or a method as a subcommand.
- * <br><b>This is required for a method/class to be registered as part of a command.</b>
- */
-@Retention(RetentionPolicy.RUNTIME)
-@Target({ElementType.TYPE, ElementType.METHOD})
-public @interface Command {
-    /**
-     * command names used to index this command and in help message
-     */
-    String[] value() default {};
-
-}
+//#if MC > 1.13
+//$$ import net.minecraft.client.Minecraft;
+//$$ import org.polyfrost.oneconfig.api.event.v1.EventManager;
+//$$ import org.polyfrost.oneconfig.api.event.v1.events.WindowFocusEvent;
+//$$ import org.spongepowered.asm.mixin.Mixin;
+//$$ import org.spongepowered.asm.mixin.injection.At;
+//$$ import org.spongepowered.asm.mixin.injection.Inject;
+//$$ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+//$$
+//$$
+//$$ @Mixin(Minecraft.class)
+//$$ public class Mixin_ModernWindowFocusEvent {
+//$$     @Inject(method = "setWindowActive", at = @At("HEAD"))
+//$$     private void onGameFocused(boolean focused, CallbackInfo ci) {
+//$$         if (focused) EventManager.INSTANCE.post(WindowFocusEvent.Gained.INSTANCE);
+//$$         else EventManager.INSTANCE.post(WindowFocusEvent.Lost.INSTANCE);
+//$$     }
+//$$ }
+//#endif

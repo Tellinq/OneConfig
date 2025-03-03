@@ -35,6 +35,7 @@ import dev.deftu.omnicore.common.OmniLoader;
 import kotlin.Unit;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.polyfrost.oneconfig.api.commands.v1.CommandManager;
 import org.polyfrost.oneconfig.api.config.v1.internal.ConfigVisualizer;
 import org.polyfrost.oneconfig.api.event.v1.EventManager;
 import org.polyfrost.oneconfig.api.event.v1.events.InitializationEvent;
@@ -55,6 +56,8 @@ import org.polyfrost.polyui.input.KeyModifiers;
 import org.polyfrost.polyui.input.Translator;
 
 import java.util.concurrent.atomic.AtomicBoolean;
+
+import static org.polyfrost.oneconfig.api.commands.v1.CommandManager.literal;
 
 /**
  * The main class of OneConfig.
@@ -77,6 +80,7 @@ public class OneConfig
 {
     public static final OneConfig INSTANCE = new OneConfig();
     private static final Logger LOGGER = LogManager.getLogger("OneConfig");
+    private boolean initialized = false;
 
     //#if FORGE-LIKE
     //#if MC <= 1.12.2
@@ -98,6 +102,10 @@ public class OneConfig
 
 
     private void init() {
+        if (initialized) {
+            LOGGER.error("Attempted to initialize oneconfig twice! this will be ignored");
+            return;
+        }
         //#if FABRIC
         //$$ try {
         //$$     Class.forName("org.polyfrost.oneconfig.test.TestMod_Test", false, getClass().getClassLoader());
@@ -109,7 +117,6 @@ public class OneConfig
         OmniLoader.ModInfo self = OmniLoader.getModInfo("oneconfig");
         String v = self == null ? "LOCAL" : self.getVersion();
         LOGGER.info("Loading OneConfig v{}", v);
-        OmniClientCommands.initialize();
         BlurHandler.init();
 
         preloadCopycat();
@@ -119,39 +126,42 @@ public class OneConfig
         registerKeybinds();
         registerEventHandlers();
 
+        initialized = true;
         LOGGER.info("OneConfig initialized!");
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})
     private static void registerCommands() {
-        LiteralArgumentBuilder b = OmniClientCommands.literal("oneconfig");
+        OmniClientCommands.initialize();
+
+        LiteralArgumentBuilder b = literal("oneconfig");
         b.executes(cmd -> {
             OneConfigUI.INSTANCE.open();
             return 1;
         });
-        b.then(OmniClientCommands.literal("updateCheck").executes(cmd -> {
+        b.then(literal("updateCheck").executes(cmd -> {
             Multithreading.submit(() -> OmniChat.showChatMessage(MavenUpdateChecker.oneconfig().hasUpdate() ? "Update available!" : "No updates available"));
             return 1;
         }));
-        b.then(OmniClientCommands.literal("locraw").executes(cmd -> {
-            OmniChat.showChatMessage(HypixelUtils.getLocation().toString());
+        b.then(literal("locraw").executes(cmd -> {
+            cmd.getSource().showMessage(HypixelUtils.getLocation().toString());
             return 1;
         }));
-        b.then(OmniClientCommands.literal("hud").executes(cmd -> {
+        b.then(literal("hud").executes(cmd -> {
             Platform.screen().display(HudManager.INSTANCE.getWithEditor());
             return 1;
         }));
-        b.then(OmniClientCommands.literal("delete").executes(cmd -> {
+        b.then(literal("delete").executes(cmd -> {
             OneConfigUI.INSTANCE.invalidateCache();
             ConfigVisualizer.INSTANCE.clearCache();
-            OmniChat.showChatMessage("Deleted OneConfig UI. Please make a report if you were having issues!");
+            cmd.getSource().showMessage("Deleted OneConfig UI. Please make a report if you were having issues!");
             return 1;
         }));
 
         CommandNode node = b.build();
-        OmniClientCommands.register(b);
-        OmniClientCommands.register(OmniClientCommands.literal("ocfg").redirect(node));
-        OmniClientCommands.register(OmniClientCommands.literal("twoconfig").redirect(node));
+        CommandManager.register(b);
+        CommandManager.register(literal("ocfg").redirect(node));
+        CommandManager.register(literal("twoconfig").redirect(node));
     }
 
     private static void registerKeybinds() {
