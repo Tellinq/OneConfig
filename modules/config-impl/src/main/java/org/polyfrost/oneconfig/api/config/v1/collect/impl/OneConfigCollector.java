@@ -78,7 +78,17 @@ public class OneConfigCollector extends ReflectiveCollector {
             if (type == Include.class) {
                 Property<?> p = Properties.field(null, null, f, src);
                 tree.put(p);
-                break;
+                continue;
+            }
+            if (type == Accordion.class) {
+                Tree t = Tree.tree(f.getName());
+                t.addMetadata(MHUtils.getAnnotationValues(a).getOrThrow());
+                try {
+                    handle(t, f.get(src), 1);
+                } catch (Throwable e) {
+                    throw new RuntimeException("Failed to collect accordion-type field " + f.getName(), e);
+                }
+                continue;
             }
             Option opt = type.getDeclaredAnnotation(Option.class);
             if (opt == null) continue;
