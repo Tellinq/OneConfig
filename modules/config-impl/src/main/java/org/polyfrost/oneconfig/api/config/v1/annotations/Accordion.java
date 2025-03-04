@@ -42,7 +42,5 @@ public @interface Accordion {
 
     String subcategory() default "General";
 
-    boolean canBeEnabled() default true;
-
     int index() default -1;
 }
