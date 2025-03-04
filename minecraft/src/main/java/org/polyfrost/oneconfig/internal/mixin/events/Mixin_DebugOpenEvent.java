@@ -10,9 +10,9 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 //#if MC >= 1.21
-//$$ @Mixin(net.minecraft.client.gui.hud.DebugHud.class)
+//$$ @Mixin(net.minecraft.client.gui.components.DebugScreenOverlay.class)
 //$$ public abstract class Mixin_DebugOpenEvent {
-//$$     @Inject(method = "toggleDebugHud", at = @At("TAIL"))
+//$$     @Inject(method = "toggleOverlay", at = @At("TAIL"))
 //$$     private void onDebugOpen(CallbackInfo ci) {
 //$$         if (OmniGameRendering.isDebugRendering()) {
 //$$             EventManager.INSTANCE.post(HudEvent.Debug.OPENED);
