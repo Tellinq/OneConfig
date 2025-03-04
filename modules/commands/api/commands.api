@@ -21,8 +21,6 @@ public class org/polyfrost/oneconfig/api/commands/v1/factories/annotated/Annotat
 }
 
 public abstract interface annotation class org/polyfrost/oneconfig/api/commands/v1/factories/annotated/Command : java/lang/annotation/Annotation {
-	public abstract fun description ()Ljava/lang/String;
-	public abstract fun greedy ()Z
 	public abstract fun value ()[Ljava/lang/String;
 }
 
