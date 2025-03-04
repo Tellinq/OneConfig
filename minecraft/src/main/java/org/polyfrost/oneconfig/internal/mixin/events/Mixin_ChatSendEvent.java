@@ -42,15 +42,19 @@ public abstract class Mixin_ChatSendEvent {
     @Unique
     private ChatEvent.Send ocfg$chatEvent;
 
-    @Unique
-    private static final String SEND_MESSAGE_SIGNATURE =
-            //#if FABRIC && MC > 1.19
-            //$$ "sendMessage(Lnet/minecraft/text/Text;)V";
+    @Inject(
+            //#if MC >= 1.21.4
+            //$$ method = "sendMessage",
+            //#elseif FABRIC && MC >= 1.19.2
+            //$$ method = "sendMessage(Lnet/minecraft/text/Text;)V",
+            //#elseif FORGE && MC >= 1.19.2
+            //$$ method = "sendSystemMessage",
             //#else
-            "sendChatMessage";
+            method = "sendChatMessage",
             //#endif
-
-    @Inject(method = SEND_MESSAGE_SIGNATURE, at = @At("HEAD"), cancellable = true)
+            at = @At("HEAD"),
+            cancellable = true
+    )
     public void chatCallback(
             //#if MC < 1.19
             String message,
@@ -61,8 +65,15 @@ public abstract class Mixin_ChatSendEvent {
             //$$ net.minecraft.network.chat.Component text,
             //#endif
             //#endif
+            //#if MC >= 1.21.4
+            //$$ boolean toHud,
+            //#endif
             CallbackInfo ci
     ) {
+        //#if MC >= 1.21.4
+        //$$ if (toHud) return;
+        //#endif
+
         //#if MC >= 1.19
         //$$ String message = text.getString();
         //#endif
@@ -81,7 +92,20 @@ public abstract class Mixin_ChatSendEvent {
         }
     }
 
-    @ModifyVariable(method = SEND_MESSAGE_SIGNATURE, at = @At("HEAD"), ordinal = 0, argsOnly = true)
+    @ModifyVariable(
+            //#if MC >= 1.21.4
+            //$$ method = "sendMessage",
+            //#elseif FABRIC && MC >= 1.19.2
+            //$$ method = "sendMessage(Lnet/minecraft/text/Text;)V",
+            //#elseif FORGE && MC >= 1.19.2
+            //$$ method = "sendSystemMessage",
+            //#else
+            method = "sendChatMessage",
+            //#endif
+            at = @At("HEAD"),
+            ordinal = 0,
+            argsOnly = true
+    )
     public String modifyMessage(String message) {
         return ocfg$chatEvent.message;
     }

@@ -87,7 +87,13 @@ public class Mixin_ScreenOpenEvent {
     }
     //#endif
     //#else
-    //$$  @Inject(method = "setScreen", at = @At(value = "INVOKE", target =
+    //$$  @Inject(
+    //#if MC >= 1.16.5
+    //$$      method = "openScreen",
+    //#else
+    //$$      method = "setScreen",
+    //#endif
+    //$$      at = @At(value = "INVOKE", target =
     //#if MC >= 1.13
     //$$  "Lnet/minecraft/client/network/ClientPlayerEntity;requestRespawn()V", shift = At.Shift.BY, by = 2
     //#elseif MC >= 1.12

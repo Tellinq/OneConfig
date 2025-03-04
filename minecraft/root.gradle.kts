@@ -72,7 +72,7 @@ preprocess {
                                             "1.20.1-fabric"(1_20_01, "yarn") {
                                                 "1.19.4-fabric"(1_19_04, "yarn") {
                                                     "1.19.4-forge"(1_19_04, "srg") {
-                                                        "1.19.2-forge"(1_19_02, "srg"){
+                                                        "1.19.2-forge"(1_19_02, "srg", file("mappings/1.19.4-forge+1.19.2-forge.txt")) {
                                                             "1.19.2-fabric"(1_19_02, "yarn") {
                                                                 "1.18.2-fabric"(1_18_02, "yarn", file("mappings/1.19.2-fabric+1.18.2-fabric.txt")) {
                                                                     "1.18.2-forge"(1_18_02, "srg") {

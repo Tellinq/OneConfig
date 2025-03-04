@@ -72,7 +72,7 @@ public class Mixin_MouseInputEvent {
     //#if MC==10809
     //$$ @Inject(method = "tick", at = @At(value = "INVOKE", target = "Lorg/lwjgl/input/Mouse;getEventButton()I", remap = false))
     //#else
-    //$$ @Inject(method = "method_12141", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/options/KeyBinding;setKeyPressed(IZ)V"))
+    //$$ @Inject(method = "tickMouse", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/option/KeyBinding;setKeyPressed(IZ)V"))
     //#endif
     //#endif
     //@formatter:on

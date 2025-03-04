@@ -14,7 +14,11 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 public class Mixin_PostWorldRenderEvent {
 
     @Inject(
+            //#if MC >= 1.16.5
+            //$$ method = "renderLevel",
+            //#else
             method = "renderWorldPass",
+            //#endif
             at = @At(
                     value = "INVOKE",
                     target = "Lnet/minecraft/profiler/Profiler;endStartSection(Ljava/lang/String;)V"
@@ -31,45 +35,22 @@ public class Mixin_PostWorldRenderEvent {
                     //#endif
             ),
             slice = @Slice(
-                    //#if MC >= 1.16.5
-                    //$$ from = @At(
-                    //$$     value = "INVOKE",
-                    //#if MC >= 1.17.1
-                    //#if FABRIC
-                    //#if MC >= 1.19.4
-                    //$$     target = "Lnet/minecraft/client/render/WorldRenderer;render(Lnet/minecraft/client/util/math/MatrixStack;FJZLnet/minecraft/client/render/Camera;Lnet/minecraft/client/render/GameRenderer;Lnet/minecraft/client/render/LightmapTextureManager;Lorg/joml/Matrix4f;)V"
-                    //#else
-                    //$$     target = "Lnet/minecraft/client/render/WorldRenderer;render(Lnet/minecraft/client/util/math/MatrixStack;FJZLnet/minecraft/client/render/Camera;Lnet/minecraft/client/render/GameRenderer;Lnet/minecraft/client/render/LightmapTextureManager;Lnet/minecraft/util/math/Matrix4f;)V"
-                    //#endif
-                    //#else
-                    //$$     target = "Lnet/minecraft/client/renderer/LevelRenderer;renderLevel(Lcom/mojang/blaze3d/vertex/PoseStack;FJZLnet/minecraft/client/Camera;Lnet/minecraft/client/renderer/GameRenderer;Lnet/minecraft/client/renderer/LightTexture;Lcom/mojang/math/Matrix4f;)V"
-                    //#endif
-                    //#else
-                    //$$     target = "Lnet/minecraft/client/renderer/WorldRenderer;updateCameraAndRender(Lcom/mojang/blaze3d/matrix/MatrixStack;FJZLnet/minecraft/client/renderer/ActiveRenderInfo;Lnet/minecraft/client/renderer/GameRenderer;Lnet/minecraft/client/renderer/LightTexture;Lnet/minecraft/util/math/vector/Matrix4f;)V"
-                    //#endif
-                    //$$ ),
-                    //$$ to = @At(
-                    //$$     value = "INVOKE",
-                    //#if MC >= 1.17.1
-                    //#if FABRIC
-                    //$$     target = "Lnet/minecraft/client/render/GameRenderer;renderHand(Lnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/render/Camera;F)V"
-                    //#else
-                    //$$     target = "Lnet/minecraft/client/renderer/GameRenderer;renderItemInHand(Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/Camera;F)V"
-                    //#endif
-                    //#else
-                    //$$     target = "Lnet/minecraft/client/renderer/GameRenderer;renderHand(Lcom/mojang/blaze3d/matrix/MatrixStack;Lnet/minecraft/client/renderer/ActiveRenderInfo;F)V"
-                    //#endif
-                    //$$ )
-                    //#else
                     from = @At(
                             value = "INVOKE",
+                            //#if MC >= 1.16.5
+                            //$$ target = "Lnet/minecraft/client/renderer/LevelRenderer;renderLevel(Lcom/mojang/blaze3d/vertex/PoseStack;FJZLnet/minecraft/client/Camera;Lnet/minecraft/client/renderer/GameRenderer;Lnet/minecraft/client/renderer/LightTexture;Lcom/mojang/math/Matrix4f;)V"
+                            //#else
                             target = "Lnet/minecraft/client/renderer/GlStateManager;disableFog()V"
+                            //#endif
                     ),
                     to = @At(
                             value = "INVOKE",
+                            //#if MC >= 1.17.1
+                            //$$ target = "Lnet/minecraft/client/render/GameRenderer;renderHand(Lnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/render/Camera;F)V"
+                            //#else
                             target = "Lnet/minecraft/client/renderer/EntityRenderer;renderHand(FI)V"
+                            //#endif
                     )
-                    //#endif
             )
     )
     private void onRenderWorldPass(
@@ -83,13 +64,11 @@ public class Mixin_PostWorldRenderEvent {
             //#endif
             CallbackInfo ci
     ) {
-        OmniMatrixStack stack =
+        OmniMatrixStack stack = OmniMatrixStack.vanilla(
                 //#if MC >= 1.16.5
-                //$$ new OmniMatrixStack(matrixStack);
-                //#else
-                // todo OmniMatrixStack.Compat.INSTANCE.get();
-                new OmniMatrixStack();
+                //$$ matrixStack
                 //#endif
+        );
         EventManager.INSTANCE.post(new PostWorldRenderEvent(stack, partialTicks));
     }
 

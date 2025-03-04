@@ -9,7 +9,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-//#if MC >= 1.21
+//#if MC >= 1.20.4
 //$$ @Mixin(net.minecraft.client.gui.components.DebugScreenOverlay.class)
 //$$ public abstract class Mixin_DebugOpenEvent {
 //$$     @Inject(method = "toggleOverlay", at = @At("TAIL"))

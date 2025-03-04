@@ -4,8 +4,11 @@ net.minecraftforge.eventbus.api.SubscribeEvent net.minecraftforge.fml.common.eve
 
 net.minecraft.client.Minecraft runTick() runGameLoop()
 
+net.minecraft.util.profiling.ProfilerFiller net.minecraft.profiler.Profiler
+net.minecraft.util.profiling.ProfilerFiller popPush() endStartSection()
+
 net.minecraft.client.renderer.GameRenderer net.minecraft.client.renderer.EntityRenderer
-net.minecraft.client.renderer.GameRenderer renderLevel() renderWorldPass()
+net.minecraft.client.renderer.GameRenderer renderItemInHand() renderHand()
 
 net.minecraft.client.renderer.EffectInstance net.minecraft.client.shader.ShaderManager
 net.minecraft.client.renderer.EffectInstance getUniform() getShaderUniform()
