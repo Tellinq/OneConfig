@@ -149,7 +149,6 @@ public final class org/polyfrost/oneconfig/api/config/v1/Visualizer$TextVisualiz
 }
 
 public abstract interface annotation class org/polyfrost/oneconfig/api/config/v1/annotations/Accordion : java/lang/annotation/Annotation {
-	public abstract fun canBeEnabled ()Z
 	public abstract fun category ()Ljava/lang/String;
 	public abstract fun description ()Ljava/lang/String;
 	public abstract fun icon ()Ljava/lang/String;

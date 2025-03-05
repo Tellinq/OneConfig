@@ -33,7 +33,7 @@ public class Mixin_RenderEvent {
         RenderEvent e = RenderEvent.Pre.INSTANCE;
         e.deltaTicks = this.timer
                 //#if MC >= 1.21.1
-                //$$ .getRealtimeDeltaTicks();
+                //$$ .getGameTimeDeltaPartialTick(true);
                 //#else
                 .renderPartialTicks;
                 //#endif
@@ -45,7 +45,7 @@ public class Mixin_RenderEvent {
         RenderEvent e = RenderEvent.Post.INSTANCE;
         e.deltaTicks = this.timer
                 //#if MC >= 1.21.1
-                //$$ .getRealtimeDeltaTicks();
+                //$$ .getGameTimeDeltaPartialTick(true);
                 //#else
                 .renderPartialTicks;
                 //#endif
