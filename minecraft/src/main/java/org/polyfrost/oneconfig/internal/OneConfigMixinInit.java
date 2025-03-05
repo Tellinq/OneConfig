@@ -67,7 +67,7 @@ public class OneConfigMixinInit implements IMixinConfigPlugin {
         mixins.add("hidpi.Mixin_FixLoadingScreenHiDPI");
         //#endif
         //#else
-        mixins.add("fabric.Mixin_LoadShaderInvoker");
+        mixins.add("fabric.Mixin_LoadShaderInvoker_Fabric");
         mixins.add("fabric.Mixin_ChatReceiveEvent_Fabric");
 
         //#if MC > 1.20

@@ -102,7 +102,7 @@ public final class BlurHandler {
         if (gui instanceof BlurScreen && ((BlurScreen) gui).hasBackgroundBlur()) {
             if (!isShaderActive()) {
                 //#if FABRIC
-                //$$ ((org.polyfrost.oneconfig.internal.mixin.fabric.Mixin_LoadShaderInvoker) MinecraftClient.getInstance().gameRenderer).invokeLoadShader(this.blurShader);
+                //$$ ((org.polyfrost.oneconfig.internal.mixin.fabric.Mixin_LoadShaderInvoker_Fabric) MinecraftClient.getInstance().gameRenderer).invokeLoadShader(this.blurShader);
                 //#else
                 //#if MC >= 1.21.4
                 //$$ Minecraft.getInstance().gameRenderer.setPostEffect(this.blurShader);

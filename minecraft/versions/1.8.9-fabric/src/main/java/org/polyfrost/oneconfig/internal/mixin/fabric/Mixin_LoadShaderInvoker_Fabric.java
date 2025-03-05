@@ -24,6 +24,7 @@
  * <https://polyfrost.org/legal/oneconfig/additional-terms>
  */
 
+//#if FABRIC
 package org.polyfrost.oneconfig.internal.mixin.fabric;
 
 import net.minecraft.client.render.GameRenderer;
@@ -32,7 +33,12 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.gen.Invoker;
 
 @Mixin(GameRenderer.class)
-public interface Mixin_LoadShaderInvoker {
+public interface Mixin_LoadShaderInvoker_Fabric {
+    //#if MC > 1.19.2
+    //$$ @Invoker("loadPostProcessor")
+    //#else
     @Invoker
+    //#endif
     void invokeLoadShader(Identifier identifier);
 }
+//#endif

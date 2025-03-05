@@ -114,4 +114,3 @@ apiValidation {
     ignoredProjects.add("legacy")
     ignoredProjects.add("bundled")
 }
-
