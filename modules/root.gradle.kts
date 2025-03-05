@@ -91,27 +91,23 @@ subprojects {
         }
     }
 
-    configure<MavenPublishingExtension> {
-        group =
-        artifactName.set(project.name)
-    }
+    afterEvaluate {
+        publishing {
+            publications {
+                named<MavenPublication>("mavenJava") {
+                    artifactId = project.name
+                    groupId = project.group.toString()
 
-    rootModuleProject.publishing {
-        publications {
-            register<MavenPublication>("module" + project.name.capitalize()) {
-                from(components["java"])
-
-                groupId = project.group.toString()
-                artifactId = project.name
-
-                signing {
-                    isRequired = project.properties["signing.keyId"] != null
-                    sign(this@register)
+                    signing {
+                        isRequired = project.properties["signing.keyId"] != null
+                        sign(this@named)
+                    }
                 }
             }
         }
     }
 }
+
 apiValidation {
     for (project in subprojects) {
         ignoredPackages.add("org.polyfrost.oneconfig.api.${project.name}.v1.internal")

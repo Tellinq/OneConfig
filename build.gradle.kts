@@ -13,6 +13,7 @@ plugins {
 subprojects {
     pluginManager.withPlugin("java") {
         apply(plugin = rootProject.libs.plugins.licenser.get().pluginId)
+        apply(plugin = rootProject.libs.plugins.dgt.base.get().pluginId)
         apply(plugin = rootProject.libs.plugins.dgt.publishing.maven.get().pluginId)
         apply(plugin = "signing")
 

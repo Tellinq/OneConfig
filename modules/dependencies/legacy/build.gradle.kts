@@ -16,6 +16,3 @@ dependencies {
     }
 }
 
-tasks.remapSourcesJar {
-    enabled = false
-}

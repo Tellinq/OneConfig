@@ -150,21 +150,17 @@ tasks {
     }
 }
 
-configure<MavenPublishingExtension> {
-    artifactName.set(project.name)
-}
+afterEvaluate {
+    publishing {
+        publications {
+            named<MavenPublication>("mavenJava") {
+                groupId = group.toString()
+                artifactId = mcData.toString()
 
-publishing {
-    publications {
-        register<MavenPublication>("java") {
-            from(components["java"])
-
-            groupId = group.toString()
-            artifactId = base.archivesName.get()
-
-            signing {
-                isRequired = project.properties["signing.keyId"] != null
-                sign(this@register)
+                signing {
+                    isRequired = project.properties["signing.keyId"] != null
+                    sign(this@named)
+                }
             }
         }
     }
