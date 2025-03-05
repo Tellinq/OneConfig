@@ -1,5 +1,8 @@
 @file:Suppress("UnstableApiUsage", "DEPRECATION")
 
+import dev.deftu.gradle.tools.publishing.MavenPublishingExtension
+
+
 // Shared build logic between all OneConfig modules to reduce boilerplate.
 
 plugins {
@@ -86,6 +89,11 @@ subprojects {
         toolchain {
             languageVersion.set(JavaLanguageVersion.of(8))
         }
+    }
+
+    configure<MavenPublishingExtension> {
+        group =
+        artifactName.set(project.name)
     }
 
     rootModuleProject.publishing {
