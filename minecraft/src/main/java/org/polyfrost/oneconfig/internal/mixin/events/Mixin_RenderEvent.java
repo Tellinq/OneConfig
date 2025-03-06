@@ -1,11 +1,10 @@
 package org.polyfrost.oneconfig.internal.mixin.events;
 
+import dev.deftu.omnicore.client.render.OmniGameRendering;
 import net.minecraft.client.Minecraft;
-import net.minecraft.util.Timer;
 import org.polyfrost.oneconfig.api.event.v1.EventManager;
 import org.polyfrost.oneconfig.api.event.v1.events.RenderEvent;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -26,29 +25,17 @@ public class Mixin_RenderEvent {
             //#endif
     //@formatter:on
 
-    @Shadow private Timer timer;
-
     @Inject(method = "runGameLoop", at = @At(value = "INVOKE", target = UPDATE_CAMERA_AND_RENDER))
     private void renderTickStartCallback(CallbackInfo ci) {
         RenderEvent e = RenderEvent.Pre.INSTANCE;
-        e.deltaTicks = this.timer
-                //#if MC >= 1.21.1
-                //$$ .getGameTimeDeltaPartialTick(true);
-                //#else
-                .renderPartialTicks;
-                //#endif
+        e.deltaTicks = OmniGameRendering.getTickDelta(false);
         EventManager.INSTANCE.post(e);
     }
 
     @Inject(method = "runGameLoop", at = @At(value = "INVOKE", target = UPDATE_CAMERA_AND_RENDER, shift = At.Shift.AFTER))
     private void renderTickEndCallback(CallbackInfo ci) {
         RenderEvent e = RenderEvent.Post.INSTANCE;
-        e.deltaTicks = this.timer
-                //#if MC >= 1.21.1
-                //$$ .getGameTimeDeltaPartialTick(true);
-                //#else
-                .renderPartialTicks;
-                //#endif
+        e.deltaTicks = OmniGameRendering.getTickDelta(false);
         EventManager.INSTANCE.post(e);
     }
 

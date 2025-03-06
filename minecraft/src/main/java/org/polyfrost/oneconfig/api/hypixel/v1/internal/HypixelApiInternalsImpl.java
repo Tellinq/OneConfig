@@ -29,18 +29,19 @@ package org.polyfrost.oneconfig.api.hypixel.v1.internal;
 import dev.deftu.omnicore.client.OmniClientPackets;
 import dev.deftu.omnicore.common.OmniIdentifier;
 import dev.deftu.omnicore.common.OmniLoader;
+import dev.deftu.omnicore.common.OmniPacketReceiverContext;
 import net.hypixel.modapi.HypixelModAPI;
 import net.hypixel.modapi.serializer.PacketSerializer;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.network.NetHandlerPlayClient;
-import net.minecraft.network.play.server.S3FPacketCustomPayload;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.ApiStatus;
 import org.polyfrost.oneconfig.api.event.v1.EventDelay;
 import org.polyfrost.oneconfig.api.event.v1.EventManager;
 import org.polyfrost.oneconfig.api.event.v1.events.HypixelLocationEvent;
-import org.polyfrost.oneconfig.api.event.v1.events.PacketEvent;
+
+import java.util.function.Predicate;
 
 //#if MC >= 1.20.4 || MC == 1.16.5
 //$$ import dev.deftu.omnicore.common.OmniIdentifier;
@@ -69,46 +70,27 @@ public final class HypixelApiInternalsImpl implements HypixelApiInternals {
                 return false;
             }
 
-            OmniClientPackets.INSTANCE.send(OmniIdentifier.create(packet.getIdentifier()), (buf) -> {
+            OmniClientPackets.send(OmniIdentifier.create(packet.getIdentifier()), (buf) -> {
                 packet.write(new PacketSerializer(buf));
             });
 
             return true;
         });
-        EventManager.register(PacketEvent.Receive.class, (ev) -> {
-            if (!(ev.getPacket() instanceof S3FPacketCustomPayload)) {
-                return;
+
+        OmniClientPackets.createGlobalPacketReceiver((Predicate<OmniPacketReceiverContext>) ctx -> {
+            String channelName = ctx.getChannel().toString();
+            if (!HypixelModAPI.getInstance().getRegistry().isRegistered(channelName)) {
+                return false;
             }
 
-            S3FPacketCustomPayload packet = ev.getPacket();
-            //#if MC >= 1.20.6
-            //$$ String identifier = packet.comp_1646().getId().comp_2242().toString();
-            //#elseif MC >= 1.20.4
-            //#if FORGE-LIKE
-            //$$ String identifier = packet.payload().id().toString();
-            //#else
-            //$$ String identifier = packet.comp_1646().comp_1678().toString();
-            //#endif
-            //#else
-            //noinspection StringOperationCanBeSimplified
-            String identifier = packet.getChannelName().toString();
-            //#endif
-            if (!HypixelModAPI.getInstance().getRegistry().isRegistered(identifier)) {
-                return;
-            }
-
+            PacketSerializer serializer = new PacketSerializer(ctx.getBuffer());
             try {
-                PacketSerializer s = new PacketSerializer(
-                        //#if MC >= 1.20.4 && FABRIC || NEOFORGE
-                        //$$ ((Payload) packet.payload()).data()
-                        //#else
-                        packet.getBufferData()
-                        //#endif
-                );
-                HypixelModAPI.getInstance().handle(identifier, s);
+                HypixelModAPI.getInstance().handle(channelName, serializer);
             } catch (Exception e) {
-                LOGGER.warn("Failed to handle packet {}", identifier, e);
+                LOGGER.warn("Failed to handle packet {}", channelName, e);
             }
+
+            return true;
         });
     }
 
@@ -117,37 +99,4 @@ public final class HypixelApiInternalsImpl implements HypixelApiInternals {
         EventManager.INSTANCE.post(HypixelLocationEvent.INSTANCE);
     }
 
-    //#if MC >= 1.20.4 && FABRIC || NEOFORGE
-    //$$ public static final class Payload implements net.minecraft.network.protocol.common.custom.CustomPacketPayload {
-    //$$     private final net.minecraft.resources.ResourceLocation id;
-    //$$     private final io.netty.buffer.ByteBuf data;
-    //$$
-    //$$     public Payload(net.minecraft.resources.ResourceLocation id, io.netty.buffer.ByteBuf data) {
-    //$$         this.id = id;
-    //$$         this.data = data.copy();
-    //$$         data.skipBytes(data.readableBytes());
-    //$$     }
-    //$$
-    //$$     public void write(net.minecraft.network.FriendlyByteBuf arg) {
-    //$$         if (this.data != null) {
-    //$$             arg.writeBytes(this.data.slice());
-    //$$         }
-    //$$     }
-    //$$
-    //#if MC >= 1.20.6
-    //$$     public Id<Payload> getId() {
-    //$$         return new Id<>(this.id);
-    //$$     }
-    //#else
-    //$$     public net.minecraft.resources.ResourceLocation id() {
-    //$$         return this.id;
-    //$$     }
-    //#endif
-    //$$
-    //$$     public io.netty.buffer.ByteBuf data() {
-    //$$         return this.data;
-    //$$     }
-    //$$
-    //$$ }
-    //#endif
 }
