@@ -24,8 +24,7 @@
   },
   "depends": {
     "fabricloader": ">=0.12.0",
-    "minecraft": "${mc_version}",
-    "java": ">=${java_version}"
+    "minecraft": "${mc_version}"
   },
   "custom": {
     "modmenu": {
