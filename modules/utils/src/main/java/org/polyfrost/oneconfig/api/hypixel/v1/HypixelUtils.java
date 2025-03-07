@@ -105,7 +105,7 @@ public final class HypixelUtils {
 
         @Override
         public final String toString() {
-            return packet.toString();
+            return packet == null ? "null" : packet.toString();
         }
 
         public T getPacket() {
