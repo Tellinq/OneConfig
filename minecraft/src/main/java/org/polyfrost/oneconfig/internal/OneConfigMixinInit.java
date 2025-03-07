@@ -69,10 +69,6 @@ public class OneConfigMixinInit implements IMixinConfigPlugin {
         //#else
         mixins.add("fabric.Mixin_LoadShaderInvoker_Fabric");
         mixins.add("fabric.Mixin_ChatReceiveEvent_Fabric");
-
-        //#if MC > 1.20
-        mixins.add("hypixel.Mixin_CaptureHypixelPayloads");
-        //#endif
         //#endif
 
         //#if MC >= 1.16
