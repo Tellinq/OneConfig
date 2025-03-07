@@ -1,7 +1,6 @@
 @file:Suppress("UnstableApiUsage")
 // Shared build logic for all versions of OneConfig.
 
-import dev.deftu.gradle.tools.publishing.MavenPublishingExtension
 import dev.deftu.gradle.utils.GameSide
 import dev.deftu.gradle.utils.version.MinecraftReleaseVersion
 import dev.deftu.gradle.utils.version.MinecraftVersions
@@ -21,6 +20,8 @@ plugins {
 
 toolkitLoomHelper {
     disableRunConfigs(GameSide.SERVER)
+
+    useDevAuth("+")
 
     useProperty("mixin.debug.export", "true", GameSide.CLIENT)
     useProperty("debugBytecode", "true", GameSide.CLIENT)
