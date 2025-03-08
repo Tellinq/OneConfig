@@ -1,25 +1,34 @@
 @file:Suppress("UnstableApiUsage", "DEPRECATION")
 
+import dev.deftu.gradle.tools.publishing.MavenPublishingExtension
+
+
 // Shared build logic between all OneConfig modules to reduce boilerplate.
 
 plugins {
-    id(libs.plugins.kotlinx.api.validator.get().pluginId)
+    alias(libs.plugins.kotlinx.api.validator)
     alias(libs.plugins.jetbrains.idea.ext)
+    id("maven-publish")
+    id("signing")
 }
 
 val rootModuleProject = project
 
 subprojects {
-    apply(plugin = "java-library")
     apply(plugin = "kotlin")
+    apply(plugin = rootProject.libs.plugins.dgt.java.get().pluginId)
+    apply(plugin = rootProject.libs.plugins.dgt.kotlin.get().pluginId)
+    apply(plugin = rootProject.libs.plugins.dgt.publishing.maven.get().pluginId)
     apply(plugin = "jvm-test-suite")
 
-    if (project.parent?.name == "dependencies")
+    if (project.parent?.name == "dependencies") {
         this.group = "${project.group}.dependencies"
+    }
 
     repositories {
         maven("https://repo.polyfrost.org/releases")
         maven("https://repo.polyfrost.org/snapshots")
+        maven("https://maven.deftu.dev/releases")
     }
 
     dependencies {
@@ -82,17 +91,17 @@ subprojects {
         }
     }
 
-    rootModuleProject.publishing {
-        publications {
-            register<MavenPublication>("module" + project.name.capitalize()) {
-                from(components["java"])
+    afterEvaluate {
+        publishing {
+            publications {
+                named<MavenPublication>("mavenJava") {
+                    artifactId = project.name
+                    groupId = project.group.toString()
 
-                groupId = project.group.toString()
-                artifactId = project.name
-
-                signing {
-                    isRequired = project.properties["signing.keyId"] != null
-                    sign(this@register)
+                    signing {
+                        isRequired = project.properties["signing.keyId"] != null
+                        sign(this@named)
+                    }
                 }
             }
         }

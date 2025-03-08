@@ -28,6 +28,8 @@
 
 package org.polyfrost.oneconfig.internal.ui
 
+import dev.deftu.omnicore.client.OmniClient
+import dev.deftu.omnicore.client.OmniClientPlayer
 import org.polyfrost.oneconfig.api.config.v1.ConfigManager
 import org.polyfrost.oneconfig.api.config.v1.internal.ConfigVisualizer
 import org.polyfrost.oneconfig.api.hud.v1.HudManager
@@ -54,7 +56,7 @@ import org.polyfrost.polyui.utils.image
 
 object OneConfigUI {
     private val playerHead = PolyImage(
-        "https://mc-heads.net/avatar/${Platform.player().playerName ?: "Steve"}/24",
+        "https://mc-heads.net/avatar/${OmniClientPlayer.name}/24",
         type = PolyImage.Type.Raster,
     )
     private val searchNoneFound = Text("oneconfig.search.nonefound", fontSize = 16f)
@@ -134,7 +136,7 @@ object OneConfigUI {
                                 Image(playerHead, size = Vec2(24f, 24f)).radius(6f).named("ProfileImage").withBoarder(
                                     rgba(255, 255, 255, 0.14f),
                                     width = 1f,
-                                ).addHoverInfo(Text(Platform.player().playerName.ifEmpty { "Steve" })),
+                                ).addHoverInfo(Text(OmniClientPlayer.name.ifEmpty { "Steve" })),
                                 alignment = Align(pad = Vec2(16f, 8f)),
                             ),
                             Block(

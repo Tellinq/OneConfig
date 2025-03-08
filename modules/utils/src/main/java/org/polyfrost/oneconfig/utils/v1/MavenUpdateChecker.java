@@ -26,6 +26,7 @@
 
 package org.polyfrost.oneconfig.utils.v1;
 
+import dev.deftu.omnicore.common.OmniLoader;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
@@ -56,13 +57,14 @@ public final class MavenUpdateChecker {
         this.id = id;
         this.repo = repo.endsWith("/") ? repo : repo + "/";
         this.group = group.replace('.', '/');
-        LoaderPlatform.ActiveMod self = Platform.loader().getLoadedMod(id);
+        OmniLoader.ModInfo self = OmniLoader.getModInfo(id);
         if (self == null) {
-            LOGGER.error("couldn't determine current version of {}. is it a valid mod id?", id);
+            LOGGER.error("couldn't determine current version of {}. is it a valid mod ID?", id);
             currentVersion = null;
         } else {
-            currentVersion = self.version.toLowerCase();
+            currentVersion = self.getVersion().toLowerCase();
         }
+
         Multithreading.submit(this::fetchUpdateStatus);
     }
 
@@ -79,6 +81,7 @@ public final class MavenUpdateChecker {
                 if (fin) break;
             }
         }
+
         return hasUpdate;
     }
 

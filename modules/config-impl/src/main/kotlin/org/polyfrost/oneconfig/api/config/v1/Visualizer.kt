@@ -49,7 +49,8 @@ fun interface Visualizer {
     class ButtonVisualizer : Visualizer {
         override fun visualize(prop: Property<*>): Drawable {
             val text = prop.getMetadata<String>("text")?.strv()
-            val action = prop.getMetadata<Runnable>("runnable") ?: prop.getAs()
+            val action: Runnable? = prop.getMetadata<Runnable>("runnable") ?: prop.getAs<Runnable?>()
+            require(action != null) { "Button property $prop is missing a runnable, set it with either the metadata key 'runnable' or the property value" }
             return Button(
                 size = Vec2(300f, 32f),
                 text = text ?: "oneconfig.button.default",
@@ -63,8 +64,13 @@ fun interface Visualizer {
             if (p !is PolyColor.Mutable) {
                 prop.setAsReferential(p.mutable())
             }
-            return Block(color = prop.getAs(), size = Vec2(58f, 32f)).withBoarder(3f, color = { page.border20 })
+            val s = Block(color = prop.getAs(), size = Vec2(58f, 32f)).withBoarder(3f, color = { page.border20 })
                 .onClick { ColorPicker(prop.getAs<PolyColor.Mutable>().ref(), null, null, polyUI); true }
+            prop.addCallback {
+                s.color = it as PolyColor
+                false
+            }
+            return s
         }
     }
 
@@ -75,7 +81,7 @@ fun interface Visualizer {
                 require(options.isEmpty()) { "Dropdowns should not have options when used with enums (offender=${prop.id})" }
                 val constants = prop.type.enumConstants
                 val index = constants.indexOf(prop.get())
-                return Dropdown(
+                val s = Dropdown(
                     optPadding = 24f,
                     initial = index,
                     entries = constants.mapToArray {
@@ -86,10 +92,12 @@ fun interface Visualizer {
                     prop.setAs(constants[i])
                     false
                 }
+                // todo setback not supported currently on dropdowns
+                return s
             } else {
                 require(prop.type == Int::class.java) { "Dropdowns can only be used with enums or integers (offender=${prop.id}, type=${prop.type})" }
                 require(options.size >= 2) { "Dropdowns must have at least two options (offender=${prop.id})" }
-                return Dropdown(
+                val s = Dropdown(
                     optPadding = 24f,
                     initial = prop.getAs(),
                     entries = options.mapToArray { null to it },
@@ -97,6 +105,7 @@ fun interface Visualizer {
                     prop.setAs(i)
                     false
                 }
+                return s
             }
         }
     }
@@ -149,6 +158,7 @@ fun interface Visualizer {
             val max = prop.getMetadata<Float>("max") ?: 100f
             val integral = prop.type == Int::class.java || prop.type == Long::class.java
             val placeholder = prop.getMetadata<String>("placeholder") ?: if (integral) "${min.toInt()}-${max.toInt()}" else "$min-$max"
+            var dodge = false
             val s = BoxedTextInput(
                 placeholder = placeholder,
                 image = "assets/oneconfig/ico/text.svg".image(),
@@ -157,8 +167,14 @@ fun interface Visualizer {
                 post = unit
             ).apply {
                 (this[1][0] as TextInput).numeric(min, max, integral).on(Event.Change.Number) {
+                    dodge = true
                     prop.setAs(if (integral) it.amount.toInt() else it.amount.toFloat())
                 }
+            }
+            prop.addCallback {
+                if (!dodge) (s[1][0] as TextInput).text = it.toString()
+                dodge = false
+                false
             }
             return s
         }
@@ -167,6 +183,7 @@ fun interface Visualizer {
     class RadioVisualizer : Visualizer {
         override fun visualize(prop: Property<*>): Drawable {
             val options: Array<String> = prop.getMetadata("options") ?: emptyArray()
+            var dodge = false
             if (prop.type.isEnum) {
                 val values = prop.type.enumConstants
                 var field = prop.type::class.java.fields.firstOrNull()
@@ -181,21 +198,34 @@ fun interface Visualizer {
                         initial = values.indexOf(prop.get()),
                         optionLateralPadding = 20f,
                     ).onChange { amount: Int ->
+                        dodge = true
                         prop.setAs(values[amount])
                         false
                     }
+                prop.addCallback {
+                    if (!dodge) r.setRadiobuttonEntry(values.indexOf(it as Enum<*>))
+                    dodge = false
+                    false
+                }
                 return r
             } else {
                 require(prop.type == Int::class.java) { "Radio buttons ${prop.id} can only be used with enum or integer types (type=${prop.type}" }
                 require(options.size >= 2) { "Radio button ${prop.id} must have at least two options" }
-                return Radiobutton(
+                val r = Radiobutton(
                     entries = options.mapToArray { null to it },
                     initial = prop.getAs(),
                     optionLateralPadding = 20f,
                 ).onChange { amount: Int ->
+                    dodge = true
                     prop.setAs(amount)
                     false
                 }
+                prop.addCallback {
+                    if (!dodge) r.setRadiobuttonEntry(it as Int)
+                    dodge = false
+                    false
+                }
+                return r
             }
         }
     }
@@ -204,6 +234,7 @@ fun interface Visualizer {
         override fun visualize(prop: Property<*>): Drawable {
             val min = prop.getMetadata<Float>("min") ?: 0f
             val max = prop.getMetadata<Float>("max") ?: 100f
+            var dodge = false
             // todo stepped
             val s =
                 Slider(
@@ -212,9 +243,15 @@ fun interface Visualizer {
                     length = 200f,
                     initialValue = prop.getAs<Number>().toFloat(),
                 ).onChange { amount: Int ->
+                    dodge = true
                     prop.setAs(amount)
                     false
                 }
+            prop.addCallback {
+                if (!dodge) s.setSliderValue((it as Number).toFloat(), min, max, false)
+                dodge = false
+                false
+            }
             return s
         }
     }
@@ -222,27 +259,43 @@ fun interface Visualizer {
     class SwitchVisualizer : Visualizer {
         override fun visualize(prop: Property<*>): Drawable {
             val state = prop.getAs<Boolean>()
-            return Switch(
+            var dodge = false
+            val s = Switch(
                 lateralStretch = 2f,
                 size = 21f,
                 state = state,
             ).onChange { new: Boolean ->
+                dodge = true
                 prop.setAs(new)
                 false
             }
+            prop.addCallback {
+                if (!dodge) s.toggle(it as Boolean)
+                dodge = false
+                false
+            }
+            return s
         }
     }
 
     class CheckboxVisualizer : Visualizer {
         override fun visualize(prop: Property<*>): Drawable {
             val state = prop.getAs<Boolean>()
-            return Checkbox(
+            var dodge = false
+            val s = Checkbox(
                 size = 24f,
                 state = state,
             ).onChange { new: Boolean ->
+                dodge = true
                 prop.setAs(new)
                 false
             }
+            prop.addCallback {
+                if (!dodge) s.toggle(it as Boolean)
+                dodge = false
+                false
+            }
+            return s
         }
     }
 
@@ -251,6 +304,7 @@ fun interface Visualizer {
             val placeholder = prop.getMetadata("placeholder") ?: "polyui.textinput.placeholder"
             val validate = prop.getMetadata<String?>("validate")
             val regex = if (validate != null) Regex(validate) else null
+            var dodge = false
             val s = BoxedTextInput(
                 image = "assets/oneconfig/ico/text.svg".image(),
                 placeholder = placeholder,
@@ -261,10 +315,16 @@ fun interface Visualizer {
                     shake()
                     return@onChange true
                 }
+                dodge = true
                 prop.setAs(text)
                 false
             }
             if (validate != null) s.addHoverInfo(Text("Must match regex: $validate"))
+            prop.addCallback {
+                if (!dodge) (s[1][0] as TextInput).text = it as String
+                dodge = false
+                false
+            }
             return s
         }
     }

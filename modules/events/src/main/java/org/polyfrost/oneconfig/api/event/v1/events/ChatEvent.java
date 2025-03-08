@@ -26,11 +26,13 @@
 
 package org.polyfrost.oneconfig.api.event.v1.events;
 
+import dev.deftu.textile.TextHolder;
 import org.polyfrost.oneconfig.api.platform.v1.Platform;
 
 public abstract class ChatEvent extends Event.Cancellable {
 
     public static final class Send extends ChatEvent {
+
         public final String message;
 
         public Send(String message) {
@@ -40,54 +42,32 @@ public abstract class ChatEvent extends Event.Cancellable {
         public String component1() {
             return message;
         }
+
     }
 
     public static final class Receive extends ChatEvent {
-        private Object message;
 
-        public Receive(Object message) {
+        private TextHolder message;
+
+        public Receive(TextHolder message) {
             this.message = message;
         }
 
-        /**
-         * @see org.polyfrost.oneconfig.api.platform.v1.I18nPlatform#getUnformattedText(Object) Platform.i18n().getUnformattedText()
-         */
         public String getFullyUnformattedMessage() {
             return Platform.i18n().getUnformattedText(message);
         }
 
-        /**
-         * Due to differences across Minecraft versions, this is a Duck method, meaning that it will return the expected type for that minecraft version.
-         * <ul>
-         *     <li>For legacy forge, this will be a ITextComponent.</li>
-         *     <li>For modern forge, this will be a Component.</li>
-         *     <li>For fabric, this will be a Text.</li>
-         * </ul>
-         * <b>Note: the toString() method on the returned object will always be the correct text of the message.</b>
-         *
-         * @see org.polyfrost.oneconfig.api.platform.v1.I18nPlatform#getUnformattedText(Object) Platform.i18n().getUnformattedText()
-         * @see #getFullyUnformattedMessage()
-         */
-        @SuppressWarnings("unchecked")
-        public <T> T getMessage() {
-            return (T) message;
+        public TextHolder getMessage() {
+            return message;
         }
 
-
-        /**
-         * Due to differences across Minecraft versions, this is a Duck method, meaning that it expects a different type for different minecraft versions.
-         * <ul>
-         *     <li>For legacy forge, this will be a ITextComponent.</li>
-         *     <li>For modern forge, this will be a Component.</li>
-         *     <li>For fabric, this will be a Text.</li>
-         * </ul>
-         */
-        public <T> void setMessage(T message) {
+        public void setMessage(TextHolder message) {
             this.message = message;
         }
 
-        public Object component1() {
+        public TextHolder component1() {
             return message;
         }
+
     }
 }

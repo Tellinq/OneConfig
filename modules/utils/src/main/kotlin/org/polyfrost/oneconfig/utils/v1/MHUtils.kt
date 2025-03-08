@@ -517,7 +517,7 @@ object MHUtils {
         return try {
             val cls = Class.forName("jdk.internal.reflect.Reflection")
             trustedLookup.findStaticSetter(cls, "fieldFilterMap", Map::class.java).invoke(null)
-            trustedLookup.findStaticGetter(cls, "methodFilterMap", Map::class.java).invoke(null)
+            trustedLookup.findStaticSetter(cls, "methodFilterMap", Map::class.java).invoke(null)
             true
         } catch (e: Throwable) {
             LOGGER.error("Failed to remove reflection filters", e)

@@ -47,66 +47,23 @@ public final class org/polyfrost/oneconfig/api/hypixel/v1/HypixelUtils$PlayerInf
 }
 
 public abstract interface class org/polyfrost/oneconfig/api/platform/v1/GLPlatform {
-	public abstract fun drawRect (Lorg/polyfrost/universal/UMatrixStack;DDDDI)V
-	public abstract fun drawText (Lorg/polyfrost/universal/UMatrixStack;Ljava/lang/String;FFIZ)F
 	public abstract fun getFunctionAddress (Ljava/lang/String;)J
-	public abstract fun getStringWidth (Ljava/lang/String;)I
 }
 
 public abstract interface class org/polyfrost/oneconfig/api/platform/v1/I18nPlatform {
-	public abstract fun format (Ljava/lang/String;[Ljava/lang/Object;)Ljava/lang/String;
-	public abstract fun getKeyName (II)Ljava/lang/String;
 	public abstract fun getUnformattedText (Ljava/lang/Object;)Ljava/lang/String;
 }
 
 public abstract interface class org/polyfrost/oneconfig/api/platform/v1/LoaderPlatform {
 	public abstract fun addToClasspath (Ljava/nio/file/Path;)V
-	public fun getLoadedMod (Ljava/lang/String;)Lorg/polyfrost/oneconfig/api/platform/v1/LoaderPlatform$ActiveMod;
-	public abstract fun getLoadedMods ()Ljava/util/List;
-	public abstract fun getLoader ()Lorg/polyfrost/oneconfig/api/platform/v1/LoaderPlatform$Loaders;
 	public fun getLoaderString ()Ljava/lang/String;
-	public abstract fun getMinecraftVersion ()I
-	public abstract fun isDevelopment ()Z
-	public abstract fun isModLoaded (Ljava/lang/String;)Z
-	public abstract fun toActiveMod (Ljava/lang/Object;)Lorg/polyfrost/oneconfig/api/platform/v1/LoaderPlatform$ActiveMod;
-}
-
-public class org/polyfrost/oneconfig/api/platform/v1/LoaderPlatform$ActiveMod {
-	public final field id Ljava/lang/String;
-	public final field name Ljava/lang/String;
-	public final field source Ljava/nio/file/Path;
-	public final field version Ljava/lang/String;
-	public fun <init> (Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/nio/file/Path;)V
-}
-
-public final class org/polyfrost/oneconfig/api/platform/v1/LoaderPlatform$Loaders : java/lang/Enum {
-	public static final field FABRIC Lorg/polyfrost/oneconfig/api/platform/v1/LoaderPlatform$Loaders;
-	public static final field FORGE Lorg/polyfrost/oneconfig/api/platform/v1/LoaderPlatform$Loaders;
-	public static fun valueOf (Ljava/lang/String;)Lorg/polyfrost/oneconfig/api/platform/v1/LoaderPlatform$Loaders;
-	public static fun values ()[Lorg/polyfrost/oneconfig/api/platform/v1/LoaderPlatform$Loaders;
 }
 
 public final class org/polyfrost/oneconfig/api/platform/v1/Platform {
 	public static fun gl ()Lorg/polyfrost/oneconfig/api/platform/v1/GLPlatform;
 	public static fun i18n ()Lorg/polyfrost/oneconfig/api/platform/v1/I18nPlatform;
 	public static fun loader ()Lorg/polyfrost/oneconfig/api/platform/v1/LoaderPlatform;
-	public static fun player ()Lorg/polyfrost/oneconfig/api/platform/v1/PlayerPlatform;
 	public static fun screen ()Lorg/polyfrost/oneconfig/api/platform/v1/ScreenPlatform;
-}
-
-public abstract interface class org/polyfrost/oneconfig/api/platform/v1/PlayerPlatform {
-	public abstract fun doesPlayerExist ()Z
-	public abstract fun getCurrentServer ()Lorg/polyfrost/oneconfig/api/platform/v1/PlayerPlatform$Server;
-	public abstract fun getPlayerName ()Ljava/lang/String;
-	public abstract fun getServerBrand ()Ljava/lang/String;
-	public abstract fun inMultiplayer ()Z
-	public abstract fun joinServer (Lorg/polyfrost/oneconfig/api/platform/v1/PlayerPlatform$Server;)V
-}
-
-public class org/polyfrost/oneconfig/api/platform/v1/PlayerPlatform$Server {
-	public final field ip Ljava/lang/String;
-	public final field name Ljava/lang/String;
-	public fun <init> (Ljava/lang/String;Ljava/lang/String;)V
 }
 
 public abstract interface class org/polyfrost/oneconfig/api/platform/v1/ScreenPlatform {
@@ -114,12 +71,9 @@ public abstract interface class org/polyfrost/oneconfig/api/platform/v1/ScreenPl
 	public abstract fun current ()Ljava/lang/Object;
 	public fun display (Ljava/lang/Object;)V
 	public abstract fun display (Ljava/lang/Object;I)V
-	public abstract fun getSmuggledMatrixStack ()Lorg/polyfrost/universal/UMatrixStack;
-	public abstract fun isInChat ()Z
-	public abstract fun isInDebug ()Z
+	public abstract fun getSmuggledMatrixStack ()Ldev/deftu/omnicore/client/render/OmniMatrixStack;
 	public fun pixelRatio ()F
-	public abstract fun playClickSound ()V
-	public abstract fun setSmuggledMatrixStack (Lorg/polyfrost/universal/UMatrixStack;)V
+	public abstract fun setSmuggledMatrixStack (Ldev/deftu/omnicore/client/render/OmniMatrixStack;)V
 	public abstract fun viewportHeight ()I
 	public abstract fun viewportWidth ()I
 	public abstract fun windowHeight ()I

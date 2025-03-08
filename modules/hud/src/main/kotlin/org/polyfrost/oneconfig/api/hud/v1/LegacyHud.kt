@@ -26,12 +26,12 @@
 
 package org.polyfrost.oneconfig.api.hud.v1
 
+import dev.deftu.omnicore.client.render.OmniMatrixStack
+import dev.deftu.omnicore.client.render.OmniResolution
 import org.jetbrains.annotations.ApiStatus
 import org.polyfrost.oneconfig.api.platform.v1.Platform
 import org.polyfrost.polyui.component.Drawable
 import org.polyfrost.polyui.component.extensions.namedId
-import org.polyfrost.universal.UMatrixStack
-import org.polyfrost.universal.UResolution
 
 /**
  * [Hud] implementation that uses the old rendering system, with a standard [render] method.
@@ -58,7 +58,7 @@ abstract class LegacyHud : Hud<Drawable>() {
      *
      * **Note:** This method is called every frame, so you should not perform any heavy calculations here.
      */
-    abstract fun render(stack: UMatrixStack, x: Float, y: Float, scaleX: Float, scaleY: Float)
+    abstract fun render(stack: OmniMatrixStack, x: Float, y: Float, scaleX: Float, scaleY: Float)
 
     /**
      * Wraps the [render] method in a [Drawable] instance, with the [Drawable.size] property delegating to [width] and [height].
@@ -81,7 +81,7 @@ abstract class LegacyHud : Hud<Drawable>() {
             override fun preRender(delta: Long) {}
 
             override fun render() {
-                val scale = Platform.screen().pixelRatio() / UResolution.scaleFactor.toFloat()
+                val scale = Platform.screen().pixelRatio() / OmniResolution.scaleFactor.toFloat()
                 render(Platform.screen().smuggledMatrixStack, x * scale, y * scale, scaleX * scale, scaleY * scale)
             }
 

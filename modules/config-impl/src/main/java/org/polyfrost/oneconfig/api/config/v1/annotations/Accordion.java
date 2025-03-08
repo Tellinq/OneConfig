@@ -26,13 +26,10 @@
 
 package org.polyfrost.oneconfig.api.config.v1.annotations;
 
-import org.polyfrost.oneconfig.api.config.v1.Visualizer;
-
 import java.lang.annotation.*;
 
-@Option(display = Visualizer.SwitchVisualizer.class) // todo
 @Retention(RetentionPolicy.RUNTIME)
-@Target(ElementType.TYPE)
+@Target({ElementType.TYPE, ElementType.FIELD})
 @Documented
 public @interface Accordion {
     String title() default "";
@@ -44,8 +41,6 @@ public @interface Accordion {
     String category() default "General";
 
     String subcategory() default "General";
-
-    boolean canBeEnabled() default true;
 
     int index() default -1;
 }

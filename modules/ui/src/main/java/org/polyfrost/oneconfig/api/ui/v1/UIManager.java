@@ -26,6 +26,8 @@
 
 package org.polyfrost.oneconfig.api.ui.v1;
 
+import dev.deftu.omnicore.client.OmniChat;
+import dev.deftu.omnicore.client.render.OmniMatrixStack;
 import org.apache.logging.log4j.LogManager;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
@@ -42,8 +44,6 @@ import org.polyfrost.polyui.Settings;
 import org.polyfrost.polyui.component.Component;
 import org.polyfrost.polyui.renderer.Renderer;
 import org.polyfrost.polyui.renderer.Window;
-import org.polyfrost.universal.UChat;
-import org.polyfrost.universal.UMatrixStack;
 
 import java.util.ServiceLoader;
 import java.util.function.Consumer;
@@ -105,7 +105,7 @@ public interface UIManager {
             p.setWindow(createWindow());
             p.resize(Platform.screen().windowWidth(), Platform.screen().windowHeight(), false);
             EventManager.register(HudRenderEvent.class, ev -> {
-                UMatrixStack stack = ev.matrices;
+                OmniMatrixStack stack = ev.matrices;
                 Platform.screen().setSmuggledMatrixStack(stack);
                 stack.runWithGlobalState(p::render);
             });
@@ -113,7 +113,7 @@ public interface UIManager {
             return p;
         } catch (Throwable t) {
             LogManager.getLogger("OneConfig/UI").error("Failed to load renderer!", t);
-            EventManager.register(WorldEvent.Load.class, () -> EventDelay.tick(20, () -> UChat.chat("&cFailed to load the renderer for OneConfig. This means the UI, HUD and Notifications will not work. Please report this to https://discord.gg/polyfrost and attach your log.")));
+            EventManager.register(WorldEvent.Load.class, () -> EventDelay.tick(20, () -> OmniChat.showChatMessage("&cFailed to load the renderer for OneConfig. This means the UI, HUD and Notifications will not work. Please report this to https://discord.gg/polyfrost and attach your log.")));
             return null;
         }
     }

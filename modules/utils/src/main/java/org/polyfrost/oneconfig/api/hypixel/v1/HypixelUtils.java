@@ -26,6 +26,7 @@
 
 package org.polyfrost.oneconfig.api.hypixel.v1;
 
+import dev.deftu.omnicore.client.OmniClientMultiplayer;
 import net.hypixel.data.rank.MonthlyPackageRank;
 import net.hypixel.data.rank.PackageRank;
 import net.hypixel.data.rank.PlayerRank;
@@ -45,7 +46,6 @@ import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.MustBeInvokedByOverriders;
 import org.jetbrains.annotations.Unmodifiable;
 import org.polyfrost.oneconfig.api.hypixel.v1.internal.HypixelApiInternals;
-import org.polyfrost.oneconfig.api.platform.v1.Platform;
 
 import java.util.*;
 
@@ -74,7 +74,7 @@ public final class HypixelUtils {
 
     @SuppressWarnings("deprecation")
     public static boolean isHypixel() {
-        String brand = Platform.player().getServerBrand();
+        String brand = OmniClientMultiplayer.getServerBrand();
         if (brand == null) return false;
         return brand.toLowerCase().contains("hypixel");
     }
@@ -105,7 +105,7 @@ public final class HypixelUtils {
 
         @Override
         public final String toString() {
-            return packet.toString();
+            return packet == null ? "null" : packet.toString();
         }
 
         public T getPacket() {

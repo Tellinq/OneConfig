@@ -10,6 +10,7 @@ public abstract class org/polyfrost/oneconfig/api/config/v1/Config {
 	protected fun addDependency (Ljava/lang/String;Ljava/lang/String;Ljava/util/function/Supplier;)V
 	protected fun addDependency (Ljava/lang/String;Ljava/lang/String;Z)V
 	protected fun getProperty (Ljava/lang/String;)Lorg/polyfrost/oneconfig/api/config/v1/Property;
+	protected static fun getProperty (Lorg/polyfrost/oneconfig/api/config/v1/Tree;Ljava/lang/String;)Lorg/polyfrost/oneconfig/api/config/v1/Property;
 	public fun getTree ()Lorg/polyfrost/oneconfig/api/config/v1/Tree;
 	protected fun hideIf (Ljava/lang/String;Ljava/lang/String;)V
 	protected fun hideIf (Ljava/lang/String;Ljava/util/function/BooleanSupplier;)V
@@ -17,6 +18,8 @@ public abstract class org/polyfrost/oneconfig/api/config/v1/Config {
 	protected fun loadFrom (Ljava/nio/file/Path;)V
 	protected fun makeTree (Ljava/lang/String;)Lorg/polyfrost/oneconfig/api/config/v1/Tree;
 	public fun preload ()V
+	protected fun restoreDefaults ()V
+	protected fun restoreProperty (Ljava/lang/String;)V
 	public fun save ()V
 }
 
@@ -34,6 +37,7 @@ public final class org/polyfrost/oneconfig/api/config/v1/Config$Category {
 public final class org/polyfrost/oneconfig/api/config/v1/ConfigManager {
 	public static final field PROFILES_DIR Ljava/nio/file/Path;
 	public static fun active ()Lorg/polyfrost/oneconfig/api/config/v1/ConfigManager;
+	public static fun backup ()Lorg/polyfrost/oneconfig/api/config/v1/ConfigManager;
 	public static fun collect (Ljava/lang/Object;Ljava/lang/String;)Lorg/polyfrost/oneconfig/api/config/v1/Tree;
 	public static fun core ()Lorg/polyfrost/oneconfig/api/config/v1/ConfigManager;
 	public fun delete (Ljava/lang/String;)Z
@@ -45,7 +49,7 @@ public final class org/polyfrost/oneconfig/api/config/v1/ConfigManager {
 	public fun load (Ljava/lang/String;)Lorg/polyfrost/oneconfig/api/config/v1/Tree;
 	public static fun openProfile (Ljava/lang/String;)V
 	public fun register (Ljava/lang/Object;Ljava/lang/String;)Lorg/polyfrost/oneconfig/api/config/v1/Tree;
-	public fun register (Lorg/polyfrost/oneconfig/api/config/v1/Tree;)Lorg/polyfrost/oneconfig/api/config/v1/Tree;
+	public fun register (Lorg/polyfrost/oneconfig/api/config/v1/Tree;)Lorg/polyfrost/oneconfig/api/config/v1/backend/Backend$RegistrationResult;
 	public static fun registerCollector (Lorg/polyfrost/oneconfig/api/config/v1/collect/PropertyCollector;)V
 	public fun save (Ljava/lang/String;)Z
 	public fun save (Lorg/polyfrost/oneconfig/api/config/v1/Tree;)Z
@@ -145,7 +149,6 @@ public final class org/polyfrost/oneconfig/api/config/v1/Visualizer$TextVisualiz
 }
 
 public abstract interface annotation class org/polyfrost/oneconfig/api/config/v1/annotations/Accordion : java/lang/annotation/Annotation {
-	public abstract fun canBeEnabled ()Z
 	public abstract fun category ()Ljava/lang/String;
 	public abstract fun description ()Ljava/lang/String;
 	public abstract fun icon ()Ljava/lang/String;
@@ -287,7 +290,7 @@ public class org/polyfrost/oneconfig/api/config/v1/backend/impl/FileBackend : or
 	public fun load0 (Ljava/nio/file/Path;Ljava/lang/String;)Lorg/polyfrost/oneconfig/api/config/v1/Tree;
 	protected static fun mkdirs (Ljava/nio/file/Path;)Ljava/nio/file/Path;
 	protected static fun read (Ljava/nio/file/Path;)Ljava/lang/String;
-	protected fun save0 (Lorg/polyfrost/oneconfig/api/config/v1/Tree;)Z
+	public fun save0 (Lorg/polyfrost/oneconfig/api/config/v1/Tree;)Z
 	protected static fun write (Ljava/nio/file/Path;Ljava/lang/String;)V
 }
 

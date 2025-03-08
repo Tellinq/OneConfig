@@ -26,28 +26,30 @@
 
 package org.polyfrost.oneconfig.api.event.v1.events;
 
-import org.polyfrost.universal.UMatrixStack;
+import dev.deftu.omnicore.client.render.OmniMatrixStack;
 
 /**
  * Called when external HUDs can be rendered.
  */
 public class HudRenderEvent implements Event {
+
     /**
      * How much time has elapsed since the last tick, in ticks. Used for animations.
      */
     public final float deltaTicks;
-    public final UMatrixStack matrices;
+    public final OmniMatrixStack matrices;
 
-    public HudRenderEvent(UMatrixStack matrices, float deltaTicks) {
+    public HudRenderEvent(OmniMatrixStack matrices, float deltaTicks) {
         this.matrices = matrices;
         this.deltaTicks = deltaTicks;
     }
 
-    public UMatrixStack component1() {
+    public OmniMatrixStack component1() {
         return matrices;
     }
 
     public float component2() {
         return deltaTicks;
     }
+
 }

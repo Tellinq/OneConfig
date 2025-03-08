@@ -26,22 +26,18 @@
 
 package org.polyfrost.oneconfig.api.commands.v1.factories;
 
+import com.mojang.brigadier.tree.LiteralCommandNode;
+import dev.deftu.omnicore.client.OmniClientCommandSource;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
-import org.polyfrost.oneconfig.api.commands.v1.CommandTree;
-import org.polyfrost.oneconfig.api.commands.v1.arguments.ArgumentParser;
 
-import java.util.Map;
 
 @FunctionalInterface
 public interface CommandFactory {
     /**
-     * Create a command tree from the given object.
+     * Create a command from the given object.
      *
-     * @param parsers a list of argument parsers available for use
-     * @param obj     the object to create the command tree from
-     * @return the command tree, or null if this factory cannot create a command tree from the given object. Ideally this is fail-fast.
+     * @param obj the object to create the command from
+     * @return the command, or null if this factory cannot create a command from the given object. Ideally this is fail-fast.
      */
-    @Nullable
-    CommandTree create(@NotNull Map<Class<?>, ArgumentParser<?>> parsers, @NotNull Object obj);
+    LiteralCommandNode<OmniClientCommandSource>[] create(@NotNull Object obj);
 }

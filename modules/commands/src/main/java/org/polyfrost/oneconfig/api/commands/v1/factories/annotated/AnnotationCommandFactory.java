@@ -26,101 +26,80 @@
 
 package org.polyfrost.oneconfig.api.commands.v1.factories.annotated;
 
-import org.jetbrains.annotations.Contract;
+import com.mojang.brigadier.builder.ArgumentBuilder;
+import com.mojang.brigadier.builder.LiteralArgumentBuilder;
+import com.mojang.brigadier.tree.LiteralCommandNode;
+import dev.deftu.omnicore.client.OmniClientCommandSource;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
-import org.polyfrost.oneconfig.api.commands.v1.CommandTree;
-import org.polyfrost.oneconfig.api.commands.v1.Executable;
-import org.polyfrost.oneconfig.api.commands.v1.arguments.ArgumentParser;
-import org.polyfrost.oneconfig.api.commands.v1.exceptions.WrongArgumentsException;
 import org.polyfrost.oneconfig.api.commands.v1.factories.CommandFactory;
 import org.polyfrost.oneconfig.utils.v1.MHUtils;
 
-import java.lang.invoke.MethodHandle;
-import java.lang.invoke.WrongMethodTypeException;
 import java.lang.reflect.Method;
-import java.util.Map;
-import java.util.function.Function;
+import java.lang.reflect.Parameter;
+
+import static org.polyfrost.oneconfig.api.commands.v1.CommandManager.*;
 
 public class AnnotationCommandFactory implements CommandFactory {
+    private static final Logger LOGGER = LogManager.getLogger("OneConfig/BrigaiderTranslator");
 
-    static void create(Map<Class<?>, ArgumentParser<?>> parsers, CommandTree tree, Object it) {
+    private void create(LiteralArgumentBuilder<OmniClientCommandSource> tree, Object it) {
         for (Method m : it.getClass().getDeclaredMethods()) {
-            if (m.isAnnotationPresent(Command.class)) {
-                tree.put(map(it, m, parsers));
+            Command cmd = m.getAnnotation(Command.class);
+            if (cmd != null) {
+                String[] paramNames = new String[m.getParameterCount()];
+                Class<?>[] paramTypes = m.getParameterTypes();
+                Parameter[] params = m.getParameters();
+                ArgumentBuilder<OmniClientCommandSource, ?> theMethod = argument(paramNames[0], getArgumentType(paramTypes[0]));
+                for (int i = 1; i < paramNames.length; i++) {
+                    paramNames[i] = params[i].getName();
+                    theMethod = theMethod.then(
+                            argument(paramNames[i], getArgumentType(paramTypes[i]))
+                    );
+                }
+
+                theMethod.executes((ctx) -> {
+                    Object[] args = new Object[paramTypes.length];
+                    for (int i = 0; i < paramTypes.length; i++) {
+                        args[i] = ctx.getArgument(paramNames[i], paramTypes[i]);
+                    }
+                    try {
+                        m.invoke(it, args);
+                        return 1;
+                    } catch (Exception e) {
+                        ctx.getSource().showError("An error occurred while executing this command!\nPlease report this to the developer: " + e.getMessage());
+                        LOGGER.error("Failed to execute command!", e);
+                        return -1;
+                    }
+                });
+                tree.then(literal(m.getName()).then(theMethod));
+                for (String s : cmd.value()) {
+                    tree.then(literal(s).then(theMethod));
+                }
             }
         }
         for (Class<?> cls : it.getClass().getDeclaredClasses()) {
             if (cls.isAnnotationPresent(Command.class)) {
-                Command c = cls.getAnnotation(Command.class);
-                CommandTree sub = new CommandTree(c.value().length == 0 ? new String[]{cls.getSimpleName()} : c.value(), c.description().isEmpty() ? null : c.description());
-                Object instance = MHUtils.instantiate(cls, true).getOrThrow();
-                create(parsers, sub, instance);
-                tree.put(sub);
+                LiteralArgumentBuilder<OmniClientCommandSource> subTree = literal(cls.getName());
+                create(subTree, MHUtils.instantiate(cls, true));
             }
         }
     }
 
-    static Executable map(Object it, Method method, Map<Class<?>, ArgumentParser<?>> parsers) {
-        Command c = method.getAnnotation(Command.class);
-        MethodHandle m = MHUtils.getMethodHandle(method, it).getOrThrow();
-        String[] names = c.value();
-        if (names.length == 0) names = new String[]{method.getName()};
-
-        return new Executable(names, c.description().isEmpty() ? null : c.description(), createParameterInfos(method, parsers), c.greedy(), getFunction(m));
-    }
-
-    @Contract(pure = true)
-    static @NotNull Function<Object[], Object> getFunction(MethodHandle mh) {
-        return args -> {
-            try {
-                return mh.invokeWithArguments(args);
-            } catch (WrongMethodTypeException | ClassCastException e) {
-                // should've been caught earlier
-                throw new WrongArgumentsException("InternalError while executing command: CommandTree method argument mismatch!", e);
-            } catch (Throwable e) {
-                throw sneakyThrow(e);
-            }
-        };
-    }
-
-    public static RuntimeException sneakyThrow(Throwable t) {
-        return sneakyThrow0(t);
-    }
-
-    @SuppressWarnings("unchecked")
-    private static <T extends Throwable> T sneakyThrow0(Throwable t) throws T {
-        throw (T) t;
-    }
-
-    static Executable.Param createParameterInfo(java.lang.reflect.Parameter parameter, Map<Class<?>, ArgumentParser<?>> parsers) {
-        String name = "";
-        String desc = "";
-        int arity = 1;
-        if (parameter.isAnnotationPresent(Parameter.class)) {
-            Parameter p = parameter.getAnnotation(Parameter.class);
-            name = p.value();
-            desc = p.description();
-            arity = p.arity();
-        }
-        if (name.isEmpty()) name = parameter.getType().getSimpleName();
-        return Executable.Param.create(name, desc.isEmpty() ? null : desc, parameter.getType(), arity, parsers);
-    }
-
-    static Executable.Param[] createParameterInfos(Method method, Map<Class<?>, ArgumentParser<?>> parsers) {
-        java.lang.reflect.Parameter[] parameters = method.getParameters();
-        Executable.Param[] infos = new Executable.Param[parameters.length];
-        for (int i = 0; i < parameters.length; i++) {
-            infos[i] = createParameterInfo(parameters[i], parsers);
-        }
-        return infos;
-    }
 
     @Override
-    public CommandTree create(@NotNull Map<Class<?>, ArgumentParser<?>> parsers, @NotNull Object obj) {
-        Command c = obj.getClass().getAnnotation(Command.class);
+    public LiteralCommandNode<OmniClientCommandSource>[] create(@NotNull Object obj) {
+        Class<?> cls = obj.getClass();
+        Command c = cls.getAnnotation(Command.class);
         if (c == null) return null;
-        CommandTree tree = new CommandTree(c.value().length == 0 ? new String[]{obj.getClass().getSimpleName()} : c.value(), c.description().isEmpty() ? null : c.description());
-        create(parsers, tree, obj);
-        return tree;
+        LiteralArgumentBuilder<OmniClientCommandSource> builder = literal(cls.getName());
+        create(builder, obj);
+        LiteralCommandNode<OmniClientCommandSource>[] nodes = new LiteralCommandNode[Math.max(1, c.value().length + 1)];
+        nodes[0] = builder.build();
+        for (int i = 1; i < c.value().length; i++) {
+            nodes[i] = literal(c.value()[i]).redirect(builder.build()).build();
+        }
+        return nodes;
     }
 }

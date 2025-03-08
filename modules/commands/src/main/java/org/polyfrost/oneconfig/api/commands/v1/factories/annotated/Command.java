@@ -43,16 +43,4 @@ public @interface Command {
      */
     String[] value() default {};
 
-    /**
-     * command description used in help message
-     */
-    String description() default "";
-
-    /**
-     * On a command method, set this to true for the last parameter to receive all remaining arguments.
-     * <br>
-     * <b>Make sure it is an array type!</b>
-     */
-    boolean greedy() default false;
-
 }

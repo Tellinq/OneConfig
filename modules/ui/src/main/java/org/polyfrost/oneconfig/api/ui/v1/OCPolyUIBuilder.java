@@ -26,6 +26,7 @@
 
 package org.polyfrost.oneconfig.api.ui.v1;
 
+import dev.deftu.omnicore.common.OmniLoader;
 import org.polyfrost.oneconfig.api.platform.v1.Platform;
 import org.polyfrost.oneconfig.api.platform.v1.ScreenPlatform;
 import org.polyfrost.polyui.PolyUI;
@@ -44,7 +45,7 @@ public final class OCPolyUIBuilder extends PolyUIBuilder {
         Settings s = getSettings();
         s.enableInitCleanup(false);
         s.enableForceSettingInitialSize(true);
-        s.enableDebugMode(Platform.loader().isDevelopment());
+        s.enableDebugMode(OmniLoader.isDevelopment());
     }
 
     public OCPolyUIBuilder onClose(Consumer<PolyUI> onClose) {

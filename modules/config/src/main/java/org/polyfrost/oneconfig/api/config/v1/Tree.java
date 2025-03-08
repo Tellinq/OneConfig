@@ -26,18 +26,14 @@
 
 package org.polyfrost.oneconfig.api.config.v1;
 
+import org.jetbrains.annotations.*;
+
 import java.io.Serializable;
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
-
-import org.jetbrains.annotations.ApiStatus;
-import org.jetbrains.annotations.Contract;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
-import org.jetbrains.annotations.UnmodifiableView;
 
 /**
  * The Tree class represents a tree structure that contains properties and other trees as children.
@@ -179,6 +175,18 @@ public class Tree extends Node implements Serializable {
         return n;
     }
 
+    @Nullable
+    public Node get(@NotNull Iterable<String> id) {
+        Tree t = this;
+        Node n = null;
+        for (String s : id) {
+            n = t.get(s);
+            if (n instanceof Tree) t = (Tree) n;
+            else return n;
+        }
+        return n;
+    }
+
     public Tree getChild(@NotNull String... id) {
         Node n = get(id);
         return n instanceof Tree ? (Tree) n : null;
@@ -250,7 +258,8 @@ public class Tree extends Node implements Serializable {
 
     /**
      * Overwrite this tree with the supplied tree, using the keyMapper to map between key names from old to new if needed.
-     * @param with the tree to overwrite with
+     *
+     * @param with      the tree to overwrite with
      * @param keyMapper the key mapper function to use
      */
     public void overwrite(Tree with, @NotNull Function<String, String> keyMapper) {
@@ -302,6 +311,40 @@ public class Tree extends Node implements Serializable {
     public void clear() {
         theMap.clear();
         clearMetadata();
+    }
+
+    /**
+     * Figure out what the path from the given root to the given node is.
+     */
+    public static String evaluatePath(Tree root, Node node) {
+        if (node == null || root == null) return null;
+        StringBuilder sb = new StringBuilder(32);
+        _evaluatePath(sb, root, node);
+        return sb.toString();
+
+    }
+
+    private static boolean _evaluatePath(StringBuilder sb, Tree root, Node node) {
+        if (root == node) {
+            if (sb.length() > 0) sb.append('.');
+            sb.append(node.getID());
+            return true;
+        }
+        for (Map.Entry<String, Node> e : root.theMap.entrySet()) {
+            if (e.getValue() == node) {
+                if (sb.length() > 0) sb.append('.');
+                sb.append(e.getKey());
+                return true;
+            }
+            if (e.getValue() instanceof Tree) {
+                boolean found = _evaluatePath(sb, (Tree) e.getValue(), node);
+                if (found) {
+                    sb.append('.').append(e.getKey());
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 }
 

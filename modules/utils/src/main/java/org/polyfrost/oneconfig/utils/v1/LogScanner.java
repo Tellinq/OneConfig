@@ -48,6 +48,7 @@
 
 package org.polyfrost.oneconfig.utils.v1;
 
+import dev.deftu.omnicore.common.OmniLoader;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
@@ -74,6 +75,7 @@ import java.util.stream.Collectors;
  * Adapted from <a href="https://github.com/natanfudge/Not-Enough-Crashes">NotEnoughCrashes</a> under the <a href="https://opensource.org/licenses/MIT">MIT License</a>
  */
 public final class LogScanner {
+
     private static final Logger LOGGER = LogManager.getLogger("OneConfig/Log Scanner");
 
     private LogScanner() {
@@ -87,12 +89,12 @@ public final class LogScanner {
      * @return A set of mods that are blamed for the given stacktrace
      */
     @NotNull
-    public static Set<LoaderPlatform.ActiveMod> identifyFromStacktrace(Throwable e) {
-        Set<LoaderPlatform.ActiveMod> mods = new HashSet<>();
+    public static Set<OmniLoader.ModInfo> identifyFromStacktrace(Throwable e) {
+        Set<OmniLoader.ModInfo> mods = new HashSet<>();
         // Include suppressed exceptions too
         visitChildrenThrowables(e, throwable -> {
-            for (LoaderPlatform.ActiveMod newMod : identifyFromThrowable(throwable)) {
-                if (mods.stream().noneMatch(mod -> mod.id.equals(newMod.id))) {
+            for (OmniLoader.ModInfo newMod : identifyFromThrowable(throwable)) {
+                if (mods.stream().noneMatch(mod -> mod.getId().equals(newMod.getId()))) {
                     mods.add(newMod);
                 }
             }
@@ -106,7 +108,7 @@ public final class LogScanner {
      * @return A singleton mod set that contains the caller, or an empty set if no caller is found.
      */
     @NotNull
-    public static Set<LoaderPlatform.ActiveMod> identifyCallerFromStacktrace(Throwable e) {
+    public static Set<OmniLoader.ModInfo> identifyCallerFromStacktrace(Throwable e) {
         // first is this method name, second is the method it called, third is what called it
         StackTraceElement target = null;
 
@@ -124,7 +126,7 @@ public final class LogScanner {
             break;
         }
         if (target == null) return Collections.emptySet();
-        Set<LoaderPlatform.ActiveMod> classMods = identifyFromClass(target.getClassName());
+        Set<OmniLoader.ModInfo> classMods = identifyFromClass(target.getClassName());
         return classMods.isEmpty() ? Collections.emptySet() : classMods;
     }
 
@@ -133,7 +135,7 @@ public final class LogScanner {
         for (Throwable child : e.getSuppressed()) visitChildrenThrowables(child, visitor);
     }
 
-    private static Set<LoaderPlatform.ActiveMod> identifyFromThrowable(Throwable e) {
+    private static Set<OmniLoader.ModInfo> identifyFromThrowable(Throwable e) {
         Set<String> involvedClasses = new LinkedHashSet<>();
         while (e != null) {
             for (StackTraceElement element : e.getStackTrace()) {
@@ -142,15 +144,15 @@ public final class LogScanner {
             e = e.getCause();
         }
 
-        Set<LoaderPlatform.ActiveMod> mods = new LinkedHashSet<>();
+        Set<OmniLoader.ModInfo> mods = new LinkedHashSet<>();
         for (String className : involvedClasses) {
-            Set<LoaderPlatform.ActiveMod> classMods = identifyFromClass(className);
+            Set<OmniLoader.ModInfo> classMods = identifyFromClass(className);
             mods.addAll(classMods);
         }
         return mods;
     }
 
-    public static Set<LoaderPlatform.ActiveMod> identifyFromClass(String className) {
+    public static Set<OmniLoader.ModInfo> identifyFromClass(String className) {
         try {
             // Skip identification for Mixin, one's mod copy of the library is shared with all other mods
             if (className.startsWith("org.spongepowered.asm.mixin.")) {
@@ -171,8 +173,8 @@ public final class LogScanner {
      * @return A set of mods that are associated with the given class
      */
     @NotNull
-    public static Set<LoaderPlatform.ActiveMod> identifyFromClass(Class<?> clazz) {
-        List<LoaderPlatform.ActiveMod> modMap = Platform.loader().getLoadedMods();
+    public static Set<OmniLoader.ModInfo> identifyFromClass(Class<?> clazz) {
+        Set<OmniLoader.ModInfo> modMap = OmniLoader.getLoadedMods();
         modMap.removeIf(Objects::isNull);
 
         try {
@@ -180,8 +182,8 @@ public final class LogScanner {
             if (codeSource == null) {
                 return Collections.emptySet(); // Some internal native sun classes
             }
-            URL url = codeSource.getLocation();
 
+            URL url = codeSource.getLocation();
             if (url == null) {
                 LOGGER.warn("Failed to identify mod for {}", clazz.getName());
                 return Collections.emptySet();
@@ -193,11 +195,13 @@ public final class LogScanner {
                 String s = uri.toString();
                 uri = new URL(s.substring(4, s.lastIndexOf("!"))).toURI();
             }
-            if (uri.toString().endsWith(".class") && Platform.loader().isDevelopment()) {
+
+            if (uri.toString().endsWith(".class") && OmniLoader.isDevelopment()) {
                 LOGGER.error("The mod you are currently developing caused this issue, or another class file. Returning 'this'.");
                 LOGGER.error("Class: {}", clazz.getName());
-                return Collections.singleton(new LoaderPlatform.ActiveMod("this", "this", "Unknown", null));
+                return Collections.singleton(new OmniLoader.ModInfo("this", "this", "Unknown", null));
             }
+
             return getModsAt(Paths.get(uri), modMap);
         } catch (URISyntaxException | MalformedURLException e) {
             return Collections.emptySet(); // we cannot do it
@@ -205,10 +209,10 @@ public final class LogScanner {
     }
 
     @NotNull
-    private static Set<LoaderPlatform.ActiveMod> getModsAt(Path path, List<LoaderPlatform.ActiveMod> modMap) {
-        Set<LoaderPlatform.ActiveMod> mods = modMap.stream().filter(m -> m.source.equals(path)).collect(Collectors.toSet());
+    private static Set<OmniLoader.ModInfo> getModsAt(Path path, Set<OmniLoader.ModInfo> modMap) {
+        Set<OmniLoader.ModInfo> mods = modMap.stream().filter(m -> m.getFile().equals(path)).collect(Collectors.toSet());
         if (!mods.isEmpty()) return mods;
-        else if (Platform.loader().isDevelopment()) {
+        else if (OmniLoader.isDevelopment()) {
             // For some reason, in dev, the mod being tested has the 'resources' folder as the origin instead of the 'classes' folder.
             String resourcesPathString = path.toString().replace("\\", "/")
                     // Make it work with Architectury as well
@@ -217,9 +221,10 @@ public final class LogScanner {
                     .replace("classes/java/main", "resources/main")
                     .replace("classes/kotlin/main", "resources/main");
             Path resourcesPath = Paths.get(resourcesPathString);
-            return modMap.stream().filter(m -> m.source.equals(resourcesPath)).collect(Collectors.toSet());
+            return modMap.stream().filter(m -> m.getFile().equals(resourcesPath)).collect(Collectors.toSet());
         } else {
             return Collections.emptySet();
         }
     }
+
 }

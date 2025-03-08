@@ -27,10 +27,7 @@
 package org.polyfrost.oneconfig.api.config.v1.internal
 
 import org.apache.logging.log4j.LogManager
-import org.polyfrost.oneconfig.api.config.v1.Node
-import org.polyfrost.oneconfig.api.config.v1.Property
-import org.polyfrost.oneconfig.api.config.v1.Tree
-import org.polyfrost.oneconfig.api.config.v1.Visualizer
+import org.polyfrost.oneconfig.api.config.v1.*
 import org.polyfrost.polyui.animate.Animations
 import org.polyfrost.polyui.color.PolyColor
 import org.polyfrost.polyui.color.rgba
@@ -128,7 +125,7 @@ open class ConfigVisualizer {
         //   -> subcategories
         //      -> list of options
         for ((_, node) in config.map) {
-            processNode(node, options)
+            processNode(config, node, options)
         }
         LOGGER.info("creating config page ${config.title} took ${(System.nanoTime() - now) / 1_000_000f}ms")
         return makeFinal(flattenSubcategories(options), initialPage)
@@ -158,7 +155,7 @@ open class ConfigVisualizer {
         }
     }
 
-    protected open /* suspend? */ fun processNode(node: Node, options: HashMap<String, HashMap<String, ArrayList<Drawable>>>) {
+    protected open /* suspend? */ fun processNode(root: Tree, node: Node, options: HashMap<String, HashMap<String, ArrayList<Drawable>>>) {
         val icon =
             when (val it = node.getMetadata<Any?>("icon")) {
                 null -> null
@@ -174,14 +171,14 @@ open class ConfigVisualizer {
         val list = options.getOrPut(category) { LinkedHashMap(4) }.getOrPut(subcategory) { ArrayList(8) }
         if (node is Property<*>) {
             val vis = node.getVisualizer() ?: return
-            list.add(wrap(vis.visualize(node), node.title, node.description, icon).addHideHandler(node).linkTo(node))
+            list.add(wrap(vis.visualize(node), node.title, node.description, icon).addHideHandler(node).addResetMenu(root, node).linkTo(node))
         } else {
             node as Tree
             if (node.map.isEmpty()) {
                 LOGGER.warn("sub-tree ${node.id} is empty; ignoring")
                 return
             }
-            list.add(makeAccordion(node, node.title, node.description, icon).linkTo(node))
+            list.add(makeAccordion(root, node, node.title, node.description, icon).linkTo(node))
         }
     }
 
@@ -197,6 +194,7 @@ open class ConfigVisualizer {
     }
 
     protected open fun makeAccordion(
+        root: Tree,
         tree: Tree,
         title: String,
         desc: String?,
@@ -206,7 +204,7 @@ open class ConfigVisualizer {
             tree.map.mapNotNull map@{ (_, node) ->
                 if (node !is Property<*>) return@map null
                 val vis = node.getVisualizer() ?: return@map null
-                wrapForAccordion(vis.visualize(node), node.title ?: return@map null, node.description).addHideHandler(node).linkTo(node)
+                wrapForAccordion(vis.visualize(node), node.title ?: return@map null, node.description).addHideHandler(node).addResetMenu(root, node).linkTo(node)
             }
 
         var open = true
@@ -285,7 +283,7 @@ open class ConfigVisualizer {
         alignment = stdAlign,
         size = Vec2(1078f, 0f),
         color = optBg,
-    ).minimumSize(Vec2(1078f, 64f))//.also { index[it] = title to desc }
+    ).minimumSize(Vec2(1078f, 64f))
 
     protected open fun wrapForAccordion(
         drawable: Drawable,
@@ -303,6 +301,17 @@ open class ConfigVisualizer {
         return visCache.getOrPut(vis) {
             val it = vis.getDeclaredConstructor().newInstance() ?: throw IllegalStateException("Visualizer $vis could not be instantiated; ensure it has a public no-args constructor")
             it as? Visualizer ?: throw IllegalArgumentException("Visualizer $vis does not implement Visualizer")
+        }
+    }
+
+    private fun Drawable.addResetMenu(root: Tree, prop: Property<*>) = this.events {
+        Event.Mouse.Clicked(1) then {
+            PopupMenu(Text("Restore Default").setDestructivePalette().withStates().onClick {
+                prop.overwrite(ConfigManager.backup().get(root.id).get(Tree.evaluatePath(root, prop).split('.')))
+                polyUI.unfocus()
+                false
+            }, polyUI = polyUI)
+            false
         }
     }
 
