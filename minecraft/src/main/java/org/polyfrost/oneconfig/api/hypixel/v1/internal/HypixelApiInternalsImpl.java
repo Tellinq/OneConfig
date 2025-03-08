@@ -77,7 +77,7 @@ public final class HypixelApiInternalsImpl implements HypixelApiInternals {
             return true;
         });
 
-        OmniClientPackets.createGlobalPacketReceiver((Predicate<OmniPacketReceiverContext>) ctx -> {
+        OmniClientPackets.createGlobalPacketReceiver(ctx -> {
             String channelName = ctx.getChannel().toString();
             if (!HypixelModAPI.getInstance().getRegistry().isRegistered(channelName)) {
                 return false;
