@@ -49,7 +49,8 @@ fun interface Visualizer {
     class ButtonVisualizer : Visualizer {
         override fun visualize(prop: Property<*>): Drawable {
             val text = prop.getMetadata<String>("text")?.strv()
-            val action = prop.getMetadata<Runnable>("runnable") ?: prop.getAs()
+            val action: Runnable? = prop.getMetadata<Runnable>("runnable") ?: prop.getAs<Runnable?>()
+            require(action != null) { "Button property $prop is missing a runnable, set it with either the metadata key 'runnable' or the property value" }
             return Button(
                 size = Vec2(300f, 32f),
                 text = text ?: "oneconfig.button.default",
