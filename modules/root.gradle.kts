@@ -1,7 +1,4 @@
-@file:Suppress("UnstableApiUsage", "DEPRECATION")
-
-import dev.deftu.gradle.tools.publishing.MavenPublishingExtension
-
+@file:Suppress("UnstableApiUsage")
 
 // Shared build logic between all OneConfig modules to reduce boilerplate.
 
@@ -85,6 +82,7 @@ subprojects {
 
     configure<JavaPluginExtension> {
         withJavadocJar()
+        withSourcesJar()
 
         toolchain {
             languageVersion.set(JavaLanguageVersion.of(8))

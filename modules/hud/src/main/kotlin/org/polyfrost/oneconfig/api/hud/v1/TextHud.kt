@@ -49,18 +49,31 @@ abstract class TextHud(
 ) : Hud<Text>() {
     /**
      * [StringBuilder] instance that is used for constructing the HUD text.
+     *
+     * **Hot-Tip**: you can use this to construct the text directly for better performance, and also from other places.
+     * For example, if you operate by updating your text in an [eventHandler][org.polyfrost.oneconfig.api.event.v1.eventHandler], you can do the following:
+     * ```kotlin
+     * eventHandler { event: Event ->
+     *    // your code here
+     *    sb.append(event.data)
+     *    updateAndRecalculate()
+     * }
+     * ```
      */
     @get:JvmName("getStringBuilder")
     protected val sb = StringBuilder()
     override fun create() = Text("".translated().dont(), fontSize = 16f)
 
     override fun update(): Boolean {
-        sb.clear()
-        if (prefix.isNotEmpty()) sb.append(prefix).append(' ')
+        if (prefix.isNotEmpty()) {
+            if (sb.isEmpty()) sb.append(prefix).append(' ')
+            else sb.insert(0, prefix).insert(prefix.length, ' ')
+        }
         val t = getText()
         if (t != null) sb.append(t)
         if (suffix.isNotEmpty()) sb.append(' ').append(suffix)
         get().text = sb.toString()
+        sb.clear()
         return true
     }
 
