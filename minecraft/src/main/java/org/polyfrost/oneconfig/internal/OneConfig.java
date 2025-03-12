@@ -139,22 +139,22 @@ public class OneConfig
             OneConfigUI.INSTANCE.open();
             return 1;
         });
-        b.then(literal("updateCheck").executes(cmd -> {
-            Multithreading.submit(() -> OmniChat.showChatMessage(MavenUpdateChecker.oneconfig().hasUpdate() ? "Update available!" : "No updates available"));
+        b.then(literal("updateCheck").executes(ctx -> {
+            Multithreading.submit(() -> ctx.getSource().showMessage(MavenUpdateChecker.oneconfig().hasUpdate() ? "Update available!" : "No updates available"));
             return 1;
         }));
-        b.then(literal("locraw").executes(cmd -> {
-            cmd.getSource().showMessage(HypixelUtils.getLocation().toString());
+        b.then(literal("locraw").executes(ctx -> {
+            ctx.getSource().showMessage(HypixelUtils.getLocation().toString());
             return 1;
         }));
-        b.then(literal("hud").executes(cmd -> {
+        b.then(literal("hud").executes(ctx -> {
             Platform.screen().display(HudManager.INSTANCE.getWithEditor());
             return 1;
         }));
-        b.then(literal("delete").executes(cmd -> {
+        b.then(literal("delete").executes(ctx -> {
             OneConfigUI.INSTANCE.invalidateCache();
             ConfigVisualizer.INSTANCE.clearCache();
-            cmd.getSource().showMessage("Deleted OneConfig UI. Please make a report if you were having issues!");
+            ctx.getSource().showMessage("Deleted OneConfig UI. Please make a report if you were having issues!");
             return 1;
         }));
 

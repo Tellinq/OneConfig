@@ -101,6 +101,10 @@ public final class BlurHandler {
         // a one of ours, we should load our own blur!
         if (gui instanceof BlurScreen && ((BlurScreen) gui).hasBackgroundBlur()) {
             if (!isShaderActive()) {
+                //#if MC >= 1.21.4
+                //$$ if (true) return false;
+                //#endif
+
                 //#if FABRIC
                 //$$ ((org.polyfrost.oneconfig.internal.mixin.fabric.Mixin_LoadShaderInvoker_Fabric) MinecraftClient.getInstance().gameRenderer).invokeLoadShader(this.blurShader);
                 //#else
@@ -174,6 +178,9 @@ public final class BlurHandler {
     }
 
     private ShaderGroup getShaderGroup() {
+        //#if MC >= 1.21.4
+        //$$ if (true) return null;
+        //#endif
         return Minecraft.getMinecraft()
                 //#if MC >= 1.21.4
                 //$$ .getShaderLoader().loadPostEffect(this.blurShader, DefaultFramebufferSet.MAIN_ONLY);
