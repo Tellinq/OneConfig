@@ -32,17 +32,13 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * Use this annotation to mark a class as a command or a method as a subcommand.
- * <br><b>This is required for a method/class to be registered as part of a command.</b>
+ * Use this annotation to descriptions to parameters.
  */
 @Retention(RetentionPolicy.RUNTIME)
-@Target({ElementType.TYPE, ElementType.METHOD})
-public @interface Command {
+@Target(ElementType.PARAMETER)
+public @interface Parameter {
     /**
-     * command names used to index this command and in help message
+     * The description of this parameter.
      */
-    String[] value() default {};
-
-    String description() default "";
-
+    String value() default "";
 }

@@ -44,45 +44,83 @@ import static org.polyfrost.oneconfig.api.commands.v1.CommandManager.*;
 public class AnnotationCommandFactory implements CommandFactory {
     private static final Logger LOGGER = LogManager.getLogger("OneConfig/BrigaiderTranslator");
 
-    private void create(LiteralArgumentBuilder<OmniClientCommandSource> tree, Object it) {
+    private void create(LiteralArgumentBuilder<OmniClientCommandSource> tree, Object it, StringBuilder help, String stem) {
+
+
         for (Method m : it.getClass().getDeclaredMethods()) {
             Command cmd = m.getAnnotation(Command.class);
             if (cmd != null) {
-                String[] paramNames = new String[m.getParameterCount()];
-                Class<?>[] paramTypes = m.getParameterTypes();
-                Parameter[] params = m.getParameters();
-                ArgumentBuilder<OmniClientCommandSource, ?> theMethod = argument(paramNames[0], getArgumentType(paramTypes[0]));
-                for (int i = 1; i < paramNames.length; i++) {
-                    paramNames[i] = params[i].getName();
-                    theMethod = theMethod.then(
-                            argument(paramNames[i], getArgumentType(paramTypes[i]))
-                    );
-                }
+                help.append(stem).append(' ').append(cmd.value().length == 0 ? m.getName() : cmd.value()[0]);
 
-                theMethod.executes((ctx) -> {
-                    Object[] args = new Object[paramTypes.length];
-                    for (int i = 0; i < paramTypes.length; i++) {
-                        args[i] = ctx.getArgument(paramNames[i], paramTypes[i]);
+                ArgumentBuilder<OmniClientCommandSource, ?> theMethod;
+                if(m.getParameterCount() > 0) {
+                    help.append('<');
+                    String[] paramNames = new String[m.getParameterCount()];
+                    Class<?>[] paramTypes = m.getParameterTypes();
+                    Parameter[] params = m.getParameters();
+                    theMethod = argument(paramNames[0], getArgumentType(paramTypes[0]));
+                    help.append(paramNames[0]);
+                    org.polyfrost.oneconfig.api.commands.v1.factories.annotated.Parameter annotation = params[0].getAnnotation(org.polyfrost.oneconfig.api.commands.v1.factories.annotated.Parameter.class);
+                    if (annotation != null) {
+                        help.append(": ").append(annotation.value());
                     }
-                    try {
-                        m.invoke(it, args);
-                        return 1;
-                    } catch (Exception e) {
-                        ctx.getSource().showError("An error occurred while executing this command!\nPlease report this to the developer: " + e.getMessage());
-                        LOGGER.error("Failed to execute command!", e);
-                        return -1;
+                    for (int i = 1; i < paramNames.length; i++) {
+                        Parameter p = params[i];
+                        String name = p.getName();
+                        help.append(", ").append(name);
+                        annotation = p.getAnnotation(org.polyfrost.oneconfig.api.commands.v1.factories.annotated.Parameter.class);
+                        if (annotation != null) {
+                            help.append(": ").append(annotation.value());
+                        }
+                        paramNames[i] = name;
+                        theMethod = theMethod.then(
+                                argument(paramNames[i], getArgumentType(paramTypes[i]))
+                        );
                     }
-                });
-                tree.then(literal(m.getName()).then(theMethod));
-                for (String s : cmd.value()) {
-                    tree.then(literal(s).then(theMethod));
+                    help.append('>');
+                    theMethod.executes((ctx) -> {
+                        Object[] args = new Object[paramTypes.length];
+                        for (int i = 0; i < paramTypes.length; i++) {
+                            args[i] = ctx.getArgument(paramNames[i], paramTypes[i]);
+                        }
+                        try {
+                            m.invoke(it, args);
+                            return 1;
+                        } catch (Exception e) {
+                            ctx.getSource().showError("An error occurred while executing this command!\nPlease report this to the developer: " + e.getMessage());
+                            LOGGER.error("Failed to execute command!", e);
+                            return -1;
+                        }
+                    });
+                    tree.then(literal(m.getName()).then(theMethod));
+                    for (String s : cmd.value()) {
+                        tree.then(literal(s).then(theMethod));
+                    }
+                } else {
+                    theMethod = literal(m.getName());
+                    theMethod.executes((ctx) -> {
+                        try {
+                            m.invoke(it);
+                            return 1;
+                        } catch (Exception e) {
+                            ctx.getSource().showError("An error occurred while executing this command!\nPlease report this to the developer: " + e.getMessage());
+                            LOGGER.error("Failed to execute command!", e);
+                            return -1;
+                        }
+                    });
+                    tree.then(theMethod);
+                    for (String s : cmd.value()) {
+                        tree.then(literal(s).then(theMethod));
+                    }
                 }
+                help.append(": ").append(cmd.description()).append('\n');
             }
         }
         for (Class<?> cls : it.getClass().getDeclaredClasses()) {
-            if (cls.isAnnotationPresent(Command.class)) {
+            Command sub = cls.getAnnotation(Command.class);
+            if (sub != null) {
                 LiteralArgumentBuilder<OmniClientCommandSource> subTree = literal(cls.getName());
-                create(subTree, MHUtils.instantiate(cls, true));
+                create(subTree, MHUtils.instantiate(cls, true), help, stem + " " + (sub.value().length == 0 ? cls.getName() : sub.value()[0]));
             }
         }
     }
@@ -93,9 +131,25 @@ public class AnnotationCommandFactory implements CommandFactory {
         Class<?> cls = obj.getClass();
         Command c = cls.getAnnotation(Command.class);
         if (c == null) return null;
+        StringBuilder help = new StringBuilder();
+        String primaryName = c.value().length == 0 ? cls.getName() : c.value()[0];
+        help.append("Help for /").append(primaryName).append(':');
+        if (c.value().length != 0) {
+            help.append("  (");
+            for (String s : c.value()) {
+                help.append(s).append(',');
+            }
+            help.setCharAt(help.length() - 1, ')');
+        }
+        help.append('\n');
+
         LiteralArgumentBuilder<OmniClientCommandSource> builder = literal(cls.getName());
-        create(builder, obj);
+        create(builder, obj, help, "  /" + primaryName);
         LiteralCommandNode<OmniClientCommandSource>[] nodes = new LiteralCommandNode[Math.max(1, c.value().length + 1)];
+        builder.then(literal("help").executes((ctx) -> {
+            ctx.getSource().showMessage(help.toString());
+            return 1;
+        }));
         nodes[0] = builder.build();
         for (int i = 1; i < c.value().length; i++) {
             nodes[i] = literal(c.value()[i]).redirect(builder.build()).build();

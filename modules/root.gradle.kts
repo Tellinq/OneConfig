@@ -81,8 +81,10 @@ subprojects {
     base.archivesName = name
 
     configure<JavaPluginExtension> {
-        withJavadocJar()
-        withSourcesJar()
+        if("dependencies" !in project.path) {
+            withJavadocJar()
+            withSourcesJar()
+        }
 
         toolchain {
             languageVersion.set(JavaLanguageVersion.of(8))
