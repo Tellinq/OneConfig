@@ -4,7 +4,6 @@
 import dev.deftu.gradle.utils.GameSide
 import dev.deftu.gradle.utils.version.MinecraftReleaseVersion
 import dev.deftu.gradle.utils.version.MinecraftVersions
-import dev.deftu.gradle.utils.includeOrShade
 import org.polyfrost.gradle.provideIncludedDependencies
 import java.text.SimpleDateFormat
 
@@ -15,7 +14,7 @@ plugins {
     id(libs.plugins.dgt.base.get().pluginId)
     id(libs.plugins.dgt.resources.get().pluginId)
     id(libs.plugins.dgt.loom.get().pluginId)
-    id(libs.plugins.dgt.shadow.get().pluginId)
+    id(libs.plugins.dgt.publishing.maven.get().pluginId)
 }
 
 toolkitLoomHelper {
@@ -39,6 +38,10 @@ toolkitLoomHelper {
     }
 }
 
+java {
+    withSourcesJar()
+}
+
 if (mcData.isForge) {
     loom.forge.mixinConfig("mixins.${modData.id}.init.json")
 }
@@ -49,8 +52,6 @@ repositories {
     maven("https://repo.hypixel.net/repository/Hypixel/")
     maven("https://maven.deftu.dev/releases")
 }
-
-val shadow by configurations.creating
 
 if (mcData.isLegacyForge) { // Quick substitution for relaunch in dev env, so that mixinextras works properly (yay!)
     configurations.all {
@@ -78,9 +79,9 @@ dependencies {
     val mcVersion = mcData.version as MinecraftReleaseVersion
     provideIncludedDependencies(Triple(mcVersion.major, mcVersion.minor, mcVersion.patch), mcData.loader.friendlyString).forEach {
         if (it.dep is String) {
-            shade(it.dep as String, it.mod)
+            handleApiDep(it.dep as String, it.mod)
         } else {
-            shade(it.dep as ExternalModuleDependency, it.mod)
+            handleApiDep(it.dep as ExternalModuleDependency, it.mod)
         }
     }
 
@@ -104,28 +105,26 @@ dependencies {
         }
     }
     if (mcData.isLegacyForge || mcData.isLegacyFabric) {
-        shade("com.mojang:brigadier:1.0.18")
+        handleApiDep("com.mojang:brigadier:1.0.18")
     }
 }
 
-fun DependencyHandlerScope.shade(dependency: String, isMod: Boolean = false) {
+fun DependencyHandlerScope.handleApiDep(dependency: String, isMod: Boolean = false) {
     val dep = project.dependencies.create(dependency) as ExternalModuleDependency
-    shade(dep, isMod)
+    handleApiDep(dep, isMod)
 }
 
-fun DependencyHandlerScope.shade(dependency: Provider<MinimalExternalModuleDependency>, isMod: Boolean = false) {
-    shade(dependency.get(), isMod)
+fun DependencyHandlerScope.handleApiDep(dependency: Provider<MinimalExternalModuleDependency>, isMod: Boolean = false) {
+    handleApiDep(dependency.get(), isMod)
 }
 
-fun DependencyHandlerScope.shade(dependency: ExternalModuleDependency, isMod: Boolean = false) {
+fun DependencyHandlerScope.handleApiDep(dependency: ExternalModuleDependency, isMod: Boolean = false) {
     val dep = "${dependency.group}:${dependency.name}:${dependency.version}"
-    val configuration = if (isMod) modApi(dep) {
+    if (isMod) modApi(dep) {
         isTransitive = false
     } else api(dep) {
         isTransitive = false
     }
-
-    includeOrShade(configuration)
 }
 
 tasks {
@@ -145,7 +144,6 @@ tasks {
                     )
                 )
             }
-
             attributes(attributesMap)
         }
     }

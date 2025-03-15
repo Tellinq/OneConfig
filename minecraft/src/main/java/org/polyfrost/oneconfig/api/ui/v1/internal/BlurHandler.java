@@ -50,7 +50,7 @@ import java.util.List;
 //#endif
 
 /**
- * An adapted & optimized implementation of the BlurMC mod by tterrag1098, later modified by boomboompower.
+ * An adapted and optimized implementation of the BlurMC mod by tterrag1098, later modified by boomboompower.
  * <p>
  * For the original source see <a href="https://github.com/tterrag1098/Blur/blob/1.8.9/src/main/java/com/tterrag/blur/Blur.java">here.</a>
  * taken the <a href="https://github.com/tterrag1098/Blur/blob/1.8.9/LICENSE">MIT Licence.</a>
