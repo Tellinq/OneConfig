@@ -17,6 +17,10 @@ plugins {
     id(libs.plugins.dgt.publishing.maven.get().pluginId)
 }
 
+if (mcData.isForge) {
+    loom.forge.mixinConfig("mixins.${modData.id}.init.json")
+}
+
 toolkitLoomHelper {
     disableRunConfigs(GameSide.SERVER)
 
@@ -40,10 +44,6 @@ toolkitLoomHelper {
 
 java {
     withSourcesJar()
-}
-
-if (mcData.isForge) {
-    loom.forge.mixinConfig("mixins.${modData.id}.init.json")
 }
 
 repositories {
@@ -140,7 +140,8 @@ tasks {
                         "Implementation-Version" to project.version,
                         "Implementation-Vendor" to "Polyfrost",
                         "Implementation-Timestamp" to SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ").format(`java.util`.Date()),
-                        "OneConfig-Main-Class" to "org.polyfrost.oneconfig.internal.bootstrap.Bootstrap"
+                        "OneConfig-Main-Class" to "org.polyfrost.oneconfig.internal.bootstrap.Bootstrap",
+                        "MixinConfigs" to "mixins.${modData.id}.init.json,mixins.${modData.id}.json",
                     )
                 )
             }
