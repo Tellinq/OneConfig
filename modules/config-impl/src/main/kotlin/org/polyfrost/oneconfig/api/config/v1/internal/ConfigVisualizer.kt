@@ -307,7 +307,13 @@ open class ConfigVisualizer {
     private fun Drawable.addResetMenu(root: Tree, prop: Property<*>) = this.events {
         Event.Mouse.Clicked(1) then {
             PopupMenu(Text("Restore Default").setDestructivePalette().withStates().onClick {
-                prop.overwrite(ConfigManager.backup().get(root.id).get(Tree.evaluatePath(root, prop).split('.')))
+                val backup = ConfigManager.backup().get(root.id)
+                if (backup == null) {
+                    LOGGER.error("Failed to locate backup source for ${root.id}, the config needs to be deleted manually to create a backup source")
+                    this@addResetMenu.shake()
+                    return@onClick false
+                }
+                prop.overwrite(backup.get(Tree.evaluatePath(root, prop).split('.')))
                 polyUI.unfocus()
                 false
             }, polyUI = polyUI)

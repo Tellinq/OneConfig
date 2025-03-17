@@ -29,6 +29,7 @@ package org.polyfrost.oneconfig.internal.ui.pages
 import org.polyfrost.oneconfig.api.config.v1.ConfigManager
 import org.polyfrost.oneconfig.api.config.v1.Tree
 import org.polyfrost.oneconfig.api.config.v1.internal.ConfigVisualizer
+import org.polyfrost.oneconfig.api.ui.v1.Notifications
 import org.polyfrost.oneconfig.internal.ui.OneConfigUI
 import org.polyfrost.polyui.component.Drawable
 import org.polyfrost.polyui.component.extensions.*
@@ -80,7 +81,17 @@ fun ModsPage(trees: Collection<Tree>): Drawable {
                 OneConfigUI.openPage(ConfigVisualizer.INSTANCE.get(it), (this[1][0] as Text).text)
             }.onRightClick { _ ->
                 PopupMenu(Text("Restore Defaults").setDestructivePalette().withStates().onClick { _ ->
-                    it.overwrite(ConfigManager.backup().get(it.id))
+                    val backup = ConfigManager.backup().get(it.id)
+                    if (backup == null) {
+                        Notifications.enqueue(
+                            Notifications.Type.Error,
+                            "Backup Failure",
+                            "Couldn't find the backup for ${it.id}. You can fix this by manually deleting the config file and restarting your game, which will reset your config! Click here to do so."
+                        ).onClick { _ ->
+                            ConfigManager.active().delete(it.id)
+                        }
+                    }
+                    it.overwrite(backup)
                     polyUI.unfocus()
                     false
                 }, polyUI = polyUI)
