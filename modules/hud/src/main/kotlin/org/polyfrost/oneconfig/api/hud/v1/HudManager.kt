@@ -77,7 +77,11 @@ object HudManager {
     @ApiStatus.Internal
     var sliney = -1f
 
-    @ApiStatus.Internal
+    /**
+     * returns true if the HUD panel is open, which is the equivalent of `HudCore.editing` in V0.
+     */
+    @get:JvmName("isPanelOpen")
+    @JvmStatic
     var panelOpen = false
         private set
 
@@ -91,6 +95,7 @@ object HudManager {
         register(TextHud.Simple("", "Text Hud", ""))
     }
 
+    @ApiStatus.Internal
     lateinit var panel: Drawable
         private set
 
@@ -183,7 +188,7 @@ object HudManager {
             LOGGER.info("Added HUD {} to {} (default)", hud.title(), default)
         }
 
-        // add callbacks
+        // add callbacks todo
         eventHandler { (opened): HudEvent.Tab ->
 //            for (hud in hudProviders.values) {
 //                if (opened) {

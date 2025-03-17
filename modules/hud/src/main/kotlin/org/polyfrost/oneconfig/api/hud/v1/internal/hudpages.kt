@@ -76,7 +76,7 @@ fun HudsPage(huds: Collection<Hud<*>>): Drawable {
                     Block(
                         preview,
                         alignment = alignC,
-                    ).withBoarder().minimumSize(215f by 80f).withStates().onInit {
+                    ).withBoarder(2f) { page.border10 }.minimumSize(215f by 80f).withStates().onInit {
                         // #created-with-set-size = true
                         layoutFlags = layoutFlags or 0b00000010
                     }

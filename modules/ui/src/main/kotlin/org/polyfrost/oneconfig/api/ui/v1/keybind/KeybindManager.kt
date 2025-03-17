@@ -66,9 +66,14 @@ object KeybindManager {
         // asm: this is an old fix which will be kept so that in the (rare) event that the keybind system fails for whatever reason,
         // the user can try to fix it by opening a screen and trying again, and it should fix the issue.
         eventHandler { (screen): ScreenOpenEvent ->
-            if (screen == null) keyBinder.release()
+            if (screen == null) {
+                inputManager.removeModifier(inputManager.mods)
+                keyBinder.release()
+            }
         }
         eventHandler { _: WindowFocusEvent.Lost ->
+            // clear all modifiers
+            inputManager.removeModifier(inputManager.mods)
             keyBinder.release()
         }
 

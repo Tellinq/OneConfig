@@ -186,7 +186,7 @@ fun Hud<*>.build(): Drawable {
             }
             Event.Mouse.Clicked(1) then {
                 PopupMenu(
-                    Text("oneconfig.edithud").withStates(consume = true).onClick {
+                    Text("oneconfig.huds.edit").withStates(consume = true).onClick {
                         HudManager.openHudEditor(this@build)
                         HudManager.polyUI.unfocus()
                     },

@@ -58,6 +58,7 @@ public class AnnotationCommandFactory implements CommandFactory {
                     String[] paramNames = new String[m.getParameterCount()];
                     Class<?>[] paramTypes = m.getParameterTypes();
                     Parameter[] params = m.getParameters();
+                    paramNames[0] = params[0].getName();
                     theMethod = argument(paramNames[0], getArgumentType(paramTypes[0]));
                     help.append(paramNames[0]);
                     org.polyfrost.oneconfig.api.commands.v1.factories.annotated.Parameter annotation = params[0].getAnnotation(org.polyfrost.oneconfig.api.commands.v1.factories.annotated.Parameter.class);

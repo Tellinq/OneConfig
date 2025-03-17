@@ -33,7 +33,9 @@ import com.mojang.brigadier.tree.LiteralCommandNode;
 import dev.deftu.omnicore.client.OmniClientCommandSource;
 import dev.deftu.omnicore.client.OmniClientCommands;
 import org.polyfrost.oneconfig.api.commands.v1.factories.CommandFactory;
+import org.polyfrost.oneconfig.api.commands.v1.factories.annotated.AnnotationCommandFactory;
 import org.polyfrost.oneconfig.api.commands.v1.factories.annotated.Command;
+import org.polyfrost.oneconfig.utils.v1.WrappingUtils;
 
 import java.util.HashSet;
 import java.util.IdentityHashMap;
@@ -61,6 +63,7 @@ public class CommandManager {
         argumentTypes.put(float.class, FloatArgumentType.floatArg());
         argumentTypes.put(double.class, DoubleArgumentType.doubleArg());
         argumentTypes.put(long.class, LongArgumentType.longArg());
+        registerFactory(new AnnotationCommandFactory());
     }
 
     public static void register(LiteralArgumentBuilder<OmniClientCommandSource> builder) {
@@ -109,6 +112,6 @@ public class CommandManager {
 
     @SuppressWarnings("unchecked")
     public static <T> ArgumentType<T> getArgumentType(Class<T> type) {
-        return (ArgumentType<T>) INSTANCE.argumentTypes.get(type);
+        return (ArgumentType<T>) INSTANCE.argumentTypes.get(WrappingUtils.getUnwrapped(type));
     }
 }
