@@ -1,6 +1,6 @@
 package org.polyfrost.oneconfig.internal.mixin.events;
 
-import dev.deftu.omnicore.client.OmniProfiler;
+import dev.deftu.omnicore.common.OmniProfiler;
 import net.minecraft.client.renderer.entity.RendererLivingEntity;
 import net.minecraft.entity.EntityLivingBase;
 import org.polyfrost.oneconfig.api.event.v1.EventManager;

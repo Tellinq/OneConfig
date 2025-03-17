@@ -106,7 +106,7 @@ public class TestConfig_Test extends Config {
 
     @Button(title = "Test")
     private void main() {
-        OmniChat.showChatMessage("button pressed");
+        OmniChat.displayClientMessage("button pressed");
     }
 
     @Accordion(title = "an accordion", description = "AAAAAAAAAAAAAAAAAAAAAAAAAAH", index = 4)
