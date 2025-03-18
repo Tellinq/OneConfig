@@ -145,7 +145,8 @@ public class OneConfig
     private static void registerCommands() {
         OmniClientCommands.initialize();
         //#if MC > 1.16
-        //#if MC > 1.19 // todo still broken on 1.20+
+        //#if MC > 1.19
+        // todo still broken on 1.20+
         //$$ net.minecraft.commands.CommandBuildContext cmdCtx = new net.minecraft.commands.CommandBuildContext(net.minecraft.core.RegistryAccess.BUILTIN.get());
         //#endif
         //$$ for (Map.Entry<Class<?>, Object> entry : Mixin_ModernArgumentTypesAccessor.getArgumentTypes().entrySet()) {
