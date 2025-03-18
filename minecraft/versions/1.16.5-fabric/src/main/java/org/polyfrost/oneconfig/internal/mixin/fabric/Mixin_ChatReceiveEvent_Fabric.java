@@ -26,7 +26,7 @@
 
 package org.polyfrost.oneconfig.internal.mixin.fabric;
 
-import dev.deftu.textile.minecraft.VanillaConverter;
+import dev.deftu.textile.minecraft.MCTextHolder;
 import net.minecraft.client.network.ClientPlayNetworkHandler;
 import net.minecraft.network.packet.s2c.play.GameMessageS2CPacket;
 import net.minecraft.text.Text;
@@ -75,9 +75,9 @@ public abstract class Mixin_ChatReceiveEvent_Fabric {
             //$$ packet.getLocation() == net.minecraft.network.MessageType.CHAT
             //#endif
         ) {
-            ocfg$chatEvent = new ChatEvent.Receive(VanillaConverter.fromVanillaText(packet.getMessage()));
+            ocfg$chatEvent = new ChatEvent.Receive(MCTextHolder.convertFromVanilla(packet.getMessage()));
             EventManager.INSTANCE.post(ocfg$chatEvent);
-            return VanillaConverter.toVanillaText(ocfg$chatEvent.getMessage());
+            return MCTextHolder.convertToVanilla(ocfg$chatEvent.getMessage());
         }
         //@formatter:on
         return packet.getMessage();

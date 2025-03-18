@@ -88,7 +88,7 @@ public class AnnotationCommandFactory implements CommandFactory {
                             m.invoke(it, args);
                             return 1;
                         } catch (Exception e) {
-                            ctx.getSource().showError("An error occurred while executing this command!\nPlease report this to the developer: " + e.getMessage());
+                            ctx.getSource().displayError("An error occurred while executing this command!\nPlease report this to the developer: " + e.getMessage());
                             LOGGER.error("Failed to execute command!", e);
                             return -1;
                         }
@@ -104,7 +104,7 @@ public class AnnotationCommandFactory implements CommandFactory {
                             m.invoke(it);
                             return 1;
                         } catch (Exception e) {
-                            ctx.getSource().showError("An error occurred while executing this command!\nPlease report this to the developer: " + e.getMessage());
+                            ctx.getSource().displayError("An error occurred while executing this command!\nPlease report this to the developer: " + e.getMessage());
                             LOGGER.error("Failed to execute command!", e);
                             return -1;
                         }
@@ -148,7 +148,7 @@ public class AnnotationCommandFactory implements CommandFactory {
         create(builder, obj, help, "  /" + primaryName);
         LiteralCommandNode<OmniClientCommandSource>[] nodes = new LiteralCommandNode[Math.max(1, c.value().length + 1)];
         builder.then(literal("help").executes((ctx) -> {
-            ctx.getSource().showMessage(help.toString());
+            ctx.getSource().displayMessage(help.toString());
             return 1;
         }));
         nodes[0] = builder.build();

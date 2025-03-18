@@ -35,7 +35,7 @@ public class TestCommand_Test {
 
     @Command
     private static void main() {  // /test
-        OmniChat.showChatMessage("Main command");
+        OmniChat.displayClientMessage("Main command");
     }
 
     private static void joinAndChat(String... stuff) {
@@ -43,30 +43,30 @@ public class TestCommand_Test {
         for (Object thing : stuff) {
             builder.append(thing).append(' ');
         }
-        OmniChat.showChatMessage(builder.toString().trim());
+        OmniChat.displayClientMessage(builder.toString().trim());
     }
 
     @Command
     private void playerTest(GameProfile profile) {
-        OmniChat.showChatMessage("Player test: " + profile.getName());
-        OmniChat.showChatMessage(profile.getId().toString());
+        OmniChat.displayClientMessage("Player test: " + profile.getName());
+        OmniChat.displayClientMessage(profile.getId().toString());
     }
 
     @Command(value = {"subcommand", "s"})
     private static class TestSubCommand {
         private static void main(int a, float b, String c) { // /test subcommand <a> <b> <c>
-            OmniChat.showChatMessage("Integer main: " + (a + b) + " " + c);
+            OmniChat.displayClientMessage("Integer main: " + (a + b) + " " + c);
         }
 
         @Command(value = {"yesNo"})
         private void yes(double a, double b, String c) { // /test subcommand <a> <b> <c>
-            OmniChat.showChatMessage("Double main: " + a + " " + b + " " + c);
+            OmniChat.displayClientMessage("Double main: " + a + " " + b + " " + c);
         }
 
         @Command(value = {"subSub", "ss"})
         private static class TestSubSubCommand {
             private void wow(int a, float b, String c) { // /test subSub <a> <b> <c>
-                OmniChat.showChatMessage("Integer subSub: " + (a + b) + " " + c);
+                OmniChat.displayClientMessage("Integer subSub: " + (a + b) + " " + c);
             }
         }
     }

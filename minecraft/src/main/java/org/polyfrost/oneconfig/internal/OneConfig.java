@@ -32,6 +32,8 @@ import dev.deftu.clipboard.Clipboard;
 import dev.deftu.omnicore.client.OmniChat;
 import dev.deftu.omnicore.client.OmniClientCommands;
 import dev.deftu.omnicore.common.OmniLoader;
+import dev.deftu.textile.minecraft.MCSimpleTextHolder;
+import dev.deftu.textile.minecraft.MCTextFormat;
 import kotlin.Unit;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -151,11 +153,11 @@ public class OneConfig
             return 1;
         });
         b.then(literal("updateCheck").executes(ctx -> {
-            Multithreading.submit(() -> ctx.getSource().showMessage(MavenUpdateChecker.oneconfig().hasUpdate() ? "Update available!" : "No updates available"));
+            Multithreading.submit(() -> ctx.getSource().displayMessage(MavenUpdateChecker.oneconfig().hasUpdate() ? "Update available!" : "No updates available"));
             return 1;
         }));
         b.then(literal("locraw").executes(ctx -> {
-            ctx.getSource().showMessage(HypixelUtils.getLocation().toString());
+            ctx.getSource().displayMessage(HypixelUtils.getLocation().toString());
             return 1;
         }));
         b.then(literal("hud").executes(ctx -> {
@@ -165,7 +167,7 @@ public class OneConfig
         b.then(literal("delete").executes(ctx -> {
             OneConfigUI.INSTANCE.invalidateCache();
             ConfigVisualizer.INSTANCE.clearCache();
-            ctx.getSource().showMessage("Deleted OneConfig UI. Please make a report if you were having issues!");
+            ctx.getSource().displayMessage("Deleted OneConfig UI. Please make a report if you were having issues!");
             return 1;
         }));
 
@@ -183,7 +185,7 @@ public class OneConfig
                 try {
                     OneConfigUI.INSTANCE.open();
                 } catch (Throwable t) {
-                    OmniChat.showChatMessage("&cFailed to open OneConfig UI: " + t.getMessage() + ". Please report this!");
+                    OmniChat.displayClientMessage(new MCSimpleTextHolder("Failed to open OneConfig UI: " + t.getMessage() + ". Please report this!").withFormatting(MCTextFormat.RED));
                     // propagate for proper error handling
                     throw t;
                 }

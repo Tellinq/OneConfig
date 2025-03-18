@@ -57,11 +57,11 @@ public final class org/polyfrost/oneconfig/api/hud/v1/HudManager {
 	public static final field INSTANCE Lorg/polyfrost/oneconfig/api/hud/v1/HudManager;
 	public final fun getPanel ()Lorg/polyfrost/polyui/component/Drawable;
 	public final fun getPanelExists ()Z
-	public final fun getPanelOpen ()Z
 	public final fun getSlinex ()F
 	public final fun getSliney ()F
 	public final fun getWithEditor ()Ljava/lang/Object;
 	public final fun initialize ()V
+	public static final fun isPanelOpen ()Z
 	public final fun openHudEditor (Lorg/polyfrost/oneconfig/api/hud/v1/Hud;)V
 	public static final fun register (Lorg/polyfrost/oneconfig/api/hud/v1/Hud;)V
 	public static final fun register ([Lorg/polyfrost/oneconfig/api/hud/v1/Hud;)V

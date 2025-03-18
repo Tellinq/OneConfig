@@ -28,6 +28,8 @@ package org.polyfrost.oneconfig.api.ui.v1;
 
 import dev.deftu.omnicore.client.OmniChat;
 import dev.deftu.omnicore.client.render.OmniMatrixStack;
+import dev.deftu.textile.minecraft.MCSimpleTextHolder;
+import dev.deftu.textile.minecraft.MCTextFormat;
 import org.apache.logging.log4j.LogManager;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
@@ -113,7 +115,7 @@ public interface UIManager {
             return p;
         } catch (Throwable t) {
             LogManager.getLogger("OneConfig/UI").error("Failed to load renderer!", t);
-            EventManager.register(WorldEvent.Load.class, () -> EventDelay.tick(20, () -> OmniChat.showChatMessage("&cFailed to load the renderer for OneConfig. This means the UI, HUD and Notifications will not work. Please report this to https://discord.gg/polyfrost and attach your log.")));
+            EventManager.register(WorldEvent.Load.class, () -> EventDelay.tick(20, () -> OmniChat.displayClientMessage(new MCSimpleTextHolder("Failed to load the renderer for OneConfig. This means the UI, HUD and Notifications will not work. Please report this to https://discord.gg/polyfrost and attach your log.").withFormatting(MCTextFormat.RED))));
             return null;
         }
     }
