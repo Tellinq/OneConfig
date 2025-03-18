@@ -57,6 +57,15 @@ import org.polyfrost.polyui.component.Drawable;
 import org.polyfrost.polyui.input.KeyModifiers;
 import org.polyfrost.polyui.input.Translator;
 
+//#if MC > 1.16
+//$$ import com.mojang.brigadier.arguments.ArgumentType;
+//$$ import net.minecraft.commands.synchronization.EmptyArgumentSerializer;
+//$$ import net.minecraft.commands.synchronization.ArgumentSerializer;
+//$$ import org.polyfrost.oneconfig.internal.mixin.command.Mixin_ModernArgumentTypeEntryAccessor;
+//$$ import org.polyfrost.oneconfig.internal.mixin.command.Mixin_ModernArgumentTypesAccessor;
+//$$ import java.util.Map;
+//#endif
+
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import static org.polyfrost.oneconfig.api.commands.v1.CommandManager.literal;
@@ -135,17 +144,23 @@ public class OneConfig
     @SuppressWarnings({"unchecked", "rawtypes"})
     private static void registerCommands() {
         OmniClientCommands.initialize();
-        // TODO //#if MC > 1.16 needs fixing with preprocessor
-        //$$ for (java.util.Map.Entry<Class<?>, Object> entry : org.polyfrost.oneconfig.internal.mixin.command.Mixin_ModernArgumentTypesAccessor.getArgumentTypes().entrySet()) {
-        //$$     net.minecraft.commands.synchronization.ArgumentSerializer<?> serializer = ((org.polyfrost.oneconfig.internal.mixin.command.Mixin_ModernArgumentTypeEntryAccessor) entry.getValue()).getSerializer();
-        //$$     if (serializer instanceof net.minecraft.commands.synchronization.EmptyArgumentSerializer<?>) {
+        //#if MC > 1.16
+        //#if MC > 1.19 // todo still broken on 1.20+
+        //$$ net.minecraft.commands.CommandBuildContext cmdCtx = new net.minecraft.commands.CommandBuildContext(net.minecraft.core.RegistryAccess.BUILTIN.get());
+        //#endif
+        //$$ for (Map.Entry<Class<?>, Object> entry : Mixin_ModernArgumentTypesAccessor.getArgumentTypes().entrySet()) {
+        //$$     ArgumentSerializer serializer = ((Mixin_ModernArgumentTypeEntryAccessor) entry.getValue()).getSerializer();
+        //$$     if (serializer instanceof EmptyArgumentSerializer<?>) {
         //$$         CommandManager.INSTANCE.registerArgumentType(
         //$$                 (Class) entry.getKey(),
-        //$$                 ((net.minecraft.commands.synchronization.EmptyArgumentSerializer<com.mojang.brigadier.arguments.ArgumentType<?>>) serializer).deserializeFromNetwork(null)
+        //$$                 ((EmptyArgumentSerializer<ArgumentType<?>>) serializer).deserializeFromNetwork(null)
+        //$$                                //#if MC > 1.19
+        //$$                                //$$ .instantiate(cmdCtx)
+        //$$                                //#endif
         //$$         );
         //$$     }
         //$$ }
-        // TODO //#endif
+        //#endif
 
         LiteralArgumentBuilder b = literal("oneconfig");
         b.executes(cmd -> {

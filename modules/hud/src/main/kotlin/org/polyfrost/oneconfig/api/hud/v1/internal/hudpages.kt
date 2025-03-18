@@ -60,12 +60,33 @@ const val minMargin = 4f
 const val snapMargin = 12f
 
 fun HudsPage(huds: Collection<Hud<*>>): Drawable {
+    val hudMap = HashMap<Hud.Category, Drawable>()
     return Group(
         Group(
-            HudButton("oneconfig.huds.all"),
-            HudButton("oneconfig.huds.pvp"),
-            HudButton("oneconfig.huds.info"),
-            HudButton("oneconfig.huds.player"),
+            HudButton("oneconfig.huds.all").onClick {
+                parent[1] = Group(
+                    *hudMap.values.toTypedArray(),
+                    visibleSize = Vec2(500f, 800f),
+                )
+            },
+            HudButton("oneconfig.huds.pvp").onClick {
+                parent[1] = Group(
+                    *hudMap.filterKeys { it == Hud.Category.COMBAT }.values.toTypedArray(),
+                    visibleSize = Vec2(500f, 800f),
+                )
+            },
+            HudButton("oneconfig.huds.info").onClick {
+                parent[1] = Group(
+                    *hudMap.filterKeys { it == Hud.Category.INFO }.values.toTypedArray(),
+                    visibleSize = Vec2(500f, 800f),
+                )
+            },
+            HudButton("oneconfig.huds.player").onClick {
+                parent[1] = Group(
+                    *hudMap.filterKeys { it == Hud.Category.PLAYER }.values.toTypedArray(),
+                    visibleSize = Vec2(500f, 800f),
+                )
+            },
             alignment = Align(pad = Vec2(6f, 8f)),
             visibleSize = Vec2(500f, 48f)
         ),
@@ -73,13 +94,15 @@ fun HudsPage(huds: Collection<Hud<*>>): Drawable {
             Group(
                 children = huds.mapToArray {
                     val preview = it.buildNew()
-                    Block(
+                    val obj = Block(
                         preview,
                         alignment = alignC,
                     ).withBoarder(2f) { page.border10 }.minimumSize(215f by 80f).withStates().onInit {
                         // #created-with-set-size = true
                         layoutFlags = layoutFlags or 0b00000010
                     }
+                    hudMap[it.category()] = obj
+                    obj
                 },
                 visibleSize = Vec2(500f, 800f),
             )
