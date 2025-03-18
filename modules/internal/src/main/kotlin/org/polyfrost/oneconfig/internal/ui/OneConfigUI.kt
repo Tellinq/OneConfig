@@ -28,7 +28,6 @@
 
 package org.polyfrost.oneconfig.internal.ui
 
-import dev.deftu.omnicore.client.OmniClient
 import dev.deftu.omnicore.client.OmniClientPlayer
 import org.polyfrost.oneconfig.api.config.v1.ConfigManager
 import org.polyfrost.oneconfig.api.config.v1.internal.ConfigVisualizer
@@ -47,6 +46,9 @@ import org.polyfrost.polyui.component.impl.*
 import org.polyfrost.polyui.data.Cursor
 import org.polyfrost.polyui.data.PolyImage
 import org.polyfrost.polyui.event.Event
+import org.polyfrost.polyui.input.KeyBinder
+import org.polyfrost.polyui.input.KeyModifiers
+import org.polyfrost.polyui.input.Modifiers
 import org.polyfrost.polyui.operations.Move
 import org.polyfrost.polyui.operations.Recolor
 import org.polyfrost.polyui.unit.Align
@@ -77,6 +79,7 @@ object OneConfigUI {
                     ConfigManager.active().save(t)
                 }
             }
+            val searchField: TextInput
             val (polyUI, win) = builder.makeAndOpenWithRef(
                 Group(
                     Block(
@@ -85,7 +88,7 @@ object OneConfigUI {
                         // move to mod button
                         this.at = parent[3].at
                     },
-                    Image("assets/oneconfig/brand/oneconfig.svg".image()).named("Logo"),
+                    Image("assets/oneconfig/brand/oneconfig.svg".image()).named("Logo").padded(0f, 8f, 0f, 0f),
                     Text("oneconfig.sidebar.title.options", fontSize = 11f).setPalette { text.secondary }.padded(0f, 24f, 0f, 0f),
                     SidebarButton(
                         "assets/oneconfig/ico/settings.svg".image(),
@@ -155,7 +158,7 @@ object OneConfigUI {
                                         openPage(ModsPage(ConfigManager.active().trees()), "oneconfig.mods")
                                     }
                                     false
-                                },
+                                }.also { searchField = it },
                                 size = Vec2(256f, 32f),
                                 alignment = Align(pad = Vec2(10f, 8f)),
                             ).named("SearchField"),
@@ -173,6 +176,10 @@ object OneConfigUI {
                     alignment = Align(cross = Align.Cross.Start, pad = Vec2.ZERO),
                 ),
             )
+            polyUI.keyBinder?.add(KeyBinder.Bind(char = 'F', mods = Modifiers(KeyModifiers.CONTROL)) {
+                polyUI.focus(searchField)
+                false
+            })
             ui = polyUI.master
             window = win
             searchNoneFound.setup(polyUI)

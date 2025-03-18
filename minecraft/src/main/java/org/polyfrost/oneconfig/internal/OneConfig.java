@@ -133,6 +133,17 @@ public class OneConfig
     @SuppressWarnings({"unchecked", "rawtypes"})
     private static void registerCommands() {
         OmniClientCommands.initialize();
+        // TODO //#if MC > 1.16 needs fixing with preprocessor
+        //$$ for (java.util.Map.Entry<Class<?>, Object> entry : org.polyfrost.oneconfig.internal.mixin.command.Mixin_ModernArgumentTypesAccessor.getArgumentTypes().entrySet()) {
+        //$$     net.minecraft.commands.synchronization.ArgumentSerializer<?> serializer = ((org.polyfrost.oneconfig.internal.mixin.command.Mixin_ModernArgumentTypeEntryAccessor) entry.getValue()).getSerializer();
+        //$$     if (serializer instanceof net.minecraft.commands.synchronization.EmptyArgumentSerializer<?>) {
+        //$$         CommandManager.INSTANCE.registerArgumentType(
+        //$$                 (Class) entry.getKey(),
+        //$$                 ((net.minecraft.commands.synchronization.EmptyArgumentSerializer<com.mojang.brigadier.arguments.ArgumentType<?>>) serializer).deserializeFromNetwork(null)
+        //$$         );
+        //$$     }
+        //$$ }
+        // TODO //#endif
 
         LiteralArgumentBuilder b = literal("oneconfig");
         b.executes(cmd -> {

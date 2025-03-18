@@ -38,7 +38,7 @@ public class TestCommand_Test {
         OmniChat.showChatMessage("Main command");
     }
 
-    private static void joinAndChat(Object... stuff) {
+    private static void joinAndChat(String... stuff) {
         StringBuilder builder = new StringBuilder();
         for (Object thing : stuff) {
             builder.append(thing).append(' ');

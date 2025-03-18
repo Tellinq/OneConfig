@@ -59,6 +59,7 @@ public class CommandManager {
     private CommandManager() {
         argumentTypes.put(int.class, IntegerArgumentType.integer());
         argumentTypes.put(String.class, StringArgumentType.string());
+        argumentTypes.put(String[].class, StringArgumentType.greedyString());
         argumentTypes.put(boolean.class, BoolArgumentType.bool());
         argumentTypes.put(float.class, FloatArgumentType.floatArg());
         argumentTypes.put(double.class, DoubleArgumentType.doubleArg());
@@ -71,7 +72,7 @@ public class CommandManager {
     }
 
     public static void register(LiteralCommandNode<OmniClientCommandSource> node) {
-         OmniClientCommands.register(node);
+        OmniClientCommands.register(node);
     }
 
     public static boolean register(Object obj) {
@@ -96,6 +97,7 @@ public class CommandManager {
     }
 
     public static <T> RequiredArgumentBuilder<OmniClientCommandSource, T> argument(String name, ArgumentType<T> type) {
+        if (type == null) throw new NullPointerException("Can't get argument type for argument '" + name + "' as type is null");
         return OmniClientCommands.argument(name, type);
     }
 
