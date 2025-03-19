@@ -3,7 +3,7 @@ package org.polyfrost.oneconfig.internal.mixin.events;
 import dev.deftu.omnicore.client.render.OmniGameRendering;
 import org.objectweb.asm.Opcodes;
 import org.polyfrost.oneconfig.api.event.v1.EventManager;
-import org.polyfrost.oneconfig.api.event.v1.HudEvent;
+import org.polyfrost.oneconfig.api.event.v1.events.HudEvent;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;

@@ -73,6 +73,8 @@ public class OneConfigMixinInit implements IMixinConfigPlugin {
 
         //#if MC >= 1.16
         //$$ mixins.add("events.Mixin_ModernWindowFocusEvent");
+        //$$ mixins.add("command.Mixin_ModernArgumentTypesAccessor");
+        //$$ mixins.add("command.Mixin_ModernArgumentTypeEntryAccessor");
         //#if MC < 1.19
         //$$ mixins.add("fixes.Mixin_LazyDataFixerUpper");
         //$$ mixins.add("events.Mixin_ChatSendEvent");

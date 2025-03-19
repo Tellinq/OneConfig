@@ -32,6 +32,8 @@ import com.mojang.brigadier.builder.RequiredArgumentBuilder;
 import com.mojang.brigadier.tree.LiteralCommandNode;
 import dev.deftu.omnicore.client.OmniClientCommandSource;
 import dev.deftu.omnicore.client.OmniClientCommands;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.polyfrost.oneconfig.api.commands.v1.factories.CommandFactory;
 import org.polyfrost.oneconfig.api.commands.v1.factories.annotated.AnnotationCommandFactory;
 import org.polyfrost.oneconfig.api.commands.v1.factories.annotated.Command;
@@ -48,6 +50,7 @@ import java.util.Set;
  * @see Command
  */
 public class CommandManager {
+    private static final Logger LOGGER = LogManager.getLogger("OneConfig/CommandManger");
     /**
      * The singleton instance of the command manager.
      */
@@ -86,8 +89,12 @@ public class CommandManager {
 
     public LiteralCommandNode<OmniClientCommandSource>[] create(Object obj) {
         for (CommandFactory factory : factories) {
-            LiteralCommandNode<OmniClientCommandSource>[] nodes = factory.create(obj);
-            if (nodes != null) return nodes;
+            try {
+                LiteralCommandNode<OmniClientCommandSource>[] nodes = factory.create(obj);
+                if (nodes != null) return nodes;
+            } catch (Exception e) {
+                LOGGER.error("Command factory {} failed with an exception trying to create commands for object {}", factory, obj, e);
+            }
         }
         return null;
     }

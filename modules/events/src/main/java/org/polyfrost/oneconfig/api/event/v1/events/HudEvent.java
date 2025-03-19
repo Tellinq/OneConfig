@@ -1,6 +1,4 @@
-package org.polyfrost.oneconfig.api.event.v1;
-
-import org.polyfrost.oneconfig.api.event.v1.events.Event;
+package org.polyfrost.oneconfig.api.event.v1.events;
 
 public abstract class HudEvent implements Event {
     public final boolean opened;

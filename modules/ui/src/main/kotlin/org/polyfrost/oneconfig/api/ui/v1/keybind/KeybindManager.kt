@@ -67,13 +67,13 @@ object KeybindManager {
         // the user can try to fix it by opening a screen and trying again, and it should fix the issue.
         eventHandler { (screen): ScreenOpenEvent ->
             if (screen == null) {
-                inputManager.removeModifier(inputManager.mods)
+                inputManager.drop()
                 keyBinder.release()
             }
         }
         eventHandler { _: WindowFocusEvent.Lost ->
             // clear all modifiers
-            inputManager.removeModifier(inputManager.mods)
+            inputManager.drop()
             keyBinder.release()
         }
 
