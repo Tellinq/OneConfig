@@ -32,7 +32,7 @@ import java.lang.annotation.*;
 
 @Option(display = Visualizer.ButtonVisualizer.class)
 @Retention(RetentionPolicy.RUNTIME)
-@Target({ElementType.FIELD, ElementType.METHOD})
+@Target(ElementType.METHOD)
 @Documented
 public @interface Button {
     String title();

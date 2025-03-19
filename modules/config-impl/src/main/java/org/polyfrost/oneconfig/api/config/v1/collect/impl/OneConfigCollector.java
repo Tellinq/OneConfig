@@ -81,10 +81,11 @@ public class OneConfigCollector extends ReflectiveCollector {
                 continue;
             }
             if (type == Accordion.class) {
-                Tree t = Tree.tree(f.getName());
-                t.addMetadata(MHUtils.getAnnotationValues(a).getOrThrow());
                 try {
+                    Tree t = Tree.tree(f.getName());
+                    t.addMetadata(MHUtils.getAnnotationValues(a).getOrThrow());
                     handle(t, MHUtils.instantiate(f.getType(), true).getOrThrow(), 1);
+                    tree.put(t);
                 } catch (Throwable e) {
                     throw new RuntimeException("Failed to collect accordion-type field " + f.getName(), e);
                 }
@@ -93,16 +94,7 @@ public class OneConfigCollector extends ReflectiveCollector {
             Option opt = type.getDeclaredAnnotation(Option.class);
             if (opt == null) continue;
             try {
-                Property<?> p;
-                if (type == Button.class) {
-                    p = Properties.dummy();
-                    try {
-                        p.addMetadata("runnable", (Runnable) MHUtils.setAccessible(f).get(src));
-                    } catch (Throwable e) {
-                        throw new RuntimeException("Couldn't extract button method from field " + f.getName() + ", is it of type Runnable?", e);
-                    }
-                }
-                else p = Properties.field(null, null, f, src);
+                Property<?> p = Properties.field(null, null, f, src);
                 handleMetadata(tree, p, a, opt, f);
                 tree.put(p);
             } catch (Throwable e) {
