@@ -71,8 +71,12 @@ object OneConfigUI {
     @JvmOverloads
     fun open(initialScreen: Component = ModsPage(ConfigManager.active().trees())) {
         if (window == null) {
-            val builder = OCPolyUIBuilder.create().blurs().atResolution(1920f, 1080f)
-                .backgroundColor(rgba(21, 21, 21)).size(1400f, 700f) as OCPolyUIBuilder
+            val builder = OCPolyUIBuilder.create()
+                .blurs()
+                .atResolution(1920f, 1080f)
+                .backgroundColor {
+                    colors.page.fg.normal
+                }.size(1400f, 700f) as OCPolyUIBuilder
             builder.translatorDelegate("assets/oneconfig")
             builder.onClose { _ ->
                 for (t in ConfigManager.active().trees()) {
