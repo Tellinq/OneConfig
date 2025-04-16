@@ -88,6 +88,10 @@ public final class BlurHandler {
      * is being used, we actually have the blur setting enabled
      */
     private boolean reloadBlur(Object gui) {
+        //#if MC >= 1.21.5
+        //$$ return false; // TODO: Fix shader usage in 1.21.5+
+        //#else
+
         // Don't do anything if no world is loaded
         if (Minecraft.getMinecraft().theWorld == null) {
             return false;
@@ -142,7 +146,9 @@ public final class BlurHandler {
                 tryStop();
             }
         }
+
         return false;
+        //#endif
     }
 
     private void tryStop() {

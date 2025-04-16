@@ -26,7 +26,6 @@
 
 package org.polyfrost.oneconfig.api.ui.v1.internal
 
-import dev.deftu.omnicore.client.render.state.OmniManagedRenderState
 import org.apache.logging.log4j.LogManager
 import org.lwjgl.opengl.GL11
 import org.polyfrost.oneconfig.api.ui.v1.api.LwjglApi
@@ -105,9 +104,6 @@ class RendererImpl(
 
     private val errorHandler: (Throwable) -> Unit = { LOGGER.error("failed to load resource!", it) }
 
-    // GL state cache
-    private var lastRenderState: OmniManagedRenderState? = null
-
     override fun init() {
         vg.maybeSetup()
 
@@ -138,8 +134,6 @@ class RendererImpl(
             GL11.glPushAttrib(GL11.GL_ALL_ATTRIB_BITS)
         }
 
-        lastRenderState = OmniManagedRenderState.active()
-
         vg.beginFrame(width, height, pixelRatio)
         isDrawing = true
     }
@@ -151,8 +145,6 @@ class RendererImpl(
         if (!isGl3) {
             GL11.glPopAttrib()
         }
-
-        lastRenderState?.let(OmniManagedRenderState.active()::apply)
 
         isDrawing = false
     }

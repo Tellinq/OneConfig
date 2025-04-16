@@ -144,24 +144,24 @@ public class OneConfig
     @SuppressWarnings({"unchecked", "rawtypes"})
     private static void registerCommands() {
         OmniClientCommands.initialize();
-        //#if MC > 1.16
-        //#if MC > 1.19
-        // todo still broken on 1.20+
-        //$$ net.minecraft.commands.CommandBuildContext cmdCtx = new net.minecraft.commands.CommandBuildContext(net.minecraft.core.RegistryAccess.BUILTIN.get());
-        //#endif
-        //$$ for (Map.Entry<Class<?>, Object> entry : Mixin_ModernArgumentTypesAccessor.getArgumentTypes().entrySet()) {
-        //$$     ArgumentSerializer serializer = ((Mixin_ModernArgumentTypeEntryAccessor) entry.getValue()).getSerializer();
-        //$$     if (serializer instanceof EmptyArgumentSerializer<?>) {
-        //$$         CommandManager.INSTANCE.registerArgumentType(
-        //$$                 (Class) entry.getKey(),
-        //$$                 ((EmptyArgumentSerializer<ArgumentType<?>>) serializer).deserializeFromNetwork(null)
-        //$$                                //#if MC > 1.19
-        //$$                                //$$ .instantiate(cmdCtx)
-        //$$                                //#endif
-        //$$         );
-        //$$     }
-        //$$ }
-        //#endif
+        // //#if MC > 1.16
+        // //#if MC > 1.19
+        // // todo still broken on 1.20+
+        // //$$ net.minecraft.commands.CommandBuildContext cmdCtx = new net.minecraft.commands.CommandBuildContext(net.minecraft.core.RegistryAccess.BUILTIN.get());
+        // //#endif
+        // //$$ for (Map.Entry<Class<?>, Object> entry : Mixin_ModernArgumentTypesAccessor.getArgumentTypes().entrySet()) {
+        // //$$     ArgumentSerializer serializer = ((Mixin_ModernArgumentTypeEntryAccessor) entry.getValue()).getSerializer();
+        // //$$     if (serializer instanceof EmptyArgumentSerializer<?>) {
+        // //$$         CommandManager.INSTANCE.registerArgumentType(
+        // //$$                 (Class) entry.getKey(),
+        // //$$                 ((EmptyArgumentSerializer<ArgumentType<?>>) serializer).deserializeFromNetwork(null)
+        // //$$                                //#if MC > 1.19
+        // //$$                                //$$ .instantiate(cmdCtx)
+        // //$$                                //#endif
+        // //$$         );
+        // //$$     }
+        // //$$ }
+        // //#endif
 
         LiteralArgumentBuilder b = literal("oneconfig");
         b.executes(cmd -> {

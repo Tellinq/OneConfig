@@ -54,6 +54,8 @@ fun Project.provideIncludedDependencies(version: Triple<Int, Int, Int>?, loader:
 
         deps.add("$lwjglBase-tinyfd:$lwjglVersion")
         deps.add("$lwjglBase-nanovg:$lwjglVersion")
+
+        logger.lifecycle("===> LWJGL version: $lwjglVersion")
     }
 
     deps.add(libs.findLibrary("polyui").get().get())

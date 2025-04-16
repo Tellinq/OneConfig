@@ -76,6 +76,8 @@ public final class MavenUpdateChecker {
      * Returns true if there is an update available, <b>blocking this thread until done.</b>
      */
     public boolean hasUpdate() {
+        if (true) return false;
+
         if (!fin) {
             while (true) {
                 if (fin) break;

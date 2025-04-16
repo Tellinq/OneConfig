@@ -51,6 +51,8 @@ public class TestMod_Test
     private void init(InitializationEvent e)
     //#endif
     {
+        if (true) return; // TODO: Remove after fixing command factory
+
         System.err.println("TestMod::init");
         CommandManager.register(new TestCommand_Test());
         new TestConfig_Test();
