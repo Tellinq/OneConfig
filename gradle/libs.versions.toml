@@ -21,7 +21,7 @@ copycat-image-awt = "0.1.1"
 
 # Per version
 textile = "0.11.1"
-omnicore = "0.23.0"
+omnicore = "0.26.2"
 lwjgl = "3.3.3" # All downloaded by the isolated-lwjgl3-loader
 
 # Legacy only
@@ -30,7 +30,7 @@ mixin-extras = "0.4.1"
 asm = "5.2"
 
 # Gradle
-dgt = "2.29.0"
+dgt = "2.32.2"
 kotlinx-abi = "0.17.0"
 licenser = "2.1.1"
 jetbrains-idea-ext = "1.1.8"

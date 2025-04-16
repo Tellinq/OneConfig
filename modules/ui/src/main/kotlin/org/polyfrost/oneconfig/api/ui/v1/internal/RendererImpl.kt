@@ -26,9 +26,7 @@
 
 package org.polyfrost.oneconfig.api.ui.v1.internal
 
-import dev.deftu.omnicore.client.render.OmniRenderState
-import dev.deftu.omnicore.client.render.OmniTextureManager
-import dev.deftu.omnicore.client.shaders.BlendState
+import dev.deftu.omnicore.client.render.state.OmniManagedRenderState
 import org.apache.logging.log4j.LogManager
 import org.lwjgl.opengl.GL11
 import org.polyfrost.oneconfig.api.ui.v1.api.LwjglApi
@@ -108,10 +106,7 @@ class RendererImpl(
     private val errorHandler: (Throwable) -> Unit = { LOGGER.error("failed to load resource!", it) }
 
     // GL state cache
-    private var blendState: BlendState? = null
-    private var depthState: Boolean? = null
-    private var activeTexture: Int? = null
-    private var textureState: Int? = null
+    private var lastRenderState: OmniManagedRenderState? = null
 
     override fun init() {
         vg.maybeSetup()
@@ -139,16 +134,11 @@ class RendererImpl(
         if (isDrawing) throw IllegalStateException("Already drawing")
 
         queue.fastRemoveIfReversed { it(); true }
-        OmniRenderState.disableAlpha()
         if (!isGl3) {
             GL11.glPushAttrib(GL11.GL_ALL_ATTRIB_BITS)
         }
 
-        blendState = BlendState.active()
-        depthState = GL11.glIsEnabled(GL11.GL_DEPTH_TEST)
-        activeTexture = OmniTextureManager.getActiveTexture()
-        activeTexture?.let(OmniTextureManager::setActiveTexture)
-        textureState = GL11.glGetInteger(GL11.GL_TEXTURE_BINDING_2D)
+        lastRenderState = OmniManagedRenderState.active()
 
         vg.beginFrame(width, height, pixelRatio)
         isDrawing = true
@@ -162,10 +152,7 @@ class RendererImpl(
             GL11.glPopAttrib()
         }
 
-        blendState?.activate()
-        depthState?.let { if (it) OmniRenderState.enableDepth() else OmniRenderState.disableDepth() }
-        textureState?.let { GL11.glBindTexture(GL11.GL_TEXTURE_2D, it) }
-        activeTexture?.let(OmniTextureManager::setActiveTexture)
+        lastRenderState?.let(OmniManagedRenderState.active()::apply)
 
         isDrawing = false
     }
