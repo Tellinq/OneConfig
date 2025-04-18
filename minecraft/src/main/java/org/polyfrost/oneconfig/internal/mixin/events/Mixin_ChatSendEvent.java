@@ -43,7 +43,7 @@ public abstract class Mixin_ChatSendEvent {
     private ChatEvent.Send ocfg$chatEvent;
 
     @Inject(
-            //#if MC >= 1.21.4
+            //#if MC >= 1.21.2
             //$$ method = "sendMessage",
             //#elseif FABRIC && MC >= 1.19.2
             //$$ method = "sendMessage(Lnet/minecraft/text/Text;)V",
@@ -65,12 +65,12 @@ public abstract class Mixin_ChatSendEvent {
             //$$ net.minecraft.network.chat.Component text,
             //#endif
             //#endif
-            //#if MC >= 1.21.4
+            //#if MC >= 1.21.2
             //$$ boolean toHud,
             //#endif
             CallbackInfo ci
     ) {
-        //#if MC >= 1.21.4
+        //#if MC >= 1.21.2
         //$$ if (toHud) return;
         //#endif
 
@@ -93,7 +93,7 @@ public abstract class Mixin_ChatSendEvent {
     }
 
     @ModifyVariable(
-            //#if MC >= 1.21.4
+            //#if MC >= 1.21.2
             //$$ method = "sendMessage",
             //#elseif FABRIC && MC >= 1.19.2
             //$$ method = "sendMessage(Lnet/minecraft/text/Text;)V",

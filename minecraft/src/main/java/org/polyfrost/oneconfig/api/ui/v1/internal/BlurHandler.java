@@ -45,7 +45,7 @@ import org.polyfrost.polyui.animate.Animation;
 
 import java.util.List;
 
-//#if MC >= 1.21.4
+//#if MC >= 1.21.2
 //$$ import net.minecraft.client.render.DefaultFramebufferSet;
 //#endif
 
@@ -112,7 +112,7 @@ public final class BlurHandler {
                 //#if FABRIC
                 //$$ ((org.polyfrost.oneconfig.internal.mixin.fabric.Mixin_LoadShaderInvoker_Fabric) MinecraftClient.getInstance().gameRenderer).invokeLoadShader(this.blurShader);
                 //#else
-                //#if MC >= 1.21.4
+                //#if MC >= 1.21.2
                 //$$ Minecraft.getInstance().gameRenderer.setPostEffect(this.blurShader);
                 //#else
                 Minecraft.getMinecraft().entityRenderer.loadShader(this.blurShader);
@@ -155,7 +155,7 @@ public final class BlurHandler {
         ShaderGroup sg = getShaderGroup();
         if (sg == null) return;
         String name =
-                //#if MC >= 1.21.4
+                //#if MC >= 1.21.2
                 //$$ MinecraftClient.getInstance().gameRenderer.getPostProcessorId().toString();
                 //#else
                 sg.getShaderGroupName();
@@ -167,7 +167,7 @@ public final class BlurHandler {
         }
 
         su = null;
-        //#if MC >= 1.21.4
+        //#if MC >= 1.21.2
         //$$ MinecraftClient.getInstance().gameRenderer.clearPostProcessor();
         //#else
         Minecraft.getMinecraft().entityRenderer.stopUseShader();
@@ -188,7 +188,7 @@ public final class BlurHandler {
         //$$ if (true) return null;
         //#endif
         return Minecraft.getMinecraft()
-                //#if MC >= 1.21.4
+                //#if MC >= 1.21.2
                 //$$ .getShaderLoader().loadPostEffect(this.blurShader, DefaultFramebufferSet.MAIN_ONLY);
                 //#else
                 .entityRenderer.getShaderGroup();
