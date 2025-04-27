@@ -26,16 +26,21 @@
 
 package org.polyfrost.oneconfig.api.ui.v1.internal
 
+import dev.deftu.omnicore.client.render.state.DepthFunction
+import dev.deftu.omnicore.client.render.state.OmniManagedDepthState
+import dev.deftu.omnicore.client.render.state.OmniManagedRenderState
+import dev.deftu.omnicore.common.OmniLoader
 import org.apache.logging.log4j.LogManager
 import org.lwjgl.opengl.GL11
+import org.lwjgl.opengl.GL30
 import org.polyfrost.oneconfig.api.ui.v1.api.LwjglApi
 import org.polyfrost.oneconfig.api.ui.v1.api.NanoVgApi
 import org.polyfrost.oneconfig.api.ui.v1.api.StbApi
 import org.polyfrost.polyui.PolyUI
 import org.polyfrost.polyui.color.PolyColor
-import org.polyfrost.polyui.renderer.Renderer
 import org.polyfrost.polyui.data.Font
 import org.polyfrost.polyui.data.PolyImage
+import org.polyfrost.polyui.renderer.Renderer
 import org.polyfrost.polyui.unit.Vec2
 import org.polyfrost.polyui.utils.*
 import java.nio.ByteBuffer
@@ -62,6 +67,7 @@ class RendererImpl(
         val buffer: ByteBuffer
     )
 
+    private var mcVersion = -1
     private var isDrawing = false
 
     private var paintAddress = -1L
@@ -100,11 +106,18 @@ class RendererImpl(
     private val images = mutableMapOf<PolyImage, Int>()
     private val svgs = mutableMapOf<PolyImage, Pair<NanoVgApi.SVG, Int2IntMap>>()
 
+    private var prevVao = -1
+    private var prevRenderState: OmniManagedRenderState? = null
+
     private val queue = ArrayList<() -> Unit>()
 
     private val errorHandler: (Throwable) -> Unit = { LOGGER.error("failed to load resource!", it) }
 
     override fun init() {
+        if (mcVersion == -1) {
+            mcVersion = OmniLoader.paddedMinecraftVersion
+        }
+
         vg.maybeSetup()
 
         if (defaultFont == null) {
@@ -129,21 +142,36 @@ class RendererImpl(
     override fun beginFrame(width: Float, height: Float, pixelRatio: Float) {
         if (isDrawing) throw IllegalStateException("Already drawing")
 
+        if (mcVersion >= 1_16_05) {
+            prevVao = GL11.glGetInteger(GL30.GL_VERTEX_ARRAY_BINDING)
+            prevRenderState = OmniManagedRenderState.active()
+            OmniManagedDepthState.enable(DepthFunction.LESS_OR_EQUAL)
+        }
+
         queue.fastRemoveIfReversed { it(); true }
         if (!isGl3) {
             GL11.glPushAttrib(GL11.GL_ALL_ATTRIB_BITS)
         }
 
+        GL11.glPixelStorei(GL11.GL_UNPACK_ALIGNMENT, 1)
         vg.beginFrame(width, height, pixelRatio)
         isDrawing = true
     }
 
     override fun endFrame() {
-        if (!isDrawing) throw IllegalStateException("Not drawing")
+        if (!isDrawing) return
 
         vg.endFrame()
         if (!isGl3) {
             GL11.glPopAttrib()
+        }
+
+        if (mcVersion >= 1_16_05) {
+            prevRenderState?.activate()
+            OmniManagedDepthState.disable()
+            if (prevVao != -1) {
+                GL30.glBindVertexArray(prevVao)
+            }
         }
 
         isDrawing = false
