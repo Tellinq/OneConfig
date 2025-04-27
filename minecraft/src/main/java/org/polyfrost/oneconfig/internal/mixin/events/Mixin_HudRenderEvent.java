@@ -20,6 +20,11 @@ import net.minecraftforge.client.GuiIngameForge;
 //#endif
 //#endif
 
+//#if MC >= 1.21.1
+//$$ import net.minecraft.client.DeltaTracker;
+//#endif
+
+import dev.deftu.omnicore.client.render.OmniGameRendering;
 import dev.deftu.omnicore.client.render.OmniMatrixStack;
 import org.polyfrost.oneconfig.api.event.v1.EventManager;
 import org.polyfrost.oneconfig.api.event.v1.events.HudRenderEvent;
@@ -55,7 +60,11 @@ public class Mixin_HudRenderEvent {
             //#elseif MC >= 1.13
             //$$ PoseStack ctx,
             //#endif
-            float partialTicks,
+            //#if MC >= 1.21.1
+            //$$ DeltaTracker deltaTracker,
+            //#else
+            float passedPartialTicks,
+            //#endif
             CallbackInfo ci
     ) {
         OmniMatrixStack stack = OmniMatrixStack.vanilla(
@@ -64,6 +73,7 @@ public class Mixin_HudRenderEvent {
                 //#endif
         );
 
+        float partialTicks = OmniGameRendering.getTickDelta(false);
         EventManager.INSTANCE.post(new HudRenderEvent(stack, partialTicks));
     }
 
