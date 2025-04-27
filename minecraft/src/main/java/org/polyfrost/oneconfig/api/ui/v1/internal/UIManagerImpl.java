@@ -27,16 +27,15 @@
 package org.polyfrost.oneconfig.api.ui.v1.internal;
 
 //#if MC >= 1.16.5
-//$$ import org.lwjgl.opengl.GL;
 //$$ import org.polyfrost.oneconfig.api.platform.v1.Platform;
 //$$ import org.polyfrost.lwjgl.isolatedloader.Lwjgl3Downloader;
 //$$ import java.nio.file.Path;
 //#else
-import org.lwjgl.opengl.GLContext;
 import org.polyfrost.lwjgl.isolatedloader.Lwjgl3Manager;
 import org.polyfrost.lwjgl.isolatedloader.classloader.IsolatedClassLoader;
 //#endif
 
+import dev.deftu.omnicore.client.render.OmniRenderEnv;
 import net.minecraft.client.Minecraft;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -106,26 +105,21 @@ public class UIManagerImpl implements UIManager {
         //#endif
 
         try {
-            boolean gl3 =
-                //#if MC >= 1.16.5
-                //$$ GL.getCapabilities().OpenGL30;
-                //#else
-                GLContext.getCapabilities().OpenGL30;
-                //#endif
+            boolean isGl3 = OmniRenderEnv.isGl3Available();
 
             //#if MC >= 1.16.5
             //$$ lwjgl = new LwjglImpl();
-            //$$ nanoVg = new NanoVgImpl(gl3);
+            //$$ nanoVg = new NanoVgImpl(isGl3);
             //$$ stb = new StbImpl();
             //$$ tinyFD = new TinyFdImpl();
             //#else
             lwjgl = Lwjgl3Manager.getIsolated(LwjglApi.class, LWJGL_IMPL_PACKAGE + "LwjglImpl");
-            nanoVg = Lwjgl3Manager.getIsolated(NanoVgApi.class, LWJGL_IMPL_PACKAGE + "NanoVgImpl", gl3);
+            nanoVg = Lwjgl3Manager.getIsolated(NanoVgApi.class, LWJGL_IMPL_PACKAGE + "NanoVgImpl", isGl3);
             stb = Lwjgl3Manager.getIsolated(StbApi.class, LWJGL_IMPL_PACKAGE + "StbImpl");
             tinyFD = Lwjgl3Manager.getIsolated(TinyFdApi.class, LWJGL_IMPL_PACKAGE + "TinyFdImpl");
             //#endif
 
-            renderer = new RendererImpl(gl3, lwjgl, nanoVg, stb);
+            renderer = new RendererImpl(isGl3, lwjgl, nanoVg, stb);
         } catch (Exception e) {
             throw new RuntimeException("Failed to get valid rendering implementation", e);
         }
