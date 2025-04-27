@@ -28,7 +28,12 @@ package org.polyfrost.oneconfig.api.ui.v1.internal.wrappers;
 
 import dev.deftu.omnicore.client.OmniKeyboard;
 import dev.deftu.omnicore.client.OmniScreen;
+import dev.deftu.omnicore.client.render.GuiScale;
 import dev.deftu.omnicore.client.render.OmniMatrixStack;
+import dev.deftu.omnicore.client.render.framebuffer.Framebuffer;
+import dev.deftu.omnicore.client.render.framebuffer.ManagedFramebuffer;
+import dev.deftu.omnicore.client.render.texture.GpuTexture;
+import kotlin.Unit;
 import net.minecraft.client.Minecraft;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -42,6 +47,7 @@ import org.polyfrost.polyui.PolyUI;
 import org.polyfrost.polyui.component.Drawable;
 import org.polyfrost.polyui.data.Cursor;
 
+import java.awt.*;
 import java.util.function.Consumer;
 
 import static org.lwjgl.opengl.GL11.glViewport;
@@ -55,6 +61,8 @@ public class PolyUIScreen extends OmniScreen implements BlurScreen {
     @NotNull
     public final PolyUI polyUI;
 
+    private Framebuffer framebuffer;
+
     private final float designedWidth, designedHeight, initialWidth, initialHeight;
     private final boolean pauses, blurs;
     private final Consumer<PolyUI> close;
@@ -65,6 +73,7 @@ public class PolyUIScreen extends OmniScreen implements BlurScreen {
 
     public PolyUIScreen(@NotNull PolyUI polyUI, float designedWidth, float designedHeight, boolean pauses, boolean blurs, Consumer<PolyUI> onClose) {
         super(true);
+
         this.polyUI = polyUI;
         this.designedWidth = designedWidth;
         this.designedHeight = designedHeight;
@@ -81,22 +90,17 @@ public class PolyUIScreen extends OmniScreen implements BlurScreen {
 
     @Override
     public void handleInitialize(int width, int height) {
-        adjustResolution(Platform.screen().windowWidth(), Platform.screen().windowHeight(), false);
+        float w = (float) Platform.screen().windowWidth();
+        float h = (float) Platform.screen().windowHeight();
+        adjustResolution(w, h, false);
     }
 
-    protected final void adjustResolution(float w, float h, boolean force) {
-        // asm: normally, a polyui instance is as big as its window and that is it.
-        // however, inside minecraft, the actual content is smaller than the window size, so resizing it directly would just fuck it up.
-        // so instead, the developer specifies a resolution that their UI was designed for, and we resize accordingly.
-        if (designedWidth == 0f || designedHeight == 0f) return;
-        float sx = w / designedWidth;
-        float sy = h / designedHeight;
-        if (sx == 1f && sy == 1f) return;
-        try {
-            polyUI.resize(initialWidth * sx, initialHeight * sy, force);
-        } catch (Exception e) {
-            death(e);
-        }
+    @Override
+    @MustBeInvokedByOverriders
+    public final void handleResize(int width, int height) {
+        float w = (float) Platform.screen().windowWidth();
+        float h = (float) Platform.screen().windowHeight();
+        adjustResolution(w, h, false);
     }
 
     @Override
@@ -107,32 +111,49 @@ public class PolyUIScreen extends OmniScreen implements BlurScreen {
             my = mouseY;
             this.mouseMoved(mx, my);
         }
-        //#endif
-        if (polyUI == UIManager.INSTANCE.getDefaultInstance()) return;
 
+        //#endif
+        if (framebuffer == null || polyUI == UIManager.INSTANCE.getDefaultInstance()) {
+            return;
+        }
+
+        int width = Platform.screen().windowWidth();
+        int height = Platform.screen().windowHeight();
         Drawable master = polyUI.getMaster();
-        //noinspection DataFlowIssue
-        float scale = polyUI.getWindow().getPixelRatio();
-        float ox = (Platform.screen().windowWidth() / 2f - master.getWidth() / 2f) * scale;
-        float oy = (Platform.screen().windowHeight() / 2f - master.getHeight() / 2f) * scale;
-        glViewport((int) ox, (int) oy, (int) (master.getWidth() * scale), (int) (master.getHeight() * scale));
 
         try {
-            matrices.runReplacingGlobalState(polyUI::render);
+            framebuffer.clearColor(1f, 1f, 1f, 0f); // Clear to transparent white
+            if (framebuffer instanceof ManagedFramebuffer) {
+                ((ManagedFramebuffer) framebuffer).clearDepthStencil(1.0, 0);
+            }
+
+            framebuffer.usingToRender((matrixStack, w, h) -> {
+                float scale = polyUI.getPixelRatio();
+                glViewport(0, 0, (int) (master.getWidth() * scale), (int) (master.getHeight() * scale));
+
+                matrices.runReplacingGlobalState(polyUI::render);
+
+                glViewport(0, 0, Platform.screen().viewportWidth(), Platform.screen().viewportHeight());
+                return Unit.INSTANCE;
+            });
         } catch (Exception e) {
             polyUI.getRenderer().endFrame();
             death(e);
         }
 
-        glViewport(0, 0, Platform.screen().viewportWidth(), Platform.screen().viewportHeight());
-    }
+        float scalingFactor = 1f / GuiScale.getRawCurrentScale();
 
-    @Override
-    @MustBeInvokedByOverriders
-    public final void handleResize(int width, int height) {
-        float w = (float) Platform.screen().windowWidth();
-        float h = (float) Platform.screen().windowHeight();
-        adjustResolution(w, h, false);
+        float scaledX = (Platform.screen().windowWidth() / 2f - master.getWidth() / 2f) * scalingFactor;
+        float scaledY = (Platform.screen().windowHeight() / 2f - master.getHeight() / 2f) * scalingFactor;
+        float scaledWidth = master.getWidth() * scalingFactor;
+        float scaledHeight = master.getHeight() * scalingFactor;
+
+        framebuffer.drawColorTexture(
+                matrices,
+                scaledX, scaledY,
+                scaledWidth, scaledHeight,
+                Color.WHITE.getRGB()
+        );
     }
 
     @Override
@@ -256,6 +277,34 @@ public class PolyUIScreen extends OmniScreen implements BlurScreen {
         if (close != null) close.accept(polyUI);
         // noinspection DataFlowIssue
         this.polyUI.getWindow().setCursor(Cursor.Pointer);
+    }
+
+    protected final void adjustResolution(float w, float h, boolean force) {
+        if (this.framebuffer == null) {
+            int width = Platform.screen().windowWidth();
+            int height = Platform.screen().windowHeight();
+            this.framebuffer = new ManagedFramebuffer(width, height, GpuTexture.TextureFormat.RGBA8, GpuTexture.TextureFormat.DEPTH24_STENCIL8);
+        }
+
+        // asm: normally, a polyui instance is as big as its window and that is it.
+        // however, inside minecraft, the actual content is smaller than the window size, so resizing it directly would just fuck it up.
+        // so instead, the developer specifies a resolution that their UI was designed for, and we resize accordingly.
+        if (designedWidth == 0f || designedHeight == 0f) {
+            return;
+        }
+
+        float sx = w / designedWidth;
+        float sy = h / designedHeight;
+        if (sx == 1f && sy == 1f) {
+            return;
+        }
+
+        try {
+            framebuffer.resize((int) (initialWidth * sx), (int) (initialHeight * sy));
+            polyUI.resize(initialWidth * sx, initialHeight * sy, force);
+        } catch (Exception e) {
+            death(e);
+        }
     }
 
     private void death(Exception e) {
