@@ -25,7 +25,7 @@ omnicore = "0.28.0"
 lwjgl = "3.3.3" # All downloaded by the isolated-lwjgl3-loader
 
 # Legacy only
-mixin = "0.8.4+build.2"
+mixin = "0.8.4+build.3"
 mixin-extras = "0.4.1"
 asm = "5.2"
 
