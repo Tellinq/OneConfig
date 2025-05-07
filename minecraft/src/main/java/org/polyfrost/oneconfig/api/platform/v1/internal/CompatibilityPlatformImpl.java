@@ -7,11 +7,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 //#if FORGE && MC <= 1.12.2
-import dev.deftu.omnicore.client.OmniChat;
-import dev.deftu.omnicore.client.OmniClient;
 import dev.deftu.omnicore.client.OmniClientPlayer;
-import dev.deftu.omnicore.client.OmniScreen;
-import net.minecraft.client.gui.GuiScreen;
 import net.minecraftforge.client.ClientCommandHandler;
 //#endif
 
@@ -42,7 +38,6 @@ public class CompatibilityPlatformImpl implements CompatibilityPlatform {
     public void executeTreeAction(String action) {
         //#if MC >= 1.16.5 || FABRIC
         //$$ // Unneeded in 1.16.5+ / Legacy Fabric
-        //$$ return;
         //#else
         // Executes the command for the given mod
         ClientCommandHandler.instance.executeCommand(OmniClientPlayer.getInstance(), action);
