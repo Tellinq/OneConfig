@@ -41,67 +41,6 @@ import org.polyfrost.polyui.utils.image
 import org.polyfrost.polyui.utils.mapToArray
 import org.polyfrost.polyui.utils.translated
 
-private val heart = PolyImage("assets/oneconfig/ico/plus.svg")
-private val defaultModImage = "assets/oneconfig/ico/default_mod.svg".image()
-private val modBoxTopRad = floatArrayOf(8f, 8f, 0f, 0f)
-private val modBoxBotRad = floatArrayOf(0f, 0f, 8f, 8f)
-private val modBoxAlign = Align(cross = Align.Cross.Start, mode = Align.Mode.Vertical, pad = Vec2.ZERO)
-private val imageAlign = Align(main = Align.Main.Center, pad = Vec2.ZERO)
-private val barAlign = Align(pad = Vec2(14f, 6f), main = Align.Main.SpaceBetween)
-
-fun ModsPage(trees: Collection<Tree>): Drawable {
-    if (trees.isEmpty()) {
-        return Group(
-            Text("oneconfig.mods.none", fontSize = 24f).setFont { medium },
-            Text("oneconfig.mods.none.desc", fontSize = 14f),
-            size = Vec2(1130f, 635f),
-            alignment = Align(main = Align.Main.Center, pad = Vec2(18f, 18f), maxRowSize = 1),
-        ).namedId("EmptyModsPage")
-    }
-    // todo add categories
-    return Group(
-        children = trees.mapNotNull {
-            if (it.getMetadata<Any?>("hidden") != null) return@mapNotNull null
-            Group(
-                Block(
-                    Image(it.getMetadata<String>("icon")?.image() ?: defaultModImage).onInit { size = size.coerceAtMost(Vec2(64f, 64f)) },
-                    radii = modBoxTopRad,
-                    alignment = imageAlign,
-                    size = Vec2(256f, 104f),
-                ).withStates(),
-                Block(
-                    Text(it.title, fontSize = 14f).setFont { medium },
-                    Image(heart),
-                    radii = modBoxBotRad,
-                    alignment = barAlign,
-                    size = Vec2(256f, 36f),
-                ).also { it.acceptsInput = true }.setPalette { brand.fg },
-                alignment = modBoxAlign,
-            ).onClick { _ ->
-                OneConfigUI.openPage(ConfigVisualizer.INSTANCE.get(it), (this[1][0] as Text).text)
-            }.onRightClick { _ ->
-                PopupMenu(Text("Restore Defaults").setDestructivePalette().withStates().onClick { _ ->
-                    val backup = ConfigManager.backup().get(it.id)
-                    if (backup == null) {
-                        Notifications.enqueue(
-                            Notifications.Type.Error,
-                            "Backup Failure",
-                            "Couldn't find the backup for ${it.id}. You can fix this by manually deleting the config file and restarting your game, which will reset your config! Click here to do so."
-                        ).onClick { _ ->
-                            ConfigManager.active().delete(it.id)
-                        }
-                    }
-                    it.overwrite(backup)
-                    polyUI.unfocus()
-                    false
-                }, polyUI = polyUI)
-            }.namedId("ModCard")
-        }.toTypedArray(),
-        visibleSize = Vec2(1130f, 635f),
-        alignment = Align(cross = Align.Cross.Start, pad = Vec2(18f, 18f)),
-    ).makeRearrangeableGrid().namedId("ModsPage")
-}
-
 fun ThemesPage(): Drawable {
     return Group()
 }

@@ -30,6 +30,7 @@ package org.polyfrost.oneconfig.internal.ui
 
 import dev.deftu.omnicore.client.OmniClientPlayer
 import org.polyfrost.oneconfig.api.config.v1.ConfigManager
+import org.polyfrost.oneconfig.api.config.v1.Tree
 import org.polyfrost.oneconfig.api.config.v1.internal.ConfigVisualizer
 import org.polyfrost.oneconfig.api.hud.v1.HudManager
 import org.polyfrost.oneconfig.api.platform.v1.Platform
@@ -37,6 +38,7 @@ import org.polyfrost.oneconfig.api.ui.v1.OCPolyUIBuilder
 import org.polyfrost.oneconfig.internal.ui.pages.FeedbackPage
 import org.polyfrost.oneconfig.internal.ui.pages.ModsPage
 import org.polyfrost.oneconfig.internal.ui.pages.ThemesPage
+import org.polyfrost.oneconfig.internal.ui.pages.TreeSource
 import org.polyfrost.polyui.animate.Animations
 import org.polyfrost.polyui.color.rgba
 import org.polyfrost.polyui.component.Component
@@ -67,9 +69,28 @@ object OneConfigUI {
     private lateinit var ui: Drawable
     private var window: Any? = null
 
+    private fun collectTrees(): Map<TreeSource, Tree> {
+        val result = mutableMapOf<TreeSource, Tree>()
+
+        for (tree in ConfigManager.active().trees()) {
+            result[TreeSource.CONFIG] = tree
+        }
+
+        for (validItem in Platform.compatibility().validTrees) {
+            if (result.entries.map(MutableMap.MutableEntry<TreeSource, Tree>::value).map(Tree::getID).any { it == validItem.id }) {
+                continue
+            }
+
+            val tree = Tree.tree(validItem.id)
+            tree.title = validItem.name
+            result[TreeSource.COMMAND] = tree
+        }
+
+        return result
+    }
 
     @JvmOverloads
-    fun open(initialScreen: Component = ModsPage(ConfigManager.active().trees())) {
+    fun open(initialScreen: Component = ModsPage(collectTrees())) {
         if (window == null) {
             val builder = OCPolyUIBuilder.create()
                 .blurs()
@@ -97,7 +118,7 @@ object OneConfigUI {
                     SidebarButton(
                         "assets/oneconfig/ico/settings.svg".image(),
                         "oneconfig.mods",
-                    ).onClick { openPage(ModsPage(ConfigManager.active().trees()), "oneconfig.mods") },
+                    ).onClick { openPage(ModsPage(collectTrees()), "oneconfig.mods") },
                     SidebarButton(
                         "assets/oneconfig/ico/profiles.svg".image(),
                         "oneconfig.profiles",
@@ -159,7 +180,7 @@ object OneConfigUI {
                                         if (ui[1][1] !== search) openPage(search, "oneconfig.search")
                                         search.recalculate()
                                     } else if (ui[1][1] === search) {
-                                        openPage(ModsPage(ConfigManager.active().trees()), "oneconfig.mods")
+                                        openPage(ModsPage(collectTrees()), "oneconfig.mods")
                                     }
                                     false
                                 }.also { searchField = it },
