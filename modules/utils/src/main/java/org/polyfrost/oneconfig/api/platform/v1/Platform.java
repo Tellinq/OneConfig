@@ -39,6 +39,7 @@ public final class Platform {
     private static GLPlatform glPlatform;
     private static ScreenPlatform screenPlatform;
     private static I18nPlatform i18nPlatform;
+    private static CompatibilityPlatform compatibilityPlatform;
 
     public static LoaderPlatform loader() {
         return loaderPlatform == null ? loaderPlatform = load(LoaderPlatform.class) : loaderPlatform;
@@ -54,6 +55,10 @@ public final class Platform {
 
     public static I18nPlatform i18n() {
         return i18nPlatform == null ? i18nPlatform = load(I18nPlatform.class) : i18nPlatform;
+    }
+
+    public static CompatibilityPlatform compatibility() {
+        return compatibilityPlatform == null ? compatibilityPlatform = load(CompatibilityPlatform.class) : compatibilityPlatform;
     }
 
     private static <T> T load(Class<T> cls) {
