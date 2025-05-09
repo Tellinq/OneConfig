@@ -104,47 +104,6 @@ public class OneConfigMixinInit implements IMixinConfigPlugin {
 
     @Override
     public void postApply(String targetClassName, ClassNode targetClass, String mixinClassName, IMixinInfo mixinInfo) {
-        fixLegacyOneConfig(targetClassName, targetClass);
-    }
-
-    /** Change the `modid` parameter in the `@Mod` annotation to `oneconfigv0` so that V1 doesn't conflict with V0 */
-    private void fixLegacyOneConfig(String targetClassName, ClassNode targetClass) {
-        if (!Objects.equals(targetClassName, "cc.polyfrost.oneconfig.internal.OneConfig")) {
-            return;
-        }
-
-        if (targetClass.visibleAnnotations == null || targetClass.visibleAnnotations.isEmpty()) {
-            return;
-        }
-
-        for (AnnotationNode annotation : targetClass.visibleAnnotations) {
-            if (!Objects.equals(annotation.desc, "Lnet/minecraftforge/fml/common/Mod;")) {
-                continue;
-            }
-
-            List<Object> values = annotation.values;
-            for (int i = 0; i < values.size(); i += 2) {
-                Object key = values.get(i);
-                if ("modid".equals(key)) {
-                    // Change the value at i + 1
-                    values.set(i + 1, "oneconfigv0");
-                    break;
-                }
-            }
-        }
-
-        if (Boolean.getBoolean("oneconfig.debug.legacyfix")) {
-            // Write the modified class to a file for debugging
-            try {
-                ClassWriter writer = new ClassWriter(ClassWriter.COMPUTE_FRAMES);
-                targetClass.accept(writer);
-                byte[] bytes = writer.toByteArray();
-
-                Files.write(Paths.get("OneConfigLegacyFix.class"), bytes);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }
     }
 
 }
