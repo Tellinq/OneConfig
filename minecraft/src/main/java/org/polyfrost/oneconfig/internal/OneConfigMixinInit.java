@@ -26,6 +26,8 @@
 
 package org.polyfrost.oneconfig.internal;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.objectweb.asm.ClassWriter;
 import org.objectweb.asm.tree.AnnotationNode;
 import org.objectweb.asm.tree.ClassNode;
@@ -66,6 +68,7 @@ public class OneConfigMixinInit implements IMixinConfigPlugin {
         //#if FORGE
         mixins.add("events.Mixin_ChatReceiveEvent_Forge");
         //#if MC < 1.13
+        mixins.add("Mixin_OneConfig_LegacyDummy");
         mixins.add("compat.OneConfigV0CompatMixin");
         mixins.add("fixes.Mixin_ASMModParser_IgnoreForgeJava9Spam");
         mixins.add("fixes.Mixin_JarDiscoverer_IgnoreForgeJava9Spam");
@@ -94,6 +97,17 @@ public class OneConfigMixinInit implements IMixinConfigPlugin {
         mixins.add("Mixin_SoundHandlerAccessor");
         //#endif
         //#endif
+
+        {
+            Logger logger = LogManager.getLogger(OneConfigMixinInit.class);
+            logger.info("Loaded {} non-common Mixins", mixins.size());
+
+            for (int i = 0; i < mixins.size(); i += 5) {
+                int end = Math.min(i + 5, mixins.size());
+                List<String> batch = mixins.subList(i, end);
+                logger.info("Loaded Mixins: {}", String.join(", ", batch));
+            }
+        }
 
         return mixins;
     }
