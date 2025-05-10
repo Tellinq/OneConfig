@@ -75,12 +75,12 @@ import static org.polyfrost.oneconfig.api.commands.v1.CommandManager.literal;
  */
 //#if FORGE-LIKE
 //#if MC <= 1.12.2
-@net.minecraftforge.fml.common.Mod(modid = "oneconfig")
+@net.minecraftforge.fml.common.Mod(modid = "oneconfigv1")
 //#else
 //#if NEOFORGE
-//$$ @net.neoforged.fml.common.Mod("oneconfig")
+//$$ @net.neoforged.fml.common.Mod("oneconfigv1")
 //#else
-//$$ @net.minecraftforge.fml.common.Mod("oneconfig")
+//$$ @net.minecraftforge.fml.common.Mod("oneconfigv1")
 //#endif
 //#endif
 //#endif

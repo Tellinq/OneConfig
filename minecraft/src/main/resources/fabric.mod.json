@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "id": "${mod_id}",
+  "id": "oneconfigv1",
   "name": "${mod_name}",
   "version": "${mod_version}",
   "description": "OneConfig",
