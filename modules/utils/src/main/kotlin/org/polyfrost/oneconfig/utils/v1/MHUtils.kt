@@ -48,7 +48,7 @@ import java.util.function.Predicate
  * MethodHandles also are "directly supported by the VM" and are "more efficient than the equivalent reflective operations", according to the documentation.
  *
  * This class is split into two main parts:
- * - direct access methods [getField], [setField], [invoke], etc. which use reflection and [setAccessible] to directly access fields and methods.
+ * - direct access methods [getFieldInHierarchy], [setField], [invoke], etc. which use reflection and [setAccessible] to directly access fields and methods.
  * - method handle methods [getFieldGetter], [getFieldSetter], [getMethodHandle], etc. which use the trusted lookup to get method handles for fields and methods - these are reusable.
  *
  * ## note that these methods are inherently unsafe and in general, bad. use with caution.
@@ -374,6 +374,13 @@ object MHUtils {
         Result.failure(ReflectiveOperationException("Failed to get field value for $fieldName from $owner", e))
     }
 
+    @JvmStatic
+    @Suppress("UNCHECKED_CAST")
+    fun <T> getFieldInHierarchy(clz: Class<*>, owner: Any, fieldName: String) = try {
+        Result.success(clz.getDeclaredField(fieldName).setAccessible().get(owner) as T)
+    } catch (e: Throwable) {
+        Result.failure(ReflectiveOperationException("Failed to get field value for $fieldName from $owner", e))
+    }
 
     /**
      * Return a static field value using reflection.

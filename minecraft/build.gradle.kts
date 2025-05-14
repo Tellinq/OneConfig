@@ -18,7 +18,7 @@ plugins {
 }
 
 if (mcData.isForge) {
-    loom.forge.mixinConfig("mixins.${modData.id}.init.json")
+    loom.forge.mixinConfig("mixins.oneconfigv1.init.json")
 }
 
 toolkitLoomHelper {
@@ -34,7 +34,7 @@ toolkitLoomHelper {
     }
 
     if (mcData.isForge) {
-        useForgeMixin(modData.id)
+        useForgeMixin("oneconfigv1")
     }
 
     if (mcData.isLegacyForge) {
@@ -156,7 +156,7 @@ tasks {
                         "Implementation-Vendor" to "Polyfrost",
                         "Implementation-Timestamp" to SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ").format(`java.util`.Date()),
                         "OneConfig-Main-Class" to "org.polyfrost.oneconfig.internal.bootstrap.Bootstrap",
-                        "MixinConfigs" to "mixins.${modData.id}.init.json,mixins.${modData.id}.json",
+                        "MixinConfigs" to "mixins.oneconfigv1.init.json,mixins.oneconfigv1.json",
                     )
                 )
             }

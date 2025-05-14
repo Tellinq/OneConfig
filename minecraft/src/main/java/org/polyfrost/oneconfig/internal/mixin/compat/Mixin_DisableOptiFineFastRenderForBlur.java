@@ -36,7 +36,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Pseudo
 @Mixin(targets = "Config", remap = false)
-public abstract class OptifineConfigMixin {
+public abstract class Mixin_DisableOptiFineFastRenderForBlur {
 
     @Dynamic("OptiFine")
     @Inject(method = "isFastRender", at = @At("HEAD"), cancellable = true)

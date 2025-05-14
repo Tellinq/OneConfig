@@ -227,8 +227,8 @@ public class OneConfigTweaker implements ITweaker {
     @Override
     public void injectIntoClassLoader(LaunchClassLoader classLoader) {
         MixinBootstrap.init();
-        Mixins.addConfiguration("mixins.oneconfig.json");
-        Mixins.addConfiguration("mixins.oneconfig.init.json");
+        Mixins.addConfiguration("mixins.oneconfigv1.json");
+        Mixins.addConfiguration("mixins.oneconfigv1.init.json");
         removeLWJGLException();
 
         // performance fix

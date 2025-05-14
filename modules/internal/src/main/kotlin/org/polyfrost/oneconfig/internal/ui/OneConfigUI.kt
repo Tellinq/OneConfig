@@ -69,21 +69,28 @@ object OneConfigUI {
     private lateinit var ui: Drawable
     private var window: Any? = null
 
-    private fun collectTrees(): Map<TreeSource, Tree> {
-        val result = mutableMapOf<TreeSource, Tree>()
+    private fun collectTrees(): Map<TreeSource, Set<Tree>> {
+        val result = mutableMapOf<TreeSource, MutableSet<Tree>>()
 
         for (tree in ConfigManager.active().trees()) {
-            result[TreeSource.CONFIG] = tree
+            if (tree.id == "oneconfig" || tree.title == "OneConfig") {
+                continue // skip our own tree
+            }
+
+            result.getOrPut(TreeSource.CONFIG, ::mutableSetOf).add(tree)
         }
 
         for (validItem in Platform.compatibility().validTrees) {
-            if (result.entries.map(MutableMap.MutableEntry<TreeSource, Tree>::value).map(Tree::getID).any { it == validItem.id }) {
+            if (
+                result.values.flatten().any { it.id.equals(validItem.id, ignoreCase = true) } ||
+                result.values.flatten().any { it.title.equals(validItem.name, ignoreCase = true) }
+            ) {
                 continue
             }
 
             val tree = Tree.tree(validItem.id)
             tree.title = validItem.name
-            result[TreeSource.COMMAND] = tree
+            result.getOrPut(TreeSource.COMMAND, ::mutableSetOf).add(tree)
         }
 
         return result

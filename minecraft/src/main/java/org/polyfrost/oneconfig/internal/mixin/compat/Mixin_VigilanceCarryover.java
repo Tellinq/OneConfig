@@ -40,7 +40,7 @@ import java.io.File;
 
 @Mixin(value = Vigilant.class, remap = false)
 @Pseudo
-public abstract class VigilantCompatMixin {
+public abstract class Mixin_VigilanceCarryover {
 
     @Dynamic("OneConfig VCAL Processor")
     @Inject(method = "<init>(Ljava/io/File;Ljava/lang/String;Lgg/essential/vigilance/data/PropertyCollector;Lgg/essential/vigilance/data/SortingBehavior;)V", at = @At("RETURN"), remap = false)

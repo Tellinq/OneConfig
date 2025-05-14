@@ -68,8 +68,9 @@ public class OneConfigMixinInit implements IMixinConfigPlugin {
         //#if FORGE
         mixins.add("events.Mixin_ChatReceiveEvent_Forge");
         //#if MC < 1.13
-        mixins.add("Mixin_OneConfig_LegacyDummy");
-        mixins.add("compat.OneConfigV0CompatMixin");
+        mixins.add("compat.Mixin_LegacyOneConfigCarryover");
+        mixins.add("compat.Mixin_OverwriteLegacyCommand");
+        mixins.add("compat.Mixin_OverwriteLegacyKeyBind");
         mixins.add("fixes.Mixin_ASMModParser_IgnoreForgeJava9Spam");
         mixins.add("fixes.Mixin_JarDiscoverer_IgnoreForgeJava9Spam");
         mixins.add("hidpi.Mixin_FixLoadingScreenHiDPI");

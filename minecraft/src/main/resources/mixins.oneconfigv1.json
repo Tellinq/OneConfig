@@ -10,8 +10,8 @@
   "client": [
     "Mixin_OneConfigCrashChecker",
     "Mixin_ShaderListAccessor",
-    "compat.OptifineConfigMixin",
-    "compat.VigilantCompatMixin",
+    "compat.Mixin_DisableOptiFineFastRenderForBlur",
+    "compat.Mixin_VigilanceCarryover",
     "events.Mixin_ChatSendEvent",
     "events.Mixin_DebugOpenEvent",
     "events.Mixin_FramebufferRenderEvent",

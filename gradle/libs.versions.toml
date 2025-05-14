@@ -8,8 +8,8 @@ kotlinx-atomicfu = "0.27.0"
 fabric-language-kotlin = "1.12.2+kotlin.2.0.20"
 polyui = "1.8.0"
 annotations = "24.1.0"
-hypixel-modapi = "1.0"
-hypixel-data = "0.1.2" # Dep of hypixel-modapi
+hypixel-modapi = "1.0.1"
+hypixel-data = "0.2.0" # Dep of hypixel-modapi
 
 # Not in risk of needing to be relaunched / bumped by JiJ
 snakeyaml = "1.31"
@@ -25,7 +25,7 @@ omnicore = "0.28.0"
 lwjgl = "3.3.3" # All downloaded by the isolated-lwjgl3-loader
 
 # Legacy only
-mixin = "0.8.4+build.3"
+mixin = "0.8.4+build.6"
 mixin-extras = "0.4.1"
 asm = "5.2"
 
