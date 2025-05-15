@@ -9,6 +9,7 @@ import org.polyfrost.oneconfig.internal.ui.OneConfigUI
 import org.polyfrost.polyui.component.Drawable
 import org.polyfrost.polyui.component.extensions.*
 import org.polyfrost.polyui.component.impl.*
+import org.polyfrost.polyui.data.PolyImage
 import org.polyfrost.polyui.unit.Align
 import org.polyfrost.polyui.unit.Vec2
 import org.polyfrost.polyui.utils.image
@@ -39,9 +40,7 @@ internal fun ModsPage(trees: Map<TreeSource, Set<Tree>>): Drawable {
 
                 Group(
                     Block(
-                        Image(tree.getMetadata<String>("icon")?.image() ?: defaultModImage).onInit { size = size.coerceAtMost(
-                            Vec2(64f, 64f)
-                        ) },
+                        createModImage(tree),
                         radii = modBoxTopRad,
                         alignment = imageAlign,
                         size = Vec2(256f, 104f),
@@ -83,4 +82,23 @@ internal fun ModsPage(trees: Map<TreeSource, Set<Tree>>): Drawable {
         visibleSize = Vec2(1130f, 635f),
         alignment = Align(cross = Align.Cross.Start, pad = Vec2(18f, 18f)),
     ).makeRearrangeableGrid().namedId("ModsPage")
+}
+
+private fun createModImage(tree: Tree): Drawable {
+    val configuredIcon = tree.getMetadata<String>("icon")?.image()
+    if (configuredIcon != null) {
+        return Image(configuredIcon).onInit {
+            size = size.coerceAtMost(Vec2(64f, 64f))
+        }
+    }
+
+    // Otherwise, just return text
+    return try {
+        Text(tree.title, fontSize = 18f).setFont { semiBold }
+    } catch (e: Exception) {
+        // Shouldn't happen ever, might as well add it just in case
+        Image(defaultModImage).onInit {
+            size = size.coerceAtMost(Vec2(64f, 64f))
+        }
+    }
 }
