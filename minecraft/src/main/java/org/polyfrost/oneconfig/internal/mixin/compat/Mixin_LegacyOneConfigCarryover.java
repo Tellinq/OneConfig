@@ -70,6 +70,11 @@ public abstract class Mixin_LegacyOneConfigCarryover {
         try {
             Tree t = Tree.tree(configFile);
             t.setTitle(mod.name);
+
+            if (mod.modIcon != null) {
+                t.addMetadata("icon", mod.modIcon);
+            }
+
             for (Map.Entry<String, BasicOption> entry : optionNames.entrySet()) {
                 try {
                     String[] path = entry.getKey().split("\\.");
