@@ -30,6 +30,7 @@ import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.polyfrost.oneconfig.api.config.v1.annotations.Include;
+import org.polyfrost.polyui.data.PolyImage;
 
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -48,7 +49,10 @@ public abstract class Config {
         // written this way so that trees can be lateinit
         if ((tree = makeTree(id)) != null) {
             tree.setTitle(title);
-            tree.addMetadata("icon", iconPath);
+            if (iconPath != null) {
+                tree.addMetadata("icon", new PolyImage(iconPath));
+            }
+
             tree.addMetadata("category", category);
             ConfigManager.backup().backend.save0(tree);
             ConfigManager.active().register(tree);

@@ -34,7 +34,6 @@ internal fun ModsPage(trees: Map<TreeSource, Set<Tree>>): Drawable {
         children = trees.flatMap { (source, treeSet) ->
             treeSet.mapNotNull { tree ->
                 if (tree.getMetadata<Any?>("hidden") != null) {
-                    println("Skipping hidden tree $tree")
                     return@mapNotNull null
                 }
 
@@ -85,7 +84,7 @@ internal fun ModsPage(trees: Map<TreeSource, Set<Tree>>): Drawable {
 }
 
 private fun createModImage(tree: Tree): Drawable {
-    val configuredIcon = tree.getMetadata<String>("icon")?.image()
+    val configuredIcon = tree.getMetadata<PolyImage>("icon")
     if (configuredIcon != null) {
         return Image(configuredIcon).onInit {
             size = size.coerceAtMost(Vec2(64f, 64f))

@@ -34,12 +34,15 @@ import cc.polyfrost.oneconfig.config.elements.BasicOption;
 import cc.polyfrost.oneconfig.gui.elements.config.*;
 import org.apache.logging.log4j.Logger;
 import org.polyfrost.oneconfig.api.config.v1.*;
+import org.polyfrost.oneconfig.internal.DynamicPolyImage;
 import org.polyfrost.oneconfig.utils.v1.MHUtils;
+import org.polyfrost.polyui.data.PolyImage;
 import org.spongepowered.asm.mixin.*;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
+import java.io.InputStream;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -71,8 +74,15 @@ public abstract class Mixin_LegacyOneConfigCarryover {
             Tree t = Tree.tree(configFile);
             t.setTitle(mod.name);
 
-            if (mod.modIcon != null) {
-                t.addMetadata("icon", mod.modIcon);
+            String iconPath = mod.modIcon;
+            if (iconPath != null) {
+                InputStream stream = ((Config) (Object) this).getClass().getResourceAsStream(iconPath);
+                logger.debug("[V1] Found icon stream: {}", stream);
+                if (stream != null) {
+                    t.addMetadata("icon", new DynamicPolyImage(iconPath, stream));
+                } else {
+                    t.addMetadata("icon", new PolyImage(iconPath));
+                }
             }
 
             for (Map.Entry<String, BasicOption> entry : optionNames.entrySet()) {
@@ -126,6 +136,8 @@ public abstract class Mixin_LegacyOneConfigCarryover {
                             // todo: placeholder, validate
                         } else if (opt instanceof ConfigColorElement) {
                             visualizer = Visualizer.ColorVisualizer.class;
+
+                            // todo: Needs special compatibility to convert from OneColor to PolyColor
                         } else if (opt instanceof ConfigNumber) {
                             visualizer = Visualizer.NumberVisualizer.class;
                             // todo: unit, min, max, placeholder
