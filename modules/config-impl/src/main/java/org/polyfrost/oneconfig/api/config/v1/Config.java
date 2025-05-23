@@ -45,11 +45,15 @@ public abstract class Config {
     @Include
     public boolean enabled = true;
 
+    /**
+     * @param iconPath the path to your mod's icon file, must be located within your mod-specific assets folder as to avoid conflicts.
+     */
     public Config(@NotNull String id, @Nullable String iconPath, @NotNull String title, @Nullable Category category) {
         // written this way so that trees can be lateinit
         if ((tree = makeTree(id)) != null) {
             tree.setTitle(title);
             if (iconPath != null) {
+                validateIconPath(iconPath);
                 tree.addMetadata("icon", new PolyImage(iconPath));
             }
 
@@ -190,6 +194,16 @@ public abstract class Config {
      */
     public void preload() {
         // <clinit>
+    }
+
+    private static void validateIconPath(@NotNull String path) {
+        if (path.startsWith("/")) {
+            path = path.substring(1);
+        }
+
+        if (!path.startsWith("assets/")) {
+            path = "assets/" + path;
+        }
     }
 
     /**

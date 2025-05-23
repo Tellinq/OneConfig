@@ -128,8 +128,7 @@ public class PolyUIScreen extends OmniScreen implements BlurScreen {
             }
 
             framebuffer.usingToRender((matrixStack, w, h) -> {
-                float scale = polyUI.getPixelRatio();
-                glViewport(0, 0, (int) (master.getWidth() * scale), (int) (master.getHeight() * scale));
+                glViewport(0, 0, framebuffer.getWidth(), framebuffer.getHeight());
 
                 matrices.runReplacingGlobalState(polyUI::render);
 
