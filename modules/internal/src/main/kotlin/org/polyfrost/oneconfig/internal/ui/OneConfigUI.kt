@@ -215,7 +215,7 @@ object OneConfigUI {
             ui = polyUI.master
             window = win
             searchNoneFound.setup(polyUI)
-            (ui as Block).radius(8f)
+            (ui as Block).radius(16f)
         } else {
             Platform.screen().display(window)
             if (ui[1][1] != initialScreen) {
