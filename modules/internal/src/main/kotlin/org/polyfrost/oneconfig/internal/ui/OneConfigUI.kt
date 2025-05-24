@@ -113,7 +113,7 @@ object OneConfigUI {
             }
             val searchField: TextInput
             val (polyUI, win) = builder.makeAndOpenWithRef(
-                Group(
+                Block(
                     Block(
                         size = Vec2(225f, 32f),
                     ).ignoreLayout().afterParentInit(Int.MAX_VALUE) {
@@ -150,7 +150,7 @@ object OneConfigUI {
                     }.padded(0f, 200f, 0f, 0f),
                     size = Vec2(273f, 700f),
                     alignment = Align(mode = Align.Mode.Vertical, pad = Vec2(6f, 8f)),
-                ).named("Sidebar"),
+                ).setPalette { page.bg }.onInit { Recolor(this, palette.hovered).add() }.withBoarder { page.border5 }.named("Sidebar"),
                 Group(
                     Group(
                         Group(
