@@ -46,6 +46,7 @@ import org.polyfrost.polyui.component.Drawable
 import org.polyfrost.polyui.component.extensions.*
 import org.polyfrost.polyui.component.impl.*
 import org.polyfrost.polyui.data.Cursor
+import org.polyfrost.polyui.data.Font
 import org.polyfrost.polyui.data.PolyImage
 import org.polyfrost.polyui.event.Event
 import org.polyfrost.polyui.input.KeyBinder
@@ -102,6 +103,7 @@ object OneConfigUI {
             val builder = OCPolyUIBuilder.create()
                 .blurs()
                 .atResolution(1920f, 1080f)
+                .allowsDebug(true)
                 .backgroundColor {
                     colors.page.fg.normal
                 }.size(1400f, 700f) as OCPolyUIBuilder
@@ -116,12 +118,12 @@ object OneConfigUI {
                 Block(
                     Block(
                         size = Vec2(225f, 32f),
-                    ).ignoreLayout().afterParentInit(Int.MAX_VALUE) {
+                    ).withBoarder(1f) { page.border5 }.ignoreLayout().afterParentInit(Int.MAX_VALUE) {
                         // move to mod button
                         this.at = parent[3].at
                     },
-                    Image("assets/oneconfig/brand/oneconfig.svg".image()).named("Logo").padded(0f, 8f, 0f, 0f),
-                    Text("oneconfig.sidebar.title.options", fontSize = 11f).setPalette { text.secondary }.padded(0f, 24f, 0f, 0f),
+                    Image("assets/oneconfig/brand/oneconfig.svg".image()).named("Logo").padded(0f, 23f, 0f, 0f),
+                    Text("oneconfig.sidebar.title.options", fontSize = 11f).setPalette { text.secondary }.padded(0f, 32f, 0f, 0f),
                     SidebarButton(
                         "assets/oneconfig/ico/settings.svg".image(),
                         "oneconfig.mods",
@@ -150,6 +152,7 @@ object OneConfigUI {
                     }.padded(0f, 200f, 0f, 0f),
                     size = Vec2(273f, 700f),
                     alignment = Align(mode = Align.Mode.Vertical, pad = Vec2(6f, 8f)),
+                    radii = floatArrayOf(16f, 0f, 16f, 0f)
                 ).setPalette { page.bg }.onInit { Recolor(this, palette.hovered).add() }.withBoarder { page.border5 }.named("Sidebar"),
                 Group(
                     Group(
@@ -164,41 +167,42 @@ object OneConfigUI {
                         ).named("Controls"),
                         Group(
                             Group(
-                                Image("assets/oneconfig/ico/cloud.svg".image()),
-                                Image(
-                                    "assets/oneconfig/ico/bell.svg".image(),
+                                Group(
+                                    Image("assets/oneconfig/ico/bell.svg".image()),
+                                    Image(playerHead, size = Vec2(24f, 24f)).radius(6f).named("ProfileImage").withBoarder(
+                                        rgba(255, 255, 255, 0.14f),
+                                        width = 1f,
+                                    ).addHoverInfo(Text(OmniClientPlayer.name.ifEmpty { "Steve" })),
+                                    alignment = Align(pad = Vec2(16f, 8f)),
                                 ),
-                                Image(playerHead, size = Vec2(24f, 24f)).radius(6f).named("ProfileImage").withBoarder(
-                                    rgba(255, 255, 255, 0.14f),
-                                    width = 1f,
-                                ).addHoverInfo(Text(OmniClientPlayer.name.ifEmpty { "Steve" })),
-                                alignment = Align(pad = Vec2(16f, 8f)),
+                                Block(
+                                    Image("assets/oneconfig/ico/search.svg".image()),
+                                    TextInput(
+                                        placeholder = "oneconfig.search.placeholder",
+                                        visibleSize = Vec2(210f, 12f),
+                                    ).onChange { text: String ->
+                                        if (text.length > 2) {
+                                            search.children?.clear()
+                                            search.children?.addAll(ConfigVisualizer.INSTANCE.getMatching(text))
+                                            if (search.children?.size == 0) search.children?.add(searchNoneFound)
+                                            if (ui[1][1] !== search) openPage(search, "oneconfig.search")
+                                            search.recalculate()
+                                        } else if (ui[1][1] === search) {
+                                            openPage(ModsPage(collectTrees()), "oneconfig.mods")
+                                        }
+
+                                        false
+                                    }.also { searchField = it },
+                                    size = Vec2(256f, 32f),
+                                    alignment = Align(pad = Vec2(10f, 8f)),
+                                ).withBoarder(1f) { page.border5 }.named("SearchField"),
+                                alignment = Align(pad = Vec2(16f, 4f))
                             ),
-                            Block(
-                                Image("assets/oneconfig/ico/search.svg".image()),
-                                TextInput(
-                                    placeholder = "oneconfig.search.placeholder",
-                                    visibleSize = Vec2(210f, 12f),
-                                ).onChange { text: String ->
-                                    if (text.length > 2) {
-                                        search.children?.clear()
-                                        search.children?.addAll(ConfigVisualizer.INSTANCE.getMatching(text))
-                                        if (search.children?.size == 0) search.children?.add(searchNoneFound)
-                                        if (ui[1][1] !== search) openPage(search, "oneconfig.search")
-                                        search.recalculate()
-                                    } else if (ui[1][1] === search) {
-                                        openPage(ModsPage(collectTrees()), "oneconfig.mods")
-                                    }
-                                    false
-                                }.also { searchField = it },
-                                size = Vec2(256f, 32f),
-                                alignment = Align(pad = Vec2(10f, 8f)),
-                            ).named("SearchField"),
                             Image(
                                 "assets/oneconfig/ico/close.svg".image(),
                             ).named("Close").onClick {
                             }.withStates().setDestructivePalette(),
-                            alignment = Align(pad = Vec2(24f, 8f)),
+                            alignment = Align(pad = Vec2(24f, 4f)),
                         ),
                         size = Vec2(1130f, 64f),
                         alignment = Align(main = Align.Main.SpaceBetween),
@@ -254,7 +258,7 @@ object OneConfigUI {
     fun SidebarButton0(image: PolyImage, text: String, extra: Drawable? = null) =
         Group(
             Image(image),
-            Text(text, fontSize = 14f),
+            Text(text, fontSize = 14f).onInit { fontWeight = Font.Weight.Regular },
             extra,
             size = Vec2(225f, 33f),
             alignment = sidebarBtnAlign,

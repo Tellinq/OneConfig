@@ -40,12 +40,12 @@ public final class OCPolyUIBuilder extends PolyUIBuilder {
     private float designedWidth, designedHeight;
     private Consumer<PolyUI> onClose;
     private boolean pauses, blurs;
+    private boolean allowsDebug = true;
 
     private OCPolyUIBuilder() {
         Settings s = getSettings();
         s.enableInitCleanup(false);
         s.enableForceSettingInitialSize(true);
-        s.enableDebugMode(OmniLoader.isDevelopment());
     }
 
     public OCPolyUIBuilder onClose(Consumer<PolyUI> onClose) {
@@ -82,8 +82,18 @@ public final class OCPolyUIBuilder extends PolyUIBuilder {
         return this;
     }
 
+    public OCPolyUIBuilder allowsDebug() {
+        return allowsDebug(true);
+    }
+
+    public OCPolyUIBuilder allowsDebug(boolean state) {
+        this.allowsDebug = state;
+        return this;
+    }
+
     public PolyUI make(Drawable... drawables) {
         if (getRenderer() == null) renderer(UIManager.INSTANCE.getRenderer());
+        if (allowsDebug) getSettings().enableDebugMode(OmniLoader.isDevelopment());
         return super.make(drawables);
     }
 

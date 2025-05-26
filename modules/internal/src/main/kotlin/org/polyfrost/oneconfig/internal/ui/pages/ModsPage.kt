@@ -43,10 +43,9 @@ internal fun ModsPage(trees: Map<TreeSource, Set<Tree>>): Drawable {
                         radii = modBoxTopRad,
                         alignment = imageAlign,
                         size = Vec2(256f, 104f),
-                    ).withStates(),
+                    ).withBoarder(1f) { page.border5 }.withStates(),
                     Block(
-                        Text(tree.title, fontSize = 14f).setFont { medium },
-                        Image(heart),
+                        Text(tree.title, fontSize = 16f).setFont { medium },
                         radii = modBoxBotRad,
                         alignment = barAlign,
                         size = Vec2(256f, 36f),
