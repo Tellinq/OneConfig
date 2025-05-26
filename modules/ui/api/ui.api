@@ -20,6 +20,8 @@ public final class org/polyfrost/oneconfig/api/ui/v1/Notifications$Type : java/l
 }
 
 public final class org/polyfrost/oneconfig/api/ui/v1/OCPolyUIBuilder : org/polyfrost/polyui/utils/PolyUIBuilder {
+	public fun allowsDebug ()Lorg/polyfrost/oneconfig/api/ui/v1/OCPolyUIBuilder;
+	public fun allowsDebug (Z)Lorg/polyfrost/oneconfig/api/ui/v1/OCPolyUIBuilder;
 	public fun atResolution (FF)Lorg/polyfrost/oneconfig/api/ui/v1/OCPolyUIBuilder;
 	public fun blurs ()Lorg/polyfrost/oneconfig/api/ui/v1/OCPolyUIBuilder;
 	public fun blurs (Z)Lorg/polyfrost/oneconfig/api/ui/v1/OCPolyUIBuilder;
