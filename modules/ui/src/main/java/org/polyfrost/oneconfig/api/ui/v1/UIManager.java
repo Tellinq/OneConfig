@@ -126,7 +126,7 @@ public interface UIManager {
                 OmniMatrixStack matrices = event.matrices;
                 Platform.screen().setSmuggledMatrixStack(matrices);
 
-                framebuffer.clearColor(1f, 1f, 1f, 0f); // Clear to transparent white
+                framebuffer.clearColor(0f, 0f, 0f, 0f); // Clear to transparent black
                 framebuffer.clearDepthStencil(1.0, 0);
                 framebuffer.usingToRender((matrixStack, w, h) -> {
                     matrices.runReplacingGlobalState(polyUI::render);
