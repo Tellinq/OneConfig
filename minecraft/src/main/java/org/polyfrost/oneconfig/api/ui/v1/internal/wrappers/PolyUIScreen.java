@@ -122,7 +122,7 @@ public class PolyUIScreen extends OmniScreen implements BlurScreen {
         Drawable master = polyUI.getMaster();
 
         try {
-            framebuffer.clearColor(1f, 1f, 1f, 0f); // Clear to transparent white
+            framebuffer.clearColor(0f, 0f, 0f, 0f); // Clear to transparent black
             if (framebuffer instanceof ManagedFramebuffer) {
                 ((ManagedFramebuffer) framebuffer).clearDepthStencil(1.0, 0);
             }
