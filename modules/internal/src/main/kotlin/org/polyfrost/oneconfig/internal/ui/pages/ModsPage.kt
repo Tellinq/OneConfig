@@ -12,7 +12,6 @@ import org.polyfrost.polyui.component.impl.*
 import org.polyfrost.polyui.data.PolyImage
 import org.polyfrost.polyui.unit.Align
 import org.polyfrost.polyui.unit.Vec2
-import org.polyfrost.polyui.utils.image
 
 internal enum class TreeSource {
     CONFIG, // Comes from OneConfig's config manager
@@ -32,49 +31,10 @@ internal fun ModsPage(trees: Map<TreeSource, Set<Tree>>): Drawable {
     // todo add categories
     return Group(
         children = trees.flatMap { (source, treeSet) ->
-            treeSet.mapNotNull { tree ->
-                if (tree.getMetadata<Any?>("hidden") != null) {
-                    return@mapNotNull null
-                }
-
-                Group(
-                    Block(
-                        createModImage(tree),
-                        radii = modBoxTopRad,
-                        alignment = imageAlign,
-                        size = Vec2(256f, 104f),
-                    ).withBoarder(1f) { page.border5 }.withStates(),
-                    Block(
-                        Text(tree.title, fontSize = 16f).setFont { medium },
-                        radii = modBoxBotRad,
-                        alignment = barAlign,
-                        size = Vec2(256f, 36f),
-                    ).also { it.acceptsInput = true }.setPalette { brand.fg },
-                    alignment = modBoxAlign,
-                ).onClick { _ ->
-                    when (source) {
-                        TreeSource.CONFIG -> OneConfigUI.openPage(ConfigVisualizer.INSTANCE.get(tree), (this[1][0] as Text).text)
-                        TreeSource.COMMAND -> Platform.compatibility().executeTreeAction(tree.id)
-                    }
-                }.onRightClick { _ ->
-                    if (source == TreeSource.CONFIG) {
-                        PopupMenu(Text("Restore Defaults").setDestructivePalette().withStates().onClick { _ ->
-                            val backup = ConfigManager.backup().get(tree.id)
-                            if (backup == null) {
-                                Notifications.enqueue(
-                                    Notifications.Type.Error,
-                                    "Backup Failure",
-                                    "Couldn't find the backup for ${tree.id}. You can fix this by manually deleting the config file and restarting your game, which will reset your config! Click here to do so."
-                                ).onClick { _ ->
-                                    ConfigManager.active().delete(tree.id)
-                                }
-                            }
-                            tree.overwrite(backup)
-                            polyUI.unfocus()
-                            false
-                        }, polyUI = polyUI)
-                    }
-                }.namedId("ModCard")
+            treeSet.filter {
+                it.getMetadata<Any?>("hidden") == null
+            }.map { tree ->
+                ModCard(source, tree)
             }
         }.toTypedArray(),
         visibleSize = Vec2(1130f, 635f),
@@ -82,7 +42,51 @@ internal fun ModsPage(trees: Map<TreeSource, Set<Tree>>): Drawable {
     ).makeRearrangeableGrid().namedId("ModsPage")
 }
 
-private fun createModImage(tree: Tree): Drawable {
+private fun ModCard(
+    source: TreeSource,
+    tree: Tree
+): Drawable {
+    return Group(
+        Block(
+            ModCardImage(tree),
+            radii = modBoxTopRad,
+            alignment = imageAlign,
+            size = Vec2(256f, 104f),
+        ).withBoarder(1f) { page.border5 }.withStates(),
+        Block(
+            Text(tree.title, fontSize = 16f).setFont { medium },
+            radii = modBoxBotRad,
+            alignment = barAlign,
+            size = Vec2(256f, 36f),
+        ).also { it.acceptsInput = true }.setPalette { brand.fg },
+        alignment = modBoxAlign,
+    ).onClick { _ ->
+        when (source) {
+            TreeSource.CONFIG -> OneConfigUI.openPage(ConfigVisualizer.INSTANCE.get(tree), tree.title)
+            TreeSource.COMMAND -> Platform.compatibility().executeTreeAction(tree.id)
+        }
+    }.onRightClick { _ ->
+        if (source == TreeSource.CONFIG) {
+            PopupMenu(Text("Restore Defaults").setDestructivePalette().withStates().onClick { _ ->
+                val backup = ConfigManager.backup().get(tree.id)
+                if (backup == null) {
+                    Notifications.enqueue(
+                        Notifications.Type.Error,
+                        "Backup Failure",
+                        "Couldn't find the backup for ${tree.id}. You can fix this by manually deleting the config file and restarting your game, which will reset your config! Click here to do so."
+                    ).onClick { _ ->
+                        ConfigManager.active().delete(tree.id)
+                    }
+                }
+                tree.overwrite(backup)
+                polyUI.unfocus()
+                false
+            }, polyUI = polyUI)
+        }
+    }.namedId("ModCard")
+}
+
+private fun ModCardImage(tree: Tree): Drawable {
     val configuredIcon = tree.getMetadata<PolyImage>("icon")
     if (configuredIcon != null) {
         return Image(configuredIcon).onInit {
