@@ -103,7 +103,7 @@ object OneConfigUI {
             val builder = OCPolyUIBuilder.create()
                 .blurs()
                 .atResolution(1920f, 1080f)
-                .allowsDebug(true)
+                .allowsDebug(false)
                 .backgroundColor {
                     colors.page.fg.normal
                 }.size(1400f, 700f) as OCPolyUIBuilder
@@ -113,6 +113,7 @@ object OneConfigUI {
                     ConfigManager.active().save(t)
                 }
             }
+
             val searchField: TextInput
             val (polyUI, win) = builder.makeAndOpenWithRef(
                 Block(
@@ -162,7 +163,7 @@ object OneConfigUI {
                             Text(
                                 "oneconfig.mods",
                                 fontSize = 24f,
-                            ).setFont { medium }.named("Current"),
+                            ).setFont { semiBold }.named("Current"),
                             alignment = Align(pad = Vec2(16f, 8f)),
                         ).named("Controls"),
                         Group(
