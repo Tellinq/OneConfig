@@ -115,6 +115,8 @@ public interface NanoVgApi {
 
     float textBounds(float x, float y, String text, float[] bounds);
 
+    void textMetrics(float[] ascender, float[] descender, float[] lineh);
+
     int createImage(float width, float height, ByteBuffer buffer, int flags);
 
     void scissor(float x, float y, float w, float h);

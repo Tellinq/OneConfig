@@ -237,6 +237,10 @@ class NanoVgImpl(
         return nvgTextBounds(handle, x, y, text, bounds)
     }
 
+    override fun textMetrics(ascender: FloatArray?, descender: FloatArray?, lineh: FloatArray?) {
+        nvgTextMetrics(handle, ascender, descender, lineh)
+    }
+
     override fun createImage(width: Float, height: Float, buffer: ByteBuffer, flags: Int): Int {
         return nvgCreateImageRGBA(handle, width.toInt(), height.toInt(), flags, buffer)
     }

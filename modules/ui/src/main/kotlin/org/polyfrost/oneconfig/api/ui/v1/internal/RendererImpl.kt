@@ -26,9 +26,7 @@
 
 package org.polyfrost.oneconfig.api.ui.v1.internal
 
-import dev.deftu.omnicore.client.render.state.DepthFunction
-import dev.deftu.omnicore.client.render.state.OmniManagedDepthState
-import dev.deftu.omnicore.client.render.state.OmniManagedRenderState
+import dev.deftu.omnicore.client.render.state.*
 import dev.deftu.omnicore.common.OmniLoader
 import org.apache.logging.log4j.LogManager
 import org.lwjgl.opengl.GL11
@@ -107,6 +105,7 @@ class RendererImpl(
     private val svgs = mutableMapOf<PolyImage, Pair<NanoVgApi.SVG, Int2IntMap>>()
 
     private var prevVao = -1
+    private var prevBlendState: OmniManagedBlendState? = null
     private var prevRenderState: OmniManagedRenderState? = null
 
     private val queue = ArrayList<() -> Unit>()
@@ -144,7 +143,9 @@ class RendererImpl(
 
         if (mcVersion >= 1_16_05) {
             prevVao = GL11.glGetInteger(GL30.GL_VERTEX_ARRAY_BINDING)
+            prevBlendState = OmniManagedBlendState.active()
             prevRenderState = OmniManagedRenderState.active()
+            OmniManagedBlendState.enable(BlendEquation.active(), BlendFunction.DEFAULT)
             OmniManagedDepthState.enable(DepthFunction.LESS_OR_EQUAL)
         }
 
@@ -167,6 +168,7 @@ class RendererImpl(
         }
 
         if (mcVersion >= 1_16_05) {
+            prevBlendState?.activate()
             prevRenderState?.activate()
             OmniManagedDepthState.disable()
             if (prevVao != -1) {
@@ -211,13 +213,24 @@ class RendererImpl(
     ) {
         if (color.transparent) return
 
-        vg.beginPath()
-        vg.fontSize(fontSize)
-        vg.fontFaceId(getOrPopulateFont(font).id)
+        val fontId = getOrPopulateFont(font).id
+        vg.fontFaceId(fontId)
         vg.textAlign(vg.constants().NVG_ALIGN_LEFT() or vg.constants().NVG_ALIGN_TOP())
-        populateFillOrColor(color, x, y, 0f, 0f)
-        vg.fillColor(color1Address)
-        vg.text(x, y, text)
+        vg.fontSize(fontSize)
+
+        val ascender = FloatArray(1)
+        val descender = FloatArray(1)
+        val lineHeight = FloatArray(1)
+        vg.textMetrics(ascender, descender, lineHeight)
+
+        val baselineY = y + (lineHeight[0] - ascender[0]) / 2f
+
+        // Draw background fill if needed
+        val (width, height) = textBounds(font, text, fontSize)
+        vg.beginPath()
+        populateFillOrColor(color, x, y - lineHeight[0] / 2f, width, lineHeight[0])
+
+        vg.text(x, baselineY, text)
     }
 
     override fun image(
@@ -357,15 +370,21 @@ class RendererImpl(
     override fun textBounds(font: Font, text: String, fontSize: Float): Vec2 {
         val text = text.let { if (it.endsWith(" ")) "$it " else it }
 
-        val output = FloatArray(4)
-        val loadedFont = getOrPopulateFont(font)
-        vg.fontFaceId(loadedFont.id)
-        vg.textAlign(vg.constants().NVG_ALIGN_LEFT() or vg.constants().NVG_ALIGN_TOP())
+        vg.fontFaceId(getOrPopulateFont(font).id)
         vg.fontSize(fontSize)
-        vg.textBounds(0f, 0f, text, output)
 
-        val width = output[2] - output[0]
-        val height = output[3] - output[1]
+        val bounds = FloatArray(4)
+        vg.textAlign(vg.constants().NVG_ALIGN_LEFT() or vg.constants().NVG_ALIGN_TOP())
+        vg.textBounds(0f, 0f, text, bounds)
+
+        val width = bounds[2] - bounds[0]
+
+        val ascender = FloatArray(1)
+        val descender = FloatArray(1)
+        val lineHeight = FloatArray(1)
+        vg.textMetrics(ascender, descender, lineHeight)
+
+        val height = lineHeight[0]
         return Vec2(width.coerceAtLeast(1f), height.coerceAtLeast(1f)) // Coercing to at least 1x1 for now because this is returning 0 sometimes for some reason and PolyUI crashes when an element has 0 width & height
     }
 
