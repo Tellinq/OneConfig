@@ -10,7 +10,7 @@ import java.lang.annotation.Target;
  */
 @Target({ElementType.METHOD})
 @Retention(RetentionPolicy.RUNTIME)
-public @interface Executor {
+public @interface Handler {
 
     /**
      * Define overrides for the name this executor is given in the command tree.

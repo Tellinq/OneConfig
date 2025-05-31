@@ -117,14 +117,14 @@ public class AnnotationCommandFactory implements CommandFactory {
         // Now, go through the methods of this class and find all methods annotated with @Command
         // These are their own subcommands executed by the command tree
         for (Method method : obj.getClass().getDeclaredMethods()) {
-            Executor executor = method.getAnnotation(Executor.class);
-            if (executor == null) {
+            Handler handler = method.getAnnotation(Handler.class);
+            if (handler == null) {
                 continue;
             }
 
             MHUtils.setAccessible(method);
 
-            String[] aliases = executor.value();
+            String[] aliases = handler.value();
             String primaryName = aliases.length == 0 ? method.getName() : aliases[0];
 
             boolean isSectionApplied = false;
@@ -201,7 +201,7 @@ public class AnnotationCommandFactory implements CommandFactory {
                 });
 
                 tree.then(literal(method.getName()).then(theMethod));
-                for (String s : executor.value()) {
+                for (String s : handler.value()) {
                     tree.then(literal(s).then(theMethod));
                 }
             } else {
@@ -246,14 +246,14 @@ public class AnnotationCommandFactory implements CommandFactory {
 
                     tree.then(theMethod);
 
-                    for (String s : executor.value()) {
+                    for (String s : handler.value()) {
                         tree.then(literal(s).then(theMethod));
                     }
                 }
             }
 
             if (isSectionApplied) {
-                String description = executor.description();
+                String description = handler.description();
                 if (!description.isEmpty()) {
                     help.append(": ").append(description);
                 } else {
