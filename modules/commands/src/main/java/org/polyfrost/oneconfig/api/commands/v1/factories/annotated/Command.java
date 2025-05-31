@@ -32,14 +32,18 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * Use this annotation to mark a class as a command or a method as a subcommand.
- * <br><b>This is required for a method/class to be registered as part of a command.</b>
+ * Marks a given class (or inner class) as a command to be registered in the command tree by the annotation-based command factory.
+ * <p>
+ * <b>Note: This annotation is REQUIRED for the command to be registered, otherwise it will be ignored.</b>
  */
 @Retention(RetentionPolicy.RUNTIME)
-@Target({ElementType.TYPE, ElementType.METHOD})
+@Target({ElementType.TYPE})
 public @interface Command {
+
     /**
-     * command names used to index this command and in help message
+     * The aliases for this command tree.
+     * <p>
+     * The first alias is used as the primary command name, while the rest are considered additional aliases which this command can be invoked with.
      */
     String[] value() default {};
 

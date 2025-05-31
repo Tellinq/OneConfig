@@ -50,7 +50,9 @@ import java.util.Set;
  * @see Command
  */
 public class CommandManager {
+
     private static final Logger LOGGER = LogManager.getLogger("OneConfig/CommandManger");
+
     /**
      * The singleton instance of the command manager.
      */
@@ -80,10 +82,20 @@ public class CommandManager {
 
     public static boolean register(Object obj) {
         LiteralCommandNode<OmniClientCommandSource>[] nodes = INSTANCE.create(obj);
-        if (nodes == null) return false;
-        for (LiteralCommandNode<OmniClientCommandSource> node : nodes) {
-            register(node);
+        if (nodes == null) {
+            return false;
         }
+
+        for (LiteralCommandNode<OmniClientCommandSource> node : nodes) {
+            if (node == null) {
+                LOGGER.warn("Command node for object {} is null, skipping registration", obj);
+                continue;
+            }
+
+            OmniClientCommands.register(node);
+            LOGGER.info("Registered command node for object {}: {}", obj, node.getName());
+        }
+
         return true;
     }
 
@@ -91,11 +103,14 @@ public class CommandManager {
         for (CommandFactory factory : factories) {
             try {
                 LiteralCommandNode<OmniClientCommandSource>[] nodes = factory.create(obj);
-                if (nodes != null) return nodes;
+                if (nodes != null) {
+                    return nodes;
+                }
             } catch (Exception e) {
                 LOGGER.error("Command factory {} failed with an exception trying to create commands for object {}", factory, obj, e);
             }
         }
+
         return null;
     }
 
@@ -104,7 +119,10 @@ public class CommandManager {
     }
 
     public static <T> RequiredArgumentBuilder<OmniClientCommandSource, T> argument(String name, ArgumentType<T> type) {
-        if (type == null) throw new NullPointerException("Can't get argument type for argument '" + name + "' as type is null");
+        if (type == null) {
+            throw new NullPointerException("Can't get argument type for argument '" + name + "' as type is null");
+        }
+
         return OmniClientCommands.argument(name, type);
     }
 
@@ -123,4 +141,5 @@ public class CommandManager {
     public static <T> ArgumentType<T> getArgumentType(Class<T> type) {
         return (ArgumentType<T>) INSTANCE.argumentTypes.get(WrappingUtils.getUnwrapped(type));
     }
+
 }

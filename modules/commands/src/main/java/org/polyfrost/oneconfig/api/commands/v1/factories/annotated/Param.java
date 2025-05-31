@@ -32,13 +32,19 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * Use this annotation to descriptions to parameters.
+ * Marks a parameter of a command executor method as a NAMED command parameter.
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.PARAMETER)
-public @interface Parameter {
+public @interface Param {
+
     /**
-     * The description of this parameter.
+     * Defines an override for the name this parameter.
+     * <p>
+     * By default, the name of the parameter is used.
      */
     String value() default "";
+
+    String description() default "";
+
 }

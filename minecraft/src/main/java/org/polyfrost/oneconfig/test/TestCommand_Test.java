@@ -29,11 +29,12 @@ package org.polyfrost.oneconfig.test;
 import com.mojang.authlib.GameProfile;
 import dev.deftu.omnicore.client.OmniChat;
 import org.polyfrost.oneconfig.api.commands.v1.factories.annotated.Command;
+import org.polyfrost.oneconfig.api.commands.v1.factories.annotated.Executor;
 
 @Command(value = {"test", "t"})
 public class TestCommand_Test {
 
-    @Command
+    @Executor
     private static void main() {  // /test
         OmniChat.displayClientMessage("Main command");
     }
@@ -46,7 +47,7 @@ public class TestCommand_Test {
         OmniChat.displayClientMessage(builder.toString().trim());
     }
 
-    @Command
+    @Executor
     private void playerTest(GameProfile profile) {
         OmniChat.displayClientMessage("Player test: " + profile.getName());
         OmniChat.displayClientMessage(profile.getId().toString());
@@ -58,7 +59,7 @@ public class TestCommand_Test {
             OmniChat.displayClientMessage("Integer main: " + (a + b) + " " + c);
         }
 
-        @Command(value = {"yesNo"})
+        @Executor(value = {"yesNo"})
         private void yes(double a, double b, String c) { // /test subcommand <a> <b> <c>
             OmniChat.displayClientMessage("Double main: " + a + " " + b + " " + c);
         }
