@@ -28,8 +28,8 @@ package org.polyfrost.oneconfig.api.ui.v1.internal.wrappers;
 
 import dev.deftu.omnicore.client.OmniKeyboard;
 import dev.deftu.omnicore.client.OmniScreen;
-import dev.deftu.omnicore.client.render.GuiScale;
 import dev.deftu.omnicore.client.render.OmniMatrixStack;
+import dev.deftu.omnicore.client.render.OmniResolution;
 import dev.deftu.omnicore.client.render.framebuffer.Framebuffer;
 import dev.deftu.omnicore.client.render.framebuffer.ManagedFramebuffer;
 import dev.deftu.omnicore.client.render.texture.GpuTexture;
@@ -128,11 +128,7 @@ public class PolyUIScreen extends OmniScreen implements BlurScreen {
             }
 
             framebuffer.usingToRender((matrixStack, w, h) -> {
-                glViewport(0, 0, framebuffer.getWidth(), framebuffer.getHeight());
-
                 matrices.runReplacingGlobalState(polyUI::render);
-
-                glViewport(0, 0, Platform.screen().viewportWidth(), Platform.screen().viewportHeight());
                 return Unit.INSTANCE;
             });
         } catch (Exception e) {
@@ -140,7 +136,7 @@ public class PolyUIScreen extends OmniScreen implements BlurScreen {
             death(e);
         }
 
-        float scalingFactor = 1f / GuiScale.getRawCurrentScale();
+        float scalingFactor = 1f / (float) OmniResolution.getScaleFactor();
 
         float scaledX = (Platform.screen().windowWidth() / 2f - master.getWidth() / 2f) * scalingFactor;
         float scaledY = (Platform.screen().windowHeight() / 2f - master.getHeight() / 2f) * scalingFactor;

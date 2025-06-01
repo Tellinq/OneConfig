@@ -27,8 +27,8 @@
 package org.polyfrost.oneconfig.api.ui.v1;
 
 import dev.deftu.omnicore.client.OmniChat;
-import dev.deftu.omnicore.client.render.GuiScale;
 import dev.deftu.omnicore.client.render.OmniMatrixStack;
+import dev.deftu.omnicore.client.render.OmniResolution;
 import dev.deftu.omnicore.client.render.framebuffer.ManagedFramebuffer;
 import dev.deftu.omnicore.client.render.texture.GpuTexture;
 import dev.deftu.textile.minecraft.MCSimpleTextHolder;
@@ -53,11 +53,8 @@ import org.polyfrost.polyui.renderer.Renderer;
 import org.polyfrost.polyui.renderer.Window;
 
 import java.awt.*;
-import java.io.File;
 import java.util.ServiceLoader;
 import java.util.function.Consumer;
-
-import static org.lwjgl.opengl.GL11.glViewport;
 
 /**
  * Abstraction over the LWJGL3 implementation and loading.
@@ -133,7 +130,7 @@ public interface UIManager {
                     return Unit.INSTANCE;
                 });
 
-                float scalingFactor = 1f / GuiScale.getRawCurrentScale();
+                float scalingFactor = 1f / (float) OmniResolution.getScaleFactor();
                 float scaledWidth = master.getWidth() * scalingFactor;
                 float scaledHeight = master.getHeight() * scalingFactor;
                 framebuffer.drawColorTexture(
