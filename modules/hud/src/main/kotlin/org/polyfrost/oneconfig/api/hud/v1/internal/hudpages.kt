@@ -131,17 +131,17 @@ private fun HudButton(text: String): Block {
 fun createInspectionsScreen(hud: Hud<*>): Drawable {
     return Group(
         Radiobutton(
-            "assets/oneconfig/ico/paintbrush.svg".image() to "oneconfig.hudeditor.designer.title",
             "assets/oneconfig/ico/cog.svg".image() to "oneconfig.hudeditor.settings.title",
+            "assets/oneconfig/ico/paintbrush.svg".image() to "oneconfig.hudeditor.designer.title",
         ).onInit { color = polyUI.colors.component.bgDeselected }.onChange { index: Int ->
             if (index == 0) {
-                parent[1] = createDesigner(hud)
-            } else {
                 parent[1] = createSettings(hud)
+            } else {
+                parent[1] = createDesigner(hud)
             }
             false
         },
-        createDesigner(hud),
+        createSettings(hud),
         visibleSize = Vec2(500f, 800f),
         alignment = Align(cross = Align.Cross.Start),
     )
