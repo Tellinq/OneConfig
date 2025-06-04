@@ -27,6 +27,7 @@
 package org.polyfrost.oneconfig.api.ui.v1.internal.wrappers;
 
 import dev.deftu.omnicore.client.OmniKeyboard;
+import dev.deftu.omnicore.client.OmniMouse;
 import dev.deftu.omnicore.client.OmniScreen;
 import dev.deftu.omnicore.client.render.OmniMatrixStack;
 import dev.deftu.omnicore.client.render.OmniResolution;
@@ -39,6 +40,9 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.MustBeInvokedByOverriders;
 import org.jetbrains.annotations.NotNull;
+import org.polyfrost.oneconfig.api.event.v1.EventManager;
+import org.polyfrost.oneconfig.api.event.v1.events.HudRenderEvent;
+import org.polyfrost.oneconfig.api.event.v1.invoke.EventHandler;
 import org.polyfrost.oneconfig.api.platform.v1.Platform;
 import org.polyfrost.oneconfig.api.ui.v1.Notifications;
 import org.polyfrost.oneconfig.api.ui.v1.UIManager;
@@ -50,7 +54,6 @@ import org.polyfrost.polyui.data.Cursor;
 import java.awt.*;
 import java.util.function.Consumer;
 
-import static org.lwjgl.opengl.GL11.glViewport;
 import static org.polyfrost.oneconfig.api.ui.v1.keybind.KeybindManager.translateKey;
 
 @SuppressWarnings("unused")
@@ -66,6 +69,8 @@ public class PolyUIScreen extends OmniScreen implements BlurScreen {
     private final float designedWidth, designedHeight, initialWidth, initialHeight;
     private final boolean pauses, blurs;
     private final Consumer<PolyUI> close;
+
+    private final EventHandler<HudRenderEvent> eventHandler;
 
     //#if MC < 1.13
     private int mx, my;
@@ -86,6 +91,16 @@ public class PolyUIScreen extends OmniScreen implements BlurScreen {
         // todo temp fix
         this.mc = Minecraft.getMinecraft();
         //#endif
+
+        if (this.mc.theWorld != null) {
+            this.eventHandler = EventManager.register(HudRenderEvent.class, event -> {
+                double mouseX = OmniMouse.getScaledX();
+                double mouseY = OmniMouse.getScaledY();
+                renderScreen(event.matrices, (int) mouseX, (int) mouseY, event.deltaTicks);
+            });
+        } else {
+            this.eventHandler = null;
+        }
     }
 
     @Override
@@ -113,42 +128,11 @@ public class PolyUIScreen extends OmniScreen implements BlurScreen {
         }
 
         //#endif
-        if (framebuffer == null || polyUI == UIManager.INSTANCE.getDefaultInstance()) {
+        if (eventHandler != null || framebuffer == null || polyUI == UIManager.INSTANCE.getDefaultInstance()) {
             return;
         }
 
-        int width = Platform.screen().windowWidth();
-        int height = Platform.screen().windowHeight();
-        Drawable master = polyUI.getMaster();
-
-        try {
-            framebuffer.clearColor(0f, 0f, 0f, 0f); // Clear to transparent black
-            if (framebuffer instanceof ManagedFramebuffer) {
-                ((ManagedFramebuffer) framebuffer).clearDepthStencil(1.0, 0);
-            }
-
-            framebuffer.usingToRender((matrixStack, w, h) -> {
-                matrices.runReplacingGlobalState(polyUI::render);
-                return Unit.INSTANCE;
-            });
-        } catch (Exception e) {
-            polyUI.getRenderer().endFrame();
-            death(e);
-        }
-
-        float scalingFactor = 1f / (float) OmniResolution.getScaleFactor();
-
-        float scaledX = (Platform.screen().windowWidth() / 2f - master.getWidth() / 2f) * scalingFactor;
-        float scaledY = (Platform.screen().windowHeight() / 2f - master.getHeight() / 2f) * scalingFactor;
-        float scaledWidth = master.getWidth() * scalingFactor;
-        float scaledHeight = master.getHeight() * scalingFactor;
-
-        framebuffer.drawColorTexture(
-                matrices,
-                scaledX, scaledY,
-                scaledWidth, scaledHeight,
-                Color.WHITE.getRGB()
-        );
+        renderScreen(matrices, mouseX, mouseY, delta);
     }
 
     @Override
@@ -268,10 +252,53 @@ public class PolyUIScreen extends OmniScreen implements BlurScreen {
     @Override
     @MustBeInvokedByOverriders
     public void handleClose() {
+        if (eventHandler != null) {
+            EventManager.INSTANCE.unregister(eventHandler);
+        }
+
         polyUI.getInputManager().unfocus();
         if (close != null) close.accept(polyUI);
         // noinspection DataFlowIssue
         this.polyUI.getWindow().setCursor(Cursor.Pointer);
+    }
+
+    protected final void renderScreen(OmniMatrixStack matrices, int mouseX, int mouseY, float delta) {
+        if (framebuffer == null) {
+            return;
+        }
+
+        int width = Platform.screen().windowWidth();
+        int height = Platform.screen().windowHeight();
+        Drawable master = polyUI.getMaster();
+
+        try {
+            framebuffer.clearColor(0f, 0f, 0f, 0f); // Clear to transparent black
+            if (framebuffer instanceof ManagedFramebuffer) {
+                ((ManagedFramebuffer) framebuffer).clearDepthStencil(1.0, 0);
+            }
+
+            framebuffer.usingToRender((matrixStack, w, h) -> {
+                matrices.runReplacingGlobalState(polyUI::render);
+                return Unit.INSTANCE;
+            });
+        } catch (Exception e) {
+            polyUI.getRenderer().endFrame();
+            death(e);
+        }
+
+        float scalingFactor = 1f / (float) OmniResolution.getScaleFactor();
+
+        float scaledX = (Platform.screen().windowWidth() / 2f - master.getWidth() / 2f) * scalingFactor;
+        float scaledY = (Platform.screen().windowHeight() / 2f - master.getHeight() / 2f) * scalingFactor;
+        float scaledWidth = master.getWidth() * scalingFactor;
+        float scaledHeight = master.getHeight() * scalingFactor;
+
+        framebuffer.drawColorTexture(
+                matrices,
+                scaledX, scaledY,
+                scaledWidth, scaledHeight,
+                Color.WHITE.getRGB()
+        );
     }
 
     protected final void adjustResolution(float w, float h, boolean force) {
