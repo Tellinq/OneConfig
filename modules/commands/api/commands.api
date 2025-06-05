@@ -25,7 +25,13 @@ public abstract interface annotation class org/polyfrost/oneconfig/api/commands/
 	public abstract fun value ()[Ljava/lang/String;
 }
 
-public abstract interface annotation class org/polyfrost/oneconfig/api/commands/v1/factories/annotated/Parameter : java/lang/annotation/Annotation {
+public abstract interface annotation class org/polyfrost/oneconfig/api/commands/v1/factories/annotated/Handler : java/lang/annotation/Annotation {
+	public abstract fun description ()Ljava/lang/String;
+	public abstract fun value ()[Ljava/lang/String;
+}
+
+public abstract interface annotation class org/polyfrost/oneconfig/api/commands/v1/factories/annotated/Param : java/lang/annotation/Annotation {
+	public abstract fun description ()Ljava/lang/String;
 	public abstract fun value ()Ljava/lang/String;
 }
 
