@@ -143,6 +143,10 @@ fun DependencyHandlerScope.handleApiDep(dependency: ExternalModuleDependency, is
 }
 
 tasks {
+    withType(Jar::class) {
+        exclude("**/**_Test.**")
+        exclude("**/**_Test$**.**")
+    }
     remapJar {
         manifest {
             val attributesMap = buildMap<String, Any> {
