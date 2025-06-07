@@ -193,19 +193,6 @@ public final class org/polyfrost/oneconfig/utils/v1/MHUtils$Result$Failure {
 	public final fun getT ()Ljava/lang/Throwable;
 }
 
-public final class org/polyfrost/oneconfig/utils/v1/MavenUpdateChecker {
-	public final field currentVersion Ljava/lang/String;
-	public final field group Ljava/lang/String;
-	public final field id Ljava/lang/String;
-	public final field repo Ljava/lang/String;
-	public fun <init> (Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)V
-	public fun getLatestVersion ()Ljava/lang/String;
-	public fun hasChecked ()Z
-	public fun hasUpdate ()Z
-	public fun isSnapshots ()Z
-	public static fun oneconfig ()Lorg/polyfrost/oneconfig/utils/v1/MavenUpdateChecker;
-}
-
 public final class org/polyfrost/oneconfig/utils/v1/Multithreading {
 	public static fun getExecutor ()Ljava/util/concurrent/ExecutorService;
 	public static fun getScheduledExecutor ()Ljava/util/concurrent/ScheduledExecutorService;

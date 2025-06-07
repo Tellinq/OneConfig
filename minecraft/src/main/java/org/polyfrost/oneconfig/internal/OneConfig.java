@@ -50,8 +50,6 @@ import org.polyfrost.oneconfig.api.ui.v1.UIManager;
 import org.polyfrost.oneconfig.api.ui.v1.internal.BlurHandler;
 import org.polyfrost.oneconfig.api.ui.v1.keybind.OCKeybindHelper;
 import org.polyfrost.oneconfig.internal.ui.OneConfigUI;
-import org.polyfrost.oneconfig.utils.v1.MavenUpdateChecker;
-import org.polyfrost.oneconfig.utils.v1.Multithreading;
 import org.polyfrost.polyui.PolyUI;
 import org.polyfrost.polyui.component.Drawable;
 import org.polyfrost.polyui.input.KeyModifiers;
@@ -168,18 +166,17 @@ public class OneConfig
             OneConfigUI.INSTANCE.open();
             return 1;
         });
-        b.then(literal("updateCheck").executes(ctx -> {
-            Multithreading.submit(() -> ctx.getSource().displayMessage(MavenUpdateChecker.oneconfig().hasUpdate() ? "Update available!" : "No updates available"));
-            return 1;
-        }));
+
         b.then(literal("locraw").executes(ctx -> {
             ctx.getSource().displayMessage(HypixelUtils.getLocation().toString());
             return 1;
         }));
+
         b.then(literal("hud").executes(ctx -> {
             Platform.screen().display(HudManager.INSTANCE.getWithEditor());
             return 1;
         }));
+
         b.then(literal("delete").executes(ctx -> {
             OneConfigUI.INSTANCE.invalidateCache();
             ConfigVisualizer.INSTANCE.clearCache();
