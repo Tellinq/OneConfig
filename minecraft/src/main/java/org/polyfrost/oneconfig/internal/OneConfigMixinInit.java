@@ -90,7 +90,17 @@ public class OneConfigMixinInit implements IMixinConfigPlugin {
         //#endif
         //#else
         mixins.add("events.Mixin_KeyInputEvent_Screen");
-        if (!Objects.equals(System.getProperty("os.arch"), "aarch64")) { // TODO currently legacy macOS ARM is broken with this
+        boolean supportsHiDPI = !Objects.equals(System.getProperty("os.arch"), "aarch64");
+        if (!supportsHiDPI) {
+            try {
+                Class<?> clazz = Class.forName("org.lwjgl.Sys", false, OneConfigMixinInit.class.getClassLoader());
+                clazz.getDeclaredField("HAS_HIDPI_FIX");
+                supportsHiDPI = true;
+            } catch (ClassNotFoundException | NoSuchFieldException ignored) {
+
+            }
+        }
+        if (supportsHiDPI) {
             mixins.add("hidpi.Mixin_EnableHiDPI");
             mixins.add("hidpi.Mixin_FixDisplaySizeHiDPI");
             mixins.add("hidpi.Mixin_FixDisplaySizeHiDPI_Screen");

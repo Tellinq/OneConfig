@@ -67,6 +67,7 @@ listOf(
     "ui",
     "internal",
     "dependencies",
+    "dependencies:agnostic",
     "dependencies:legacy",
     "dependencies:bundled",
     "utils"

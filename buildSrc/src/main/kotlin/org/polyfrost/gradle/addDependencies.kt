@@ -10,10 +10,10 @@ import org.gradle.kotlin.dsl.getByType
  * @param version The version of Minecraft. If null, the method is running inside the `:dependencies:legacy` module.
  * @param loader The mod loader being used.
  */
-fun Project.provideIncludedDependencies(version: Triple<Int, Int, Int>?, loader: String): List<OCDependency> { // Either a String or ExternalModuleDependency
+fun Project.provideIncludedDependencies(version: Triple<Int, Int, Int>?, loader: String?): List<OCDependency> { // Either a String or ExternalModuleDependency
     project.logger.lifecycle("===> Adding dependencies for Minecraft ${version?.toMCVer()} & $loader")
 
-    val libs = project
+    val libs = rootProject
         .extensions
         .getByType<VersionCatalogsExtension>()
         .named("libs")
@@ -66,11 +66,11 @@ fun Project.provideIncludedDependencies(version: Triple<Int, Int, Int>?, loader:
     } else if (version != null && version.second > 12) { // forge / neoforge
         // TODO add KFF
     }
-    if (version == null // legacy dep module
-        || (version.first == 1 && version.second <= 12 && loader == "forge")) {
+    if ((version == null && loader != null) // legacy dep module
+        || (version != null && version.first == 1 && version.second <= 12 && loader == "forge")) {
         deps.add(libs.findLibrary("mixin").get().get()) // PolyMixin
     }
-    if (version == null) {
+    if (version == null && loader != null) {
         deps.add(libs.findLibrary("asm").get().get())
     }
     deps.add(libs.findLibrary("mixin-extras").get().get())
