@@ -30,6 +30,8 @@ import dev.deftu.omnicore.client.OmniChat;
 import dev.deftu.omnicore.client.render.OmniMatrixStack;
 import dev.deftu.omnicore.client.render.OmniResolution;
 import dev.deftu.omnicore.client.render.framebuffer.ManagedFramebuffer;
+import dev.deftu.omnicore.client.render.state.DepthFunction;
+import dev.deftu.omnicore.client.render.state.OmniManagedDepthState;
 import dev.deftu.omnicore.client.render.texture.GpuTexture;
 import dev.deftu.textile.minecraft.MCSimpleTextHolder;
 import dev.deftu.textile.minecraft.MCTextFormat;
@@ -139,6 +141,8 @@ public interface UIManager {
                         scaledWidth, scaledHeight,
                         Color.WHITE.getRGB()
                 );
+
+                OmniManagedDepthState.enable(DepthFunction.LESS_OR_EQUAL);
             });
 
             EventManager.register(ResizeEvent.class, event -> {

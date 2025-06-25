@@ -31,6 +31,7 @@ import dev.deftu.omnicore.common.OmniLoader
 import org.apache.logging.log4j.LogManager
 import org.lwjgl.opengl.GL11
 import org.lwjgl.opengl.GL30
+import org.polyfrost.oneconfig.api.platform.v1.Platform
 import org.polyfrost.oneconfig.api.ui.v1.api.LwjglApi
 import org.polyfrost.oneconfig.api.ui.v1.api.NanoVgApi
 import org.polyfrost.oneconfig.api.ui.v1.api.StbApi
@@ -104,9 +105,8 @@ class RendererImpl(
     private val images = mutableMapOf<PolyImage, Int>()
     private val svgs = mutableMapOf<PolyImage, Pair<NanoVgApi.SVG, Int2IntMap>>()
 
+    private var prevState: OmniManagedRenderState? = null
     private var prevVao = -1
-    private var prevBlendState: OmniManagedBlendState? = null
-    private var prevRenderState: OmniManagedRenderState? = null
 
     private val queue = ArrayList<() -> Unit>()
 
@@ -141,18 +141,22 @@ class RendererImpl(
     override fun beginFrame(width: Float, height: Float, pixelRatio: Float) {
         if (isDrawing) throw IllegalStateException("Already drawing")
 
+        prevState = OmniManagedRenderState.active()
         if (mcVersion >= 1_16_05) {
             prevVao = GL11.glGetInteger(GL30.GL_VERTEX_ARRAY_BINDING)
-            prevBlendState = OmniManagedBlendState.active()
-            prevRenderState = OmniManagedRenderState.active()
             OmniManagedBlendState.enable(BlendEquation.active(), BlendFunction.DEFAULT)
             OmniManagedDepthState.enable(DepthFunction.LESS_OR_EQUAL)
         }
 
         queue.fastRemoveIfReversed { it(); true }
-        if (!isGl3) {
+
+        if (mcVersion <= 1_12_02) {
             GL11.glPushAttrib(GL11.GL_ALL_ATTRIB_BITS)
         }
+
+//        if (!isGl3) {
+//            GL11.glPushAttrib(GL11.GL_ALL_ATTRIB_BITS)
+//        }
 
         GL11.glPixelStorei(GL11.GL_UNPACK_ALIGNMENT, 1)
         vg.beginFrame(width, height, pixelRatio)
@@ -163,18 +167,23 @@ class RendererImpl(
         if (!isDrawing) return
 
         vg.endFrame()
-        if (!isGl3) {
+//        if (!isGl3) {
+//            GL11.glPopAttrib()
+//        }
+
+        if (mcVersion <= 1_12_02) {
             GL11.glPopAttrib()
         }
 
-        if (mcVersion >= 1_16_05) {
-            prevBlendState?.activate()
-            prevRenderState?.activate()
-            OmniManagedDepthState.disable()
-            if (prevVao != -1) {
-                GL30.glBindVertexArray(prevVao)
-            }
+        if (mcVersion >= 1_16_05 && isGl3 && prevVao != -1) {
+            GL30.glBindVertexArray(prevVao)
         }
+
+        Platform.gl().updateGameRenderStateAlongsideNanoVG()
+        prevState?.activate()
+        OmniManagedDepthState.enableDepth()
+        OmniManagedBlendState.enableBlend()
+        OmniManagedAlphaState.enableAlpha()
 
         isDrawing = false
     }

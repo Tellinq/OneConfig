@@ -13,6 +13,9 @@ net.minecraft.client.renderer.GameRenderer renderItemInHand() renderHand()
 net.minecraft.client.renderer.EffectInstance net.minecraft.client.shader.ShaderManager
 net.minecraft.client.renderer.EffectInstance getUniform() getShaderUniform()
 
+com.mojang.blaze3d.platform.GlStateManager net.minecraft.client.renderer.GlStateManager
+com.mojang.blaze3d.platform.GlStateManager _enableCull() enableCull()
+
 net.minecraft.client.renderer.PostPass net.minecraft.client.shader.Shader
 net.minecraft.client.renderer.PostPass getEffect() getShaderManager()
 

@@ -26,13 +26,27 @@
 
 package org.polyfrost.oneconfig.api.platform.v1.internal;
 
+import dev.deftu.omnicore.client.render.OmniRenderState;
+import dev.deftu.omnicore.client.render.OmniTextureManager;
+import dev.deftu.omnicore.client.render.state.OmniManagedBlendState;
+import dev.deftu.omnicore.client.render.state.OmniManagedColorMask;
+import dev.deftu.omnicore.client.render.state.OmniManagedDepthState;
+import dev.deftu.omnicore.client.render.state.OmniManagedScissorState;
+import org.lwjgl.opengl.GL11;
 import org.polyfrost.oneconfig.api.platform.v1.GLPlatform;
 import org.polyfrost.oneconfig.utils.v1.MHUtils;
+import static org.lwjgl.opengl.GL11.GL_ONE_MINUS_SRC_ALPHA;
+import static org.lwjgl.opengl.GL11.GL_SRC_ALPHA;
+import static org.lwjgl.opengl.GL13.GL_TEXTURE0;
+
+//#if MC <= 1.12.2
+import net.minecraft.client.renderer.GlStateManager;
+//#endif
 
 public class GLPlatformImpl implements GLPlatform {
 
     //@formatter:off
-    //#if MC<=11202
+    //#if MC <= 1.12.2
     private static final java.util.function.Function<String, Long> getProcAddress =
             MHUtils.getFunctionHandle(org.lwjgl.opengl.GLContext.class, "getFunctionAddress", long.class, String.class)
                     .logIfErr().getOrElse(v -> 0L);
@@ -40,12 +54,47 @@ public class GLPlatformImpl implements GLPlatform {
 
     @Override
     public long getFunctionAddress(String addr) {
-        //#if MC<=11202
+        //#if MC <= 1.12.2
         return getProcAddress.apply(addr);
         //#else
         //$$ return org.lwjgl.glfw.GLFW.glfwGetProcAddress(addr);
         //#endif
     }
     //@formatter:on
+
+    /**
+     * This method is called to update the game's internally tracked OpenGL state
+     * to match what NanoVG leaves dropped into the OpenGL context.
+     */
+    @Override
+    public void updateGameRenderStateAlongsideNanoVG() {
+        // Blending
+        OmniManagedBlendState.enableBlend();
+        OmniManagedBlendState.blendFuncSeparate(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA, GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+        // Depth
+        OmniManagedDepthState.disableDepth();
+
+        // Culling
+        //noinspection deprecation
+        OmniRenderState.enableCull();
+        //#if MC <= 1.8.9
+        GlStateManager.cullFace(GL11.GL_BACK);
+        //#endif
+
+        // Scissor
+        OmniManagedScissorState.disable();
+
+        // Color mask
+        new OmniManagedColorMask(true, true, true, true).activate();
+
+        // Active texture
+        OmniTextureManager.setActiveTexture(GL_TEXTURE0);
+        OmniTextureManager.bindTexture(0);
+
+        //#if MC >= 1.17.1 && MC < 1.21.5
+        //$$ net.minecraft.client.render.BufferRenderer.unbindAll();
+        //#endif
+    }
 
 }

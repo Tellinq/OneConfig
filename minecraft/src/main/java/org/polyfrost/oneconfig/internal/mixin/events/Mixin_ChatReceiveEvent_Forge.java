@@ -33,6 +33,7 @@ import net.minecraftforge.fml.common.eventhandler.Event;
 import net.minecraftforge.fml.common.eventhandler.EventBus;
 import org.polyfrost.oneconfig.api.event.v1.EventManager;
 import org.polyfrost.oneconfig.api.event.v1.events.ChatEvent;
+import org.polyfrost.oneconfig.internal.utils.ComponentHelper;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -51,6 +52,10 @@ public abstract class Mixin_ChatReceiveEvent_Forge {
         //#if MC == 1.8.9
         if (event.type != 0) {
             return;
+        }
+
+        if (Boolean.getBoolean("oneconfig.debug.chat")) {
+            System.out.println("Chat message received:\n" + ComponentHelper.prettyPrint(event.message));
         }
 
         ChatEvent.Receive ev = new ChatEvent.Receive(MCTextHolder.convertFromVanilla(event.message));

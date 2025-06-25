@@ -36,4 +36,6 @@ public interface GLPlatform {
      */
     long getFunctionAddress(String addr);
 
+    void updateGameRenderStateAlongsideNanoVG();
+
 }

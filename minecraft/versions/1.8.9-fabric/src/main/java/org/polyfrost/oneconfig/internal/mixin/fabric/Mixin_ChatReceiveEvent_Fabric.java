@@ -32,6 +32,7 @@ import net.minecraft.network.packet.s2c.play.ChatMessageS2CPacket;
 import net.minecraft.text.Text;
 import org.polyfrost.oneconfig.api.event.v1.EventManager;
 import org.polyfrost.oneconfig.api.event.v1.events.ChatEvent;
+import org.polyfrost.oneconfig.internal.utils.ComponentHelper;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
@@ -72,7 +73,12 @@ public abstract class Mixin_ChatReceiveEvent_Fabric {
             //$$ !packet.isNonChat()
             //#endif
         ) {
-            ocfg$chatEvent = new ChatEvent.Receive(MCTextHolder.convertFromVanilla(packet.getMessage()));
+            Text component = packet.getMessage();
+            if (Boolean.getBoolean("oneconfig.debug.chat")) {
+                System.out.println("Chat message received:\n" + ComponentHelper.prettyPrint(component));
+            }
+
+            ocfg$chatEvent = new ChatEvent.Receive(MCTextHolder.convertFromVanilla(component));
             EventManager.INSTANCE.post(ocfg$chatEvent);
             return MCTextHolder.convertToVanilla(ocfg$chatEvent.getMessage());
         }
