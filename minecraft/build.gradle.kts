@@ -106,7 +106,7 @@ dependencies {
 
     for (project in rootProject.project(":modules").subprojects) {
         if ("dependencies" !in project.path) {
-            "oneConfigModulesCompileOnlyApi"(runtimeNoApi(compileOnly(project(project.path)) {
+            "oneConfigModulesCompileOnlyApi"(runtimeOnly(compileOnly(project(project.path)) {
                 isTransitive = false
                 attributes {
                     attribute(includeInLoader, JBoolean.TRUE)
