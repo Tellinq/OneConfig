@@ -131,6 +131,18 @@ dependencies {
     }
 
     api("dev.deftu:enhancedeventbus:2.0.0") // TODO
+
+    if (mcData.isFabric) {
+            modImplementation("net.fabricmc:fabric-language-kotlin:${mcData.dependencies.fabric.fabricLanguageKotlinVersion}")
+
+        if (mcData.isLegacyFabric) {
+            // 1.8.9 - 1.13
+            modImplementation("net.legacyfabric.legacy-fabric-api:legacy-fabric-api:${mcData.dependencies.legacyFabric.legacyFabricApiVersion}")
+        } else {
+            // 1.16.5+
+            modImplementation("net.fabricmc.fabric-api:fabric-api:${mcData.dependencies.fabric.fabricApiVersion}")
+        }
+    }
 }
 
 fun DependencyHandlerScope.handleApiDep(dependency: String, isMod: Boolean = false) {
