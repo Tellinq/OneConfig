@@ -77,9 +77,6 @@ if (mcData.isLegacyForge) { // Quick substitution for relaunch in dev env, so th
 
 val includeInLoader = Attribute.of("org.polyfrost.oneconfig.loader.include", Boolean::class.javaObjectType)
 val jijInLoader = Attribute.of("org.polyfrost.oneconfig.loader.jij", Boolean::class.javaObjectType)
-val runtimeNoApi by configurations.creating {
-    extendsFrom(configurations.runtimeClasspath.get())
-}
 
 dependencies {
     compileOnly("gg.essential:vigilance-1.8.9-forge:295") {
@@ -106,7 +103,7 @@ dependencies {
 
     for (project in rootProject.project(":modules").subprojects) {
         if ("dependencies" !in project.path) {
-            "oneConfigModulesCompileOnlyApi"(runtimeOnly(compileOnly(project(project.path)) {
+            "oneConfigModulesCompileOnlyApi"(localRuntime(compileOnly(project(project.path)) {
                 isTransitive = false
                 attributes {
                     attribute(includeInLoader, JBoolean.TRUE)
@@ -131,18 +128,6 @@ dependencies {
     }
 
     api("dev.deftu:enhancedeventbus:2.0.0") // TODO
-
-    if (mcData.isFabric) {
-            modImplementation("net.fabricmc:fabric-language-kotlin:${mcData.dependencies.fabric.fabricLanguageKotlinVersion}")
-
-        if (mcData.isLegacyFabric) {
-            // 1.8.9 - 1.13
-            modImplementation("net.legacyfabric.legacy-fabric-api:legacy-fabric-api:${mcData.dependencies.legacyFabric.legacyFabricApiVersion}")
-        } else {
-            // 1.16.5+
-            modImplementation("net.fabricmc.fabric-api:fabric-api:${mcData.dependencies.fabric.fabricApiVersion}")
-        }
-    }
 }
 
 fun DependencyHandlerScope.handleApiDep(dependency: String, isMod: Boolean = false) {
