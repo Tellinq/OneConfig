@@ -251,9 +251,8 @@ public class PolyUIScreen extends OmniScreen implements BlurScreen {
     @MustBeInvokedByOverriders
     public void mouseMoved(double mouseX, double mouseY) {
         Drawable master = polyUI.getMaster();
-        float scalingFactor = 1f / (float) OmniResolution.getScaleFactor();
-        float ox = ((float) Platform.screen().windowWidth() / 2f - master.getWidth() / 2f) * scalingFactor;
-        float oy = ((float) Platform.screen().windowHeight() / 2f - master.getHeight() / 2f) * scalingFactor;
+        float ox = (float) Platform.screen().windowWidth() / 2f - master.getWidth() / 2f;
+        float oy = (float) Platform.screen().windowHeight() / 2f - master.getHeight() / 2f;
 
         float mx, my;
         //#if MC >= 1.13
