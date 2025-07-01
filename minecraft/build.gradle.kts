@@ -5,6 +5,7 @@ import dev.deftu.gradle.utils.GameSide
 import dev.deftu.gradle.utils.version.MinecraftReleaseVersion
 import dev.deftu.gradle.utils.version.MinecraftVersions
 import org.polyfrost.gradle.provideIncludedDependencies
+import org.polyfrost.gradle.provideFabricApiDependency
 import java.text.SimpleDateFormat
 import java.lang.Boolean as JBoolean
 
@@ -84,11 +85,20 @@ dependencies {
     }
 
     val mcVersion = mcData.version as MinecraftReleaseVersion
-    provideIncludedDependencies(Triple(mcVersion.major, mcVersion.minor, mcVersion.patch), mcData.loader.friendlyString).forEach {
+    val tripleVersion = Triple(mcVersion.major, mcVersion.minor, mcVersion.patch)
+    provideIncludedDependencies(tripleVersion, mcData.loader.friendlyString).forEach {
         if (it.dep is String) {
             handleApiDep(it.dep as String, it.mod)
         } else {
             handleApiDep(it.dep as ExternalModuleDependency, it.mod)
+        }
+    }
+
+    if (mcData.isFabric) {
+        provideFabricApiDependency(tripleVersion).forEach {
+            include(modApi(if (it.dep is String) it.dep as String else "${(it.dep as ExternalModuleDependency).group}:${(it.dep as ExternalModuleDependency).name}:${(it.dep as ExternalModuleDependency).version}") {
+                isTransitive = false
+            })
         }
     }
 

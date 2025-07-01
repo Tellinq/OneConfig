@@ -204,35 +204,38 @@ fun Project.provideIncludedDependencies(version: Triple<Int, Int, Int>?, loader:
         actualDeps.add(OCDependency("dev.deftu:omnicore-${version.toMCVer()}-$loader:${libs.findVersion("omnicore").get().displayName}", true))
     }
 
-    if (version != null && loader == "fabric") {
-        if (version.second <= 12) {
-            // Legacy Fabric
-            for (module in legacyFabricApiModules) {
-                val commonVersionValue = fabricApiModuleVersions["$module-common"] ?: error("No version found for $module-common")
-                actualDeps.add(OCDependency("net.legacyfabric.legacy-fabric-api:legacy-fabric-$module-common:$commonVersionValue", true))
-                val mcVersionValue = fabricApiModuleVersions["$module-${version.toPreprocessorNumber()}"] ?: error("No version found for $module-${version.toMCVer()}")
-                actualDeps.add(OCDependency("net.legacyfabric.legacy-fabric-api:legacy-fabric-$module:$mcVersionValue", true))
-            }
+    return actualDeps
+}
+
+fun Project.provideFabricApiDependency(version: Triple<Int, Int, Int>): List<OCDependency> {
+    val deps = mutableListOf<OCDependency>()
+
+    if (version.second <= 12) {
+        // Legacy Fabric
+        for (module in legacyFabricApiModules) {
+            val commonVersionValue = fabricApiModuleVersions["$module-common"] ?: error("No version found for $module-common")
+            deps.add(OCDependency("net.legacyfabric.legacy-fabric-api:legacy-fabric-$module-common:$commonVersionValue", true))
+            val mcVersionValue = fabricApiModuleVersions["$module-${version.toPreprocessorNumber()}"] ?: error("No version found for $module-${version.toMCVer()}")
+            deps.add(OCDependency("net.legacyfabric.legacy-fabric-api:legacy-fabric-$module:$mcVersionValue", true))
+        }
+    } else {
+        // Modern Fabric
+        val finalList = mutableListOf<String>()
+        finalList.addAll(fabricApiModules)
+        if (version.second >= 18) {
+            finalList.add("transitive-access-wideners-v1")
+        }
+        if (version.second >= 19) {
+            finalList.add("command-api-v2")
         } else {
-            // Modern Fabric
-            val finalList = mutableListOf<String>()
-            finalList.addAll(fabricApiModules)
-            if (version.second >= 18) {
-                finalList.add("transitive-access-wideners-v1")
-            }
-            if (version.second >= 19) {
-                finalList.add("command-api-v2")
-            } else {
-                finalList.add("command-api-v1")
-            }
-            for (module in finalList) {
-                val mcVersionValue = fabricApiModuleVersions["$module-${version.toPreprocessorNumber()}"] ?: error("No version found for $module-${version.toMCVer()}")
-                actualDeps.add(OCDependency("net.fabricmc.fabric-api:fabric-$module:$mcVersionValue", true))
-            }
+            finalList.add("command-api-v1")
+        }
+        for (module in finalList) {
+            val mcVersionValue = fabricApiModuleVersions["$module-${version.toPreprocessorNumber()}"] ?: error("No version found for $module-${version.toMCVer()}")
+            deps.add(OCDependency("net.fabricmc.fabric-api:fabric-$module:$mcVersionValue", true))
         }
     }
-
-    return actualDeps
+    return deps
 }
 
 private fun Triple<Int, Int, Int>.toMCVer() = listOf(first, second, third).dropLastWhile { it == 0 }.joinToString(".")
