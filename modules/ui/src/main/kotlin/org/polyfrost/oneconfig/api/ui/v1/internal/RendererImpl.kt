@@ -184,9 +184,6 @@ class RendererImpl(
 
         Platform.gl().updateGameRenderStateAlongsideNanoVG()
         prevState?.activate()
-        OmniManagedDepthState.enableDepth()
-        OmniManagedBlendState.enableBlend()
-        OmniManagedAlphaState.enableAlpha()
 
         isDrawing = false
     }
