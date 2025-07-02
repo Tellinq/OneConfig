@@ -32,7 +32,7 @@ public abstract class Mixin_FixDisplaySizeHiDPI {
     @Unique
     private static final Logger oneconfig$HIDPI_LOGGER = LogManager.getLogger("OneConfig/HiDPI");
 
-    @WrapOperation(method = "checkWindowResize", at = @At(value = "INVOKE", target = "Lorg/lwjgl/opengl/Display;wasResized()Z"))
+    @WrapOperation(method = "checkWindowResize", at = @At(value = "INVOKE", target = "Lorg/lwjgl/opengl/Display;wasResized()Z", remap = false), remap = true)
     private boolean hiDpiFixWasResized(Operation<Boolean> original) {
         // If the display scale factor is not 1, we assume that the window has been resized
         // to account for HiDPI scaling.

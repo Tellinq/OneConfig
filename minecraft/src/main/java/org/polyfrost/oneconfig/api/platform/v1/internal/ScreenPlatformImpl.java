@@ -60,7 +60,7 @@ public class ScreenPlatformImpl implements ScreenPlatform {
         //#if MC>=11502
         //$$ return Minecraft.getInstance().getWindow().getWidth();
         //#else
-        return (int) (Minecraft.getMinecraft().displayWidth / org.lwjgl.opengl.Display.getPixelScaleFactor());
+        return Minecraft.getMinecraft().displayWidth; //TODO uh... either this is the "fix" that breaks input or this is good
         //#endif
     }
 
@@ -69,7 +69,7 @@ public class ScreenPlatformImpl implements ScreenPlatform {
         //#if MC>=11502
         //$$ return Minecraft.getInstance().getWindow().getHeight();
         //#else
-        return (int) (Minecraft.getMinecraft().displayHeight / org.lwjgl.opengl.Display.getPixelScaleFactor());
+        return Minecraft.getMinecraft().displayHeight; // todo same here
         //#endif
     }
 
@@ -82,6 +82,15 @@ public class ScreenPlatformImpl implements ScreenPlatform {
     @Override
     public OmniMatrixStack getSmuggledMatrixStack() {
         return smuggled;
+    }
+
+    @Override
+    public float pixelRatio() {
+        //#if MC>=11502
+        //$$ return (float) windowWidth() / viewportWidth();
+        //#else
+        return org.lwjgl.opengl.Display.getPixelScaleFactor();
+        //#endif
     }
 
     @Override

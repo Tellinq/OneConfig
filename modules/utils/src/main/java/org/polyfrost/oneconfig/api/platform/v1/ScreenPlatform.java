@@ -55,9 +55,7 @@ public interface ScreenPlatform {
     @ApiStatus.Obsolete
     OmniMatrixStack getSmuggledMatrixStack();
 
-    default float pixelRatio() {
-        return (float) windowWidth() / viewportWidth();
-    }
+    float pixelRatio();
 
     void display(@Nullable Object screen, int ticks);
 
