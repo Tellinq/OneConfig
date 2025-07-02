@@ -26,10 +26,13 @@
 
 package org.polyfrost.oneconfig.api.ui.v1.internal
 
+import dev.deftu.omnicore.client.render.OmniTextureManager
 import dev.deftu.omnicore.client.render.state.*
 import dev.deftu.omnicore.common.OmniLoader
 import org.apache.logging.log4j.LogManager
 import org.lwjgl.opengl.GL11
+import org.lwjgl.opengl.GL13
+import org.lwjgl.opengl.GL20
 import org.lwjgl.opengl.GL30
 import org.polyfrost.oneconfig.api.platform.v1.Platform
 import org.polyfrost.oneconfig.api.ui.v1.api.LwjglApi
@@ -105,7 +108,9 @@ class RendererImpl(
     private val images = mutableMapOf<PolyImage, Int>()
     private val svgs = mutableMapOf<PolyImage, Pair<NanoVgApi.SVG, Int2IntMap>>()
 
-    private var prevState: OmniManagedRenderState? = null
+    private var prevProgram = -1
+    private var prevTexture = -1
+    private var prevTextureBinding = -1
     private var prevVao = -1
 
     private val textBounds = FloatArray(4)
@@ -144,11 +149,11 @@ class RendererImpl(
     override fun beginFrame(width: Float, height: Float, pixelRatio: Float) {
         if (isDrawing) throw IllegalStateException("Already drawing")
 
-        prevState = OmniManagedRenderState.active()
         if (mcVersion >= 1_16_05) {
+            prevProgram = GL11.glGetInteger(GL20.GL_CURRENT_PROGRAM)
             prevVao = GL11.glGetInteger(GL30.GL_VERTEX_ARRAY_BINDING)
-            OmniManagedBlendState.enable(BlendEquation.active(), BlendFunction.DEFAULT)
-            OmniManagedDepthState.enable(DepthFunction.LESS_OR_EQUAL)
+            prevTexture = GL11.glGetInteger(GL13.GL_ACTIVE_TEXTURE)
+            prevTextureBinding = GL11.glGetInteger(GL11.GL_TEXTURE_BINDING_2D)
         }
 
         queue.fastRemoveIfReversed { it(); true }
@@ -156,10 +161,6 @@ class RendererImpl(
         if (mcVersion <= 1_12_02) {
             GL11.glPushAttrib(GL11.GL_ALL_ATTRIB_BITS)
         }
-
-//        if (!isGl3) {
-//            GL11.glPushAttrib(GL11.GL_ALL_ATTRIB_BITS)
-//        }
 
         GL11.glPixelStorei(GL11.GL_UNPACK_ALIGNMENT, 1)
         vg.beginFrame(width, height, pixelRatio)
@@ -170,20 +171,25 @@ class RendererImpl(
         if (!isDrawing) return
 
         vg.endFrame()
-//        if (!isGl3) {
-//            GL11.glPopAttrib()
-//        }
 
         if (mcVersion <= 1_12_02) {
             GL11.glPopAttrib()
         }
 
-        if (mcVersion >= 1_16_05 && isGl3 && prevVao != -1) {
-            GL30.glBindVertexArray(prevVao)
-        }
-
         Platform.gl().updateGameRenderStateAlongsideNanoVG()
-        prevState?.activate()
+
+        if (mcVersion >= 1_16_05) {
+            if (prevProgram != -1) {
+                GL20.glUseProgram(prevProgram)
+            }
+            if (prevTexture != -1) {
+                OmniTextureManager.setActiveTexture(prevTexture)
+                OmniTextureManager.bindTexture(prevTextureBinding)
+            }
+            if (prevVao != -1) {
+                GL30.glBindVertexArray(prevVao)
+            }
+        }
 
         isDrawing = false
     }

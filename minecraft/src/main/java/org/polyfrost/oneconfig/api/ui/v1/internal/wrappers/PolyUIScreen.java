@@ -32,7 +32,7 @@ import dev.deftu.omnicore.client.render.OmniMatrixStack;
 import dev.deftu.omnicore.client.render.OmniResolution;
 import dev.deftu.omnicore.client.render.framebuffer.Framebuffer;
 import dev.deftu.omnicore.client.render.framebuffer.ManagedFramebuffer;
-import dev.deftu.omnicore.client.render.state.DepthFunction;
+import dev.deftu.omnicore.client.render.state.OmniManagedBlendState;
 import dev.deftu.omnicore.client.render.state.OmniManagedDepthState;
 import dev.deftu.omnicore.client.render.texture.GpuTexture;
 import kotlin.Unit;
@@ -44,7 +44,6 @@ import org.jetbrains.annotations.NotNull;
 import org.polyfrost.oneconfig.api.platform.v1.Platform;
 import org.polyfrost.oneconfig.api.ui.v1.Notifications;
 import org.polyfrost.oneconfig.api.ui.v1.UIManager;
-import org.polyfrost.oneconfig.api.ui.v1.internal.RendererImpl;
 import org.polyfrost.oneconfig.api.ui.v1.screen.BlurScreen;
 import org.polyfrost.polyui.PolyUI;
 import org.polyfrost.polyui.component.Drawable;
@@ -53,7 +52,6 @@ import org.polyfrost.polyui.data.Cursor;
 import java.awt.*;
 import java.util.function.Consumer;
 
-import static org.lwjgl.opengl.GL11.glViewport;
 import static org.polyfrost.oneconfig.api.ui.v1.keybind.KeybindManager.translateKey;
 
 @SuppressWarnings("unused")
@@ -153,7 +151,8 @@ public class PolyUIScreen extends OmniScreen implements BlurScreen {
                 Color.WHITE.getRGB()
         );
 
-        OmniManagedDepthState.enable(DepthFunction.LESS_OR_EQUAL);
+        OmniManagedBlendState.disableBlend();
+        OmniManagedDepthState.disableDepth();
     }
 
     @Override
