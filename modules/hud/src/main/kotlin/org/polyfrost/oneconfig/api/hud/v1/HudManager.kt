@@ -133,6 +133,7 @@ object HudManager {
             LOGGER.info("Found a size to restore: $size")
             prevSize = polyUI.size
             polyUI.resize(size.x, size.y)
+            polyUI.window?.pixelRatio = Platform.screen().pixelRatio()
         } else {
             LOGGER.warn("Failed to read previous size from size.lock: HUD positions may be inaccurate. If this is first start, you may ignore this message.")
             prevSize = Vec2.ZERO
@@ -174,7 +175,10 @@ object HudManager {
             LOGGER.warn("Failed to load HUDs from ${failed.size} providers as they weren't found: (maybe the mods were removed?)")
             failed.forEach { (cls, amount) -> LOGGER.warn("  $cls: $amount HUDs") }
         }
-        if (prevSize.isPositive) polyUI.resize(prevSize.x, prevSize.y)
+        if (prevSize.isPositive) {
+            polyUI.resize(prevSize.x, prevSize.y)
+            polyUI.window?.pixelRatio = Platform.screen().pixelRatio()
+        }
         LOGGER.info("successfully loaded {} HUDs from {} providers (total {} registered providers)", i, used.size, hudProviders.size)
         hudProviders.forEach { (cls, h) ->
             if (cls in used) return@forEach

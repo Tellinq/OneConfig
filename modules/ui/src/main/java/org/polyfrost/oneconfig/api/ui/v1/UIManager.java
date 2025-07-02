@@ -150,6 +150,7 @@ public interface UIManager {
             EventManager.register(ResizeEvent.class, event -> {
                 framebuffer.resize(event.newWidth, event.newHeight);
                 polyUI.resize(event.newWidth, event.newHeight, false);
+                polyUI.getWindow().setPixelRatio(Platform.screen().pixelRatio());
             });
 
             return polyUI;
