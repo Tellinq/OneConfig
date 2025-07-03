@@ -250,8 +250,8 @@ public class PolyUIScreen extends OmniScreen implements BlurScreen {
     @MustBeInvokedByOverriders
     public void mouseMoved(double mouseX, double mouseY) {
         Drawable master = polyUI.getMaster();
-        float ox = (float) Platform.screen().windowWidth() / 2f - master.getWidth() / 2f;
-        float oy = (float) Platform.screen().windowHeight() / 2f - master.getHeight() / 2f;
+        float ox = (float) (Platform.screen().windowWidth() / 2f - master.getWidth() / 2f) / Platform.screen().pixelRatio();
+        float oy = (float) (Platform.screen().windowHeight() / 2f - master.getHeight() / 2f) / Platform.screen().pixelRatio();
 
         float mx, my;
         //#if MC >= 1.13
@@ -259,11 +259,11 @@ public class PolyUIScreen extends OmniScreen implements BlurScreen {
         //$$ my = (float) Minecraft.getInstance().mouseHandler.ypos();
         //#else
         mx = org.lwjgl.input.Mouse.getX();
-        my = Platform.screen().windowHeight() - org.lwjgl.input.Mouse.getY() - 1;
+        my = ((Platform.screen().windowHeight() / Platform.screen().pixelRatio()) - org.lwjgl.input.Mouse.getY() - 1);
         //#endif
 
         try {
-            polyUI.getInputManager().mouseMoved(mx - ox, my - oy);
+            polyUI.getInputManager().mouseMoved((mx - ox) * Platform.screen().pixelRatio(), (my - oy) * Platform.screen().pixelRatio());
         } catch (Exception e) {
             death(e);
         }
