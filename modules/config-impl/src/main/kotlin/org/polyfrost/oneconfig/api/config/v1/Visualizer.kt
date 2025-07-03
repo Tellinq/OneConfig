@@ -154,7 +154,7 @@ fun interface Visualizer {
     class NumberVisualizer : Visualizer {
         override fun visualize(prop: Property<*>): Drawable {
             val unit = prop.getMetadata<String>("unit")
-            val min = prop.getMetadata<Float>("min") ?: -10f
+            val min = prop.getMetadata<Float>("min") ?: 0f
             val max = prop.getMetadata<Float>("max") ?: 100f
             val integral = prop.type == Int::class.java || prop.type == Long::class.java
             val placeholder = prop.getMetadata<String>("placeholder") ?: if (integral) "${min.toInt()}-${max.toInt()}" else "$min-$max"

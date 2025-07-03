@@ -40,7 +40,7 @@ public class ScreenPlatformImpl implements ScreenPlatform {
     @Override
     public int viewportWidth() {
         //#if MC>=11502
-        //$$ return Minecraft.getInstance().getWindow().getScreenWidth();
+        //$$ return Minecraft.getInstance().getWindow().getWidth();
         //#else
         return Minecraft.getMinecraft().displayWidth;
         //#endif
@@ -49,7 +49,7 @@ public class ScreenPlatformImpl implements ScreenPlatform {
     @Override
     public int viewportHeight() {
         //#if MC>=11502
-        //$$ return Minecraft.getInstance().getWindow().getScreenHeight();
+        //$$ return Minecraft.getInstance().getWindow().getHeight();
         //#else
         return Minecraft.getMinecraft().displayHeight;
         //#endif
@@ -58,18 +58,18 @@ public class ScreenPlatformImpl implements ScreenPlatform {
     @Override
     public int windowWidth() {
         //#if MC>=11502
-        //$$ return Minecraft.getInstance().getWindow().getWidth();
+        //$$ return Minecraft.getInstance().getWindow().getScreenWidth();
         //#else
-        return Minecraft.getMinecraft().displayWidth; //TODO uh... either this is the "fix" that breaks input or this is good
+        return (int) (Minecraft.getMinecraft().displayWidth / org.lwjgl.opengl.Display.getPixelScaleFactor());
         //#endif
     }
 
     @Override
     public int windowHeight() {
         //#if MC>=11502
-        //$$ return Minecraft.getInstance().getWindow().getHeight();
+        //$$ return Minecraft.getInstance().getWindow().getScreenHeight();
         //#else
-        return Minecraft.getMinecraft().displayHeight; // todo same here
+        return (int) (Minecraft.getMinecraft().displayHeight / org.lwjgl.opengl.Display.getPixelScaleFactor());
         //#endif
     }
 
@@ -82,15 +82,6 @@ public class ScreenPlatformImpl implements ScreenPlatform {
     @Override
     public OmniMatrixStack getSmuggledMatrixStack() {
         return smuggled;
-    }
-
-    @Override
-    public float pixelRatio() {
-        //#if MC>=11502
-        //$$ return (float) windowWidth() / viewportWidth();
-        //#else
-        return org.lwjgl.opengl.Display.getPixelScaleFactor();
-        //#endif
     }
 
     @Override

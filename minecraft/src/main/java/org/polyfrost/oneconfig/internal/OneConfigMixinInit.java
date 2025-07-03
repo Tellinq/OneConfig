@@ -28,17 +28,12 @@ package org.polyfrost.oneconfig.internal;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.objectweb.asm.ClassWriter;
-import org.objectweb.asm.tree.AnnotationNode;
 import org.objectweb.asm.tree.ClassNode;
 import org.spongepowered.asm.mixin.extensibility.IMixinConfigPlugin;
 import org.spongepowered.asm.mixin.extensibility.IMixinInfo;
 
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 import java.util.Set;
 
 public class OneConfigMixinInit implements IMixinConfigPlugin {
@@ -92,7 +87,7 @@ public class OneConfigMixinInit implements IMixinConfigPlugin {
         mixins.add("events.Mixin_KeyInputEvent_Screen");
         mixins.add("hidpi.Mixin_EnableHiDPI");
         mixins.add("hidpi.Mixin_FixDisplaySizeHiDPI");
-        mixins.add("hidpi.Mixin_FixDisplaySizeHiDPI_Screen");
+        mixins.add("hidpi.Mixin_FixMousePositionHiDPI_Screen");
         mixins.add("hidpi.Mixin_FixMousePositionHiDPI");
         //#if MC <= 1.8.9
         mixins.add("Mixin_SoundHandlerAccessor");

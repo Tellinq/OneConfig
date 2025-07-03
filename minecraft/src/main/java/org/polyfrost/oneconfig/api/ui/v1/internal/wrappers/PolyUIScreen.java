@@ -49,7 +49,6 @@ import org.polyfrost.polyui.PolyUI;
 import org.polyfrost.polyui.component.Drawable;
 import org.polyfrost.polyui.data.Cursor;
 
-import java.awt.*;
 import java.util.function.Consumer;
 
 import static org.polyfrost.oneconfig.api.ui.v1.keybind.KeybindManager.translateKey;
@@ -118,8 +117,6 @@ public class PolyUIScreen extends OmniScreen implements BlurScreen {
             return;
         }
 
-        int width = Platform.screen().windowWidth();
-        int height = Platform.screen().windowHeight();
         Drawable master = polyUI.getMaster();
 
         try {
@@ -138,17 +135,18 @@ public class PolyUIScreen extends OmniScreen implements BlurScreen {
         }
 
         float scalingFactor = 1f / (float) OmniResolution.getScaleFactor();
+        float ratio = Platform.screen().pixelRatio();
 
-        float scaledX = (Platform.screen().windowWidth() / 2f - master.getWidth() / 2f) * scalingFactor;
-        float scaledY = (Platform.screen().windowHeight() / 2f - master.getHeight() / 2f) * scalingFactor;
-        float scaledWidth = master.getWidth() * scalingFactor;
-        float scaledHeight = master.getHeight() * scalingFactor;
+        float scaledX = (Platform.screen().viewportWidth() / 2f - master.getWidth() * ratio / 2f) * scalingFactor;
+        float scaledY = (Platform.screen().viewportHeight() / 2f - master.getHeight() * ratio / 2f) * scalingFactor;
+        float scaledWidth = master.getWidth() * scalingFactor * ratio;
+        float scaledHeight = master.getHeight() * scalingFactor * ratio;
 
         framebuffer.drawColorTexture(
                 matrices,
                 scaledX, scaledY,
                 scaledWidth, scaledHeight,
-                Color.WHITE.getRGB()
+                -1 // White
         );
 
         OmniManagedBlendState.disableBlend();
@@ -174,7 +172,7 @@ public class PolyUIScreen extends OmniScreen implements BlurScreen {
 
     @Override
     @MustBeInvokedByOverriders
-    public boolean handleKeyRelease(int keyCode, int scancode, OmniKeyboard.KeyboardModifiers modifiers) {
+    public boolean handleKeyRelease(int keyCode, int scancode, OmniKeyboard.@NotNull KeyboardModifiers modifiers) {
         try {
             translateKey(polyUI.getInputManager(), keyCode, '\u0000', false);
         } catch (Exception e) {
@@ -217,7 +215,7 @@ public class PolyUIScreen extends OmniScreen implements BlurScreen {
                     //$$ delta / 8f;
                     //#else
                     delta;
-                    //#endif
+            //#endif
             polyUI.getInputManager().mouseScrolled(0f, v);
         } catch (Exception e) {
             death(e);
@@ -250,8 +248,9 @@ public class PolyUIScreen extends OmniScreen implements BlurScreen {
     @MustBeInvokedByOverriders
     public void mouseMoved(double mouseX, double mouseY) {
         Drawable master = polyUI.getMaster();
-        float ox = (float) (Platform.screen().windowWidth() / 2f - master.getWidth() / 2f) / Platform.screen().pixelRatio();
-        float oy = (float) (Platform.screen().windowHeight() / 2f - master.getHeight() / 2f) / Platform.screen().pixelRatio();
+        // guys it's not that deep
+        float ox = Platform.screen().windowWidth() / 2f - master.getWidth() / 2f;
+        float oy = Platform.screen().windowHeight() / 2f - master.getHeight() / 2f;
 
         float mx, my;
         //#if MC >= 1.13
@@ -259,11 +258,11 @@ public class PolyUIScreen extends OmniScreen implements BlurScreen {
         //$$ my = (float) Minecraft.getInstance().mouseHandler.ypos();
         //#else
         mx = org.lwjgl.input.Mouse.getX();
-        my = ((Platform.screen().windowHeight() / Platform.screen().pixelRatio()) - org.lwjgl.input.Mouse.getY() - 1);
+        my = (Platform.screen().windowHeight() - org.lwjgl.input.Mouse.getY() - 1);
         //#endif
 
         try {
-            polyUI.getInputManager().mouseMoved((mx - ox) * Platform.screen().pixelRatio(), (my - oy) * Platform.screen().pixelRatio());
+            polyUI.getInputManager().mouseMoved(mx - ox, my - oy);
         } catch (Exception e) {
             death(e);
         }
@@ -280,8 +279,8 @@ public class PolyUIScreen extends OmniScreen implements BlurScreen {
 
     protected final void adjustResolution(float w, float h, boolean force) {
         if (this.framebuffer == null) {
-            int width = Platform.screen().windowWidth();
-            int height = Platform.screen().windowHeight();
+            int width = Platform.screen().viewportWidth();
+            int height = Platform.screen().viewportHeight();
             this.framebuffer = new ManagedFramebuffer(width, height, GpuTexture.TextureFormat.RGBA8, GpuTexture.TextureFormat.DEPTH24_STENCIL8);
         }
 
@@ -299,9 +298,12 @@ public class PolyUIScreen extends OmniScreen implements BlurScreen {
         }
 
         try {
-            framebuffer.resize((int) (initialWidth * sx), (int) (initialHeight * sy));
+            float ratio = Platform.screen().pixelRatio();
+            // framebuffer should you know probably be the correct larger size because.. well yeah of course it does
+            // didn't anyone think of that?
+            framebuffer.resize((int) (initialWidth * sx * ratio), (int) (initialHeight * sy * ratio));
             polyUI.resize(initialWidth * sx, initialHeight * sy, force);
-            polyUI.getWindow().setPixelRatio(Platform.screen().pixelRatio());
+            polyUI.getWindow().setPixelRatio(ratio);
         } catch (Exception e) {
             death(e);
         }

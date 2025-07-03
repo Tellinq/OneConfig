@@ -103,7 +103,6 @@ object OneConfigUI {
             val builder = OCPolyUIBuilder.create()
                 .blurs()
                 .atResolution(1920f, 1080f)
-                .allowsDebug(false)
                 .backgroundColor {
                     colors.page.fg.normal
                 }.size(1400f, 700f) as OCPolyUIBuilder
