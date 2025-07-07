@@ -65,7 +65,7 @@ object OneConfigUI {
         type = PolyImage.Type.Raster,
     )
     private val searchNoneFound = Text("oneconfig.search.nonefound", fontSize = 16f)
-    private val search = Group(searchNoneFound, visibleSize = Vec2(1130f, 635f))
+    private val search = Group(searchNoneFound, size = Vec2(1130f, 0f), visibleSize = Vec2(1130f, 635f)).addRescalingListeners(false)
 
     private lateinit var ui: Drawable
     private var window: Any? = null
@@ -219,6 +219,7 @@ object OneConfigUI {
             ui = polyUI.master
             window = win
             searchNoneFound.setup(polyUI)
+            search.setup(polyUI)
             (ui as Block).radius(16f)
         } else {
             Platform.screen().display(window)
