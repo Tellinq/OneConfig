@@ -224,8 +224,8 @@ open class ConfigVisualizer {
             Rotate(arrow, if (!open) PI else 0.0, false, anim).add()
             val content = parent[1]
             if (contentHeight == -1f) contentHeight = content.height
-            Resize(parent, width = 0f, height = if (!open) -contentHeight else contentHeight, add = true, animation = anim).add()
-            Resize(content, width = 0f, height = if (!open) -contentHeight else contentHeight, add = true, animation = anim).add()
+            Resize(parent, width = 0f, height = if (open) -contentHeight else contentHeight, add = true, animation = anim).add()
+            Resize(content, width = 0f, height = if (open) -contentHeight else contentHeight, add = true, animation = anim).add()
             // won't ever open properly unless it renders at least once (tee hee) :)
             if (!open) {
                 content.height = 1f
@@ -242,7 +242,7 @@ open class ConfigVisualizer {
                     state = open
                 ).onToggle {
                     enabled?.setAs(it)
-                    if (open != !it) (parent.parent as Drawable).openInsn(null)
+                    if (open != it) (parent.parent as Drawable).openInsn(null)
                 },
                 Image("polyui/chevron-down.svg").also { it.rotation = PI }
             )

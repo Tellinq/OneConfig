@@ -92,6 +92,9 @@ public class TestConfig_Test extends Config {
     @Color(title = "color", category = "bob")
     PolyColor color = ColorUtils.rgba(255, 0, 100, 1f);
 
+    @Slider(title = "we slide", description = "so real", min = 10f, max = 70f)
+    public float slide = 40f;
+
     @Keybind(title = "keybind")
     private KeyBinder.Bind bind = ((OCKeybindHelper) OCKeybindHelper.builder().mods(KeyModifiers.CONTROL).chars('g').does((a) -> {
         Notifications.enqueue(Notifications.Type.Info, "state: " + a);

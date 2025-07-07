@@ -242,9 +242,10 @@ fun interface Visualizer {
                     max = max,
                     length = 200f,
                     initialValue = prop.getAs<Number>().toFloat(),
-                ).onChange { amount: Int ->
+                    integral = prop.type == Int::class.java || prop.type == Long::class.java,
+                ).onChange { amount: Float ->
                     dodge = true
-                    prop.setAs(amount)
+                    if(prop.type == Int::class.java) prop.setAs(amount.toInt()) else prop.setAs(amount)
                     false
                 }
             prop.addCallback {
