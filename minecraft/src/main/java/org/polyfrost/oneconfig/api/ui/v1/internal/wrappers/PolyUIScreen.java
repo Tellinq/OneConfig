@@ -41,7 +41,6 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.MustBeInvokedByOverriders;
 import org.jetbrains.annotations.NotNull;
-import org.lwjgl.opengl.GL20;
 import org.polyfrost.oneconfig.api.platform.v1.Platform;
 import org.polyfrost.oneconfig.api.ui.v1.Notifications;
 import org.polyfrost.oneconfig.api.ui.v1.UIManager;

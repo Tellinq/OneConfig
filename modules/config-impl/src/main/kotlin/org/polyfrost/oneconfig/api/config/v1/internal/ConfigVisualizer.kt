@@ -119,7 +119,7 @@ open class ConfigVisualizer {
      */
     protected open fun create(
         config: Tree,
-        initialPage: String = "General",
+        initialCategory: String = "General",
     ): Drawable {
         val now = System.nanoTime()
         val options = LinkedHashMap<String, HashMap<String, ArrayList<Drawable>>>(4)
@@ -129,16 +129,30 @@ open class ConfigVisualizer {
         //   -> subcategories
         //      -> list of options
         for ((_, node) in config.map) {
+            // first ignore empty tree nodes
+            if(node is Tree) {
+                if (node.map.isEmpty()) {
+                    LOGGER.warn("sub-tree ${node.id} is empty; ignoring")
+                    continue
+                }
+            } else {
+                node as Property<*>
+                if (node.getMetadata<Any?>("visualizer") == null) {
+                    // LOGGER.warn("Property ${node.id} does not have a visualizer; ignoring")
+                    continue
+                }
+            }
+
             processNode(config, node, options)
         }
         LOGGER.info("creating config page ${config.title} took ${(System.nanoTime() - now) / 1_000_000f}ms")
-        return makeFinal(flattenSubcategories(options), initialPage)
+        return makeFinal(flattenSubcategories(options), initialCategory)
     }
 
-    protected open fun makeFinal(categories: Map<String, Drawable>, initialPage: String): Drawable {
+    protected open fun makeFinal(categories: Map<String, Drawable>, initialCategory: String): Drawable {
         return Group(
             createHeaders(categories),
-            categories[initialPage] ?: categories.values.first(),
+            categories[initialCategory] ?: categories.values.first(),
             alignment = Align(cross = Align.Cross.Start, maxRowSize = 1),
             visibleSize = Vec2(1130f, 635f),
         )
@@ -178,10 +192,6 @@ open class ConfigVisualizer {
             list.add(wrap(vis.visualize(node), node.title, node.description, icon).addHideHandler(node).addResetMenu(root, node).linkTo(node))
         } else {
             node as Tree
-            if (node.map.isEmpty()) {
-                LOGGER.warn("sub-tree ${node.id} is empty; ignoring")
-                return
-            }
             list.add(makeAccordion(root, node, node.title, node.description, icon).linkTo(node))
         }
     }
