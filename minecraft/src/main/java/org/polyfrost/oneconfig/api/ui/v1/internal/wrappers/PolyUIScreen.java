@@ -295,7 +295,6 @@ public class PolyUIScreen extends OmniScreen implements BlurScreen {
             int width = Platform.screen().viewportWidth();
             int height = Platform.screen().viewportHeight();
             this.framebuffer = new ManagedFramebuffer(width, height, GpuTexture.TextureFormat.RGBA8, GpuTexture.TextureFormat.DEPTH24_STENCIL8);
-            Glstate
         }
 
         // asm: normally, a polyui instance is as big as its window and that is it.
