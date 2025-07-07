@@ -41,6 +41,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.MustBeInvokedByOverriders;
 import org.jetbrains.annotations.NotNull;
+import org.lwjgl.opengl.GL20;
 import org.polyfrost.oneconfig.api.platform.v1.Platform;
 import org.polyfrost.oneconfig.api.ui.v1.Notifications;
 import org.polyfrost.oneconfig.api.ui.v1.UIManager;
@@ -161,7 +162,12 @@ public class PolyUIScreen extends OmniScreen implements BlurScreen {
             return true;
         }
 
+
         try {
+            //#if MC < 1.13
+            typedChar = org.lwjgl.input.Keyboard.getEventCharacter();
+            if (modifiers.isShift()) typedChar = Character.toUpperCase(typedChar);
+            //#endif
             translateKey(polyUI.getInputManager(), keyCode, typedChar, true);
         } catch (Exception e) {
             death(e);
@@ -174,7 +180,14 @@ public class PolyUIScreen extends OmniScreen implements BlurScreen {
     @MustBeInvokedByOverriders
     public boolean handleKeyRelease(int keyCode, int scancode, OmniKeyboard.@NotNull KeyboardModifiers modifiers) {
         try {
-            translateKey(polyUI.getInputManager(), keyCode, '\u0000', false);
+            char typedChar;
+            //#if MC < 1.13
+            typedChar = org.lwjgl.input.Keyboard.getEventCharacter();
+            if (modifiers.isShift()) typedChar = Character.toUpperCase(typedChar);
+            //#else
+            //$$ typedChar = (char) 0; // No character for key release
+            //#endif
+            translateKey(polyUI.getInputManager(), keyCode, typedChar, false);
         } catch (Exception e) {
             death(e);
         }
@@ -282,6 +295,7 @@ public class PolyUIScreen extends OmniScreen implements BlurScreen {
             int width = Platform.screen().viewportWidth();
             int height = Platform.screen().viewportHeight();
             this.framebuffer = new ManagedFramebuffer(width, height, GpuTexture.TextureFormat.RGBA8, GpuTexture.TextureFormat.DEPTH24_STENCIL8);
+            Glstate
         }
 
         // asm: normally, a polyui instance is as big as its window and that is it.

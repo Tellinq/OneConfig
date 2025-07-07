@@ -58,34 +58,31 @@ abstract class LegacyHud : Hud<Drawable>() {
      *
      * **Note:** This method is called every frame, so you should not perform any heavy calculations here.
      */
-    abstract fun render(stack: OmniMatrixStack, x: Float, y: Float, scaleX: Float, scaleY: Float)
+    abstract fun render(stack: OmniMatrixStack, x: Float, y: Float, scaleX: Float, scaleY: Float, example: Boolean)
 
     /**
      * Wraps the [render] method in a [Drawable] instance, with the [Drawable.size] property delegating to [width] and [height].
      */
-    protected fun createLegacy(): Drawable {
-
-        return object : Drawable() {
-            override var width: Float
-                get() = this@LegacyHud.width
-                set(value) {
-                    this@LegacyHud.width = value
-                }
-
-            override var height: Float
-                get() = this@LegacyHud.height
-                set(value) {
-                    this@LegacyHud.height = value
-                }
-
-            override fun preRender(delta: Long) {}
-
-            override fun render() {
-                val scale = Platform.screen().pixelRatio() / OmniResolution.scaleFactor.toFloat()
-                render(Platform.screen().smuggledMatrixStack, x * scale, y * scale, scaleX * scale, scaleY * scale)
+    protected fun createLegacy() = object : Drawable() {
+        override var width: Float
+            get() = this@LegacyHud.width
+            set(value) {
+                this@LegacyHud.width = value
             }
 
-            override fun postRender() {}
-        }.namedId("LegacyHud")
-    }
+        override var height: Float
+            get() = this@LegacyHud.height
+            set(value) {
+                this@LegacyHud.height = value
+            }
+
+        override fun preRender(delta: Long) {}
+
+        override fun render() {
+            val scale = Platform.screen().pixelRatio() / OmniResolution.scaleFactor.toFloat()
+            render(Platform.screen().smuggledMatrixStack, x * scale, y * scale, scaleX * scale, scaleY * scale, false)
+        }
+
+        override fun postRender() {}
+    }.namedId("LegacyHud")
 }

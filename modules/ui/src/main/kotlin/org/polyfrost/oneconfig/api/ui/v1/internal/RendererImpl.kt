@@ -27,7 +27,6 @@
 package org.polyfrost.oneconfig.api.ui.v1.internal
 
 import dev.deftu.omnicore.client.render.OmniTextureManager
-import dev.deftu.omnicore.client.render.state.*
 import dev.deftu.omnicore.common.OmniLoader
 import org.apache.logging.log4j.LogManager
 import org.lwjgl.opengl.GL11
@@ -113,7 +112,6 @@ class RendererImpl(
     private var prevTextureBinding = -1
     private var prevVao = -1
 
-    private val textBounds = FloatArray(4)
     private val lineHeight = FloatArray(1)
 
     private val queue = ArrayList<() -> Unit>()
@@ -227,6 +225,7 @@ class RendererImpl(
         fontSize: Float,
     ) {
         if (color.transparent) return
+        // todo (nextday): what the fuck is going on here
 
         val fontId = getOrPopulateFont(font).id
         vg.fontFaceId(fontId)
@@ -241,7 +240,7 @@ class RendererImpl(
         val baselineY = y + (lineHeight[0] - ascender[0]) / 2f
 
         // Draw background fill if needed
-        val (width, height) = textBounds(font, text, fontSize)
+        val (width, _) = textBounds(font, text, fontSize)
         vg.beginPath()
         populateFillOrColor(color, x, y - lineHeight[0] / 2f, width, lineHeight[0])
 
@@ -383,22 +382,16 @@ class RendererImpl(
 
     @Suppress("NAME_SHADOWING")
     override fun textBounds(font: Font, text: String, fontSize: Float): Vec2 {
-        val text = text.let { if (it.endsWith(' ')) "$it " else it }
-
         vg.fontFaceId(getOrPopulateFont(font).id)
         vg.fontSize(fontSize)
 
-        val bounds = textBounds
-        textBounds.fill(0f)
         vg.textAlign(vg.constants().NVG_ALIGN_LEFT() or vg.constants().NVG_ALIGN_TOP())
-        vg.textBounds(0f, 0f, text, bounds)
-        val width = bounds[2] - bounds[0]
+        val width = vg.textBounds(0f, 0f, text, null)
 
-        lineHeight[0] = 0f
+        lineHeight[0] = fontSize.coerceAtLeast(1f)
         vg.textMetrics(null, null, lineHeight)
 
-        val height = lineHeight[0]
-        return Vec2(width.coerceAtLeast(1f), height.coerceAtLeast(1f)) // Coercing to at least 1x1 for now because this is returning 0 sometimes for some reason and PolyUI crashes when an element has 0 width & height
+        return Vec2(width.coerceAtLeast(1f), lineHeight[0]) // Coercing to at least 1 x fontSize for now because this is returning 0 sometimes for some reason and PolyUI crashes when an element has 0 width & height
     }
 
     private fun getOrPopulateFont(font: Font): NvgFont {
