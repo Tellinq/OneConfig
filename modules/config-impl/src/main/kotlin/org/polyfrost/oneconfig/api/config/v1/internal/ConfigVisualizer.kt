@@ -62,7 +62,21 @@ open class ConfigVisualizer {
     /**
      * For information, see [create].
      */
-    fun get(config: Tree) = configs.getOrPut(config) { create(config) }
+    fun get(config: Tree): Drawable {
+        val it = configs[config]
+        if (it != null) {
+            // asm: might've been searched, so we need to reposition our option lists
+            val listToReposition = it.children?.last()
+            listToReposition?.children?.fastEach {
+                it.position()
+            }
+            return it
+        } else {
+            val configPage = create(config)
+            configs[config] = configPage
+            return configPage
+        }
+    }
 
     /**
      * Clears the cache of all created config screens.

@@ -65,7 +65,6 @@ object OneConfigUI {
         type = PolyImage.Type.Raster,
     )
     private val searchNoneFound = Text("oneconfig.search.nonefound", fontSize = 16f)
-    private val search = Group(searchNoneFound, size = Vec2(1130f, 0f), visibleSize = Vec2(1130f, 635f)).addRescalingListeners(false)
 
     private lateinit var ui: Drawable
     private var window: Any? = null
@@ -182,12 +181,12 @@ object OneConfigUI {
                                         visibleSize = Vec2(210f, 12f),
                                     ).onChange { text: String ->
                                         if (text.length > 2) {
-                                            search.children?.clear()
-                                            search.children?.addAll(ConfigVisualizer.INSTANCE.getMatching(text))
+                                            val scale = Vec2(polyUI.size.x / polyUI.iSize.x, polyUI.size.y / polyUI.iSize.y)
+                                            val search = Group(children = ConfigVisualizer.INSTANCE.getMatching(text).toTypedArray(), visibleSize = Vec2(1130f, 635f) * scale)
                                             if (search.children?.size == 0) search.children?.add(searchNoneFound)
-                                            if (ui[1][1] !== search) openPage(search, "oneconfig.search")
-                                            search.recalculate()
-                                        } else if (ui[1][1] === search) {
+                                            search.setup(polyUI)
+                                            openPage(search, "oneconfig.search")
+                                        } else {
                                             openPage(ModsPage(collectTrees()), "oneconfig.mods")
                                         }
 
@@ -219,7 +218,6 @@ object OneConfigUI {
             ui = polyUI.master
             window = win
             searchNoneFound.setup(polyUI)
-            search.setup(polyUI)
             (ui as Block).radius(16f)
         } else {
             Platform.screen().display(window)
