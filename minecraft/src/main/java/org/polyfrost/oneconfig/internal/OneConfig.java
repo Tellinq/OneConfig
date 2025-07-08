@@ -131,6 +131,7 @@ public class OneConfig
         preloadCopycat();
         preloadPolyUI();
 
+        new OneConfigConfig();
         registerCommands();
         registerKeybinds();
         registerEventHandlers();

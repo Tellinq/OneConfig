@@ -34,6 +34,11 @@ import org.polyfrost.oneconfig.api.config.v1.Properties.ktProperty
 import org.polyfrost.oneconfig.api.config.v1.Properties.simple
 import org.polyfrost.oneconfig.api.config.v1.Tree
 import org.polyfrost.oneconfig.api.config.v1.annotations.Switch
+import org.polyfrost.oneconfig.api.config.v1.getProp
+import org.polyfrost.oneconfig.api.event.v1.eventHandler
+import org.polyfrost.oneconfig.api.event.v1.events.HudEvent
+import org.polyfrost.oneconfig.api.event.v1.events.ScreenOpenEvent
+import org.polyfrost.oneconfig.api.event.v1.invoke.EventHandler
 import org.polyfrost.oneconfig.api.hud.v1.HudManager.LOGGER
 import org.polyfrost.polyui.color.PolyColor
 import org.polyfrost.polyui.component.Component
@@ -43,6 +48,7 @@ import org.polyfrost.polyui.component.impl.Text
 import org.polyfrost.polyui.unit.Vec2
 import org.polyfrost.polyui.utils.fastAll
 import org.polyfrost.polyui.utils.fastEachIndexed
+import java.util.function.Consumer
 import kotlin.io.path.exists
 import kotlin.random.Random
 
@@ -65,7 +71,7 @@ import kotlin.random.Random
  */
 @Suppress("EqualsOrHashCode")
 abstract class Hud<T : Drawable> : Cloneable, Config("null", null, "null", null) {
-    @Switch(title = "Show in Tab")
+    @Switch(title = "Show in F3")
     var showInF3 = true
 
     @Switch(title = "Show in Tab")
@@ -122,8 +128,37 @@ abstract class Hud<T : Drawable> : Cloneable, Config("null", null, "null", null)
         if (with != null) tree.overwrite(with)
         else LOGGER.info("generated new HUD config for ${out.title()} -> ${tree.id}")
         out.tree = tree
+        tree.getProp<Boolean>("showInF3")?.addCallback {
+            if (!it) hideF3Handler.register()
+            else hideF3Handler?.unregister()
+            false
+        }
+        tree.getProp<Boolean>("showInTab")?.addCallback {
+            if (!it) hideTabHandler.register()
+            else hideTabHandler?.unregister()
+            false
+        }
+        tree.getProp<Boolean>("showInScreens")?.addCallback {
+            if (!it) hideScreenHandler.register()
+            else hideScreenHandler?.unregister()
+            false
+        }
         ConfigManager.active().register(tree)
         return out
+    }
+
+    private val hideF3Handler by lazy { EventHandler.of(HudEvent.Debug::class.java, hideHandler) }
+    private val hideTabHandler by lazy { EventHandler.of(HudEvent.Tab::class.java, hideHandler) }
+    private val hideScreenHandler by lazy {
+        eventHandler { (screen): ScreenOpenEvent ->
+            hidden = screen != null
+        }
+    }
+
+    private val hideHandler by lazy {
+        Consumer<HudEvent> { (opened): HudEvent ->
+            hidden = opened
+        }
     }
 
     private fun inspect(cmp: Component, tree: Tree) {
@@ -193,21 +228,22 @@ abstract class Hud<T : Drawable> : Cloneable, Config("null", null, "null", null)
      * If `true`, the HUD will not be rendered, and, if this is in a HUD group, it will resize accordingly.
      */
     var hidden: Boolean
-        get() = it?.isEnabled == false
+        get() = it?.renders == false
         set(new) {
             val value = !new
             // useless null-safety checks, but I don't want to risk dumb errors
             val it = it ?: return
-            if (value == it.isEnabled) return
-            it.isEnabled = value
+            //if (value == it.renders) return
+            it.renders = value
+            it.layoutIgnored = value
 
             val bg = getBackground() ?: return
             val siblings = bg.children ?: return
 
             if (siblings.size == 1) {
-                bg.isEnabled = value
+                bg.renders = value
             } else if (!value && siblings.fastAll { !it.renders }) {
-                bg.isEnabled = false
+                bg.renders = false
             }
             bg.recalculate()
         }

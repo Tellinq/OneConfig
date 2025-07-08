@@ -136,7 +136,9 @@ object OneConfigUI {
                     SidebarButton("assets/oneconfig/ico/paintbrush.svg".image(), "oneconfig.themes", label("oneconfig.soon")).onClick {
                         openPage(ThemesPage(), "oneconfig.themes")
                     }.disable(),
-                    SidebarButton("assets/oneconfig/ico/cog.svg".image(), "oneconfig.preferences"),
+                    SidebarButton("assets/oneconfig/ico/cog.svg".image(), "oneconfig.preferences").onClick {
+                        openPage(ConfigVisualizer.INSTANCE.get(ConfigManager.active().get("oneconfig.json")), "oneconfig.preferences")
+                    },
                     Text("oneconfig.sidebar.title.extra", fontSize = 11f).setPalette { text.secondary }.padded(0f, 12f, 0f, 0f),
                     SidebarButton("assets/oneconfig/ico/refresh.svg".image(), "oneconfig.changelog"),
                     SidebarButton(
