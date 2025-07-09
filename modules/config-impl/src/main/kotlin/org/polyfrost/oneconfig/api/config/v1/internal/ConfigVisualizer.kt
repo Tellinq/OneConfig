@@ -160,7 +160,7 @@ open class ConfigVisualizer {
             processNode(config, node, options)
         }
         LOGGER.info("creating config page ${config.title} took ${(System.nanoTime() - now) / 1_000_000f}ms")
-        return makeFinal(flattenSubcategories(options), initialCategory)
+        return makeFinal(flattenSubcategories(options), initialCategory).addRethemingListeners()
     }
 
     protected open fun makeFinal(categories: Map<String, Drawable>, initialCategory: String): Drawable {

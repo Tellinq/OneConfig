@@ -29,8 +29,6 @@ package org.polyfrost.oneconfig.api.hud.v1
 import org.apache.logging.log4j.LogManager
 import org.jetbrains.annotations.ApiStatus
 import org.polyfrost.oneconfig.api.config.v1.ConfigManager
-import org.polyfrost.oneconfig.api.event.v1.events.HudEvent
-import org.polyfrost.oneconfig.api.event.v1.eventHandler
 import org.polyfrost.oneconfig.api.hud.v1.internal.HudsPage
 import org.polyfrost.oneconfig.api.hud.v1.internal.alignC
 import org.polyfrost.oneconfig.api.hud.v1.internal.build
@@ -189,25 +187,8 @@ object HudManager {
             theHud.x = default.x
             theHud.y = default.y
             polyUI.master.addChild(theHud, recalculate = false)
-            LOGGER.info("Added HUD {} to {} (default)", hud.title(), default)
+            LOGGER.info("Added HUD {} to {} (default)", hud.title, default)
         }
-
-        // add callbacks todo
-        eventHandler { (opened): HudEvent.Tab ->
-//            for (hud in hudProviders.values) {
-//                if (opened) {
-//                    if (!hud.hidden && !hud.showInF3) hud.hidden = true
-//                } else {
-//                    if (hud.hidden && !hud.showInF3) hud.hidden = false
-//                }
-//            }
-        }
-//        eventHandler { (screen): ScreenOpenEvent ->
-//
-//        }
-//        eventHandler { (opened): HudEvent.Debug ->
-//
-//        }
 
         LOGGER.info("HUD load took {}ms", (System.nanoTime() - now) / 1_000_000.0)
     }
@@ -326,7 +307,6 @@ object HudManager {
                 size = Vec2(500f, 1048f),
                 alignment = Align(cross = Align.Cross.Start, pad = Vec2(0f, 18f)),
             ).apply {
-                rawResize = true
                 addOperation {
                     if (polyUI.mouseDown) {
                         if (slinex != -1f) polyUI.renderer.line(slinex, 0f, slinex, polyUI.size.y, snapLineColor, 1f)

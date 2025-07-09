@@ -88,7 +88,7 @@ fun HudsPage(huds: Collection<Hud<*>>): Drawable {
                 )
             },
             alignment = Align(pad = Vec2(6f, 8f)),
-            visibleSize = Vec2(500f, 48f)
+            size = Vec2(500f, 48f)
         ),
         if (huds.isNotEmpty()) {
             Group(
@@ -101,9 +101,10 @@ fun HudsPage(huds: Collection<Hud<*>>): Drawable {
                         // #created-with-set-size = true
                         layoutFlags = layoutFlags or 0b00000010
                     }
-                    hudMap[it.category()] = obj
+                    hudMap[it.category] = obj
                     obj
                 },
+                size = Vec2(500f, 0f),
                 visibleSize = Vec2(500f, 800f),
             )
         } else {
@@ -135,20 +136,17 @@ fun createInspectionsScreen(hud: Hud<*>): Drawable {
             "assets/oneconfig/ico/paintbrush.svg".image() to "oneconfig.hudeditor.designer.title",
         ).onInit { color = polyUI.colors.component.bgDeselected }.onChange { index: Int ->
             if (index == 0) {
-                parent[1] = createSettings(hud)
+                parent[1] = HudVisualizer.get(hud.tree)
             } else {
                 parent[1] = createDesigner(hud)
             }
             false
         },
-        createSettings(hud),
+        HudVisualizer.get(hud.tree),
+        size = Vec2(500f, 0f),
         visibleSize = Vec2(500f, 800f),
         alignment = Align(cross = Align.Cross.Start),
     )
-}
-
-private fun createSettings(hud: Hud<*>): Drawable {
-    return HudVisualizer().get(hud.tree)
 }
 
 private fun createDesigner(hud: Hud<*>): Drawable {

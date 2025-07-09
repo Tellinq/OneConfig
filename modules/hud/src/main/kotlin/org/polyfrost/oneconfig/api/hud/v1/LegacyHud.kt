@@ -45,7 +45,7 @@ import org.polyfrost.polyui.component.extensions.namedId
  * There are currently no plans to remove this, hence it is not considered a warning. This may change in the future.
  */
 @ApiStatus.Obsolete(since = "1.0.0")
-abstract class LegacyHud : Hud<Drawable>() {
+abstract class LegacyHud(id: String, title: String, category: Category) : Hud<Drawable>(id, title, category) {
     abstract var width: Float
     abstract var height: Float
 

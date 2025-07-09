@@ -35,7 +35,7 @@ import org.polyfrost.polyui.component.extensions.setFont
 import org.polyfrost.polyui.data.PolyImage
 import org.polyfrost.polyui.unit.Vec2
 
-class HudVisualizer : ConfigVisualizer() {
+object HudVisualizer : ConfigVisualizer() {
 
     override fun createHeaders(categories: Map<String, Drawable>) = null
 
