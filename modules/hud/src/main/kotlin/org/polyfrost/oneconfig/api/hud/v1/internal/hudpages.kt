@@ -129,27 +129,32 @@ private fun HudButton(text: String): Block {
     return Button(text = text, fontSize = 14f, font = PolyUI.defaultFonts.medium, padding = Vec2(12f, 8f)).radius(6f).withBorder()
 }
 
-fun createInspectionsScreen(hud: Hud<*>): Drawable {
+fun HudSettingsPage(hud: Hud<*>): Drawable {
     return Group(
         Radiobutton(
             "assets/oneconfig/ico/cog.svg".image() to "oneconfig.hudeditor.settings.title",
             "assets/oneconfig/ico/paintbrush.svg".image() to "oneconfig.hudeditor.designer.title",
         ).onInit { color = polyUI.colors.component.bgDeselected }.onChange { index: Int ->
             if (index == 0) {
-                parent[1] = HudVisualizer.get(hud.tree)
+                val p = parent
+                val config = HudVisualizer.get(hud.tree)
+                p[1] = config
+//                p.size = p.size.coerceAtLeast(Vec2(config.x + config.width - p.x, config.y + config.height - p.y))
             } else {
-                parent[1] = createDesigner(hud)
+                val p = parent
+                val hudDesigner = makeHudDesigner(hud)
+                p[1] = hudDesigner
+//                p.size = p.size.coerceAtLeast(Vec2(hudDesigner.x + hudDesigner.width - p.x, hudDesigner.y + hudDesigner.height - p.y))
             }
             false
         },
         HudVisualizer.get(hud.tree),
-        size = Vec2(500f, 0f),
-        visibleSize = Vec2(500f, 800f),
+//        visibleSize = Vec2(500f, 800f),
         alignment = Align(cross = Align.Cross.Start),
-    )
+    ).namedId("HudSettingsPage")
 }
 
-private fun createDesigner(hud: Hud<*>): Drawable {
+private fun makeHudDesigner(hud: Hud<*>): Drawable {
     val isLegacy = hud is LegacyHud
     val theHud = hud.get()
     val bg = hud.getBackground()
@@ -212,7 +217,6 @@ private fun createDesigner(hud: Hud<*>): Drawable {
         },
         alignment = Align(cross = Align.Cross.Start),
         size = Vec2(480f, 0f),
-        visibleSize = Vec2(480f, 800f),
     )
 }
 

@@ -40,6 +40,7 @@ object HudVisualizer : ConfigVisualizer() {
     override fun createHeaders(categories: Map<String, Drawable>) = null
 
     override fun flattenSubcategories(options: Map<String, Map<String, ArrayList<Drawable>>>): Map<String, Drawable> {
+        // one category with one subcategory, so skip the headers
         return if (options.values.size == 1 && options.values.first().size == 1) {
             mapOf(
                 options.keys.first() to Group(

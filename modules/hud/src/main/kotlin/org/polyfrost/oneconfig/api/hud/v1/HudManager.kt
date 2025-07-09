@@ -32,7 +32,7 @@ import org.polyfrost.oneconfig.api.config.v1.ConfigManager
 import org.polyfrost.oneconfig.api.hud.v1.internal.HudsPage
 import org.polyfrost.oneconfig.api.hud.v1.internal.alignC
 import org.polyfrost.oneconfig.api.hud.v1.internal.build
-import org.polyfrost.oneconfig.api.hud.v1.internal.createInspectionsScreen
+import org.polyfrost.oneconfig.api.hud.v1.internal.HudSettingsPage
 import org.polyfrost.oneconfig.api.platform.v1.Platform
 import org.polyfrost.oneconfig.api.ui.v1.UIManager
 import org.polyfrost.oneconfig.utils.v1.MHUtils
@@ -207,7 +207,7 @@ object HudManager {
     @ApiStatus.Internal
     fun openHudEditor(hud: Hud<*>) {
         if (!panelOpen) toggle()
-        panel[0][3] = createInspectionsScreen(hud)
+        panel[0][3] = HudSettingsPage(hud)
     }
 
     private fun editorClose() {
