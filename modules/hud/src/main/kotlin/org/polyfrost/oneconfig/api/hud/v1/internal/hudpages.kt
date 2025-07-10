@@ -136,21 +136,15 @@ fun HudSettingsPage(hud: Hud<*>): Drawable {
             "assets/oneconfig/ico/paintbrush.svg".image() to "oneconfig.hudeditor.designer.title",
         ).onInit { color = polyUI.colors.component.bgDeselected }.onChange { index: Int ->
             if (index == 0) {
-                val p = parent
-                val config = HudVisualizer.get(hud.tree)
-                p[1] = config
-//                p.size = p.size.coerceAtLeast(Vec2(config.x + config.width - p.x, config.y + config.height - p.y))
+                parent[1] = HudVisualizer.get(hud.tree)
             } else {
-                val p = parent
-                val hudDesigner = makeHudDesigner(hud)
-                p[1] = hudDesigner
-//                p.size = p.size.coerceAtLeast(Vec2(hudDesigner.x + hudDesigner.width - p.x, hudDesigner.y + hudDesigner.height - p.y))
+                parent[1] = makeHudDesigner(hud)
             }
             false
         },
         HudVisualizer.get(hud.tree),
 //        visibleSize = Vec2(500f, 800f),
-        alignment = Align(cross = Align.Cross.Start),
+        alignment = Align(cross = Align.Cross.Start, mode = Align.Mode.Vertical, wrap = Align.Wrap.NEVER),
     ).namedId("HudSettingsPage")
 }
 
