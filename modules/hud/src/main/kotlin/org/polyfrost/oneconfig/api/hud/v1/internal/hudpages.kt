@@ -173,27 +173,27 @@ private fun makeHudDesigner(hud: Hud<*>): Drawable {
                     "oneconfig.align.spaceevenly",
                 ).minimumSize(70f by 32f).titled("oneconfig.hudeditor.padding.mode.main").onChange { index: Int ->
                     val a = receiver.alignment
-                    receiver.alignment = Align(Align.Main.entries[index], a.cross, a.mode, a.pad, a.maxRowSize)
+                    receiver.alignment = Align(Align.Main.entries[index], a.cross, a.mode, a.pad, a.wrap)
                     false
                 },
                 Dropdown(
                     "oneconfig.align.start", "oneconfig.align.center", "oneconfig.align.end",
                 ).minimumSize(70f by 32f).titled("oneconfig.hudeditor.padding.mode.cross").onChange { index: Int ->
                     val a = receiver.alignment
-                    receiver.alignment = Align(a.main, Align.Cross.entries[index], a.mode, a.pad, a.maxRowSize)
+                    receiver.alignment = Align(a.main, Align.Cross.entries[index], a.mode, a.pad, a.wrap)
                     false
                 },
                 BoxedNumericInput("assets/oneconfig/ico/info.svg".image(), initialValue = receiver.alignment.pad.x, size = Vec2(72f, 0f), post = "px").also {
                     it[0].onChange { value: Float ->
                         val a = receiver.alignment
-                        receiver.alignment = Align(a.main, a.cross, a.mode, Vec2(value, a.pad.y), a.maxRowSize)
+                        receiver.alignment = Align(a.main, a.cross, a.mode, Vec2(value, a.pad.y), a.wrap)
                         false
                     }
                 }.titled("oneconfig.hudeditor.padding.main"),
                 BoxedNumericInput("assets/oneconfig/ico/info.svg".image(), initialValue = receiver.alignment.pad.y, size = Vec2(72f, 0f), post = "px").also {
                     it[0].onChange { value: Float ->
                         val a = receiver.alignment
-                        receiver.alignment = Align(a.main, a.cross, a.mode, Vec2(a.pad.x, value), a.maxRowSize)
+                        receiver.alignment = Align(a.main, a.cross, a.mode, Vec2(a.pad.x, value), a.wrap)
                         false
                     }
                 }.titled("oneconfig.hudeditor.padding.cross"),
