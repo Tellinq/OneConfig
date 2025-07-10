@@ -80,7 +80,7 @@ public class ScreenPlatformImpl implements ScreenPlatform {
     public float pixelRatio() {
         // asm: considerably more reliable than just doing viewport / window
         //#if MC > 1.13
-        //$$ org.lwjgl.glfw.GLFW.glfwGetWindowContentScale(Minecraft.getInstance().getWindow().getHandle(), pixelScaleFactor, null);
+        //$$ org.lwjgl.glfw.GLFW.glfwGetWindowContentScale(Minecraft.getInstance().getWindow().getWindow(), pixelScaleFactor, null);
         //$$ return pixelScaleFactor[0];
         //#else
         return org.lwjgl.opengl.Display.getPixelScaleFactor();
