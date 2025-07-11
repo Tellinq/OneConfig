@@ -78,7 +78,7 @@ private fun ModCard(
                         ConfigManager.active().delete(tree.id)
                     }
                 }
-                tree.overwrite(backup)
+                tree.overwrite(backup, false)
                 polyUI.unfocus()
                 false
             }, polyUI = polyUI)

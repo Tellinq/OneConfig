@@ -177,6 +177,7 @@ private fun makeHudDesigner(hud: Hud<*>): Drawable {
                     "oneconfig.align.end",
                     "oneconfig.align.spacebetween",
                     "oneconfig.align.spaceevenly",
+                    initial = receiver.alignment.main.ordinal
                 ).minimumSize(70f by 32f).titled("oneconfig.hudeditor.padding.mode.main").onChange { index: Int ->
                     val a = receiver.alignment
                     receiver.alignment = Align(Align.Main.entries[index], a.cross, a.mode, a.pad, a.wrap)
@@ -184,19 +185,20 @@ private fun makeHudDesigner(hud: Hud<*>): Drawable {
                 },
                 Dropdown(
                     "oneconfig.align.start", "oneconfig.align.center", "oneconfig.align.end",
+                    initial = receiver.alignment.cross.ordinal
                 ).minimumSize(70f by 32f).titled("oneconfig.hudeditor.padding.mode.cross").onChange { index: Int ->
                     val a = receiver.alignment
                     receiver.alignment = Align(a.main, Align.Cross.entries[index], a.mode, a.pad, a.wrap)
                     false
                 },
-                BoxedNumericInput("assets/oneconfig/ico/info.svg".image(), initialValue = receiver.alignment.pad.x, size = Vec2(72f, 0f), post = "px").also {
+                BoxedNumericInput("assets/oneconfig/ico/info.svg".image(), initialValue = receiver.alignment.pad.x, size = Vec2(72f, 0f), post = "px", arrows = false).also {
                     it[0].onChange { value: Float ->
                         val a = receiver.alignment
                         receiver.alignment = Align(a.main, a.cross, a.mode, Vec2(value, a.pad.y), a.wrap)
                         false
                     }
                 }.titled("oneconfig.hudeditor.padding.main"),
-                BoxedNumericInput("assets/oneconfig/ico/info.svg".image(), initialValue = receiver.alignment.pad.y, size = Vec2(72f, 0f), post = "px").also {
+                BoxedNumericInput("assets/oneconfig/ico/info.svg".image(), initialValue = receiver.alignment.pad.y, size = Vec2(72f, 0f), post = "px", arrows = false).also {
                     it[0].onChange { value: Float ->
                         val a = receiver.alignment
                         receiver.alignment = Align(a.main, a.cross, a.mode, Vec2(a.pad.x, value), a.wrap)
@@ -381,7 +383,7 @@ fun textOptions(text: Text): Drawable {
             ex.parent.recalculate()
             false
         }.titled("oneconfig.hudeditor.text.font"),
-        BoxedNumericInput("assets/oneconfig/ico/info.svg".image(), initialValue = text.fontSize, min = 1f, size = Vec2(72f, 0f), post = "px").also {
+        BoxedNumericInput("assets/oneconfig/ico/info.svg".image(), initialValue = text.fontSize, min = 1f, size = Vec2(72f, 0f), post = "px", arrows = false).also {
             it[0].onChange { value: Float ->
                 text.fontSize = value
                 text._parent?.recalculate()

@@ -341,7 +341,7 @@ open class ConfigVisualizer {
                     this@addResetMenu.shake()
                     return@onClick false
                 }
-                prop.overwrite(backup.get(Tree.evaluatePath(root, prop).split('.')))
+                prop.overwrite(backup.get(Tree.evaluatePath(root, prop).split('.')), false)
                 polyUI.unfocus()
                 false
             }, polyUI = polyUI)

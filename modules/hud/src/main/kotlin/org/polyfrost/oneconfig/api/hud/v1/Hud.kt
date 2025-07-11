@@ -110,12 +110,11 @@ abstract class Hud<T : Drawable>(id: String, title: String, val category: Catego
         tree.addMetadata("hidden", true)
         tree["x"] = ktProperty(out.hud::x)
         tree["y"] = ktProperty(out.hud::y)
-        tree["hidden"] = ktProperty(out::hidden)
         inspect(out.hud, tree)
         out.addToSerialized(tree)
         tree["hudClass"] = simple(value = out::class.java.name)
         if (with != null) {
-            tree.overwrite(with)
+            tree.overwrite(with, true)
             out.addHideHandlers(tree)
         } else LOGGER.info("generated new HUD config for ${out.title} -> ${tree.id}")
         out.tree = tree
@@ -180,16 +179,9 @@ abstract class Hud<T : Drawable>(id: String, title: String, val category: Catego
     private fun inspect(cmp: Component, tree: Tree) {
         if (cmp is Drawable) {
             tree["color"] = ktProperty(cmp::_color)
-            tree["alpha"] = ktProperty(cmp::alpha)
-            tree["scaleX"] = ktProperty(cmp::scaleX)
-            tree["scaleY"] = ktProperty(cmp::scaleY)
-            tree["rotation"] = ktProperty(cmp::rotation)
-            tree["skewX"] = ktProperty(cmp::skewX)
-            tree["skewY"] = ktProperty(cmp::skewY)
         }
         when (cmp) {
             is Block -> {
-                tree["radii"] = ktProperty(cmp::radii)
                 tree["boarderColor"] = ktProperty(cmp::borderColor)
                 tree["boarderWidth"] = ktProperty(cmp::borderWidth)
             }
@@ -282,7 +274,22 @@ abstract class Hud<T : Drawable>(id: String, title: String, val category: Catego
      *
      * this method will be called once, and once only.
      */
-    open fun initialize() {}
+    @MustBeInvokedByOverriders
+    open fun initialize() {
+        if (isReal) {
+            // asm: add all the background properties to the tree as well (we have to do it here because in make, the background is not be created yet)
+            val cmp = getBackground() ?: get()
+            tree["alignment"] = ktProperty( cmp::alignment)
+            tree["alpha"] = ktProperty(cmp::alpha)
+            tree["scaleX"] = ktProperty(cmp::scaleX)
+            tree["scaleY"] = ktProperty(cmp::scaleY)
+            tree["rotation"] = ktProperty(cmp::rotation)
+            tree["skewX"] = ktProperty(cmp::skewX)
+            tree["skewY"] = ktProperty(cmp::skewY)
+
+            if(cmp is Block) tree["radii"] = ktProperty(cmp::radii)
+        }
+    }
 
     /**
      * shorthand for [adding a callback][addCallback] on the given property that just calls [updateAndRecalculate].

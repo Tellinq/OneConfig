@@ -84,6 +84,7 @@ abstract class TextHud(
     override fun minimumSize() = Vec2(120f, 32f)
 
     override fun initialize() {
+        super.initialize()
         if (isReal) {
             updateWhenChanged("prefix")
             updateWhenChanged("suffix")
