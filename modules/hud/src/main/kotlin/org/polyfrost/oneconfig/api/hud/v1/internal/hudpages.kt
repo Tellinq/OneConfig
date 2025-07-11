@@ -34,6 +34,7 @@ import org.polyfrost.oneconfig.api.hud.v1.LegacyHud
 import org.polyfrost.polyui.PolyUI
 import org.polyfrost.polyui.color.Colors
 import org.polyfrost.polyui.color.mutable
+import org.polyfrost.polyui.color.rgba
 import org.polyfrost.polyui.component.Drawable
 import org.polyfrost.polyui.component.extensions.*
 import org.polyfrost.polyui.component.impl.*
@@ -54,6 +55,8 @@ import kotlin.math.min
 
 val alignC = Align(main = Align.Main.Center, cross = Align.Cross.Center)
 val alignNoPad = Align(pad = Vec2.ZERO)
+val alignHudDefault = Align(main = Align.Main.Center, cross = Align.Cross.Center, pad = Vec2(8f, 8f))
+val BLACK_HALF = rgba(0, 0, 0, 0.5f)
 private val mcFont = FontFamily("Minecraft", "assets/oneconfig/fonts/minecraft")
 const val angleSnapMargin = PI / 12.0
 const val minMargin = 4f
@@ -71,25 +74,25 @@ fun HudsPage(huds: Collection<Hud<*>>): Drawable {
             },
             HudButton("oneconfig.huds.pvp").onClick {
                 parent[1] = Group(
-                    *hudMap.filterKeys { it == Hud.Category.COMBAT }.values.toTypedArray(),
+                    *hudMap.filterValuesByKey { it == Hud.Category.COMBAT }.toTypedArray(),
                     visibleSize = Vec2(500f, 800f),
                 )
             },
             HudButton("oneconfig.huds.info").onClick {
                 parent[1] = Group(
-                    *hudMap.filterKeys { it == Hud.Category.INFO }.values.toTypedArray(),
+                    *hudMap.filterValuesByKey { it == Hud.Category.INFO }.toTypedArray(),
                     visibleSize = Vec2(500f, 800f),
                 )
             },
             HudButton("oneconfig.huds.player").onClick {
                 parent[1] = Group(
-                    *hudMap.filterKeys { it == Hud.Category.PLAYER }.values.toTypedArray(),
+                    *hudMap.filterValuesByKey { it == Hud.Category.PLAYER }.toTypedArray(),
                     visibleSize = Vec2(500f, 800f),
                 )
             },
             alignment = Align(pad = Vec2(6f, 8f)),
-            size = Vec2(500f, 48f)
-        ),
+            size = Vec2(452f, 48f)
+        ).padded(18f, 0f).named("HudsPageFilterButtons"),
         if (huds.isNotEmpty()) {
             Group(
                 children = huds.mapToArray {
@@ -97,13 +100,14 @@ fun HudsPage(huds: Collection<Hud<*>>): Drawable {
                     val obj = Block(
                         preview,
                         alignment = alignC,
-                    ).withBorder(2f) { page.border10 }.minimumSize(215f by 80f).withHoverStates().onInit {
+                    ).withBorder().minimumSize(215f by 80f).withHoverStates().onInit {
                         // #created-with-set-size = true
                         layoutFlags = layoutFlags or 0b00000010
                     }
                     hudMap[it.category] = obj
                     obj
                 },
+                alignment = Align(pad = Vec2(22f, 22f)),
                 size = Vec2(500f, 0f),
                 visibleSize = Vec2(500f, 800f),
             )
@@ -111,18 +115,27 @@ fun HudsPage(huds: Collection<Hud<*>>): Drawable {
             Text("oneconfig.hudeditor.nothinghere", fontSize = 14f).secondary()
         },
         size = Vec2(500f, 0f),
+        alignment = Align(main = Align.Main.SpaceBetween, pad = Vec2.ZERO)
     ).onInit {
         if (huds.isNotEmpty()) {
             polyUI.every(1.seconds) {
                 if (!HudManager.panelExists) return@every
                 huds.forEach {
-                    if (it.update()) {
-                        it.getBackground()?.recalculate()
-                    }
+                    if (it.update()) it.getBackground()?.recalculate()
                 }
             }
         }
     }.named("HudsPage")
+}
+
+inline fun <K, reified V> Map<K, V>.filterValuesByKey(predicate: (K) -> Boolean): MutableList<V> {
+    val out = mutableListOf<V>()
+    for ((key, value) in this) {
+        if (predicate(key)) {
+            out.add(value)
+        }
+    }
+    return out
 }
 
 private fun HudButton(text: String): Block {
@@ -143,7 +156,6 @@ fun HudSettingsPage(hud: Hud<*>): Drawable {
             false
         },
         HudVisualizer.get(hud.tree),
-//        visibleSize = Vec2(500f, 800f),
         alignment = Align(cross = Align.Cross.Start, mode = Align.Mode.Vertical, wrap = Align.Wrap.NEVER),
     ).namedId("HudSettingsPage")
 }

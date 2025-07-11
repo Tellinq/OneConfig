@@ -51,12 +51,12 @@ open class ConfigVisualizer {
     private val LOGGER = LogManager.getLogger("OneConfig/Config")
     protected val configs = HashMap<Tree, Drawable>()
     protected val optBg = rgba(39, 49, 55, 0.2f)
-    protected val alignCStart = Align(cross = Align.Cross.Start, wrap = Align.Wrap.ALWAYS)
-    protected val alignCStartNoPad = Align(cross = Align.Cross.Start, wrap = Align.Wrap.ALWAYS, pad = Vec2.ZERO)
+    protected val alignCStart = Align(cross = Align.Cross.Start, mode = Align.Mode.Vertical, wrap = Align.Wrap.NEVER)
+    protected val alignCStartNoPad = Align(cross = Align.Cross.Start, mode = Align.Mode.Vertical, wrap = Align.Wrap.NEVER, pad = Vec2.ZERO)
     protected val stdAlign = Align(main = Align.Main.SpaceBetween, pad = Vec2(16f, 8f))
     protected val stdAccord = Align(main = Align.Main.SpaceBetween, pad = Vec2.ZERO)
     protected val ic2text = Align(pad = Vec2(8f, 0f))
-    protected val stdOpt = Align(cross = Align.Cross.Start, pad = Vec2(0f, 8f), wrap = Align.Wrap.ALWAYS)
+    protected val stdOpt = Align(cross = Align.Cross.Start, pad = Vec2(0f, 8f), mode = Align.Mode.Vertical, wrap = Align.Wrap.NEVER)
     protected val accordOpt = Align(cross = Align.Cross.Start, pad = Vec2(22f, 12f))
 
     /**
