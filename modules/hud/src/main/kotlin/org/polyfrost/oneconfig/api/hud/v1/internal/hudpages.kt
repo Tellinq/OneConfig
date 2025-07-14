@@ -166,7 +166,39 @@ private fun makeHudDesigner(hud: Hud<*>): Drawable {
         Text("oneconfig.hudeditor.general.title", fontSize = 16f).setFont { medium },
         subheading("oneconfig.hudeditor.padding.title", "oneconfig.hudeditor.padding.info"),
         interactiveAlignment(receiver),
-
+        Group(
+            Group(
+                DraggingNumericTextInput(icon = "assets/oneconfig/ico/info.svg".image(), suffix = "px", max = 30f, size = Vec2(120f, 32f)).also {
+                    it[0].onChange { value: Float ->
+                        receiver.alignment = receiver.alignment.copy(pad = Vec2(value, value))
+                        receiver.recalculate()
+                        false
+                    }
+                }.titled("oneconfig.hudeditor.padding.between"),
+                DraggingNumericTextInput(icon = "assets/oneconfig/ico/info.svg".image(), suffix = "px", max = 10f, size = Vec2(120f, 32f)).also {
+                    it[0].onChange { value: Float ->
+                        (receiver as? Block)?.radius(value)
+                        false
+                    }
+                }.titled("oneconfig.hudeditor.corner.radius"),
+                alignment = Align(pad = Vec2(16f, 0f))
+            ),
+            Group(
+                DraggingNumericTextInput(icon = "assets/oneconfig/ico/info.svg".image(), suffix = "px", max = 10f, size = Vec2(68f, 32f)),
+                DraggingNumericTextInput(icon = "assets/oneconfig/ico/info.svg".image(), suffix = "px", max = 10f, size = Vec2(68f, 32f)),
+                DraggingNumericTextInput(icon = "assets/oneconfig/ico/info.svg".image(), suffix = "px", max = 10f, size = Vec2(68f, 32f)),
+                DraggingNumericTextInput(icon = "assets/oneconfig/ico/info.svg".image(), suffix = "px", max = 10f, size = Vec2(68f, 32f)),
+                alignment = Align(pad = Vec2(12f, 0f), main = Align.Main.SpaceBetween, wrap = Align.Wrap.NEVER),
+                size = Vec2(308f, 32f)
+            ).titled("oneconfig.hudeditor.padding.edges").padded(0f, 12f, 0f, 0f),
+            alignment = Align(cross = Align.Cross.Start, mode = Align.Mode.Vertical, wrap = Align.Wrap.NEVER, pad = Vec2.ZERO)
+        ),
+        Group(
+            Checkbox(size = 18f),
+            Text("oneconfig.hudeditor.staticwidth"),
+            DraggingNumericTextInput(pre = "oneconfig.width", suffix = "px", max = 1000f, size = Vec2(128f, 32f)),
+            DraggingNumericTextInput(pre = "oneconfig.height", suffix = "px", max = 1000f, size = Vec2(128f, 32f)),
+        ),
         *(if (bg != null) colorOptions(bg) else arrayOf()),
         Text("oneconfig.hudeditor.component.title", fontSize = 16f).padded(0f, 18f, 0f, 0f).setFont { medium },
         if (isLegacy) {
@@ -188,23 +220,32 @@ private fun makeHudDesigner(hud: Hud<*>): Drawable {
 }
 
 fun interactiveAlignment(recv: Drawable): Block {
-    val short = Block(size = Vec2(8f, 4f)).setPalette { brand.fg }.radius(2f)
-    val medium = Block(size = Vec2(10f, 4f)).setPalette { brand.fg }.radius(2f)
-    val long = Block(size = Vec2(15f, 4f)).setPalette { brand.fg }.radius(2f)
+    val short = Block(size = Vec2(6f, 3f)).setPalette { text.secondary }.radius(1.5f)
+    val medium = Block(size = Vec2(9f, 3f)).setPalette { text.secondary }.radius(1.5f)
+    val long = Block(size = Vec2(15f, 3f)).setPalette { text.secondary }.radius(1.5f)
+    val shortBlue = Block(size = Vec2(6f, 3f)).setPalette { brand.fg }.radius(1.5f)
+    val mediumBlue = Block(size = Vec2(9f, 3f)).setPalette { brand.fg }.radius(1.5f)
+    val longBlue = Block(size = Vec2(15f, 3f)).setPalette { brand.fg }.radius(1.5f)
 
     val theGrid: Image
     val theLittleBars = Group(
         medium, long, short,
-        size = Vec2(18f, 18f),
+        size = Vec2(16f, 16f),
+        alignment = Align(pad = Vec2(2f, 2f))
+    ).ignoreLayout()
+    val theBlueLittleBars = Group(
+        mediumBlue, longBlue, shortBlue,
+        size = Vec2(16f, 16f),
         alignment = Align(pad = Vec2(2f, 2f))
     ).ignoreLayout()
 
     val o = Block(
         Image(
-            "alignment.svg".image(),
+            "assets/oneconfig/hud/align/alignment.svg".image(),
             children = arrayOf(
                 *repeat(9) {
-                    Image("circle.svg").onHover { _ ->
+                    Image("assets/oneconfig/hud/align/circle.svg").onHover { _ ->
+                        theLittleBars.renders = true
                         needsRedraw = true
                         val mainAlign = when (it) {
                             0, 3, 6 -> Align.Main.Start
@@ -222,23 +263,40 @@ fun interactiveAlignment(recv: Drawable): Block {
                         theLittleBars.position()
                         theLittleBars.at = this.at + (this.size / 2f) - (theLittleBars.size / 2f)
                     }.onClick { _ ->
+                        needsRedraw = true
+                        theLittleBars.renders = false
+                        val mainAlign = when (it) {
+                            0, 3, 6 -> Align.Main.Start
+                            1, 4, 7 -> Align.Main.Center
+                            else -> Align.Main.End
+                        }
+                        theBlueLittleBars.alignment = Align(main = mainAlign, pad = Vec2(2f, 2f))
+                        val bars = theBlueLittleBars.children ?: return@onClick
+                        // reorder the bars to give a much clearer visual representation of the cross alignment.
+                        when (it) {
+                            0, 1, 2 -> bars.set(longBlue, mediumBlue, shortBlue)
+                            3, 4, 5 -> bars.set(mediumBlue, longBlue, shortBlue)
+                            6, 7, 8 -> bars.set(shortBlue, mediumBlue, longBlue)
+                        }
+                        theBlueLittleBars.position()
+                        theBlueLittleBars.at = this.at + (this.size / 2f) - (theBlueLittleBars.size / 2f)
                         recv.alignment = indexToAlign(it, recv.alignment)
                     }
                 },
-                theLittleBars
+                theLittleBars, theBlueLittleBars
             ),
             size = Vec2(90f, 90f),
             alignment = Align(pad = Vec2.ZERO)
         ).onHoverExit {
-            this[alignToIndex(recv.alignment)].accept(Event.Mouse.Entered)
+            theLittleBars.renders = false
             needsRedraw = true
         }.also { theGrid = it },
         alignment = Align(main = Align.Main.Center),
         size = Vec2(125f, 125f)
     ).withBorder()
 
-    theLittleBars.onInit {
-        theGrid[alignToIndex(recv.alignment)].accept(Event.Mouse.Entered)
+    theBlueLittleBars.onInit {
+        theGrid[alignToIndex(recv.alignment)].accept(Event.Mouse.Clicked)
     }
     return o
 }

@@ -67,6 +67,12 @@ public abstract class Config {
         tree.getOrPutMetadata("aliases", () -> new ArrayList<String>(aliases.length)).addAll(Arrays.asList(aliases));
     }
 
+    public final void addAliases(String option, String... aliases) {
+        if (tree == null) throw notInitialized();
+        Property<?> prop = getProperty(option);
+        prop.getOrPutMetadata("aliases", () -> new ArrayList<String>(aliases.length)).addAll(Arrays.asList(aliases));
+    }
+
     @ApiStatus.Internal
     protected Tree makeTree() {
         return ConfigManager.collect(this, id);
