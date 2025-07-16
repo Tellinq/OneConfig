@@ -124,7 +124,10 @@ abstract class Hud<T : Drawable>(id: String, title: String, val category: Catego
         return out
     }
 
-    private fun addCallbacks(tree: Tree) {
+    /**
+     * This method is called during config tree initialization. it is
+     */
+    protected open fun addCallbacks(tree: Tree) {
         // initial
         bgUseSetSize = staticWidth
         tree.getProp<Boolean>("staticWidth")?.addCallback {
@@ -275,7 +278,7 @@ abstract class Hud<T : Drawable>(id: String, title: String, val category: Catego
      * this method will be called once, and once only.
      */
     @MustBeInvokedByOverriders
-    open fun initialize() {
+    open fun setup() {
         if (isReal) {
             // asm: add all the background properties to the tree as well (we have to do it here because in make, the background is not be created yet)
             val cmp = getBackground() ?: get()

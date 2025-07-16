@@ -410,7 +410,7 @@ fun Drawable.titled(title: String): Drawable {
     return Group(
         Text(title, fontSize = 14f).secondary(),
         this,
-        alignment = Align(cross = Align.Cross.Start, mode = Align.Mode.Vertical, pad = Vec2(2f, 3f)),
+        alignment = Align(cross = Align.Cross.Start, mode = Align.Mode.Vertical, pad = Vec2(2f, 7f)),
     )
 }
 

@@ -105,7 +105,7 @@ public final class ConfigManager {
         while (!pendingInitialization.isEmpty()) {
             Config config = pendingInitialization.poll();
             if (config != null) {
-                config.initializeConfig();
+                config.initialize(true);
             }
         }
     }
@@ -113,10 +113,14 @@ public final class ConfigManager {
     @ApiStatus.Internal
     public static void submitForInitialization(Config config) {
         if (initialized) {
-            config.initializeConfig();
+            config.initialize(false);
         } else {
             pendingInitialization.add(config);
         }
+    }
+
+    static void removePendingInitialization(Config config) {
+        pendingInitialization.remove(config);
     }
 
     private static synchronized void initProfiles() {
