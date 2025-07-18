@@ -282,15 +282,16 @@ abstract class Hud<T : Drawable>(id: String, title: String, val category: Catego
         if (isReal) {
             // asm: add all the background properties to the tree as well (we have to do it here because in make, the background is not be created yet)
             val cmp = getBackground() ?: get()
-            tree["alignment"] = ktProperty( cmp::alignment)
+            tree["alignment"] = ktProperty(cmp::alignment)
             tree["alpha"] = ktProperty(cmp::alpha)
             tree["scaleX"] = ktProperty(cmp::scaleX)
             tree["scaleY"] = ktProperty(cmp::scaleY)
             tree["rotation"] = ktProperty(cmp::rotation)
             tree["skewX"] = ktProperty(cmp::skewX)
             tree["skewY"] = ktProperty(cmp::skewY)
+            tree["padding"] = ktProperty(cmp::padding)
 
-            if(cmp is Block) tree["radii"] = ktProperty(cmp::radii)
+            if (cmp is Block) tree["radii"] = ktProperty(cmp::radii)
         }
     }
 
@@ -361,6 +362,8 @@ abstract class Hud<T : Drawable>(id: String, title: String, val category: Catego
     /**
      * Specify a minimum size for this HUD.
      */
+    @Suppress("INAPPLICABLE_JVM_NAME")
+    @JvmName("minimumSize")
     open fun minimumSize(): Vec2 = Vec2.ZERO
 
     /**

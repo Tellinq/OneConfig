@@ -168,36 +168,47 @@ private fun makeHudDesigner(hud: Hud<*>): Drawable {
         interactiveAlignment(receiver),
         Group(
             Group(
-                DraggingNumericTextInput(icon = "assets/oneconfig/ico/info.svg".image(), suffix = "px", max = 30f, size = Vec2(120f, 32f)).also {
+                DraggingNumericTextInput(icon = "assets/oneconfig/ico/align.svg".image(), suffix = "px", max = 30f, size = Vec2(120f, 32f)).also {
                     it[0].onChange { value: Float ->
                         receiver.alignment = receiver.alignment.copy(pad = Vec2(value, value))
                         receiver.recalculate()
                         false
                     }
-                }.titled("oneconfig.hudeditor.padding.between"),
-                DraggingNumericTextInput(icon = "assets/oneconfig/ico/info.svg".image(), suffix = "px", max = 10f, size = Vec2(120f, 32f)).also {
+                }.titled("oneconfig.hudeditor.padding.between", pad = Vec2(2f, 0f)),
+                DraggingNumericTextInput(icon = "assets/oneconfig/ico/maximise.svg".image(), suffix = "px", max = 10f, size = Vec2(120f, 32f)).also {
                     it[0].onChange { value: Float ->
                         (receiver as? Block)?.radius(value)
                         false
                     }
-                }.titled("oneconfig.hudeditor.corner.radius"),
+                }.titled("oneconfig.hudeditor.corner.radius", pad = Vec2(2f, 0f)),
                 alignment = Align(pad = Vec2(16f, 0f))
             ),
             Group(
-                DraggingNumericTextInput(icon = "assets/oneconfig/ico/info.svg".image(), suffix = "px", max = 10f, size = Vec2(68f, 32f)),
-                DraggingNumericTextInput(icon = "assets/oneconfig/ico/info.svg".image(), suffix = "px", max = 10f, size = Vec2(68f, 32f)),
-                DraggingNumericTextInput(icon = "assets/oneconfig/ico/info.svg".image(), suffix = "px", max = 10f, size = Vec2(68f, 32f)),
-                DraggingNumericTextInput(icon = "assets/oneconfig/ico/info.svg".image(), suffix = "px", max = 10f, size = Vec2(68f, 32f)),
-                alignment = Align(pad = Vec2(12f, 0f), main = Align.Main.SpaceBetween, wrap = Align.Wrap.NEVER),
+                DraggingNumericTextInput(icon = "assets/oneconfig/ico/align.svg".image(), suffix = "px", initialValue = receiver.padding.x, max = 30f, size = Vec2(68f, 32f)).onChange { value: Float ->
+                    receiver.padding = receiver.padding.copy(x = value)
+                },
+                DraggingNumericTextInput(icon = "assets/oneconfig/ico/align.svg".image(), suffix = "px", initialValue = receiver.padding.y, max = 30f, size = Vec2(68f, 32f)).onChange { value: Float ->
+                    receiver.padding = receiver.padding.copy(y = value)
+                }.also { it[0].rotation = PI / 2 },
+                DraggingNumericTextInput(icon = "assets/oneconfig/ico/align.svg".image(), suffix = "px", initialValue = receiver.padding.w, max = 30f, size = Vec2(68f, 32f)).onChange { value: Float ->
+                    receiver.padding = receiver.padding.copy(w = value)
+                }.also { it[0].rotation = PI },
+                DraggingNumericTextInput(icon = "assets/oneconfig/ico/align.svg".image(), suffix = "px", initialValue = receiver.padding.h, max = 30f, size = Vec2(68f, 32f)).onChange { value: Float ->
+                    receiver.padding = receiver.padding.copy(h = value)
+                }.also { it[0].rotation = PI * 1.5 },
+                alignment = Align(main = Align.Main.SpaceBetween, wrap = Align.Wrap.NEVER),
                 size = Vec2(308f, 32f)
-            ).titled("oneconfig.hudeditor.padding.edges").padded(0f, 12f, 0f, 0f),
+            ).titled("oneconfig.hudeditor.padding.edges").padded(16f, 12f, 0f, 0f),
             alignment = Align(cross = Align.Cross.Start, mode = Align.Mode.Vertical, wrap = Align.Wrap.NEVER, pad = Vec2.ZERO)
         ),
         Group(
-            Checkbox(size = 18f),
-            Text("oneconfig.hudeditor.staticwidth"),
-            DraggingNumericTextInput(pre = "oneconfig.width", suffix = "px", max = 1000f, size = Vec2(128f, 32f)),
-            DraggingNumericTextInput(pre = "oneconfig.height", suffix = "px", max = 1000f, size = Vec2(128f, 32f)),
+            Checkbox(size = 18f).onToggle {
+                hud.staticWidth = it
+            },
+            Text("oneconfig.hudeditor.staticwidth").padded(-2f, 0f, 12f, 0f),
+            DraggingNumericTextInput(pre = "oneconfig.width", suffix = "px", initialValue = receiver.width, max = 1000f, size = Vec2(128f, 32f)),
+            DraggingNumericTextInput(pre = "oneconfig.height", suffix = "px", initialValue = receiver.height, max = 1000f, size = Vec2(128f, 32f)),
+            alignment = Align(pad = Vec2(12f, 6f))
         ),
         *(if (bg != null) colorOptions(bg) else arrayOf()),
         Text("oneconfig.hudeditor.component.title", fontSize = 16f).padded(0f, 18f, 0f, 0f).setFont { medium },
@@ -220,28 +231,28 @@ private fun makeHudDesigner(hud: Hud<*>): Drawable {
 }
 
 fun interactiveAlignment(recv: Drawable): Block {
-    val short = Block(size = Vec2(6f, 3f)).setPalette { text.secondary }.radius(1.5f)
-    val medium = Block(size = Vec2(9f, 3f)).setPalette { text.secondary }.radius(1.5f)
-    val long = Block(size = Vec2(15f, 3f)).setPalette { text.secondary }.radius(1.5f)
-    val shortBlue = Block(size = Vec2(6f, 3f)).setPalette { brand.fg }.radius(1.5f)
-    val mediumBlue = Block(size = Vec2(9f, 3f)).setPalette { brand.fg }.radius(1.5f)
-    val longBlue = Block(size = Vec2(15f, 3f)).setPalette { brand.fg }.radius(1.5f)
+    val short = Block(size = Vec2(9f, 4f)).setPalette { text.secondary }.radius(2f)
+    val medium = Block(size = Vec2(14f, 4f)).setPalette { text.secondary }.radius(2f)
+    val long = Block(size = Vec2(18f, 4f)).setPalette { text.secondary }.radius(2f)
+    val shortBlue = Block(size = Vec2(9f, 4f)).setPalette { brand.fg }.radius(2f)
+    val mediumBlue = Block(size = Vec2(14f, 4f)).setPalette { brand.fg }.radius(2f)
+    val longBlue = Block(size = Vec2(18f, 4f)).setPalette { brand.fg }.radius(2f)
 
     val theGrid: Image
     val theLittleBars = Group(
         medium, long, short,
-        size = Vec2(16f, 16f),
+        size = Vec2(20f, 20f),
         alignment = Align(pad = Vec2(2f, 2f))
     ).ignoreLayout()
     val theBlueLittleBars = Group(
         mediumBlue, longBlue, shortBlue,
-        size = Vec2(16f, 16f),
+        size = Vec2(20f, 20f),
         alignment = Align(pad = Vec2(2f, 2f))
     ).ignoreLayout()
 
     val o = Block(
         Image(
-            "assets/oneconfig/hud/align/alignment.svg".image(),
+            "assets/oneconfig/hud/align/background.svg".image(),
             children = arrayOf(
                 *repeat(9) {
                     Image("assets/oneconfig/hud/align/circle.svg").onHover { _ ->
@@ -324,7 +335,7 @@ fun textOptions(text: Text): Drawable {
             ex.parent.recalculate()
             false
         }.titled("oneconfig.hudeditor.text.font"),
-        BoxedNumericInput("assets/oneconfig/ico/info.svg".image(), initialValue = text.fontSize, min = 1f, size = Vec2(72f, 0f), post = "px", arrows = false).also {
+        DraggingNumericTextInput("assets/oneconfig/ico/text-input.svg".image(), initialValue = text.fontSize, min = 1f, size = Vec2(72f, 0f), suffix = "px").also {
             it[0].onChange { value: Float ->
                 text.fontSize = value
                 text._parent?.recalculate()
@@ -334,15 +345,6 @@ fun textOptions(text: Text): Drawable {
                 false
             }
         }.titled("oneconfig.hudeditor.text.size"),
-        Radiobutton(
-            "assets/oneconfig/ico/info.svg".image(),
-            "assets/oneconfig/ico/info.svg".image(),
-            "assets/oneconfig/ico/info.svg".image(),
-            optionLateralPadding = 2f,
-            optionVerticalPadding = 2f,
-        ).onChange { it: Int ->
-            false
-        }.titled("oneconfig.align"),
         Dropdown(
             "oneconfig.fweight.100",
             "oneconfig.fweight.200",
@@ -358,7 +360,7 @@ fun textOptions(text: Text): Drawable {
             false
         }.titled("oneconfig.hudeditor.text.weight"),
         Group(
-            Block(Image("assets/oneconfig/ico/info.svg"), alignment = alignNoPad).radius(2f).toggleable(text.fontWeight.value > 500).onToggle {
+            Block(Image("assets/oneconfig/ico/bold.svg"), alignment = alignNoPad).radius(2f).toggleable(text.fontWeight.value > 500).onToggle {
                 if (it) {
                     prevWeight = text.fontWeight
                     text.fontWeight = when (text.fontWeight) {
@@ -371,8 +373,9 @@ fun textOptions(text: Text): Drawable {
                     text.fontWeight = prevWeight
                 }
             },
-            Block(Image("assets/oneconfig/ico/info.svg"), alignment = alignNoPad).radius(2f).toggleable(text.italic).onToggle { text.italic = it },
-            Block(Image("assets/oneconfig/ico/info.svg"), alignment = alignNoPad).radius(2f).toggleable(text.strikethrough).onToggle { text.strikethrough = it },
+            Block(Image("assets/oneconfig/ico/italic.svg"), alignment = alignNoPad).radius(2f).toggleable(text.italic).onToggle { text.italic = it },
+            Block(Image("assets/oneconfig/ico/underline.svg"), alignment = alignNoPad).radius(2f).toggleable(text.underline).onToggle { text.underline = it },
+            Block(Image("assets/oneconfig/ico/strikethrough.svg"), alignment = alignNoPad).radius(2f).toggleable(text.strikethrough).onToggle { text.strikethrough = it },
         ).titled("oneconfig.hudeditor.text.effects"),
         *colorOptions(text),
         size = Vec2(476f, 0f),
@@ -406,11 +409,11 @@ fun subheading(title: String, desc: String) = Group(
     alignment = Align(main = Align.Main.SpaceBetween),
 )
 
-fun Drawable.titled(title: String): Drawable {
+fun Drawable.titled(title: String, pad: Vec2 = Vec2(2f, 7f)): Drawable {
     return Group(
         Text(title, fontSize = 14f).secondary(),
         this,
-        alignment = Align(cross = Align.Cross.Start, mode = Align.Mode.Vertical, pad = Vec2(2f, 7f)),
+        alignment = Align(cross = Align.Cross.Start, mode = Align.Mode.Vertical, pad = pad),
     )
 }
 
