@@ -14,8 +14,8 @@ preprocess {
     strictExtraMappings.set(true)
     // FOR ALL NEW VERSIONS ENSURE TO UPDATE settings.gradle.kts !
 
-//    "1.21.8-neoforge"(1_21_08, "srg") {
-//        "1.21.8-fabric"(1_21_08, "yarn") {
+    "1.21.8-neoforge"(1_21_08, "srg") {
+        "1.21.8-fabric"(1_21_08, "yarn") {
             "1.21.7-fabric"(1_21_07, "yarn") {
                 "1.21.7-neoforge"(1_21_07, "srg") {
                     "1.21.6-neoforge"(1_21_06, "srg") {
@@ -85,6 +85,6 @@ preprocess {
                     }
                 }
             }
-//        }
-//    }
+        }
+    }
 }

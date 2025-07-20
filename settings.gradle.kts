@@ -131,8 +131,8 @@ listOf(
     "1.21.7-neoforge",
     "1.21.7-fabric",
 
-//    "1.21.8-neoforge",
-//    "1.21.8-fabric"
+    "1.21.8-neoforge",
+    "1.21.8-fabric"
 ).forEach { version ->
     val proj = ":minecraft:$version"
     include(proj)
