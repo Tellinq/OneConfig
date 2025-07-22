@@ -40,6 +40,7 @@ import org.polyfrost.oneconfig.internal.ui.pages.ModsPage
 import org.polyfrost.oneconfig.internal.ui.pages.ThemesPage
 import org.polyfrost.oneconfig.internal.ui.pages.TreeSource
 import org.polyfrost.polyui.animate.Animations
+import org.polyfrost.polyui.animate.SetAnimation
 import org.polyfrost.polyui.color.rgba
 import org.polyfrost.polyui.component.Component
 import org.polyfrost.polyui.component.Drawable
@@ -171,7 +172,7 @@ object OneConfigUI {
                                 Group(
                                     Image("assets/oneconfig/ico/bell.svg".image()),
                                     Image(playerHead, size = Vec2(24f, 24f)).radius(6f).named("ProfileImage").withBorder(
-                                        rgba(255, 255, 255, 0.14f),
+                                        rgba(255, 255, 255, 0.2f),
                                         width = 1f,
                                     ).addHoverInfo(Text(OmniClientPlayer.name.ifEmpty { "Steve" })),
                                     alignment = Align(pad = Vec2(16f, 8f)),
@@ -239,14 +240,15 @@ object OneConfigUI {
         val title = ui[1][0][0][2] as Text
         val translated = ui.polyUI.translator.translate(name)
         title.text = translated.string
-        ui[1][1] = page
+        val prev = ui[1][1]
+        ui[1].set(prev, page, SetAnimation.SlideLeft)
     }
 
     fun label(text: String) = Block(
         Text(text).setFont { bold },
         alignment = Align(main = Align.Content.Center),
         size = Vec2(54f, 18f),
-    ).setPalette { brand.fg }
+    ).setPalette { brand.fg }.radius(9f)
 
     fun invalidateCache() {
         window = null
