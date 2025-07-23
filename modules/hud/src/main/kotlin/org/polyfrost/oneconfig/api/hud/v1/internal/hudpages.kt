@@ -381,7 +381,7 @@ fun textOptions(text: Text): Drawable {
         ).titled("oneconfig.hudeditor.text.effects"),
         *colorOptions(text),
         size = Vec2(476f, 0f),
-        alignment = Align(pad = Vec2(0f, 8f))
+        alignment = Align(padEdges = Vec2(0f, 8f), padBetween = Vec2(24f, 8f), main = Align.Content.SpaceBetween)
     ).namedId("TextOptions")
 }
 
