@@ -66,6 +66,7 @@ public final class org/polyfrost/oneconfig/api/hud/v1/HudManager {
 	public final fun openHudEditor (Lorg/polyfrost/oneconfig/api/hud/v1/Hud;)V
 	public static final fun register (Lorg/polyfrost/oneconfig/api/hud/v1/Hud;)V
 	public static final fun register ([Lorg/polyfrost/oneconfig/api/hud/v1/Hud;)V
+	public final fun removeHud (Lorg/polyfrost/oneconfig/api/hud/v1/Hud;Lorg/polyfrost/polyui/utils/Clock$Executor;)V
 	public final fun setSlinex (F)V
 	public final fun setSliney (F)V
 	public final fun toggle ()V
@@ -92,7 +93,8 @@ public abstract class org/polyfrost/oneconfig/api/hud/v1/TextHud : org/polyfrost
 	protected final fun getStringBuilder ()Ljava/lang/StringBuilder;
 	public final fun getSuffix ()Ljava/lang/String;
 	protected abstract fun getText ()Ljava/lang/String;
-	public fun minimumSize ()J
+	public synthetic fun minimumSize ()J
+	public fun minimumSize-2K4fKj8 ()J
 	public final fun setPrefix (Ljava/lang/String;)V
 	public final fun setSuffix (Ljava/lang/String;)V
 	public fun setup ()V
@@ -107,6 +109,15 @@ public final class org/polyfrost/oneconfig/api/hud/v1/TextHud$DateTime : org/pol
 	public final fun getTemplate ()Ljava/lang/String;
 	public final fun setTemplate (Ljava/lang/String;)V
 	public fun setup ()V
+	public fun updateFrequency ()J
+}
+
+public final class org/polyfrost/oneconfig/api/hud/v1/TextHud$DownKeys : org/polyfrost/oneconfig/api/hud/v1/TextHud {
+	public fun <init> ()V
+	public final fun getBinder ()Lorg/polyfrost/polyui/input/KeyBinder;
+	public final fun getDownKeys ()Ljava/util/ArrayList;
+	public final fun getDownMouse ()Lorg/polyfrost/polyui/utils/IntArraySet;
+	public final fun getDownUnmapped ()Lorg/polyfrost/polyui/utils/IntArraySet;
 	public fun updateFrequency ()J
 }
 

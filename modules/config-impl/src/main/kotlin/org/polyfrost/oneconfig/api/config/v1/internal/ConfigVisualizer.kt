@@ -28,6 +28,7 @@ package org.polyfrost.oneconfig.api.config.v1.internal
 
 import org.apache.logging.log4j.LogManager
 import org.polyfrost.oneconfig.api.config.v1.*
+import org.polyfrost.oneconfig.api.config.v1.dsl.ConfigDSL.Companion.config
 import org.polyfrost.oneconfig.utils.v1.MHUtils.setAccessible
 import org.polyfrost.polyui.animate.Animations
 import org.polyfrost.polyui.color.PolyColor
@@ -65,6 +66,7 @@ open class ConfigVisualizer {
      * For information, see [create].
      */
     fun get(config: Tree): Drawable {
+        if (config.getOrPutMetadata("no_cache") { false }) return create(config)
         val it = configs[config]
         if (it != null) {
             // asm: might've been searched, so we need to reposition our option lists

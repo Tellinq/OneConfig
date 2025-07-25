@@ -2,6 +2,7 @@
 // Shared build logic for all versions of OneConfig.
 
 import dev.deftu.gradle.utils.GameSide
+import dev.deftu.gradle.utils.propertyBoolOr
 import dev.deftu.gradle.utils.version.MinecraftReleaseVersion
 import dev.deftu.gradle.utils.version.MinecraftVersions
 import org.polyfrost.gradle.provideIncludedDependencies
@@ -12,6 +13,7 @@ import java.lang.Boolean as JBoolean
 plugins {
     java
     alias(libs.plugins.kotlin)
+    alias(libs.plugins.google.ksp)
     id(libs.plugins.dgt.multiversion.platform.get().pluginId)
     id(libs.plugins.dgt.base.get().pluginId)
     id(libs.plugins.dgt.resources.get().pluginId)
@@ -56,6 +58,30 @@ repositories {
     maven("https://repo.polyfrost.org/snapshots")
     maven("https://repo.hypixel.net/repository/Hypixel/")
     maven("https://maven.deftu.dev/releases")
+    maven("https://maven.notenoughupdates.org/releases") {
+        content { includeGroup("org.notenoughupdates.moulconfig") }
+    }
+    maven("https://maven.teamresourceful.com/repository/maven-releases") {
+        content { includeGroup("com.teamresourceful.resourcefulconfig") }
+    }
+    maven("https://maven.isxander.dev/releases") {
+        content { includeGroup("dev.isxander") }
+    }
+    maven("https://api.modrinth.com/maven") {
+        content { includeGroup("maven.modrinth") } // for some reason yacl versions exist that aren't on the official repo???
+    }
+    maven("https://maven.terraformersmc.com/") {
+        content { includeGroup("com.terraformersmc" ) }
+    }
+    maven("https://jitpack.io") {
+        content { includeGroupAndSubgroups("com.github") }
+    }
+    maven("https://maven.teamresourceful.com/repository/maven-public/") {
+        content { includeGroupAndSubgroups("me.owdding") }
+    }
+    maven("https://maven.azureaaron.net/releases") {
+        content { includeGroup("net.azureaaron") }
+    }
 }
 
 if (mcData.isLegacyForge) { // Quick substitution for relaunch in dev env, so that mixinextras works properly (yay!)
@@ -79,14 +105,140 @@ if (mcData.isLegacyForge) { // Quick substitution for relaunch in dev env, so th
 val includeInLoader = Attribute.of("org.polyfrost.oneconfig.loader.include", Boolean::class.javaObjectType)
 val jijInLoader = Attribute.of("org.polyfrost.oneconfig.loader.jij", Boolean::class.javaObjectType)
 
-dependencies {
-    compileOnly("gg.essential:vigilance-1.8.9-forge:295") {
+
+fun DependencyHandlerScope.handleApiDep(dependency: String, isMod: Boolean = false) {
+    val dep = project.dependencies.create(dependency) as ExternalModuleDependency
+    this.handleApiDep(dep, isMod)
+}
+
+fun DependencyHandlerScope.handleApiDep(dependency: Provider<MinimalExternalModuleDependency>, isMod: Boolean = false) {
+    handleApiDep(dependency.get(), isMod)
+}
+
+fun DependencyHandlerScope.handleApiDep(dependency: ExternalModuleDependency, isMod: Boolean = false) {
+    val dep = "${dependency.group}:${dependency.name}:${dependency.version}"
+    if (isMod) "oneConfigModulesCompileOnlyApi"(modApi(dep) {
         isTransitive = false
+        attributes {
+            attribute(includeInLoader, JBoolean.TRUE)
+        }
+    }) else api(dep) {
+        isTransitive = false
+    }
+}
+
+
+dependencies {
+    data class CompatDependency(
+        val all: String? = null,
+        val forge: String? = all,
+        val fabric: String? = all,
+        val neoforge: String? = all,
+    )
+
+    fun DependencyHandlerScope.compileOnlyCompat(notation: String?) =
+        notation?.let { modCompileOnly(it) { isTransitive = false } }
+
+    fun DependencyHandlerScope.compileOnlyCompat(notation: CompatDependency?) {
+        when {
+            mcData.isNeoForge -> compileOnlyCompat(notation?.neoforge)
+            mcData.isForge -> compileOnlyCompat(notation?.forge)
+            mcData.isFabric -> compileOnlyCompat(notation?.fabric)
+        }
     }
 
     val mcVersion = mcData.version as MinecraftReleaseVersion
     val tripleVersion = Triple(mcVersion.major, mcVersion.minor, mcVersion.patch)
-    provideIncludedDependencies(tripleVersion, mcData.loader.friendlyString).forEach {
+    val mcVersionString = listOf(mcVersion.major, mcVersion.minor, mcVersion.patch).joinToString(".")
+
+    compileOnlyCompat("gg.essential:vigilance-1.8.9-forge:295")
+    compileOnlyCompat("org.notenoughupdates.moulconfig:common:3.11.0")
+
+    fun rconfig(mcVersion: String, modVersion: String, mcVersionOverride: String = mcVersion) =
+        mcVersion to CompatDependency("com.teamresourceful.resourcefulconfig:resourcefulconfig-common-$mcVersionOverride:$modVersion")
+
+    val rconfig = mapOf(
+        rconfig("1.19.2", "1.0.20"),
+        rconfig("1.19.3", "1.1.4"),
+        rconfig("1.19.4", "1.2.0"),
+        rconfig("1.20.0", "2.1.0", "1.20"),
+        rconfig("1.20.1", "2.1.3"),
+        rconfig("1.20.2", "2.2.3"),
+        rconfig("1.20.4", "2.4.8"),
+        rconfig("1.20.5", "2.5.2"),
+        rconfig("1.20.6", "2.5.2", "1.20.5"),
+        rconfig("1.21.0", "3.0.11", "1.21"),
+        rconfig("1.21.1", "3.0.11", "1.21"),
+        rconfig("1.21.3", "3.3.4"),
+        rconfig("1.21.4", "3.4.3"),
+        rconfig("1.21.5", "3.5.9"),
+        rconfig("1.21.6", "3.6.2"),
+    )
+
+    compileOnlyCompat(rconfig[mcVersionString])
+
+    fun yacl(
+        mcVersion: String,
+        modVersion: String,
+        mcVersionOverride: String = mcVersion,
+        withoutLoader: Boolean = false,
+        noForge: Boolean = false
+    ) = mcVersion to if (withoutLoader)
+        CompatDependency("dev.isxander:yet-another-config-lib:$modVersion")
+    else CompatDependency(
+        fabric = "dev.isxander:yet-another-config-lib:$modVersion+$mcVersionOverride-fabric",
+        forge = "dev.isxander:yet-another-config-lib:$modVersion+$mcVersionOverride-forge".takeUnless { noForge },
+        neoforge = "dev.isxander:yet-another-config-lib:$modVersion+$mcVersionOverride-neoforge"
+    )
+
+    val yacl = mapOf(
+        yacl("1.19.0", "1.7.1", withoutLoader = true),
+        yacl("1.19.1", "1.7.1", withoutLoader = true),
+       "1.19.2" to CompatDependency("maven.modrinth:1eAoo2KR:gJ6ZmZ4Z", "maven.modrinth:1eAoo2KR:Jf2pciI1"),
+        yacl("1.19.3", "2.2.0", withoutLoader = true),
+        "1.19.4" to CompatDependency("maven.modrinth:1eAoo2KR:gJ6ZmZ4Z", "maven.modrinth:1eAoo2KR:Jf2pciI1"),
+        yacl("1.20.0", "3.6.6", "1.20.1"),
+        yacl("1.20.1", "3.6.6", "1.20.1"),
+        yacl("1.20.2", "3.2.1"),
+        yacl("1.20.3", "3.3.2"),
+        yacl("1.20.4", "3.6.6", "1.20.4", noForge = true),
+        yacl("1.20.5", "3.6.6", "1.20.6"),
+        yacl("1.20.6", "3.6.6", "1.20.6"),
+        yacl("1.21.0", "3.7.1", "1.21.1"),
+        yacl("1.21.1", "3.7.1"),
+        yacl("1.21.2", "3.7.1", "1.21.3"),
+        yacl("1.21.3", "3.7.1"),
+        yacl("1.21.4", "3.7.1"),
+        yacl("1.21.5", "3.7.1"),
+        yacl("1.21.6", "3.7.1"),
+    )
+    compileOnlyCompat(yacl[mcVersionString])
+
+    fun modMenu(mcVersion: String, version: String) = mcVersion to CompatDependency(fabric = "com.terraformersmc:modmenu:$version")
+
+    val modMenu = mapOf(
+        modMenu("1.16.5", "1.16.23"),
+        modMenu("1.17.1", "2.0.16"),
+        modMenu("1.18.2", "3.2.5"),
+        modMenu("1.18.2", "3.2.5"),
+        modMenu("1.19.2", "4.1.2"),
+        modMenu("1.19.4", "6.3.1"),
+        modMenu("1.20.1", "7.2.2"),
+        modMenu("1.20.4", "9.2.0"),
+        modMenu("1.20.6", "10.0.0"),
+        modMenu("1.21.1", "11.0.3"),
+        modMenu("1.21.2", "12.0.0"),
+        modMenu("1.21.3", "12.0.0"),
+        modMenu("1.21.4", "13.0.3"),
+        modMenu("1.21.5", "14.0.0-rc.2"),
+    )
+    compileOnlyCompat(modMenu[mcVersionString])
+
+
+    provideIncludedDependencies(
+        Triple(mcVersion.major, mcVersion.minor, mcVersion.patch),
+        mcData.loader.friendlyString
+    ).forEach {
         if (it.dep is String) {
             handleApiDep(it.dep as String, it.mod)
         } else {
@@ -104,15 +256,26 @@ dependencies {
 
     annotationProcessor(libs.mixin.extras)
 
-    for (dep in listOf("-nanovg").run { if (mcData.version < MinecraftVersions.VERSION_1_13) this else this + listOf("-tinyfd", "-stb", "") }) {
+    for (dep in listOf("-nanovg").run {
+        if (mcData.version < MinecraftVersions.VERSION_1_13) this else this + listOf(
+            "-tinyfd",
+            "-stb",
+            ""
+        )
+    }) {
         val lwjglDep = "org.lwjgl:lwjgl$dep:${libs.versions.lwjgl.get()}"
         compileOnlyApi(lwjglDep) {
             isTransitive = false
         }
     }
 
+    ksp(rootProject.project(":modules:relocator"))
+    annotationProcessor(rootProject.project(":modules:relocator"))
+
     for (project in rootProject.project(":modules").subprojects) {
-        if ("dependencies" !in project.path) {
+        if ("relocator" in project.path) {
+            compileOnly(project(project.path))
+        } else if ("dependencies" !in project.path) {
             "oneConfigModulesCompileOnlyApi"(localRuntime(compileOnly(project(project.path)) {
                 isTransitive = false
                 attributes {
@@ -137,28 +300,11 @@ dependencies {
         }
     }
 
-    api("dev.deftu:enhancedeventbus:2.0.0") // TODO
-}
-
-fun DependencyHandlerScope.handleApiDep(dependency: String, isMod: Boolean = false) {
-    val dep = project.dependencies.create(dependency) as ExternalModuleDependency
-    handleApiDep(dep, isMod)
-}
-
-fun DependencyHandlerScope.handleApiDep(dependency: Provider<MinimalExternalModuleDependency>, isMod: Boolean = false) {
-    handleApiDep(dependency.get(), isMod)
-}
-
-fun DependencyHandlerScope.handleApiDep(dependency: ExternalModuleDependency, isMod: Boolean = false) {
-    val dep = "${dependency.group}:${dependency.name}:${dependency.version}"
-    if (isMod) "oneConfigModulesCompileOnlyApi"(modApi(dep) {
-        isTransitive = false
-        attributes {
-            attribute(includeInLoader, JBoolean.TRUE)
-        }
-    }) else api(dep) {
-        isTransitive = false
+    compileOnly("com.github.hannibal002:SkyHanni:3.8.0") { isTransitive = false }
+    if ((mcData.version as MinecraftReleaseVersion).isNewerThan(MinecraftVersions.VERSION_1_21_4)) {
+        compileOnly("net.azureaaron:dandelion:1.0.0-alpha.3") { isTransitive = false }
     }
+    api("dev.deftu:enhancedeventbus:2.0.0") // TODO
 }
 
 tasks {

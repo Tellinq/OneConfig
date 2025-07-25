@@ -5,7 +5,7 @@
 kotlin = "2.0.20"
 kotlinx-coroutines = "1.8.1"
 kotlinx-atomicfu = "0.27.0"
-fabric-language-kotlin = "1.12.2+kotlin.2.0.20"
+fabric-language-kotlin = "1.13.2+kotlin.2.1.20"
 polyui = "1.11.7"
 annotations = "24.1.0"
 hypixel-modapi = "1.0.1"
@@ -115,3 +115,5 @@ dgt-loom = { id = "dev.deftu.gradle.tools.minecraft.loom", version.ref = "dgt" }
 licenser = { id = "dev.yumi.gradle.licenser", version.ref = "licenser" }
 
 jetbrains-idea-ext = { id = "org.jetbrains.gradle.plugin.idea-ext", version.ref = "jetbrains-idea-ext" }
+
+google-ksp = { id = "com.google.devtools.ksp", version = "2.1.20-2.0.1" }

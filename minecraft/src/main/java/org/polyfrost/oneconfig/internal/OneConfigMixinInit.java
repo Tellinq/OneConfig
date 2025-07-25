@@ -26,9 +26,13 @@
 
 package org.polyfrost.oneconfig.internal;
 
+import kotlin.Unit;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.objectweb.asm.ClassWriter;
+import org.objectweb.asm.tree.AnnotationNode;
 import org.objectweb.asm.tree.ClassNode;
+import org.polyfrost.oneconfig.internal.generated.RelocatedMixins;
 import org.spongepowered.asm.mixin.extensibility.IMixinConfigPlugin;
 import org.spongepowered.asm.mixin.extensibility.IMixinInfo;
 
@@ -59,6 +63,25 @@ public class OneConfigMixinInit implements IMixinConfigPlugin {
     @Override
     public List<String> getMixins() {
         List<String> mixins = new ArrayList<>();
+
+
+        RelocatedMixins.INSTANCE.register(e -> {
+            mixins.add(e);
+            return Unit.INSTANCE;
+        });
+
+        //#if MC>=1.19.2
+        //$$mixins.add("Mixin_MinecraftClientResourceStuff");
+        //$$mixins.add("compat.yacl.Mixin_YetAnotherConfigLib_Builder");
+        //#endif
+
+        //#if MC>=1.20.4
+        //$$mixins.add("compat.rconfig.Mixin_Configurations");
+        //#endif
+
+        //#if MC>1.16
+        //$$mixins.add("compat.modmenu.Mixin_ModMenu");
+        //#endif
 
         //#if FORGE
         mixins.add("events.Mixin_ChatReceiveEvent_Forge");
