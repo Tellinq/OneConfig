@@ -355,6 +355,10 @@ afterEvaluate {
     }
 }
 
+ksp {
+    arg("relocator.mcVersion", mcData.version.toString())
+}
+
 if (mcData.version < MinecraftVersions.VERSION_1_13) {
     if (
         System.getProperty("os.arch") == "aarch64" &&

@@ -51,7 +51,9 @@ internal class KspRelocator : SymbolProcessorProvider, SymbolProcessor {
                 val sourcePackage = relocations.sourcePackage
 
                 val originName = symbol.simpleName.asString()
-                relocations.targets.forEach { (target, targetPackage) ->
+                relocations.targets.filter { target ->
+                    target.test(environment.options["relocator.mcVersion"])
+                }.forEach { (target, targetPackage) ->
                     val newName = originName + "_" + target
                     val packageName = symbol.packageName.asString()
                     if (relocateMixin) {

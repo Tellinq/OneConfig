@@ -11,6 +11,10 @@ internal enum class SourceKind(val fileExtension: String) {
     ;
 }
 
+internal fun convertStringToIntVersion(version: String) =
+    version.let { if (it.count { char -> char == '.' } == 1) "$it.0" else it }.split(".")
+        .joinToString("") { it.padStart(2, '0') }.toInt()
+
 internal enum class SourceLocation(val path: String) {
     PRE_PROCESSED("build/preprocessed/main"),
     NORMAL("src/main"),
@@ -25,5 +29,5 @@ internal object SourceFileHelper {
         .flatMap { listOf(it.resolveSibling("${it.nameWithoutExtension}.${kind.fileExtension}")) }
         .firstOrNull { it.exists() }?.readText()
 
-    fun String.replacePatterns(target: String): String = this.replace("/*!target!*/","_$target")
+    fun String.replacePatterns(target: String): String = this.replace("/*!target!*/", "_$target")
 }
