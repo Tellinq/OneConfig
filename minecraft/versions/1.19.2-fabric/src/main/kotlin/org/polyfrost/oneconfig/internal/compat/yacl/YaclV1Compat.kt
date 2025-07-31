@@ -1,5 +1,8 @@
 package org.polyfrost.oneconfig.internal.compat.yacl
 
+import net.minecraft.text.Text as Text // preprocessor moment, ping me (wyvest) if you want an explanation why this is needed
+
+//#if MC != 1.20.4 || FABRIC
 import dev.deftu.omnicore.common.OmniLoader
 import dev.isxander.yacl3.api.ConfigCategory
 import dev.isxander.yacl3.api.Controller
@@ -12,7 +15,6 @@ import dev.isxander.yacl3.gui.controllers.TickBoxController
 import dev.isxander.yacl3.gui.controllers.cycling.EnumController
 import dev.isxander.yacl3.gui.controllers.slider.ISliderController
 import dev.isxander.yacl3.gui.controllers.string.StringController
-import net.minecraft.text.Text
 import org.polyfrost.oneconfig.api.config.v1.ConfigManager
 import org.polyfrost.oneconfig.api.config.v1.Properties
 import org.polyfrost.oneconfig.api.config.v1.Tree
@@ -204,3 +206,4 @@ internal class YaclPropertyBuilder internal constructor(option: Option<*>) {
         this@YaclPropertyBuilder.metadata.entries.forEach { (key, value) -> addMetadata(key, value) }
     }
 }
+//#endif

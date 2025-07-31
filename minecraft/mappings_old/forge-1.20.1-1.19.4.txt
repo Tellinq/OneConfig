@@ -1,2 +1,0 @@
-net.minecraft.network.protocol.game.ClientboundCustomPayloadPacket net.minecraft.network.protocol.game.ClientboundCustomPayloadPacket
-net.minecraft.network.protocol.game.ClientboundCustomPayloadPacket getInternalData() getData()

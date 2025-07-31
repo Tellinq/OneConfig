@@ -1,5 +1,6 @@
 package org.polyfrost.oneconfig.internal.compat.yacl
 
+//#if MC != 1.20.4 || FABRIC
 import dev.isxander.yacl3.api.Controller
 import dev.isxander.yacl3.gui.controllers.dropdown.AbstractDropdownController
 import org.polyfrost.oneconfig.api.config.v1.Visualizer
@@ -24,3 +25,4 @@ internal object AbstractDropdownControllerCompat : ExtraHandler<AbstractDropdown
     }
 
 }
+//#endif

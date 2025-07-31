@@ -1,5 +1,5 @@
 package org.polyfrost.oneconfig.internal.compat
-
+//#if FABRIC
 import com.terraformersmc.modmenu.ModMenu
 import com.terraformersmc.modmenu.util.mod.Mod
 import dev.deftu.omnicore.client.OmniScreen
@@ -40,3 +40,4 @@ object ModMenuCompat {
     }
 
 }
+//#endif

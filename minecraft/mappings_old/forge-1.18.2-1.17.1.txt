@@ -1,8 +1,0 @@
-net.minecraft.client.Minecraft missTime leftClickCounter
-
-net.minecraftforge.client.event.ClientPlayerNetworkEvent getConnection() getNetworkManager()
-
-net.minecraftforge.client.event.ScreenOpenEvent getScreen() getGui()
-net.minecraftforge.client.event.ScreenOpenEvent net.minecraftforge.client.event.GuiOpenEvent
-
-net.minecraftforge.client.loading.ClientModLoader net.minecraftforge.fmlclient.ClientModLoader

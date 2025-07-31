@@ -1,9 +1,8 @@
 package org.polyfrost.oneconfig.internal.mixin.compat.yacl;
-
+//#if MC != 1.20.4 || FABRIC
 import dev.isxander.yacl3.api.ConfigCategory;
 import dev.isxander.yacl3.api.YetAnotherConfigLib;
 import dev.isxander.yacl3.impl.YetAnotherConfigLibImpl;
-import net.minecraft.text.Text;
 import org.polyfrost.oneconfig.internal.compat.yacl.YaclV1Compat;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
@@ -19,7 +18,13 @@ import java.util.List;
 @Mixin(value = YetAnotherConfigLibImpl.BuilderImpl.class, remap = false)
 public class Mixin_YetAnotherConfigLib_Builder {
 
-    @Shadow private Text title;
+    @Shadow private
+    //#if FABRIC
+    net.minecraft.text.Text
+    //#else
+    //$$ net.minecraft.network.chat.Component
+    //#endif
+    title;
 
     @Shadow @Final private List<ConfigCategory> categories;
 
@@ -31,3 +36,4 @@ public class Mixin_YetAnotherConfigLib_Builder {
     }
 
 }
+//#endif
