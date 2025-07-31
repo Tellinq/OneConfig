@@ -30,8 +30,6 @@ plugins {
     id(libs.plugins.dgt.publishing.maven.get().pluginId)
 }
 
-apply(from = rootProject.file("versions.gradle.kts"))
-
 evaluationDependsOn(":modules")
 
 if (mcData.isForge) {
