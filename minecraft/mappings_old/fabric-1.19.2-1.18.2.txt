@@ -1,4 +1,0 @@
-net.minecraft.client.network.ClientPlayerEntity sendMessage() sendChatMessage()
-
-net.minecraft.network.packet.s2c.play.GameMessageS2CPacket comp_763() getMessage()
-net.minecraft.text.Text getString() asString()

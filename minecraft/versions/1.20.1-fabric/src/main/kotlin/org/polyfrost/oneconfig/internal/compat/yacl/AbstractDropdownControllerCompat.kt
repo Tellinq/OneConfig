@@ -1,5 +1,6 @@
 package org.polyfrost.oneconfig.internal.compat.yacl
 
+//#if MC != 1.20.4 || FABRIC
 import dev.isxander.yacl3.api.Controller
 import dev.isxander.yacl3.gui.controllers.dropdown.AbstractDropdownController
 import org.polyfrost.oneconfig.api.config.v1.Visualizer
@@ -10,7 +11,7 @@ internal object AbstractDropdownControllerCompat : ExtraHandler<AbstractDropdown
     override fun handle(
         controller: Controller<*>,
         builder: YaclPropertyBuilder,
-    ): KClass<out Visualizer>? {
+    ): Class<out Visualizer>? {
         val controller = controller as AbstractDropdownController<Any>
         val values = controller.allowedValues
         builder.setter = { value -> (value as? Int)?.let { controller.setFromString(values[value]); controller.option().applyValue() } }
@@ -20,7 +21,8 @@ internal object AbstractDropdownControllerCompat : ExtraHandler<AbstractDropdown
         }
         builder["options"] = values.toTypedArray()
 
-        return Visualizer.DropdownVisualizer::class
+        return Visualizer.DropdownVisualizer::class.java
     }
 
 }
+//#endif

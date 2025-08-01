@@ -2,29 +2,30 @@ package org.polyfrost.oneconfig.internal.compat
 
 import com.teamresourceful.resourcefulconfig.api.types.ResourcefulConfig
 import com.teamresourceful.resourcefulconfig.api.types.ResourcefulConfigButton
-import com.teamresourceful.resourcefulconfig.api.types.ResourcefulConfigElement
-import com.teamresourceful.resourcefulconfig.api.types.elements.ResourcefulConfigEntryElement
-import com.teamresourceful.resourcefulconfig.api.types.elements.ResourcefulConfigObjectEntryElement
-import com.teamresourceful.resourcefulconfig.api.types.elements.ResourcefulConfigSeparatorElement
+import com.teamresourceful.resourcefulconfig.api.types.entries.ResourcefulConfigEntry
+import com.teamresourceful.resourcefulconfig.api.types.entries.ResourcefulConfigObjectEntry
 import com.teamresourceful.resourcefulconfig.api.types.entries.ResourcefulConfigValueEntry
 import com.teamresourceful.resourcefulconfig.api.types.options.EntryType
 import com.teamresourceful.resourcefulconfig.api.types.options.Option
 import dev.deftu.omnicore.common.OmniLoader
-import org.polyfrost.oneconfig.api.config.v1.*
+import org.polyfrost.oneconfig.api.config.v1.ConfigManager
 import org.polyfrost.oneconfig.api.config.v1.Properties
+import org.polyfrost.oneconfig.api.config.v1.Tree
+import org.polyfrost.oneconfig.api.config.v1.Visualizer
 import org.polyfrost.oneconfig.internal.DynamicPolyImage
 import org.polyfrost.oneconfig.utils.v1.dsl.*
 import org.polyfrost.polyui.color.PolyColor
 import org.polyfrost.polyui.color.argb
 import org.polyfrost.polyui.color.mutable
 import java.util.*
-import kotlin.reflect.KClass
 
 internal object RConfigCompat {
 
 
     @JvmStatic
-    fun enable() = Unit
+    fun enable() {
+
+    }
 
     @JvmStatic
     fun addConfig(config: ResourcefulConfig) {
@@ -56,7 +57,8 @@ internal object RConfigCompat {
             )
         }.forEach((root ?: tree)::put)
 
-        parseAny(config.elements(), tree)
+        parseAny(config.entries().values, tree)
+        parseButtons(config.buttons(), tree)
 
         tree.addMetadata("custom_save", Runnable { config.save() })
         tree.addMetadata("no_cache", true)
@@ -64,30 +66,26 @@ internal object RConfigCompat {
         return tree
     }
 
-    private fun parseButton(button: ResourcefulConfigButton, tree: Tree) {
-        val property = Properties.dummy(id = UUID.randomUUID().toString())
-        property.title = button.title()?.takeUnless { it.isEmpty() }
-            ?: "button" //todo find a better way of doing this, rconfig allows empty names
-        property.description = button.description()
-        property.visualizer = Visualizer.ButtonVisualizer::class.java
-        property.metadata?.put("runnable", Runnable { button.invoke() })
-        property.addDisplayCondition { if (button.isHidden) Property.Display.HIDDEN else Property.Display.SHOWN }
-        tree.put(property)
+    private fun parseButtons(buttons: List<ResourcefulConfigButton>, tree: Tree) {
+        buttons.forEach { button ->
+            val property = Properties.dummy(id = UUID.randomUUID().toString())
+            property.title = button.title()?.takeUnless { it.isEmpty() }
+                ?: "button" //todo find a better way of doing this, rconfig allows empty names
+            property.description = button.description()
+            property.visualizer = Visualizer.ButtonVisualizer::class.java
+            property.metadata?.put("runnable", Runnable { button.invoke() })
+            tree.put(property)
+        }
     }
 
-    private fun parseAny(list: Iterable<ResourcefulConfigElement>, tree: Tree) = list.forEach { parseAny(it, tree) }
-
-    private fun parseAny(element: ResourcefulConfigElement, tree: Tree) = when (element) {
-        is ResourcefulConfigButton -> parseButton(element, tree)
-        is ResourcefulConfigObjectEntryElement -> parseCategory(element, tree)
-        is ResourcefulConfigEntryElement -> buildAndAdd(element, tree)
-        is ResourcefulConfigSeparatorElement -> null // Todo, they arent implemented yet :3
-        else -> null
+    private fun parseAny(list: Iterable<ResourcefulConfigEntry>, tree: Tree) = list.forEach {
+        when (it) {
+            is ResourcefulConfigObjectEntry -> parseCategory(it, tree)
+            is ResourcefulConfigValueEntry -> buildAndAdd(it, tree)
+        }
     }
 
-    private fun parseCategory(element: ResourcefulConfigObjectEntryElement, tree: Tree) {
-        if (element.isHidden) return
-        val entry = element.entry()
+    private fun parseCategory(entry: ResourcefulConfigObjectEntry, tree: Tree) {
         val objectEntry = Tree.tree()
         objectEntry.title = entry.options().title.toLocalizedString()
         objectEntry.description = entry.options().comment.toLocalizedString()
@@ -95,19 +93,17 @@ internal object RConfigCompat {
         objectEntry.category = tree.category
         objectEntry.subcategory = entry.options().title.toLocalizedString()
         objectEntry.index = -1
-        parseAny(entry.elements(), objectEntry)
+        parseAny(entry.entries().values, objectEntry)
         tree.put(objectEntry)
-
     }
 
-    private fun buildAndAdd(element: ResourcefulConfigEntryElement, tree: Tree) {
-        val entry = element.entry() as? ResourcefulConfigValueEntry ?: return
+    private fun buildAndAdd(entry: ResourcefulConfigValueEntry, tree: Tree) {
         val builder = RConfigPropertyBuilder(entry)
 
         if (entry.get().javaClass.isArray) return
         val options = entry.options() // todo draggable list and multiselects
 
-        val visualizer: KClass<out Visualizer> = when (entry.type()) {
+        val visualizer: Class<out Visualizer> = when (entry.type()) {
             EntryType.BYTE, EntryType.SHORT, EntryType.INTEGER, EntryType.LONG, EntryType.FLOAT, EntryType.DOUBLE -> {
                 if (entry.options().getOption(Option.RANGE) != null) {
                     builder["min"] = options.getOption(Option.RANGE).min.toFloat()
@@ -128,11 +124,11 @@ internal object RConfigCompat {
                         argb(entry.int).mutable()
                     }
 
-                    Visualizer.ColorVisualizer::class
+                    Visualizer.ColorVisualizer::class.java
                 } else if (entry.options().hasOption(Option.SLIDER)) {
-                    Visualizer.SliderVisualizer::class
+                    Visualizer.SliderVisualizer::class.java
                 } else {
-                    Visualizer.NumberVisualizer::class
+                    Visualizer.NumberVisualizer::class.java
                 }
             }
 
@@ -140,23 +136,21 @@ internal object RConfigCompat {
                 // TODO multiline :pensive:
                 builder["validate"] =
                     if (options.hasOption(Option.REGEX)) options.getOption(Option.REGEX).pattern() else null
-                Visualizer.TextVisualizer::class
+                Visualizer.TextVisualizer::class.java
             }
 
-            EntryType.BOOLEAN -> Visualizer.SwitchVisualizer::class
-            EntryType.ENUM -> Visualizer.DropdownVisualizer::class
+            EntryType.BOOLEAN -> Visualizer.SwitchVisualizer::class.java
+            EntryType.ENUM -> Visualizer.DropdownVisualizer::class.java
             else -> null
         } ?: return
 
-        builder["visualizer"] = visualizer.java
-        val build = builder.build()
-        build.addDisplayCondition { if (element.isHidden) Property.Display.HIDDEN else Property.Display.SHOWN }
-        tree.put(build)
+        builder["visualizer"] = visualizer
+        tree.put(builder.build())
     }
 
     private class RConfigPropertyBuilder internal constructor(option: ResourcefulConfigValueEntry) {
         val name: String? = option.options().title.toLocalizedString()
-        val description: String? = option.options().comment.toLocalizedString()
+        val description: String? = option.options().comment().toLocalizedString()
 
         var setter: (Any) -> Unit = { value ->
             when (option.type()) {

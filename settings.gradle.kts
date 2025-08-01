@@ -23,8 +23,8 @@ pluginManagement {
     }
 
     plugins {
-        kotlin("jvm") version("2.0.0")
-        id("dev.deftu.gradle.multiversion-root") version("2.43.0") // Update in libs.versions.toml too!!!
+        kotlin("jvm") version("2.0.20")
+        id("dev.deftu.gradle.multiversion-root") version("2.48.0") // Update in libs.versions.toml too!!!
     }
 }
 
@@ -75,7 +75,7 @@ listOf(
     include(":modules:$module")
 }
 
-// FOR ALL NEW VERSIONS MAKE SURE TO INCLUDE THEM IN root..gradle.kts !
+// FOR ALL NEW VERSIONS MAKE SURE TO INCLUDE THEM IN root.gradle.kts !
 include(":minecraft")
 project(":minecraft").buildFileName = "root.gradle.kts"
 listOf(

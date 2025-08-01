@@ -1,13 +1,22 @@
 @file:Suppress("UnstableApiUsage")
 // Shared build logic for all versions of OneConfig.
 
+import com.google.devtools.ksp.gradle.KspAATask
+import com.replaymod.gradle.preprocess.Node
+import com.replaymod.gradle.preprocess.PreprocessTask
+import com.replaymod.gradle.preprocess.ProjectGraphNode
+import com.replaymod.gradle.preprocess.RootPreprocessExtension
 import dev.deftu.gradle.utils.GameSide
-import dev.deftu.gradle.utils.propertyBoolOr
 import dev.deftu.gradle.utils.version.MinecraftReleaseVersion
 import dev.deftu.gradle.utils.version.MinecraftVersions
-import org.polyfrost.gradle.provideIncludedDependencies
+import gg.essential.gradle.util.RelocationTransform.Companion.registerRelocationAttribute
+import gg.essential.gradle.util.prebundle
+import org.gradle.kotlin.dsl.invoke
 import org.polyfrost.gradle.provideFabricApiDependency
+import org.polyfrost.gradle.provideIncludedDependencies
 import java.text.SimpleDateFormat
+import java.util.function.Predicate
+import kotlin.io.path.absolutePathString
 import java.lang.Boolean as JBoolean
 
 plugins {
@@ -20,6 +29,8 @@ plugins {
     id(libs.plugins.dgt.loom.get().pluginId)
     id(libs.plugins.dgt.publishing.maven.get().pluginId)
 }
+
+evaluationDependsOn(":modules")
 
 if (mcData.isForge) {
     loom.forge.mixinConfig("mixins.oneconfigv1.init.json")
@@ -127,6 +138,19 @@ fun DependencyHandlerScope.handleApiDep(dependency: ExternalModuleDependency, is
     }
 }
 
+preprocess {
+    val filter: Predicate<File> = Predicate { !it.toPath().absolutePathString().contains("build/generated/ksp") }
+    javaFilter = filter
+    kotlinFilter = filter
+}
+
+val skyhanniRelocated = registerRelocationAttribute("relocate-skyhanni-moulconfig") {
+    relocate("io.github.notenoughupdates.moulconfig", "at.hannibal2.skyhanni.deps.moulconfig")
+}
+
+val skyhanniRelocatedConfiguration by configurations.creating {
+    attributes { attribute(skyhanniRelocated, true) }
+}
 
 dependencies {
     data class CompatDependency(
@@ -153,6 +177,8 @@ dependencies {
 
     compileOnlyCompat("gg.essential:vigilance-1.8.9-forge:295")
     compileOnlyCompat("org.notenoughupdates.moulconfig:common:3.11.0")
+    skyhanniRelocatedConfiguration("org.notenoughupdates.moulconfig:common:3.11.0")
+    compileOnly(prebundle(skyhanniRelocatedConfiguration))
 
     fun rconfig(mcVersion: String, modVersion: String, mcVersionOverride: String = mcVersion) =
         mcVersion to CompatDependency("com.teamresourceful.resourcefulconfig:resourcefulconfig-common-$mcVersionOverride:$modVersion")
@@ -169,6 +195,7 @@ dependencies {
         rconfig("1.20.6", "2.5.2", "1.20.5"),
         rconfig("1.21.0", "3.0.11", "1.21"),
         rconfig("1.21.1", "3.0.11", "1.21"),
+        rconfig("1.21.2", "3.0.11", "1.21"),
         rconfig("1.21.3", "3.3.4"),
         rconfig("1.21.4", "3.4.3"),
         rconfig("1.21.5", "3.5.9"),
@@ -300,7 +327,6 @@ dependencies {
         }
     }
 
-    compileOnly("com.github.hannibal002:SkyHanni:3.8.0") { isTransitive = false }
     if ((mcData.version as MinecraftReleaseVersion).isNewerThan(MinecraftVersions.VERSION_1_21_4)) {
         compileOnly("net.azureaaron:dandelion:1.0.0-alpha.3") { isTransitive = false }
     }
@@ -353,6 +379,39 @@ afterEvaluate {
             }
         }
     }
+
+    tasks.withType<PreprocessTask>().configureEach {
+        for (project in rootProject.project(":modules").subprojects) {
+            if ("dependencies" !in project.path) {
+                project.tasks.findByPath("jar")?.let {
+                    this@configureEach.dependsOn(it)
+                }
+            }
+        }
+
+        fun recurseAndAdd(list: MutableList<ProjectGraphNode>, node: ProjectGraphNode) {
+            list.add(node)
+            for (child in node.links) {
+                recurseAndAdd(list, child.first)
+            }
+        }
+        val rootPreprocess = parent!!.extensions.getByType<RootPreprocessExtension>()
+        val nodes = mutableListOf<ProjectGraphNode>()
+        recurseAndAdd(nodes, rootPreprocess.rootNode!!)
+        var previousNode: ProjectGraphNode? = null
+        nodes.reversed().forEach {
+            if (it.project == project.name) {
+                val previousProject = rootProject.project(":minecraft:${previousNode!!.project}")
+                this@configureEach.dependsOn(previousProject.tasks.withType<KspAATask>())
+                return@forEach
+            }
+            previousNode = it
+        }
+    }
+}
+
+ksp {
+    arg("relocator.mcVersion", mcData.version.toString())
 }
 
 if (mcData.version < MinecraftVersions.VERSION_1_13) {

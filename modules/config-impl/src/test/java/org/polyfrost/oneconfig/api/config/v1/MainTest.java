@@ -32,7 +32,9 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 public class MainTest {
     @org.junit.jupiter.api.Test
     void test() {
-        Tree t = new TestConfig().tree;
+        TestConfig config = new TestConfig();
+        config.initialize(true);
+        Tree t = config.tree;
         assertEquals(t, ConfigManager.active().get(t.getID()));
         assertNotNull(t.get("chicken").getMetadata("visualizer"));
         System.err.println(t);

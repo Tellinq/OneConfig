@@ -118,6 +118,11 @@ public class TestConfig extends Config {
         super("test_mod.json", "Test Mod", Category.QOL);
     }
 
+    @Override
+    public void initialize(boolean byConfigManager) {
+        super.initialize(byConfigManager);
+    }
+
     @Button(title = "Test")
     private static void testBtn() {
     }

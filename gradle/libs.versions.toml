@@ -26,15 +26,15 @@ lwjgl = "3.3.3" # All downloaded by the isolated-lwjgl3-loader
 
 # Legacy only
 mixin = "0.8.4+build.6"
-mixin-extras = "0.4.1"
+mixin-extras = "0.5.0"
 asm = "5.2"
 brigadier = "1.0.18"
 
 # Gradle
-dgt = "2.43.0"
+dgt = "2.48.0"
 kotlinx-abi = "0.17.0"
 licenser = "2.1.1"
-jetbrains-idea-ext = "1.1.8"
+jetbrains-idea-ext = "1.2"
 
 log4j-api = "2.0-beta9" # used because this is the version that 1.8.9 supports, so we have to compile against the same (annoying)
 
