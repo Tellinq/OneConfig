@@ -39,6 +39,7 @@ import org.polyfrost.polyui.unit.Vec2
 import org.polyfrost.polyui.utils.image
 import org.polyfrost.polyui.utils.mapToArray
 import org.polyfrost.polyui.utils.ref
+import java.util.function.Predicate
 import kotlin.jvm.java
 
 /**
@@ -316,8 +317,9 @@ fun interface Visualizer {
     class TextVisualizer : Visualizer {
         override fun visualize(prop: Property<*>): Drawable {
             val placeholder = prop.getMetadata("placeholder") ?: "polyui.textinput.placeholder"
-            val validate = prop.getMetadata<String?>("validate")
-            val regex = if (validate != null) Regex(validate) else null
+            val regexString = prop.getMetadata<String?>("regex")
+            val regex = regexString?.let { Regex(it) }
+            val validate = prop.getMetadata<Predicate<String>>("validate")
             var dodge = false
             val s = BoxedTextInput(
                 image = "assets/oneconfig/ico/text.svg".image(),
@@ -325,6 +327,10 @@ fun interface Visualizer {
                 size = Vec2(200f, 32f),
                 initialValue = prop.getAs(),
             ).onChange { text: String ->
+                if (validate != null && !validate.test(text)) {
+                    shake()
+                    return@onChange true
+                }
                 if (regex != null && !regex.matches(text)) {
                     shake()
                     return@onChange true
@@ -333,7 +339,7 @@ fun interface Visualizer {
                 prop.setAs(text)
                 false
             }
-            if (validate != null) s.addHoverInfo(Text("Must match regex: $validate"))
+            if (regexString != null) s.addHoverInfo(Text("Must match regex: $regexString"))
             prop.addCallback {
                 if (!dodge) (s[1][0] as TextInput).text = it as String
                 dodge = false

@@ -116,6 +116,10 @@ object HudManager {
         }
     }
 
+    fun unregister(hud: Hud<*>) {
+        hudProviders.remove(hud::class.java)
+    }
+
     fun removeHud(hud: Hud<*>, executorCallback: Clock.Executor?) {
         require(hud.isReal) { "Tried to remove a non-real HUD" }
         polyUI.master.removeChild(hud.getBackground() ?: hud.get(), recalculate = false)

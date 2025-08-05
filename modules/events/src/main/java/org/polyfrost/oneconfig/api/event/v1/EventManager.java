@@ -26,6 +26,7 @@
 
 package org.polyfrost.oneconfig.api.event.v1;
 
+import dev.deftu.omnicore.client.OmniChat;
 import dev.deftu.omnicore.common.OmniLoader;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -36,12 +37,13 @@ import org.polyfrost.oneconfig.api.event.v1.events.InitializationEvent;
 import org.polyfrost.oneconfig.api.event.v1.invoke.EventCollector;
 import org.polyfrost.oneconfig.api.event.v1.invoke.EventHandler;
 import org.polyfrost.oneconfig.api.event.v1.invoke.impl.AnnotationEventMapper;
-import org.polyfrost.oneconfig.api.platform.v1.Platform;
+import org.polyfrost.oneconfig.utils.v1.LogScanner;
 import org.polyfrost.oneconfig.utils.v1.TableHelper;
 
 import java.util.*;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.Consumer;
+import java.util.stream.Collectors;
 
 /**
  * Manages all events from OneConfig.
@@ -226,8 +228,13 @@ public final class EventManager {
                 throw ex;
             } catch (Throwable throwable) {
                 LOGGER.error("Failed to invoke event handler for {}", event.getClass().getName(), throwable);
+                if (OmniLoader.isDevelopment()) {
+                    throw new EventException("Event handler " + handler.getEventClass().getName() + " for " + handler.getEventClass().getName() + " failed", throwable);
+                }
                 if (handler.onError()) {
                     LOGGER.error("removing {} registered to {} as it has failed too many times ({})", handler, event.getClass().getName(), EventHandler.ERROR_THRESHOLD);
+                    String blamed = LogScanner.identifyFromStacktrace(throwable).stream().map(OmniLoader.ModInfo::getName).collect(Collectors.joining(", "));
+                    OmniChat.displayClientMessage("&cSomething internally in the mod(s) " + blamed + " has failed. Please report this to their developers and attach the log.");
                     unregister(handler);
                 }
             }

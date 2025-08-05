@@ -55,7 +55,7 @@ val alignC = Align(main = Align.Content.Center, cross = Align.Content.Center)
 val alignNoPad = Align(pad = Vec2.ZERO)
 val alignHudDefault = Align(main = Align.Content.Center, cross = Align.Content.Center, pad = Vec2(8f, 8f))
 val BLACK_HALF = rgba(0, 0, 0, 0.5f)
-private val mcFont = FontFamily("Minecraft", "assets/oneconfig/fonts/minecraft")
+private val mcFont = FontFamily("Minecraft", "assets/oneconfig/fonts/minecraft/", FontFamily.Type.OpenType)
 const val angleSnapMargin = PI / 12.0
 const val minMargin = 4f
 const val snapMargin = 12f
@@ -65,25 +65,25 @@ fun HudsPage(huds: Collection<Hud<*>>): Drawable {
     return Group(
         Group(
             HudButton("oneconfig.huds.all").onClick {
-                parent[1] = Group(
+                parent.parent[1] = Group(
                     *hudMap.values.toTypedArray(),
                     visibleSize = Vec2(500f, 800f),
                 )
             },
             HudButton("oneconfig.huds.pvp").onClick {
-                parent[1] = Group(
+                parent.parent[1] = Group(
                     *hudMap.filterValuesByKey { it == Hud.Category.COMBAT }.toTypedArray(),
                     visibleSize = Vec2(500f, 800f),
                 )
             },
             HudButton("oneconfig.huds.info").onClick {
-                parent[1] = Group(
+                parent.parent[1] = Group(
                     *hudMap.filterValuesByKey { it == Hud.Category.INFO }.toTypedArray(),
                     visibleSize = Vec2(500f, 800f),
                 )
             },
             HudButton("oneconfig.huds.player").onClick {
-                parent[1] = Group(
+                parent.parent[1] = Group(
                     *hudMap.filterValuesByKey { it == Hud.Category.PLAYER }.toTypedArray(),
                     visibleSize = Vec2(500f, 800f),
                 )
