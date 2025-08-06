@@ -14,6 +14,8 @@ public abstract class org/polyfrost/oneconfig/api/config/v1/Config {
 	protected fun addDependency (Ljava/lang/String;Ljava/lang/String;)V
 	protected fun addDependency (Ljava/lang/String;Ljava/lang/String;Ljava/util/function/Supplier;)V
 	protected fun addDependency (Ljava/lang/String;Ljava/lang/String;Z)V
+	protected fun addMigrationEntries ([Ljava/lang/String;)V
+	protected fun addMigrationEntry (Ljava/lang/String;Ljava/lang/String;)V
 	protected fun addToInitQueue ()V
 	protected fun getProperty (Ljava/lang/String;)Lorg/polyfrost/oneconfig/api/config/v1/Property;
 	protected static fun getProperty (Lorg/polyfrost/oneconfig/api/config/v1/Tree;Ljava/lang/String;)Lorg/polyfrost/oneconfig/api/config/v1/Property;
@@ -289,9 +291,9 @@ public abstract interface annotation class org/polyfrost/oneconfig/api/config/v1
 	public abstract fun description ()Ljava/lang/String;
 	public abstract fun icon ()Ljava/lang/String;
 	public abstract fun placeholder ()Ljava/lang/String;
+	public abstract fun regex ()Ljava/lang/String;
 	public abstract fun subcategory ()Ljava/lang/String;
 	public abstract fun title ()Ljava/lang/String;
-	public abstract fun validate ()Ljava/lang/String;
 }
 
 public class org/polyfrost/oneconfig/api/config/v1/backend/impl/FileBackend : org/polyfrost/oneconfig/api/config/v1/backend/Backend {
