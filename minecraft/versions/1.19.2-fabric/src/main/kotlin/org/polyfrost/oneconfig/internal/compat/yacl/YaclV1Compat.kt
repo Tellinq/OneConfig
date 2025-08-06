@@ -27,7 +27,7 @@ import org.polyfrost.oneconfig.utils.v1.dsl.saveFunction
 import org.polyfrost.oneconfig.utils.v1.dsl.subcategory
 import org.polyfrost.oneconfig.utils.v1.dsl.visualizer
 import org.polyfrost.polyui.color.PolyColor
-import org.polyfrost.polyui.color.mutable
+import org.polyfrost.polyui.color.asMutable
 import org.polyfrost.polyui.color.toPolyColor
 import java.awt.Color
 import java.util.*
@@ -150,7 +150,7 @@ object YaclV1Compat {
             is ColorController -> { // todo alpha
                 builder.setter =
                     { value -> (value as? PolyColor)?.let { controller.option().requestAndSubmitSet(Color(value.argb)) } }
-                builder.getter = { controller.option().binding().value.toPolyColor().mutable() }
+                builder.getter = { controller.option().binding().value.toPolyColor().asMutable() }
                 Visualizer.ColorVisualizer::class.java
             }
 
