@@ -91,7 +91,10 @@ public abstract class Config {
     @MustBeInvokedByOverriders
     protected void initialize(boolean byConfigManager) {
         if (!byConfigManager) ConfigManager.removePendingInitialization(this);
-        if (tree != null) throw new IllegalStateException("Config already initialized: " + id);
+        if (tree != null) {
+            ConfigManager.LOGGER.warn("Config {} is already initialized, skipping initialization", id);
+            return;
+        }
         if ((tree = makeTree()) != null) {
             tree.setTitle(title);
             if (iconPath != null) tree.addMetadata("icon", new PolyImage(iconPath));

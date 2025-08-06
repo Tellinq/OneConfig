@@ -39,7 +39,7 @@ import org.polyfrost.polyui.component.impl.PopupMenu
 import org.polyfrost.polyui.component.impl.Text
 import org.polyfrost.polyui.event.Event
 import org.polyfrost.polyui.unit.Align
-import org.polyfrost.polyui.unit.Point
+import org.polyfrost.polyui.unit.SpawnPos
 import org.polyfrost.polyui.unit.Vec2
 import org.polyfrost.polyui.unit.by
 import org.polyfrost.polyui.utils.fastEach
@@ -47,7 +47,7 @@ import kotlin.math.sqrt
 
 private val LOGGER = LogManager.getLogger("OneConfig/HUD")
 
-val scaleBlob by lazy {
+val scaleBlob: Block by lazy {
     var sx = 0f
     var sy = 0f
     var st = 1f
@@ -72,6 +72,7 @@ val scaleBlob by lazy {
             x = it.x + (it.width * s) - (width / 2f)
             y = it.y + (it.height * s) - (height / 2f)
         }
+        Unit
     }.setPalette { brand.fg }
     HudManager.polyUI.master.addChild(b, recalculate = false)
     b.renders = false
@@ -214,7 +215,7 @@ fun Hud<*>.build(): Drawable {
 //                    if (HudManager.panel[3] !== HudManager.hudsPage) HudManager.panel[3] = HudManager.hudsPage
                     },
                     polyUI = HudManager.polyUI,
-                    position = Point.Above,
+                    spawnPos = SpawnPos.AboveMouse,
                 )
                 true
             }
