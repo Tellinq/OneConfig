@@ -50,7 +50,7 @@ import static org.polyfrost.oneconfig.api.config.v1.Tree.tree;
 
 public final class ConfigManager {
     public static final Path PROFILES_DIR = Paths.get("profiles");
-    private static final Logger LOGGER = LogManager.getLogger("OneConfig/Config");
+    static final Logger LOGGER = LogManager.getLogger("OneConfig/Config");
     private static final List<PropertyCollector> collectors = new ArrayList<>(1);
     private static final ConfigManager internal = new ConfigManager(Paths.get("oneconfig"), NightConfigSerializer.ALL);
     private static final ConfigManager core = new ConfigManager(Paths.get("config"), NightConfigSerializer.ALL);

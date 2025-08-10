@@ -71,6 +71,7 @@ public final class org/polyfrost/oneconfig/api/hud/v1/HudManager {
 	public final fun setSliney (F)V
 	public final fun toggle ()V
 	public final fun toggleHudPicker ()V
+	public final fun unregister (Lorg/polyfrost/oneconfig/api/hud/v1/Hud;)V
 }
 
 public abstract class org/polyfrost/oneconfig/api/hud/v1/LegacyHud : org/polyfrost/oneconfig/api/hud/v1/Hud {

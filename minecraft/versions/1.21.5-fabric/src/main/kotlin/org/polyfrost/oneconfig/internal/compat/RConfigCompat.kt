@@ -16,7 +16,7 @@ import org.polyfrost.oneconfig.internal.DynamicPolyImage
 import org.polyfrost.oneconfig.utils.v1.dsl.*
 import org.polyfrost.polyui.color.PolyColor
 import org.polyfrost.polyui.color.argb
-import org.polyfrost.polyui.color.mutable
+import org.polyfrost.polyui.color.asMutable
 import java.util.*
 import kotlin.reflect.KClass
 
@@ -125,7 +125,7 @@ internal object RConfigCompat {
                     }
 
                     builder.getter = {
-                        argb(entry.int).mutable()
+                        argb(entry.int).asMutable()
                     }
 
                     Visualizer.ColorVisualizer::class
