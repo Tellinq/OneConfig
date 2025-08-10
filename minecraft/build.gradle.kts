@@ -142,7 +142,6 @@ preprocess {
     val filter: Predicate<File> = Predicate {
         val seperator = File.separator
         val path = "build${seperator}generated${seperator}ksp"
-        logger.lifecycle("Filtering out $it from preprocessing: $path")
         !it.toPath().absolutePathString().contains(path)
     }
 
