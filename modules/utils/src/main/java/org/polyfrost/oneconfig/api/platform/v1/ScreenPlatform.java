@@ -55,6 +55,8 @@ public interface ScreenPlatform {
     @ApiStatus.Obsolete
     OmniMatrixStack getSmuggledMatrixStack();
 
+    void renderLegacyHuds();
+
     default float pixelRatio() {
         return (float) viewportWidth() / windowWidth();
     }

@@ -208,7 +208,13 @@ open class ConfigVisualizer {
             list.add(wrap(vis.visualize(node), node.title, node.description, icon).addHideHandler(node).addResetMenu(root, node).linkTo(node))
         } else {
             node as Tree
-            list.add(makeAccordion(root, node, node.title, node.description, icon).linkTo(node))
+            val title = node.title
+            if (title == null) {
+                LOGGER.warn("Tree node ${node.id} does not have a title; ignoring")
+                return
+            }
+
+            list.add(makeAccordion(root, node, title, node.description, icon).linkTo(node))
         }
     }
 

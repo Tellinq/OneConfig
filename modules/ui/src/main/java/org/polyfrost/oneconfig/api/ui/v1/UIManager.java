@@ -131,9 +131,11 @@ public interface UIManager {
                 framebuffer.usingToRender((matrixStack, w, h) -> {
                     OmniManagedAlphaState.enableAlpha();
                     OmniManagedBlendState.enableBlend();
-                    matrices.runReplacingGlobalState(polyUI::render);
-                    OmniManagedBlendState.disableBlend();
-                    OmniManagedAlphaState.disableAlpha();
+                    matrices.runReplacingGlobalState(() -> {
+                        polyUI.render();
+                        Platform.screen().renderLegacyHuds();
+                    });
+
                     return Unit.INSTANCE;
                 });
 
