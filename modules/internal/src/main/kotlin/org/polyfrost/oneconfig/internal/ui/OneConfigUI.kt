@@ -195,18 +195,20 @@ object OneConfigUI {
                                         if (text.length > 2) {
                                             val scale = Vec2(polyUI.size.x / polyUI.iSize.x, polyUI.size.y / polyUI.iSize.y)
                                             val search = Group(children = ConfigVisualizer.INSTANCE.getMatching(text).toTypedArray(), visibleSize = Vec2(1130f, 635f) * scale)
-                                            if (search.children?.size == 0) search.children?.add(searchNoneFound)
+                                            if (search.children.isNullOrEmpty()) search.addChild(searchNoneFound)
                                             search.setup(polyUI)
-                                            openPage(search, "oneconfig.search")
+                                            openPage(search, "oneconfig.search", SetAnimation.Fade)
                                         } else {
-                                            openPage(ModsPage(collectTrees()), "oneconfig.mods")
+                                            openPage(ModsPage(collectTrees()), "oneconfig.mods", SetAnimation.Fade)
                                         }
 
                                         false
                                     }.also { searchField = it },
                                     size = Vec2(256f, 32f),
                                     alignment = Align(pad = Vec2(10f, 8f)),
-                                ).withBorder(1f) { page.border5 }.named("SearchField"),
+                                ).withBorder(1f) { page.border5 }.named("SearchField").onRightClick {
+                                    (this[1] as TextInput).text = ""
+                                },
                                 alignment = Align(pad = Vec2(16f, 4f))
                             ),
                             Image(
@@ -250,12 +252,12 @@ object OneConfigUI {
         }
     }
 
-    fun openPage(page: Component, name: String) {
+    fun openPage(page: Component, name: String, animation: SetAnimation = SetAnimation.SlideLeft) {
         val title = ui[1][0][0][2] as Text
         val translated = ui.polyUI.translator.translate(name)
         title.text = translated.string
         val prev = ui[1][1]
-        ui[1].set(prev, page, SetAnimation.SlideLeft)
+        ui[1].set(prev, page, animation)
     }
 
     fun label(text: String) = Block(

@@ -36,6 +36,7 @@ import org.polyfrost.polyui.data.PolyImage;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.function.BooleanSupplier;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
@@ -54,7 +55,7 @@ public abstract class Config {
     public Config(@NotNull String id, @Nullable String iconPath, @NotNull String title, @Nullable Category category) {
         this.title = title;
         this.id = id;
-        this.iconPath = iconPath;
+        this.iconPath = validateIconPath(iconPath);
         this.category = category == null ? Category.OTHER : category;
         addToInitQueue();
     }
@@ -90,13 +91,13 @@ public abstract class Config {
     @MustBeInvokedByOverriders
     protected void initialize(boolean byConfigManager) {
         if (!byConfigManager) ConfigManager.removePendingInitialization(this);
-        if (tree != null) throw new IllegalStateException("Config already initialized: " + id);
+        if (tree != null) {
+            ConfigManager.LOGGER.warn("Config {} is already initialized, skipping initialization", id);
+            return;
+        }
         if ((tree = makeTree()) != null) {
             tree.setTitle(title);
-            if (iconPath != null) {
-                validateIconPath(iconPath);
-                tree.addMetadata("icon", new PolyImage(iconPath));
-            }
+            if (iconPath != null) tree.addMetadata("icon", new PolyImage(iconPath));
 
             tree.addMetadata("category", category);
             ConfigManager.backup().backend.save0(tree);
@@ -173,6 +174,27 @@ public abstract class Config {
         return tree;
     }
 
+    /**
+     * Add a migration entry to the config. This should be in the format of oldName -> newName.
+     * <br>To be used in conjunction with {@link #loadFrom(String)} or {@link #loadFrom(Path)} to migrate old configs to new ones.
+     */
+    protected void addMigrationEntry(String oldName, String newName) {
+        if (tree == null) initialize(false);
+        tree.getOrPutMetadata("migrationMap", () -> new HashMap<String, String>()).put(oldName, newName);
+    }
+
+    /**
+     * Add multiple migration entries to the config. This should be in the format of pairs, where the first element is the old name and the second element is the new name.
+     * <br>To be used in conjunction with {@link #loadFrom(String)} or {@link #loadFrom(Path)} to migrate old configs to new ones.
+     */
+    protected void addMigrationEntries(String... entries) {
+        if (tree == null) initialize(false);
+        HashMap<String, String> map = tree.getOrPutMetadata("migrationMap", () -> new HashMap<>(entries.length / 2));
+        for (int i = 0; i < entries.length; i += 2) {
+            map.put(entries[i], entries[i + 1]);
+        }
+    }
+
     protected void loadFrom(String id) {
         if (tree == null) initialize(false);
         Tree in = ConfigManager.active().get(id);
@@ -223,7 +245,10 @@ public abstract class Config {
         initialize(false);
     }
 
-    private static void validateIconPath(@NotNull String path) {
+    private static String validateIconPath(String path) {
+        if (path == null || path.isEmpty()) {
+            return null; // no icon
+        }
         if (path.startsWith("/")) {
             path = path.substring(1);
         }
@@ -231,6 +256,7 @@ public abstract class Config {
         if (!path.startsWith("assets/")) {
             path = "assets/" + path;
         }
+        return path;
     }
 
     /**

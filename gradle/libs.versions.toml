@@ -6,7 +6,7 @@ kotlin = "2.0.20"
 kotlinx-coroutines = "1.8.1"
 kotlinx-atomicfu = "0.27.0"
 fabric-language-kotlin = "1.13.2+kotlin.2.1.20"
-polyui = "1.11.7"
+polyui = "1.12.1"
 annotations = "24.1.0"
 hypixel-modapi = "1.0.1"
 hypixel-data = "0.2.0" # Dep of hypixel-modapi
@@ -21,7 +21,7 @@ copycat-image-awt = "0.1.1"
 
 # Per version
 textile = "0.21.0"
-omnicore = "0.40.0"
+omnicore = "0.44.0"
 lwjgl = "3.3.3" # All downloaded by the isolated-lwjgl3-loader
 
 # Legacy only
@@ -31,7 +31,7 @@ asm = "5.2"
 brigadier = "1.0.18"
 
 # Gradle
-dgt = "2.48.0"
+dgt = "2.49.0"
 kotlinx-abi = "0.17.0"
 licenser = "2.1.1"
 jetbrains-idea-ext = "1.2"

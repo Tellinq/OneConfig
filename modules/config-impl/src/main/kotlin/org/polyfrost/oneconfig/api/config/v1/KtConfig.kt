@@ -48,7 +48,11 @@ open class KtConfig(id: String, title: String, category: Category, icon: String?
      * return the property with the given id by a kotlin property reference.
      */
     @Suppress("UNCHECKED_CAST")
-    protected val <V> KProperty<V>.property: Property<V> get() = (tree.getProp(this.name) as Property<V>)
+    protected val <V> KProperty<V>.property: Property<V>
+        get() {
+            if (tree == null) initialize(false)
+            return tree.getProp(this.name) as Property<V>
+        }
 
     /**
      * create a new delegate for the given property.
@@ -93,11 +97,11 @@ open class KtConfig(id: String, title: String, category: Category, icon: String?
         }
 
     fun hideIf(option: KProperty<*>, condition: () -> Boolean) {
-        option.property.addDisplayCondition { if(condition()) Display.HIDDEN else Display.SHOWN }
+        option.property.addDisplayCondition { if (condition()) Display.HIDDEN else Display.SHOWN }
     }
 
     fun hideIf(option: KProperty<*>, condition: KProperty0<Boolean>) {
-        option.property.addDisplayCondition { if(condition.get()) Display.HIDDEN else Display.SHOWN }
+        option.property.addDisplayCondition { if (condition.get()) Display.HIDDEN else Display.SHOWN }
     }
 
     fun <T> addCallback(option: KProperty<T>, callback: (T?) -> Boolean) {
@@ -124,6 +128,7 @@ open class KtConfig(id: String, title: String, category: Category, icon: String?
             p.addMetadata("visualizer", visualizer)
             p.addMetadata("category", category)
             p.addMetadata("subcategory", subcategory)
+            if (thisRef.tree == null) thisRef.initialize(false)
             thisRef.tree.put(p)
             return PropertyDelegate(p)
         }

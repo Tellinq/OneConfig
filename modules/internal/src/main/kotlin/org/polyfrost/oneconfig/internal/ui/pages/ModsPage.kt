@@ -89,6 +89,13 @@ private fun ModCard(
 }
 
 private fun ModCardImage(tree: Tree): Drawable {
+    val banner = tree.getMetadata<PolyImage>("banner")
+    if (banner != null) {
+        return Image(banner).onInit {
+            size = size.coerceAtMost(Vec2(256f, 104f))
+        }
+    }
+
     val configuredIcon = tree.getMetadata<PolyImage>("icon")
     if (configuredIcon != null) {
         return Image(configuredIcon).onInit {

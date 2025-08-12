@@ -139,7 +139,12 @@ fun DependencyHandlerScope.handleApiDep(dependency: ExternalModuleDependency, is
 }
 
 preprocess {
-    val filter: Predicate<File> = Predicate { !it.toPath().absolutePathString().contains("build/generated/ksp") }
+    val filter: Predicate<File> = Predicate {
+        val seperator = File.separator
+        val path = "build${seperator}generated${seperator}ksp"
+        !it.toPath().absolutePathString().contains(path)
+    }
+
     javaFilter = filter
     kotlinFilter = filter
 }

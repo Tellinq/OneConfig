@@ -28,7 +28,6 @@ package org.polyfrost.oneconfig.api.config.v1.internal
 
 import org.apache.logging.log4j.LogManager
 import org.polyfrost.oneconfig.api.config.v1.*
-import org.polyfrost.oneconfig.api.config.v1.dsl.ConfigDSL.Companion.config
 import org.polyfrost.oneconfig.utils.v1.MHUtils.setAccessible
 import org.polyfrost.polyui.animate.Animations
 import org.polyfrost.polyui.color.PolyColor
@@ -41,12 +40,11 @@ import org.polyfrost.polyui.data.PolyImage
 import org.polyfrost.polyui.event.Event
 import org.polyfrost.polyui.operations.Resize
 import org.polyfrost.polyui.operations.Rotate
-import org.polyfrost.polyui.unit.Align
-import org.polyfrost.polyui.unit.Point
-import org.polyfrost.polyui.unit.Vec2
-import org.polyfrost.polyui.unit.by
-import org.polyfrost.polyui.unit.seconds
-import org.polyfrost.polyui.utils.*
+import org.polyfrost.polyui.unit.*
+import org.polyfrost.polyui.utils.fastEach
+import org.polyfrost.polyui.utils.image
+import org.polyfrost.polyui.utils.levenshteinDistance
+import org.polyfrost.polyui.utils.mapToArray
 import java.lang.ref.WeakReference
 import kotlin.math.PI
 
@@ -148,7 +146,7 @@ open class ConfigVisualizer {
         //      -> list of options
         for ((_, node) in config.map) {
             // first ignore empty tree nodes
-            if(node is Tree) {
+            if (node is Tree) {
                 if (node.map.isEmpty()) {
                     LOGGER.warn("sub-tree ${node.id} is empty; ignoring")
                     continue
@@ -210,7 +208,13 @@ open class ConfigVisualizer {
             list.add(wrap(vis.visualize(node), node.title, node.description, icon).addHideHandler(node).addResetMenu(root, node).linkTo(node))
         } else {
             node as Tree
-            list.add(makeAccordion(root, node, node.title, node.description, icon).linkTo(node))
+            val title = node.title
+            if (title == null) {
+                LOGGER.warn("Tree node ${node.id} does not have a title; ignoring")
+                return
+            }
+
+            list.add(makeAccordion(root, node, title, node.description, icon).linkTo(node))
         }
     }
 
@@ -349,7 +353,7 @@ open class ConfigVisualizer {
                 prop.overwrite(backup.get(Tree.evaluatePath(root, prop).split('.')), false)
                 polyUI.unfocus()
                 false
-            }, polyUI = polyUI, position = Point.Above)
+            }, polyUI = polyUI, spawnPos = SpawnPos.AboveMouse)
             false
         }
     }

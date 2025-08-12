@@ -28,17 +28,18 @@ package org.polyfrost.oneconfig.api.config.v1
 
 import org.polyfrost.oneconfig.api.config.v1.internal.ConfigVisualizer.Companion.strv
 import org.polyfrost.polyui.color.PolyColor
-import org.polyfrost.polyui.color.mutable
+import org.polyfrost.polyui.color.asMutable
 import org.polyfrost.polyui.component.Drawable
 import org.polyfrost.polyui.component.extensions.*
 import org.polyfrost.polyui.component.impl.*
 import org.polyfrost.polyui.event.Event
+import org.polyfrost.polyui.event.State
 import org.polyfrost.polyui.input.KeyBinder
 import org.polyfrost.polyui.unit.Align
 import org.polyfrost.polyui.unit.Vec2
 import org.polyfrost.polyui.utils.image
 import org.polyfrost.polyui.utils.mapToArray
-import org.polyfrost.polyui.utils.ref
+import java.util.function.Predicate
 import kotlin.jvm.java
 
 /**
@@ -63,10 +64,10 @@ fun interface Visualizer {
         override fun visualize(prop: Property<*>): Drawable {
             val p = prop.getAs<PolyColor>()
             if (p !is PolyColor.Mutable) {
-                prop.setAsReferential(p.mutable())
+                prop.setAsReferential(p.asMutable())
             }
             val s = Block(color = prop.getAs(), size = Vec2(58f, 32f)).withBorder(3f, color = { page.border20 })
-                .onClick { ColorPicker(prop.getAs<PolyColor.Mutable>().ref(), null, null, polyUI); true }
+                .onClick { ColorPicker(State(prop.getAs()), null, null, polyUI); true }
             prop.addCallback {
                 s.color = it as PolyColor
                 false
@@ -316,15 +317,20 @@ fun interface Visualizer {
     class TextVisualizer : Visualizer {
         override fun visualize(prop: Property<*>): Drawable {
             val placeholder = prop.getMetadata("placeholder") ?: "polyui.textinput.placeholder"
-            val validate = prop.getMetadata<String?>("validate")
-            val regex = if (validate != null) Regex(validate) else null
+            val regexString = prop.getMetadata<String?>("regex")
+            val regex = regexString?.let { Regex(it) }
+            val validate = prop.getMetadata<Predicate<String>>("validate")
             var dodge = false
             val s = BoxedTextInput(
                 image = "assets/oneconfig/ico/text.svg".image(),
                 placeholder = placeholder,
-                size = Vec2(200f, 32f),
+                //size = Vec2(200f, 32f),
                 initialValue = prop.getAs(),
             ).onChange { text: String ->
+                if (validate != null && !validate.test(text)) {
+                    shake()
+                    return@onChange true
+                }
                 if (regex != null && !regex.matches(text)) {
                     shake()
                     return@onChange true
@@ -333,7 +339,7 @@ fun interface Visualizer {
                 prop.setAs(text)
                 false
             }
-            if (validate != null) s.addHoverInfo(Text("Must match regex: $validate"))
+            if (regexString != null) s.addHoverInfo(Text("Must match regex: $regexString"))
             prop.addCallback {
                 if (!dodge) (s[1][0] as TextInput).text = it as String
                 dodge = false

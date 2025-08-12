@@ -44,7 +44,7 @@ public @interface Text {
     /**
      * Insert a regex expression which will be used to validate the text written in the box.
      */
-    String validate() default "";
+    String regex() default "";
 
     String category() default "General";
 

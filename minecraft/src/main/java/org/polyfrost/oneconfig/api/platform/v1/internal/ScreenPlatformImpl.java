@@ -31,7 +31,15 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiScreen;
 import org.jetbrains.annotations.Nullable;
 import org.polyfrost.oneconfig.api.event.v1.EventDelay;
+import org.polyfrost.oneconfig.api.hud.v1.LegacyHud;
 import org.polyfrost.oneconfig.api.platform.v1.ScreenPlatform;
+import org.polyfrost.oneconfig.api.ui.v1.UIManager;
+import org.polyfrost.polyui.PolyUI;
+import org.polyfrost.polyui.component.Component;
+import org.polyfrost.polyui.component.Drawable;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 public class ScreenPlatformImpl implements ScreenPlatform {
 //    //#if MC > 1.13
@@ -74,6 +82,24 @@ public class ScreenPlatformImpl implements ScreenPlatform {
         //#else
         return (int) (Minecraft.getMinecraft().displayHeight / org.lwjgl.opengl.Display.getPixelScaleFactor());
         //#endif
+    }
+
+    public void renderLegacyHuds() {
+        PolyUI defaultInstance = UIManager.INSTANCE.getDefaultInstance();
+        Drawable master = defaultInstance.getMaster();
+        List<Component> children = master.getChildren();
+        if (children == null || children.isEmpty()) {
+            return;
+        }
+
+        for (Component child : children) {
+            if (!(child instanceof LegacyHud.LegacyHudComponent)) {
+                continue;
+            }
+
+            LegacyHud.LegacyHudComponent legacyHud = (LegacyHud.LegacyHudComponent) child;
+            legacyHud.renderLegacy();
+        }
     }
 
     // todo: https://github.com/Polyfrost/OneConfig/issues/478
