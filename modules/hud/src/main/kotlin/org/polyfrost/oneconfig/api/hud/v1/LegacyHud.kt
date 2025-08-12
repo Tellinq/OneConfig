@@ -65,17 +65,30 @@ abstract class LegacyHud(id: String, title: String, category: Category) : Hud<Dr
      */
     protected fun createLegacy(): Drawable = LegacyHudComponent(hud = this).namedId("LegacyHud")
 
+    @Suppress("SENSELESS_COMPARISON")
     internal class LegacyHudComponent(private val hud: LegacyHud) : Drawable() {
         private var hasRenderedAtLeastOnce = false
 
         override var width: Float
-            get() = hud.width
+            get() {
+                require(hud != null) { "HUD must not be null" }
+                val width = hud.width
+                require(width != null) { "HUD width must not be null" }
+                require(width >= 0) { "HUD width must be greater than 0" }
+                return width
+            }
             set(value) {
                 hud.width = value
             }
 
         override var height: Float
-            get() = hud.height
+            get() {
+                require(hud != null) { "HUD must not be null" }
+                val height = hud.height
+                require(height != null) { "HUD height must not be null" }
+                require(height >= 0) { "HUD height must be greater than 0" }
+                return height
+            }
             set(value) {
                 hud.height = value
             }
