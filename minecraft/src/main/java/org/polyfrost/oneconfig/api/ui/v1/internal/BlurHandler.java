@@ -88,7 +88,7 @@ public final class BlurHandler {
      * is being used, we actually have the blur setting enabled
      */
     private boolean reloadBlur(Object gui) {
-        //#if MC >= 1.21.5
+        //#if MC >= 1.21.2
         //$$ return false; // TODO: Fix shader usage in 1.21.5+
         //#else
 
@@ -184,7 +184,7 @@ public final class BlurHandler {
     }
 
     private ShaderGroup getShaderGroup() {
-        //#if MC >= 1.21.4
+        //#if MC >= 1.21.2
         //$$ if (true) return null;
         //#endif
         return Minecraft.getMinecraft()
