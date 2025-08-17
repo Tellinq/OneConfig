@@ -202,7 +202,7 @@ public class OneConfig
 
     private static void registerKeybinds() {
         OCKeybindHelper builder = OCKeybindHelper.builder();
-        if (OmniLoader.isDevelopment()) builder.inScreens();
+        // if (OmniLoader.isDevelopment()) builder.inScreens(); see #452
         builder.mods(KeyModifiers.RSHIFT).does((s) -> {
             if (s) {
                 try {

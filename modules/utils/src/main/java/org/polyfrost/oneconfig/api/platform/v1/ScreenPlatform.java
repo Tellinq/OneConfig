@@ -47,14 +47,6 @@ public interface ScreenPlatform {
     @ApiStatus.Obsolete
     void setSmuggledMatrixStack(OmniMatrixStack stack);
 
-    /**
-     * Return a special smuggled UMatrixStack that represents the current stack of the screen at the time of calling.
-     * <b>Do NOT call this method yourself. it is used for legacy HUD only.</b>
-     */
-    @ApiStatus.Internal
-    @ApiStatus.Obsolete
-    OmniMatrixStack getSmuggledMatrixStack();
-
     void renderLegacyHuds();
 
     default float pixelRatio() {

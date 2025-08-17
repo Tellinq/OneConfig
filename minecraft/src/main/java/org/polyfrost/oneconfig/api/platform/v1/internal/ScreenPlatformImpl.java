@@ -39,7 +39,6 @@ import org.polyfrost.polyui.component.Component;
 import org.polyfrost.polyui.component.Drawable;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 public class ScreenPlatformImpl implements ScreenPlatform {
 //    //#if MC > 1.13
@@ -88,17 +87,11 @@ public class ScreenPlatformImpl implements ScreenPlatform {
         PolyUI defaultInstance = UIManager.INSTANCE.getDefaultInstance();
         Drawable master = defaultInstance.getMaster();
         List<Component> children = master.getChildren();
-        if (children == null || children.isEmpty()) {
-            return;
-        }
+        if (children == null || children.isEmpty()) return;
 
         for (Component child : children) {
-            if (!(child instanceof LegacyHud.LegacyHudComponent)) {
-                continue;
-            }
-
-            LegacyHud.LegacyHudComponent legacyHud = (LegacyHud.LegacyHudComponent) child;
-            legacyHud.renderLegacy();
+            if (!(child instanceof LegacyHud.LegacyHudComponent)) continue;
+            ((LegacyHud.LegacyHudComponent) child).renderLegacy(smuggled);
         }
     }
 
@@ -123,11 +116,6 @@ public class ScreenPlatformImpl implements ScreenPlatform {
     public void setSmuggledMatrixStack(OmniMatrixStack stack) {
         if (stack == null) return;
         this.smuggled = stack;
-    }
-
-    @Override
-    public OmniMatrixStack getSmuggledMatrixStack() {
-        return smuggled;
     }
 
     @Override

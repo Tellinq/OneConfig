@@ -195,7 +195,7 @@ public final class EventManager {
      */
     public boolean unregister(Object object) {
         Iterable<EventHandler<?>> h = cache.remove(object);
-        if (h == null) return false;
+        if (h == null) throw new IllegalArgumentException("Event handling object needs to be registered with removable as true to be unregistered; use register(Object, true)");
         boolean state = true;
         for (EventHandler<?> handler : h) {
             if (!unregister(handler)) {

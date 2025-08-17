@@ -46,6 +46,7 @@ public abstract class Node {
     // @jdk.internal.vm.annotation.Stable
     private transient String id;
     // @jdk.internal.vm.annotation.Stable
+    @Nullable
     private transient String title;
     @Nullable
     private transient Map<String, Object> metadata = null;
@@ -91,6 +92,7 @@ public abstract class Node {
         this.id = s;
     }
 
+    @Nullable
     public String getTitle() {
         return title;
     }
