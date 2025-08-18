@@ -227,7 +227,8 @@ public final class EventManager {
             } catch (EventException ex) {
                 throw ex;
             } catch (Throwable throwable) {
-                LOGGER.error("Failed to invoke event handler for {}", event.getClass().getName(), throwable);
+                //noinspection StringConcatenationArgumentToLogCall
+                LOGGER.error("Failed to invoke event handler for " + event.getClass().getName(), throwable);
                 if (OmniLoader.isDevelopment()) {
                     throw new EventException("Event handler " + handler.getEventClass().getName() + " for " + handler.getEventClass().getName() + " failed", throwable);
                 }
