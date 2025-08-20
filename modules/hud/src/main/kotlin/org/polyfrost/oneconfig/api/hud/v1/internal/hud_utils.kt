@@ -43,18 +43,20 @@ import org.polyfrost.polyui.unit.SpawnPos
 import org.polyfrost.polyui.unit.Vec2
 import org.polyfrost.polyui.unit.by
 import org.polyfrost.polyui.utils.fastEach
+import org.polyfrost.polyui.utils.image
 import kotlin.math.sqrt
 
 private val LOGGER = LogManager.getLogger("OneConfig/HUD")
 
-val scaleBlob: Block by lazy {
+val scaleBlob: Image by lazy {
     var sx = 0f
     var sy = 0f
     var st = 1f
-    val b = Block(
-        size = 20f by 20f,
-        focusable = true,
-    ).radius(10f).draggable().onDragStart {
+    val b = Image(
+        "assets/oneconfig/hud/selector_curve.svg".image(),
+        size = 18f by 18f,
+        //focusable = true,
+    ).draggable().onDragStart {
         sx = polyUI.mouseX
         sy = polyUI.mouseY
         st = cur?.get()?.scaleX ?: 1f

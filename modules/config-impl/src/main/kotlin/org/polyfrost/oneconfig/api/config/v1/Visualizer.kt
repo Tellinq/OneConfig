@@ -128,20 +128,13 @@ fun interface Visualizer {
                 text.text = "oneconfig.recording"
                 image.color = polyUI.colors.state.danger.pressed
                 recalculate()
-                polyUI.keyBinder?.record(bind.durationNanos, callback = {
-                    if (it != null) {
-                        prop.setAs(it)
-                        polyUI.keyBinder?.remove(bind)
-                        polyUI.keyBinder?.add(it)
-                        text.text = it.keysToString()
-                    } else {
-                        shake()
-                        text.text = bind.keysToString()
-                    }
+                polyUI.keyBinder?.record(bind) {
+                    text.text = bind.keysToString()
+                    if (it == null) shake()
                     image.color = polyUI.colors.text.primary.normal
                     recalculate()
                     needsRedraw = true
-                }, bind.action)
+                }
                 false
             }
         }

@@ -32,14 +32,9 @@ import dev.deftu.omnicore.client.render.OmniMatrixStack;
 import dev.deftu.omnicore.client.render.OmniResolution;
 import dev.deftu.omnicore.client.render.framebuffer.Framebuffer;
 import dev.deftu.omnicore.client.render.framebuffer.ManagedFramebuffer;
-import dev.deftu.omnicore.client.render.pipeline.DrawModes;
-import dev.deftu.omnicore.client.render.pipeline.OmniRenderPipeline;
-import dev.deftu.omnicore.client.render.pipeline.OmniRenderPipelineBuilder;
-import dev.deftu.omnicore.client.render.pipeline.VertexFormats;
 import dev.deftu.omnicore.client.render.state.OmniManagedBlendState;
 import dev.deftu.omnicore.client.render.state.OmniManagedDepthState;
 import dev.deftu.omnicore.client.render.texture.GpuTexture;
-import dev.deftu.omnicore.common.OmniIdentifier;
 import kotlin.Unit;
 import net.minecraft.client.Minecraft;
 import org.apache.logging.log4j.LogManager;
@@ -164,7 +159,7 @@ public class PolyUIScreen extends OmniScreen implements BlurScreen {
     public boolean handleKeyPress(int keyCode, int scancode, char typedChar, OmniKeyboard.@NotNull KeyboardModifiers modifiers, OmniScreen.@NotNull KeyPressTrigger trigger) {
         if (keyCode == OmniKeyboard.KEY_ESCAPE && shouldCloseOnEsc()) {
             Platform.screen().close();
-            return true;
+            return super.handleKeyPress(keyCode, scancode, typedChar, modifiers, trigger);
         }
 
 
@@ -178,7 +173,7 @@ public class PolyUIScreen extends OmniScreen implements BlurScreen {
             death(e);
         }
 
-        return true;
+        return super.handleKeyPress(keyCode, scancode, typedChar, modifiers, trigger);
     }
 
     @Override
@@ -293,6 +288,7 @@ public class PolyUIScreen extends OmniScreen implements BlurScreen {
         if (close != null) close.accept(polyUI);
         // noinspection DataFlowIssue
         this.polyUI.getWindow().setCursor(Cursor.Pointer);
+        super.handleClose();
     }
 
     protected final void adjustResolution(float w, float h, boolean force) {
