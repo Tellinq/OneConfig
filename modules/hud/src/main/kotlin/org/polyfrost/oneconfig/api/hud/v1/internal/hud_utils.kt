@@ -41,12 +41,25 @@ import org.polyfrost.polyui.event.Event
 import org.polyfrost.polyui.unit.Align
 import org.polyfrost.polyui.unit.SpawnPos
 import org.polyfrost.polyui.unit.Vec2
-import org.polyfrost.polyui.unit.by
 import org.polyfrost.polyui.utils.fastEach
 import org.polyfrost.polyui.utils.image
 import kotlin.math.sqrt
 
 private val LOGGER = LogManager.getLogger("OneConfig/HUD")
+
+val menu by lazy {
+    val b = Block(
+        Image("assets/oneconfig/ico/cog.svg").withHoverStates().onClick { HudManager.openHudEditor(cur ?: return@onClick) },
+        Image("assets/oneconfig/ico/trash.svg").withHoverStates().setPalette { state.danger }.onClick {
+            val cur = cur ?: return@onClick
+            HudManager.removeHud(cur, cur.tree.getMetadata("updateTicker"))
+        },
+        alignment = Align(padEdges = Vec2(10f, 8f), padBetween = Vec2(14f, 8f))
+    ).withBorder(2f)
+    HudManager.polyUI.master.addChild(b, recalculate = false)
+    b.renders = false
+    b
+}
 
 val scaleBlob: Image by lazy {
     var sx = 0f
@@ -54,9 +67,9 @@ val scaleBlob: Image by lazy {
     var st = 1f
     val b = Image(
         "assets/oneconfig/hud/selector_curve.svg".image(),
-        size = 18f by 18f,
-        //focusable = true,
+        focusable = true,
     ).draggable().onDragStart {
+        menu.renders = false
         sx = polyUI.mouseX
         sy = polyUI.mouseY
         st = cur?.get()?.scaleX ?: 1f
@@ -75,21 +88,13 @@ val scaleBlob: Image by lazy {
             y = it.y + (it.height * s) - (height / 2f)
         }
         Unit
-    }.setPalette { brand.fg }
-    HudManager.polyUI.master.addChild(b, recalculate = false)
-    b.renders = false
-    b
-}
-
-val menu by lazy {
-    val b = Block(
-        Image("assets/oneconfig/ico/cog.svg").withHoverStates().onClick { HudManager.openHudEditor(cur ?: return@onClick) },
-        Image("assets/oneconfig/ico/trash.svg").withHoverStates().setPalette { state.danger }.onClick {
-            val cur = cur ?: return@onClick
-            HudManager.removeHud(cur, cur.tree.getMetadata("updateTicker"))
-        },
-        alignment = Align(pad = Vec2(10f, 8f))
-    ).withBorder(2f)
+    }.onDragEnd {
+        cur?.get()?.let {
+            menu.x = it.x + (it.visibleSize.x / 2f) - (menu.width / 2f)
+            menu.y = it.y - menu.height - 8f
+        }
+        menu.renders = true
+    }
     HudManager.polyUI.master.addChild(b, recalculate = false)
     b.renders = false
     b
@@ -246,7 +251,7 @@ private fun Hud<*>.addMenuAndScaler() {
         if (!menu.initialized) menu.setup(polyUI)
         menu.renders = true
         menu.x = x + vs.x / 2f - (menu.width / 2f)
-        menu.y = y - menu.height - 6f
+        menu.y = y - menu.height - 8f
         cur = this@addMenuAndScaler
         polyUI.focus(scaleBlob)
         return@onClick false

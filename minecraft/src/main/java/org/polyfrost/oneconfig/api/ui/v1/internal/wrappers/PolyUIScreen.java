@@ -90,6 +90,7 @@ public class PolyUIScreen extends OmniScreen implements BlurScreen {
 
     @Override
     public void handleInitialize(int width, int height) {
+        super.handleInitialize(width, height);
         float w = (float) Platform.screen().windowWidth();
         float h = (float) Platform.screen().windowHeight();
         adjustResolution(w, h, false);
@@ -192,7 +193,7 @@ public class PolyUIScreen extends OmniScreen implements BlurScreen {
             death(e);
         }
 
-        return true;
+        return super.handleKeyRelease(keyCode, scancode, modifiers);
     }
 
     @Override
