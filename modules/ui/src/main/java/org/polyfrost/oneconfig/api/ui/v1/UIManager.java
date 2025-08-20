@@ -30,6 +30,7 @@ import dev.deftu.omnicore.client.OmniChat;
 import dev.deftu.omnicore.client.render.OmniMatrixStack;
 import dev.deftu.omnicore.client.render.OmniResolution;
 import dev.deftu.omnicore.client.render.framebuffer.ManagedFramebuffer;
+import dev.deftu.omnicore.client.render.pipeline.OmniRenderPipeline;
 import dev.deftu.omnicore.client.render.state.OmniManagedAlphaState;
 import dev.deftu.omnicore.client.render.state.OmniManagedBlendState;
 import dev.deftu.omnicore.client.render.state.OmniManagedDepthState;
@@ -102,6 +103,8 @@ public interface UIManager {
     @NotNull
     PolyUI getDefaultInstance();
 
+    OmniRenderPipeline getRenderPipeline();
+
     /**
      * <h1>don't use this method!!</h1>
      */
@@ -144,6 +147,7 @@ public interface UIManager {
                 float scaledWidth = master.getWidth() * scalingFactor * ratio;
                 float scaledHeight = master.getHeight() * scalingFactor * ratio;
                 framebuffer.drawColorTexture(
+                        getRenderPipeline(),
                         matrices,
                         0, 0,
                         scaledWidth, scaledHeight,

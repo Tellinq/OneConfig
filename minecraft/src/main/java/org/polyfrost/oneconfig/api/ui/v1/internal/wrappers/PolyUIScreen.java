@@ -32,9 +32,14 @@ import dev.deftu.omnicore.client.render.OmniMatrixStack;
 import dev.deftu.omnicore.client.render.OmniResolution;
 import dev.deftu.omnicore.client.render.framebuffer.Framebuffer;
 import dev.deftu.omnicore.client.render.framebuffer.ManagedFramebuffer;
+import dev.deftu.omnicore.client.render.pipeline.DrawModes;
+import dev.deftu.omnicore.client.render.pipeline.OmniRenderPipeline;
+import dev.deftu.omnicore.client.render.pipeline.OmniRenderPipelineBuilder;
+import dev.deftu.omnicore.client.render.pipeline.VertexFormats;
 import dev.deftu.omnicore.client.render.state.OmniManagedBlendState;
 import dev.deftu.omnicore.client.render.state.OmniManagedDepthState;
 import dev.deftu.omnicore.client.render.texture.GpuTexture;
+import dev.deftu.omnicore.common.OmniIdentifier;
 import kotlin.Unit;
 import net.minecraft.client.Minecraft;
 import org.apache.logging.log4j.LogManager;
@@ -143,6 +148,7 @@ public class PolyUIScreen extends OmniScreen implements BlurScreen {
         float scaledHeight = master.getHeight() * scalingFactor * ratio;
 
         framebuffer.drawColorTexture(
+                UIManager.INSTANCE.getRenderPipeline(),
                 matrices,
                 scaledX, scaledY,
                 scaledWidth, scaledHeight,
