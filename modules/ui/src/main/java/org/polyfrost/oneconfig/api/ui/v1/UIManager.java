@@ -132,8 +132,6 @@ public interface UIManager {
                 framebuffer.clearColor(0f, 0f, 0f, 0f); // Clear to transparent black
                 framebuffer.clearDepthStencil(1.0, 0);
                 framebuffer.usingToRender((matrixStack, w, h) -> {
-                    OmniManagedAlphaState.enableAlpha();
-                    OmniManagedBlendState.enableBlend();
                     matrices.runReplacingGlobalState(() -> {
                         polyUI.render();
                         Platform.screen().renderLegacyHuds();
@@ -153,9 +151,6 @@ public interface UIManager {
                         scaledWidth, scaledHeight,
                         Color.WHITE.getRGB()
                 );
-
-                OmniManagedBlendState.disableBlend();
-                OmniManagedDepthState.disableDepth();
             });
 
             EventManager.register(ResizeEvent.class, event -> {
