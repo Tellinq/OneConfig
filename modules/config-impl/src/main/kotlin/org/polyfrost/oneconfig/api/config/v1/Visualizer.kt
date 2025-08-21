@@ -116,7 +116,7 @@ fun interface Visualizer {
         override fun visualize(prop: Property<*>): Drawable {
             return Block(
                 Image("assets/oneconfig/ico/keyboard.svg".image(), at = Vec2(7f, 7f)).ignoreLayout(),
-                Text(prop.getAs<KeyBinder.Bind>().keysToString("oneconfig.keybinds.none")),
+                Text(prop.getAs<KeyBinder.Bind>().keysToString()),
                 size = Vec2(230f, 32f),
                 alignment = Align(main = Align.Content.Center),
             ).onInit {
@@ -125,11 +125,11 @@ fun interface Visualizer {
                 val bind = prop.getAs<KeyBinder.Bind>()
                 val image = this[0] as Image
                 val text = this[1] as Text
-                text.text = "oneconfig.keybinds.recording"
+                text.text = "oneconfig.recording"
                 image.color = polyUI.colors.state.danger.pressed
                 recalculate()
                 polyUI.keyBinder?.record(bind) {
-                    text.text = bind.keysToString("oneconfig.keybinds.none")
+                    text.text = bind.keysToString()
                     if (it == null) shake()
                     image.color = polyUI.colors.text.primary.normal
                     recalculate()

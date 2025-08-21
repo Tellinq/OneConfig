@@ -1,9 +1,6 @@
 oneconfig.search.placeholder=Search for something...
 oneconfig.button.default=Click
 
-oneconfig.keybinds.none=Not bound
-oneconfig.keybinds.recording=Recording...
-
 oneconfig.align=Align
 oneconfig.align.start=Start
 oneconfig.align.center=Center
