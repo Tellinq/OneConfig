@@ -90,6 +90,7 @@ public class PolyUIScreen extends OmniScreen implements BlurScreen {
 
     @Override
     public void handleInitialize(int width, int height) {
+        super.handleInitialize(width, height);
         float w = (float) Platform.screen().windowWidth();
         float h = (float) Platform.screen().windowHeight();
         adjustResolution(w, h, false);
@@ -143,6 +144,7 @@ public class PolyUIScreen extends OmniScreen implements BlurScreen {
         float scaledHeight = master.getHeight() * scalingFactor * ratio;
 
         framebuffer.drawColorTexture(
+                UIManager.INSTANCE.getRenderPipeline(),
                 matrices,
                 scaledX, scaledY,
                 scaledWidth, scaledHeight,
@@ -158,7 +160,7 @@ public class PolyUIScreen extends OmniScreen implements BlurScreen {
     public boolean handleKeyPress(int keyCode, int scancode, char typedChar, OmniKeyboard.@NotNull KeyboardModifiers modifiers, OmniScreen.@NotNull KeyPressTrigger trigger) {
         if (keyCode == OmniKeyboard.KEY_ESCAPE && shouldCloseOnEsc()) {
             Platform.screen().close();
-            return true;
+            return super.handleKeyPress(keyCode, scancode, typedChar, modifiers, trigger);
         }
 
 
@@ -172,7 +174,7 @@ public class PolyUIScreen extends OmniScreen implements BlurScreen {
             death(e);
         }
 
-        return true;
+        return super.handleKeyPress(keyCode, scancode, typedChar, modifiers, trigger);
     }
 
     @Override
@@ -191,7 +193,7 @@ public class PolyUIScreen extends OmniScreen implements BlurScreen {
             death(e);
         }
 
-        return true;
+        return super.handleKeyRelease(keyCode, scancode, modifiers);
     }
 
     @Override
@@ -287,6 +289,7 @@ public class PolyUIScreen extends OmniScreen implements BlurScreen {
         if (close != null) close.accept(polyUI);
         // noinspection DataFlowIssue
         this.polyUI.getWindow().setCursor(Cursor.Pointer);
+        super.handleClose();
     }
 
     protected final void adjustResolution(float w, float h, boolean force) {

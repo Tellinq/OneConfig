@@ -29,6 +29,7 @@
 package org.polyfrost.oneconfig.internal.ui
 
 import dev.deftu.omnicore.client.OmniClientPlayer
+import dev.deftu.omnicore.common.OmniLoader
 import org.jetbrains.annotations.ApiStatus
 import org.polyfrost.oneconfig.api.config.v1.ConfigManager
 import org.polyfrost.oneconfig.api.config.v1.Tree
@@ -121,6 +122,7 @@ object OneConfigUI {
                     ConfigManager.active().save(t)
                 }
             }
+            if (!OmniLoader.isDevelopment) builder.pauses()
 
             val searchField: TextInput
             val (polyUI, win) = builder.makeAndOpenWithRef(

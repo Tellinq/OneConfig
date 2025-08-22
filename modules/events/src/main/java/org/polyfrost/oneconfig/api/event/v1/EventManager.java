@@ -195,7 +195,7 @@ public final class EventManager {
      */
     public boolean unregister(Object object) {
         Iterable<EventHandler<?>> h = cache.remove(object);
-        if (h == null) return false;
+        if (h == null) throw new IllegalArgumentException("Event handling object needs to be registered with removable as true to be unregistered; use register(Object, true)");
         boolean state = true;
         for (EventHandler<?> handler : h) {
             if (!unregister(handler)) {
@@ -227,7 +227,8 @@ public final class EventManager {
             } catch (EventException ex) {
                 throw ex;
             } catch (Throwable throwable) {
-                LOGGER.error("Failed to invoke event handler for {}", event.getClass().getName(), throwable);
+                //noinspection StringConcatenationArgumentToLogCall
+                LOGGER.error("Failed to invoke event handler for " + event.getClass().getName(), throwable);
                 if (OmniLoader.isDevelopment()) {
                     throw new EventException("Event handler " + handler.getEventClass().getName() + " for " + handler.getEventClass().getName() + " failed", throwable);
                 }

@@ -35,6 +35,12 @@ import org.polyfrost.lwjgl.isolatedloader.Lwjgl3Manager;
 import org.polyfrost.lwjgl.isolatedloader.classloader.IsolatedClassLoader;
 //#endif
 
+import dev.deftu.omnicore.common.OmniIdentifier;
+import dev.deftu.omnicore.client.render.pipeline.DrawModes;
+import dev.deftu.omnicore.client.render.pipeline.OmniRenderPipeline;
+import dev.deftu.omnicore.client.render.pipeline.OmniRenderPipelineBuilder;
+import dev.deftu.omnicore.client.render.pipeline.VertexFormats;
+import dev.deftu.omnicore.client.render.state.OmniManagedBlendState;
 import dev.deftu.omnicore.client.render.OmniRenderEnv;
 import net.minecraft.client.Minecraft;
 import org.apache.logging.log4j.LogManager;
@@ -65,6 +71,7 @@ public class UIManagerImpl implements UIManager {
     private static final Logger LOGGER = LogManager.getLogger("OneConfig/LWJGL");
 
     private PolyUI ui;
+    private OmniRenderPipeline pipeline;
 
     private final Set<String> classLoaderInclude = new HashSet<>();
     private final Map<String, Class<?>> classCache = new HashMap<>();
@@ -148,5 +155,20 @@ public class UIManagerImpl implements UIManager {
     @Override
     public @NotNull PolyUI getDefaultInstance() {
         return ui == null ? ui = createDefault() : ui;
+    }
+
+    public OmniRenderPipeline getRenderPipeline() {
+        if (pipeline == null) {
+            OmniRenderPipelineBuilder builder = OmniRenderPipeline.builderWithDefaultShader(
+                    OmniIdentifier.create("oneconfig", "uimanager"),
+                    VertexFormats.POSITION_TEXTURE_COLOR,
+                    DrawModes.QUADS
+            );
+
+            builder.blendState = OmniManagedBlendState.ALPHA_OVERWRITE;
+            this.pipeline = builder.build();
+        }
+
+        return pipeline;
     }
 }

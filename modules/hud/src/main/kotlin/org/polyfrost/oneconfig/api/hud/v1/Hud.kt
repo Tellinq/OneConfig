@@ -33,12 +33,14 @@ import org.polyfrost.oneconfig.api.config.v1.ConfigManager
 import org.polyfrost.oneconfig.api.config.v1.Properties.ktProperty
 import org.polyfrost.oneconfig.api.config.v1.Properties.simple
 import org.polyfrost.oneconfig.api.config.v1.Tree
+import org.polyfrost.oneconfig.api.config.v1.annotations.Keybind
 import org.polyfrost.oneconfig.api.config.v1.annotations.Switch
 import org.polyfrost.oneconfig.api.config.v1.getProp
 import org.polyfrost.oneconfig.api.event.v1.events.HudEvent
 import org.polyfrost.oneconfig.api.event.v1.events.ScreenOpenEvent
 import org.polyfrost.oneconfig.api.event.v1.invoke.EventHandler
 import org.polyfrost.oneconfig.api.hud.v1.HudManager.LOGGER
+import org.polyfrost.oneconfig.api.ui.v1.keybind.OCKeybindHelper
 import org.polyfrost.polyui.color.PolyColor
 import org.polyfrost.polyui.component.Component
 import org.polyfrost.polyui.component.Drawable
@@ -84,6 +86,12 @@ abstract class Hud<T : Drawable>(id: String, title: String, val category: Catego
     @Switch(title = "Show in GUIs")
     var showInScreens = true
 
+    @Keybind(title = "Toggle HUD Key")
+    var toggleKey = (OCKeybindHelper.builder().does { if (it) hidden = !hidden } as OCKeybindHelper).register()
+
+    @Keybind(title = "Show HUD Key")
+    var showKey = (OCKeybindHelper.builder().does { hidden = it } as OCKeybindHelper).register()
+
     // we don't need to use this as we initialize in our own way.
     override fun addToInitQueue() {}
 
@@ -120,6 +128,10 @@ abstract class Hud<T : Drawable>(id: String, title: String, val category: Catego
         out.addCallbacks(tree)
 
         ConfigManager.active().register(tree)
+        // asm: we will start hidden when we are using a show keybind.
+        if (showKey.isBound) {
+            hidden = true
+        }
         return out
     }
 

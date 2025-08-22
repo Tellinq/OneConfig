@@ -1,5 +1,6 @@
 package org.polyfrost.oneconfig.internal.ui.pages
 
+import org.apache.logging.log4j.LogManager
 import org.polyfrost.oneconfig.api.config.v1.ConfigManager
 import org.polyfrost.oneconfig.api.config.v1.Tree
 import org.polyfrost.oneconfig.api.config.v1.internal.ConfigVisualizer
@@ -19,6 +20,8 @@ internal enum class TreeSource {
     COMPAT, // Comes from the native compat layer, will open the mod config ui, known config libs get registered as config
 }
 
+private val LOGGER = LogManager.getLogger("OneConfig/UI/ModsPage")
+
 internal fun ModsPage(trees: Map<TreeSource, Set<Tree>>): Drawable {
     if (trees.isEmpty()) {
         return Group(
@@ -32,9 +35,12 @@ internal fun ModsPage(trees: Map<TreeSource, Set<Tree>>): Drawable {
     // todo add categories
     return Group(
         children = trees.flatMap { (source, treeSet) ->
-            treeSet.filter {
-                it.getMetadata<Any?>("hidden") == null
-            }.map { tree ->
+            treeSet.mapNotNull { tree ->
+                if (tree.getMetadata<Any?>("hidden") != null) return@mapNotNull null
+                if (tree.title == null) {
+                    LOGGER.warn("Tree ${tree.id} has no title, it will be skipped.")
+                    return@mapNotNull null
+                }
                 ModCard(source, tree)
             }
         }.toTypedArray(),
@@ -55,7 +61,7 @@ private fun ModCard(
             size = Vec2(256f, 104f),
         ).withBorder(1f) { page.border5 }.withHoverStates(),
         Block(
-            Text(tree.title, fontSize = 16f).setFont { medium },
+            Text(tree.title!!, fontSize = 16f).setFont { medium },
             radii = modBoxBotRad,
             alignment = barAlign,
             size = Vec2(256f, 36f),
@@ -63,7 +69,7 @@ private fun ModCard(
         alignment = modBoxAlign,
     ).onClick { _ ->
         when (source) {
-            TreeSource.CONFIG -> OneConfigUI.openPage(ConfigVisualizer.INSTANCE.get(tree), tree.title)
+            TreeSource.CONFIG -> OneConfigUI.openPage(ConfigVisualizer.INSTANCE.get(tree), tree.title!!)
             TreeSource.COMMAND -> Platform.compatibility().executeTreeAction(tree.id)
             TreeSource.COMPAT -> tree.getMetadata<() -> Unit>("on_click")?.invoke() ?: Unit
         }
@@ -105,7 +111,7 @@ private fun ModCardImage(tree: Tree): Drawable {
 
     // Otherwise, just return text
     return try {
-        Text(tree.title, fontSize = 18f).setFont { semiBold }
+        Text(tree.title!!, fontSize = 18f).setFont { semiBold }
     } catch (e: Exception) {
         // Shouldn't happen ever, might as well add it just in case
         Image(defaultModImage).onInit {

@@ -67,51 +67,28 @@ abstract class LegacyHud(id: String, title: String, category: Category) : Hud<Dr
 
     @Suppress("SENSELESS_COMPARISON")
     internal class LegacyHudComponent(private val hud: LegacyHud) : Drawable() {
-        private var hasRenderedAtLeastOnce = false
 
         override var width: Float
-            get() {
-                require(hud != null) { "HUD must not be null" }
-                val width = hud.width
-                require(width != null) { "HUD width must not be null" }
-                require(width >= 0) { "HUD width must be greater than 0" }
-                return width
-            }
+            get() = hud.width
             set(value) {
                 hud.width = value
             }
 
         override var height: Float
-            get() {
-                require(hud != null) { "HUD must not be null" }
-                val height = hud.height
-                require(height != null) { "HUD height must not be null" }
-                require(height >= 0) { "HUD height must be greater than 0" }
-                return height
-            }
+            get() = hud.height
             set(value) {
                 hud.height = value
             }
 
-        fun renderLegacy() {
-            if (!hasRenderedAtLeastOnce) {
-                return
-            }
-
+        fun renderLegacy(stack: OmniMatrixStack) {
             val scale = Platform.screen().pixelRatio() / OmniResolution.scaleFactor.toFloat()
-            hud.render(Platform.screen().smuggledMatrixStack, x * scale, y * scale, scaleX * scale, scaleY * scale, false)
+            hud.render(stack, x * scale, y * scale, scaleX * scale, scaleY * scale, false)
         }
 
         override fun render() {
-            // no-op, we don't want to draw within the NanoVG context
-            // instead, we'll pass around our own render method
-            // the only reason we still need to wrap in a Drawable
-            // is to obtain the settings, which the HUD system applies
-            // to the Drawable
-            if (!hasRenderedAtLeastOnce) {
-                hasRenderedAtLeastOnce = true
-                hud.update() // Ensure the HUD is updated at least once before rendering
-            }
+            // nop
+            // asm: we do not render here because rendering in the nanovg context
+            // just fucks everything up
         }
     }
 }
