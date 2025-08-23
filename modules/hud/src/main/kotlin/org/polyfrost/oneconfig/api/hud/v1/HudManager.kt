@@ -168,12 +168,16 @@ object HudManager {
                 val h = hudProviders.getOrPut(cls) { MHUtils.instantiate(cls, true).getOrThrow() }
                 used.add(cls)
                 val hud = h.make(data)
-                val theHud = hud.build()
-                polyUI.master.addChild(theHud, recalculate = false)
+                val bg = hud.build()
+                polyUI.master.addChild(bg, recalculate = false)
                 val x = data.getProp("x")?.getAs<Number?>()?.toFloat() ?: 0f
                 val y = data.getProp("y")?.getAs<Number?>()?.toFloat() ?: 0f
-                theHud.x = x - (hud.get().x - theHud.x)
-                theHud.y = y - (hud.get().y - theHud.y)
+                val it = hud.get()
+                // asm: place it so that the relative position to bg is maintained
+                bg.x = x - (it.x - bg.x)
+                bg.y = y - (it.y - bg.y)
+                it.x = x
+                it.y = y
                 i++
             } catch (e: ClassNotFoundException) {
                 val cls = e.message?.substringAfter(':') ?: "unknown"

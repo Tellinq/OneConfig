@@ -26,6 +26,7 @@
 
 package org.polyfrost.oneconfig.api.hud.v1
 
+import dev.deftu.omnicore.client.render.OmniResolution
 import org.jetbrains.annotations.ApiStatus
 import org.jetbrains.annotations.MustBeInvokedByOverriders
 import org.polyfrost.oneconfig.api.config.v1.Config
@@ -86,11 +87,14 @@ abstract class Hud<T : Drawable>(id: String, title: String, val category: Catego
     @Switch(title = "Show in GUIs")
     var showInScreens = true
 
+    @Switch(title = "Use GUI Scale")
+    var useGuiScale = true
+
     @Keybind(title = "Toggle HUD Key")
     var toggleKey = (OCKeybindHelper.builder().does { if (it) hidden = !hidden } as OCKeybindHelper).register()
 
     @Keybind(title = "Show HUD Key")
-    var showKey = (OCKeybindHelper.builder().does { hidden = it } as OCKeybindHelper).register()
+    var showKey = (OCKeybindHelper.builder().does { hidden = !it } as OCKeybindHelper).register()
 
     // we don't need to use this as we initialize in our own way.
     override fun addToInitQueue() {}
@@ -130,7 +134,7 @@ abstract class Hud<T : Drawable>(id: String, title: String, val category: Catego
         ConfigManager.active().register(tree)
         // asm: we will start hidden when we are using a show keybind.
         if (showKey.isBound) {
-            hidden = true
+            out.hidden = true
         }
         return out
     }
@@ -267,7 +271,7 @@ abstract class Hud<T : Drawable>(id: String, title: String, val category: Catego
             } else if (!value && siblings.fastAll { !it.renders }) {
                 bg.renders = false
             }
-            bg.recalculate()
+            bg.recalculate(false)
         }
 
     /**
@@ -315,7 +319,7 @@ abstract class Hud<T : Drawable>(id: String, title: String, val category: Catego
     }
 
     protected fun updateAndRecalculate() {
-        if (update()) getBackground()?.recalculate()
+        if (update()) getBackground()?.recalculate(false)
     }
 
     /**
@@ -326,6 +330,14 @@ abstract class Hud<T : Drawable>(id: String, title: String, val category: Catego
      *         so the system will automatically resize the drawable.
      */
     abstract fun update(): Boolean
+
+    fun updateScale() {
+        if (!useGuiScale) return
+        val it = getBackground() ?: get()
+        val scale = OmniResolution.scaleFactor.toFloat()
+        it.scaleX = scale
+        it.scaleY = scale
+    }
 
     /**
      * Return, in *nanoseconds*, how often the [update] method should be called.

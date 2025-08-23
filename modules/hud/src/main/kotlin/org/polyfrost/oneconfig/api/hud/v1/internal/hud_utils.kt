@@ -185,7 +185,7 @@ fun Hud<*>.build(): Drawable {
         null
     } else {
         HudManager.polyUI.every(freq) {
-            if (update()) getBackground()?.recalculate()
+            if (update()) getBackground()?.recalculate(false)
         }
     }
     tree.addMetadata("updateTicker", exe)

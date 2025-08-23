@@ -119,7 +119,7 @@ fun HudsPage(huds: Collection<Hud<*>>): Drawable {
             polyUI.every(1.seconds) {
                 if (!HudManager.panelExists) return@every
                 huds.forEach {
-                    if (it.update()) it.getBackground()?.recalculate()
+                    if (it.update()) it.getBackground()?.recalculate(false)
                 }
             }
         }
@@ -171,7 +171,7 @@ private fun makeHudDesigner(hud: Hud<*>): Drawable {
             DraggingNumericTextInput(icon = "assets/oneconfig/ico/align.svg".image(), suffix = "px", max = 30f, size = Vec2(120f, 32f)).also {
                 it[0].onChange { value: Float ->
                     receiver.alignment = receiver.alignment.copy(padBetween = Vec2(value, value))
-                    receiver.recalculate()
+                    receiver.recalculate(false)
                     false
                 }
             }.titled("oneconfig.hudeditor.padding.between"),
@@ -331,7 +331,7 @@ fun textOptions(text: Text): Drawable {
                 2 -> mcFont.get(text.fontWeight, text.italic)
                 else -> polyUI.fonts.get(text.fontWeight, text.italic)
             }
-            text._parent?.recalculate()
+            text._parent?.recalculate(false)
             val ex = (parent.parent[1][0] as? Text) ?: return@onChange false
             ex.font = text.font
             ex.parent.recalculate()
@@ -340,7 +340,7 @@ fun textOptions(text: Text): Drawable {
         DraggingNumericTextInput("assets/oneconfig/ico/text-input.svg".image(), initialValue = text.fontSize.roundToInt().toFloat(), min = 1f, size = Vec2(72f, 0f), suffix = "px").also {
             it[0].onChange { value: Float ->
                 text.fontSize = value
-                text._parent?.recalculate()
+                text._parent?.recalculate(false)
                 val ex = (parent.parent.parent[1][0] as? Text) ?: return@onChange false
                 ex.fontSize = text.fontSize
                 ex.parent.recalculate()
@@ -355,7 +355,7 @@ fun textOptions(text: Text): Drawable {
             "oneconfig.fweight.500",
         ).onChange { it: Int ->
             text.fontWeight = Font.byWeight((it + 1) * 100)
-            text._parent?.recalculate()
+            text._parent?.recalculate(false)
             val ex = (parent.parent[1][0] as? Text) ?: return@onChange false
             ex.fontWeight = text.fontWeight
             ex.parent.recalculate()
