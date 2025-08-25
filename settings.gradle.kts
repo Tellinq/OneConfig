@@ -67,7 +67,6 @@ listOf(
     "ui",
     "internal",
     "dependencies",
-    "dependencies:agnostic",
     "dependencies:legacy",
     "utils",
     "relocator"
