@@ -121,6 +121,7 @@ object OneConfigUI {
                 for (t in ConfigManager.active().trees()) {
                     ConfigManager.active().save(t)
                 }
+                ui[1].accept(Event.Lifetime.Removed)
             }
             if (!OmniLoader.isDevelopment) builder.pauses()
 

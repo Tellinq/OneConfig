@@ -7,12 +7,19 @@ import org.polyfrost.oneconfig.api.config.v1.internal.ConfigVisualizer
 import org.polyfrost.oneconfig.api.platform.v1.Platform
 import org.polyfrost.oneconfig.api.ui.v1.Notifications
 import org.polyfrost.oneconfig.internal.ui.OneConfigUI
+import org.polyfrost.polyui.component.Component
 import org.polyfrost.polyui.component.Drawable
 import org.polyfrost.polyui.component.extensions.*
 import org.polyfrost.polyui.component.impl.*
 import org.polyfrost.polyui.data.PolyImage
+import org.polyfrost.polyui.event.Event
 import org.polyfrost.polyui.unit.Align
 import org.polyfrost.polyui.unit.Vec2
+import org.polyfrost.polyui.utils.mapToArray
+import java.nio.file.StandardOpenOption
+import kotlin.io.path.exists
+import kotlin.io.path.readText
+import kotlin.io.path.writeText
 
 internal enum class TreeSource {
     CONFIG, // Comes from OneConfig's config manager
@@ -33,6 +40,12 @@ internal fun ModsPage(trees: Map<TreeSource, Set<Tree>>): Drawable {
     }
 
     // todo add categories
+    val modOrderFile = ConfigManager.internal().folder.resolve("mods_ordering")
+    val order: List<String>? = if (modOrderFile.exists()) {
+        modOrderFile.readText().split(',')
+    } else null
+
+    val sb = StringBuilder()
     return Group(
         children = trees.flatMap { (source, treeSet) ->
             treeSet.mapNotNull { tree ->
@@ -41,12 +54,27 @@ internal fun ModsPage(trees: Map<TreeSource, Set<Tree>>): Drawable {
                     LOGGER.warn("Tree ${tree.id} has no title, it will be skipped.")
                     return@mapNotNull null
                 }
-                ModCard(source, tree)
+                ModCard(source, tree).events {
+                    Event.Lifetime.Removed then {
+                        sb.append(tree.id).append(',')
+                        false
+                    }
+                }
             }
-        }.toTypedArray(),
+        }.reorder(order),
         visibleSize = Vec2(1130f, 635f),
         alignment = Align(line = Align.Line.Start, pad = Vec2(18f, 18f)),
-    ).makeRearrangeableGrid().namedId("ModsPage")
+    ).makeRearrangeableGrid().namedId("ModsPage").events {
+        Event.Lifetime.Removed then {
+            ConfigManager.internal().folder.resolve("mods_ordering").writeText(sb.toString(), Charsets.UTF_8, StandardOpenOption.CREATE, StandardOpenOption.WRITE, StandardOpenOption.TRUNCATE_EXISTING)
+        }
+    }
+}
+
+private fun List<Component>.reorder(order: List<String>?): Array<Component> {
+    if (order == null || order.isEmpty()) return this.toTypedArray()
+    val map = this.associateBy { it.name }
+    return order.mapToArray { map[it]!! }
 }
 
 private fun ModCard(
@@ -91,7 +119,7 @@ private fun ModCard(
                 false
             }, polyUI = polyUI)
         }
-    }.namedId("ModCard")
+    }.named(tree.id)
 }
 
 private fun ModCardImage(tree: Tree): Drawable {
