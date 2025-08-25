@@ -46,7 +46,6 @@ import org.polyfrost.polyui.unit.Vec2
 import org.polyfrost.polyui.unit.by
 import org.polyfrost.polyui.unit.seconds
 import org.polyfrost.polyui.utils.image
-import org.polyfrost.polyui.utils.mapToArray
 import kotlin.experimental.or
 import kotlin.math.PI
 import kotlin.math.roundToInt
@@ -56,6 +55,7 @@ val alignNoPad = Align(pad = Vec2.ZERO)
 val alignHudDefault = Align(main = Align.Content.Center, cross = Align.Content.Center, pad = Vec2(8f, 8f))
 val BLACK_HALF = rgba(0, 0, 0, 0.5f)
 private val mcFont = FontFamily("Minecraft", "assets/oneconfig/fonts/minecraft/", FontFamily.Type.OpenType)
+
 // const val angleSnapMargin = PI / 12.0
 const val minMargin = 4f
 const val snapMargin = 12f
@@ -93,7 +93,8 @@ fun HudsPage(huds: Collection<Hud<*>>): Drawable {
         ).padded(18f, 0f).named("HudsPageFilterButtons"),
         if (huds.isNotEmpty()) {
             Group(
-                children = huds.mapToArray {
+                children = huds.mapNotNull {
+                    if (it.hidden) return@mapNotNull null
                     val preview = it.buildNew()
                     val obj = Block(
                         preview,
@@ -104,7 +105,7 @@ fun HudsPage(huds: Collection<Hud<*>>): Drawable {
                     }
                     hudMap[it.category] = obj
                     obj
-                },
+                }.toTypedArray(),
                 alignment = Align(pad = Vec2(22f, 22f)),
                 size = Vec2(500f, 0f),
                 visibleSize = Vec2(500f, 800f),

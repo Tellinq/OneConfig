@@ -64,6 +64,8 @@ object HudManager {
     private val hudProviders = HashMap<Class<out Hud<*>>, Hud<*>>()
     private val snapLineColor = rgba(170, 170, 170, 0.8f)
 
+    private var init = false
+
     /**
      * the vertical line x position used for snapping.
      * Do not set this value.
@@ -107,10 +109,13 @@ object HudManager {
 
     /**
      * **VERY** internal list of active HUD instances. Do not modify this list directly. Please. Like, seriously.
-      */
+     */
     @ApiStatus.Internal
     val activeInstances = ArrayList<Hud<*>>()
 
+    /**
+     * Register a HUD provider to the system. This does not add an instance of the HUD to the screen; it only makes it available in the HUD picker.
+     */
     @JvmStatic
     fun register(hud: Hud<*>) {
         hudProviders[hud::class.java] = hud
@@ -123,20 +128,79 @@ object HudManager {
         }
     }
 
-    fun unregister(hud: Hud<*>) {
+    /**
+     * Remove a HUD type from the registered providers. If [removeActiveInstances] is true, all active instances of this HUD will be removed from the screen; and they will be returned.
+     * If [delete] is true, the config entries of the removed HUDs will be deleted as well, meaning they won't be restored on next load.
+     *
+     * **The [delete] operation is permanent and CANNOT be undone.** To temporarily hide a HUD, use [toggleAllHuds] instead.
+     */
+    fun <T : Drawable> unregister(hud: Hud<T>, removeActiveInstances: Boolean = false, delete: Boolean = false): ArrayList<Hud<T>>? {
         hudProviders.remove(hud::class.java)
+        if (removeActiveInstances) {
+            val out = ArrayList<Hud<T>>(10.coerceAtMost(activeInstances.size))
+            activeInstances.fastEach {
+                if (it::class.java == hud::class.java) {
+                    removeHud(it, delete)
+                    @Suppress("UNCHECKED_CAST")
+                    out.add(it as Hud<T>)
+                }
+            }
+            return out
+        } else return null
     }
 
-    fun removeHud(hud: Hud<*>) {
+    /**
+     * Return all active HUD instances of this type. To get the "provider" HUD (the one in the picker screen), use [getProvider].
+     */
+    fun <T : Drawable> getHudsOfType(hudClass: Class<Hud<T>>): ArrayList<Hud<T>> {
+        val out = ArrayList<Hud<T>>(10.coerceAtMost(activeInstances.size))
+        activeInstances.fastEach {
+            if (it::class.java == hudClass) {
+                @Suppress("UNCHECKED_CAST")
+                out.add(it as Hud<T>)
+            }
+        }
+        return out
+    }
+
+    /**
+     * Get the "provider" HUD of this type, which is the one in the picker screen. To get active instances, use [getHudsOfType].
+     */
+    fun getProvider(hudClass: Class<out Hud<*>>): Hud<*>? = hudProviders[hudClass]
+
+    /**
+     * Hide/unhide **all** the huds of this type on the screen, and remove the HUD from the HUD picker temporarily until the inverse is called.
+     *
+     * To permanently remove a HUD, use [removeHud].
+     * To permanently unregister a HUD type, use [unregister].
+     */
+    fun toggleAllHuds(hud: Hud<*>, state: Boolean) {
+        val provider = hudProviders[hud::class.java] ?: return
+        activeInstances.fastEach {
+            if (it::class.java == hud::class.java) {
+                it.hidden = state
+            }
+        }
+        provider.hidden = state
+    }
+
+    /**
+     * Remove a HUD instance from the screen. If [delete] is true, the HUD's config will be deleted as well, meaning it won't be restored on next load.
+     *
+     * **The [delete] operation is permanent and CANNOT be undone.** To temporarily hide a HUD, use [toggleAllHuds] instead.
+     */
+    fun removeHud(hud: Hud<*>, delete: Boolean = false) {
         require(hud.isReal) { "Tried to remove a non-real HUD - use unregister() for this case. You might also be calling this method too early!" }
         polyUI.master.removeChild(hud.getBackground() ?: hud.get(), recalculate = false)
         polyUI.removeExecutor(hud.tree.getMetadata("updateTicker"))
-        ConfigManager.active().delete(hud.tree.id)
+        if (delete) ConfigManager.active().delete(hud.tree.id)
     }
 
     @Suppress("UNCHECKED_CAST")
     @ApiStatus.Internal
     fun initialize() {
+        if (init) throw IllegalStateException("HudManager.initialize() called twice!")
+        init = true
         polyUI.translator.addDelegate("assets/oneconfig/hud")
         LOGGER.info("Initializing HUD...")
         val now = System.nanoTime()
@@ -221,7 +285,7 @@ object HudManager {
         // as most often this will occur in a screen. It is more reliable than listening to the option change directly
         // as it is a public int so would be impossible to listen to find every change.
         eventHandler { (screen): ScreenOpenEvent ->
-            if(screen == null) activeInstances.fastEach { it.updateToGuiScale() }
+            if (screen == null) activeInstances.fastEach { it.updateToGuiScale() }
         }
 
         LOGGER.info("HUD load took {}ms", (System.nanoTime() - now) / 1_000_000.0)
