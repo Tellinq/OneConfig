@@ -41,6 +41,7 @@ import org.polyfrost.polyui.utils.image
 import org.polyfrost.polyui.utils.mapToArray
 import java.util.function.Predicate
 import kotlin.jvm.java
+import kotlin.math.roundToInt
 
 /**
  * Visualizers are procedures that take a property, and return a drawable that represents it.
@@ -241,6 +242,8 @@ fun interface Visualizer {
         override fun visualize(prop: Property<*>): Drawable {
             val min = prop.getMetadata<Float>("min") ?: 0f
             val max = prop.getMetadata<Float>("max") ?: 100f
+            val stepAmount = prop.getMetadata<Float>("step") ?: 0f
+            val nsteps = if (stepAmount > 0f) ((max - min) / stepAmount).roundToInt() else 0
             var dodge = false
             // todo stepped
             val s =
@@ -248,6 +251,7 @@ fun interface Visualizer {
                     min = min,
                     max = max,
                     length = 200f,
+                    steps = nsteps,
                     initialValue = prop.getAs<Number>().toFloat().coerceAtLeast(min),
                     integral = prop.type == Int::class.java || prop.type == Long::class.java,
                 ).onChange { amount: Float ->
