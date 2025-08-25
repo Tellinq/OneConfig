@@ -57,6 +57,15 @@ import org.polyfrost.polyui.component.Drawable;
 import org.polyfrost.polyui.input.KeyModifiers;
 import org.polyfrost.polyui.input.Translator;
 
+//#if MC > 1.16
+//$$ import com.mojang.brigadier.arguments.ArgumentType;
+//$$ import net.minecraft.commands.synchronization.EmptyArgumentSerializer;
+//$$ import net.minecraft.commands.synchronization.ArgumentSerializer;
+//$$ // import org.polyfrost.oneconfig.internal.mixin.command.Mixin_ModernArgumentTypeEntryAccessor;
+//$$ import org.polyfrost.oneconfig.internal.mixin.command.Mixin_ModernArgumentTypesAccessor;
+//$$ import java.util.Map;
+//#endif
+
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import static org.polyfrost.oneconfig.api.commands.v1.CommandManager.literal;
