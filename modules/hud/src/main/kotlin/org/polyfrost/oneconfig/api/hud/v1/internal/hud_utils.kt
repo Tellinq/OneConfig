@@ -35,11 +35,9 @@ import org.polyfrost.polyui.component.Drawable
 import org.polyfrost.polyui.component.extensions.*
 import org.polyfrost.polyui.component.impl.Block
 import org.polyfrost.polyui.component.impl.Image
-import org.polyfrost.polyui.component.impl.PopupMenu
 import org.polyfrost.polyui.component.impl.Text
 import org.polyfrost.polyui.event.Event
 import org.polyfrost.polyui.unit.Align
-import org.polyfrost.polyui.unit.SpawnPos
 import org.polyfrost.polyui.unit.Vec2
 import org.polyfrost.polyui.utils.fastEach
 import org.polyfrost.polyui.utils.image
@@ -113,6 +111,10 @@ private var cur: Hud<*>? = null
         scaleBlob.renders = value != null
         menu.renders = value != null
     }
+
+fun removeMenu() {
+    cur = null
+}
 
 /**
  * Build a HUD element, turning the given HUD into a representation for the HUD picker screen.

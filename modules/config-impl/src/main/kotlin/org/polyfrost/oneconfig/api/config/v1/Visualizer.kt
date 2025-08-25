@@ -36,6 +36,7 @@ import org.polyfrost.polyui.event.Event
 import org.polyfrost.polyui.event.State
 import org.polyfrost.polyui.input.KeyBinder
 import org.polyfrost.polyui.unit.Align
+import org.polyfrost.polyui.unit.Align.Wrap
 import org.polyfrost.polyui.unit.Vec2
 import org.polyfrost.polyui.utils.image
 import org.polyfrost.polyui.utils.mapToArray
@@ -116,10 +117,10 @@ fun interface Visualizer {
     class KeybindVisualizer : Visualizer {
         override fun visualize(prop: Property<*>): Drawable {
             return Block(
-                Image("assets/oneconfig/ico/keyboard.svg".image(), at = Vec2(7f, 7f)).ignoreLayout(),
+                Image("assets/oneconfig/ico/keyboard.svg".image(), at = Vec2(7f, 7f)),
                 Text(prop.getAs<KeyBinder.Bind>().keysToString("oneconfig.keybinds.none")),
                 size = Vec2(230f, 32f),
-                alignment = Align(main = Align.Content.Center),
+                alignment = Align(main = Align.Content.Center, wrap = Wrap.NEVER),
             ).onInit {
                 polyUI.keyBinder?.add(prop.getAs())
             }.withHoverStates().onClick {

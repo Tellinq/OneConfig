@@ -299,6 +299,9 @@ object HudManager {
             panel.renders = false
         }
         toggleHudPicker()
+        activeInstances.fastEach {
+            it.hidden = false
+        }
         return UIManager.INSTANCE.createPolyUIScreen(polyUI, 0f, 0f, false, true) { editorClose() }
     }
 
@@ -317,11 +320,7 @@ object HudManager {
     @ApiStatus.Internal
     fun toggle() {
         panelOpen = !panelOpen
-        scaleBlob.renders = false
-        menu.renders = false
-        activeInstances.fastEach {
-            it.hidden = panelOpen
-        }
+        removeMenu()
         val pg = panel
         if (!panelOpen) {
             Move(pg, polyUI.size.x - 32f, pg.y, false, Animations.Default.create(0.2.seconds)).add()

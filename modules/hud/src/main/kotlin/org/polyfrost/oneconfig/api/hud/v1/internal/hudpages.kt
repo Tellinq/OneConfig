@@ -50,7 +50,7 @@ import kotlin.experimental.or
 import kotlin.math.PI
 import kotlin.math.roundToInt
 
-val alignC = Align(main = Align.Content.Center, cross = Align.Content.Center)
+val alignC = Align(main = Align.Content.Center, cross = Align.Content.Center, line = Align.Line.Center)
 val alignNoPad = Align(pad = Vec2.ZERO)
 val alignHudDefault = Align(main = Align.Content.Center, cross = Align.Content.Center, pad = Vec2(8f, 8f))
 val BLACK_HALF = rgba(0, 0, 0, 0.5f)
