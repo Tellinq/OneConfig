@@ -30,6 +30,7 @@ import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.tree.CommandNode;
 import dev.deftu.clipboard.Clipboard;
 import dev.deftu.omnicore.client.OmniChat;
+import dev.deftu.omnicore.client.OmniClient;
 import dev.deftu.omnicore.client.OmniClientCommands;
 import dev.deftu.omnicore.common.OmniLoader;
 import dev.deftu.textile.minecraft.MCSimpleTextHolder;
@@ -55,15 +56,6 @@ import org.polyfrost.polyui.PolyUI;
 import org.polyfrost.polyui.component.Drawable;
 import org.polyfrost.polyui.input.KeyModifiers;
 import org.polyfrost.polyui.input.Translator;
-
-//#if MC > 1.16
-//$$ import com.mojang.brigadier.arguments.ArgumentType;
-//$$ import net.minecraft.commands.synchronization.EmptyArgumentSerializer;
-//$$ import net.minecraft.commands.synchronization.ArgumentSerializer;
-//$$ // import org.polyfrost.oneconfig.internal.mixin.command.Mixin_ModernArgumentTypeEntryAccessor;
-//$$ import org.polyfrost.oneconfig.internal.mixin.command.Mixin_ModernArgumentTypesAccessor;
-//$$ import java.util.Map;
-//#endif
 
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -202,9 +194,11 @@ public class OneConfig
 
     private static void registerKeybinds() {
         OCKeybindHelper builder = OCKeybindHelper.builder();
-        // if (OmniLoader.isDevelopment()) builder.inScreens(); see #452
+        builder.inScreens();
         builder.mods(KeyModifiers.RSHIFT).does((s) -> {
             if (s) {
+                // asm: in non-dev prevent the UI from opening in the main menu
+                if (OmniClient.getWorld() == null && !OmniLoader.isDevelopment()) return Unit.INSTANCE;
                 try {
                     OneConfigUI.INSTANCE.open();
                 } catch (Throwable t) {

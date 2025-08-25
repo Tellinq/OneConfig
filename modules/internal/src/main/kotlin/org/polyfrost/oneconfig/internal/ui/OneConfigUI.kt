@@ -142,12 +142,12 @@ object OneConfigUI {
                     SidebarButton(
                         "assets/oneconfig/ico/profiles.svg".image(),
                         "oneconfig.profiles",
-                    ).disable().addHoverInfo(Text("this feature is experimental and is coming soon!")),
-                    SidebarButton("assets/oneconfig/ico/keyboard.svg".image(), "oneconfig.keybinds").disable(),
+                    ).sidebarDisable().addHoverInfo(Text("this feature is experimental and is coming soon!")),
+                    SidebarButton("assets/oneconfig/ico/keyboard.svg".image(), "oneconfig.keybinds").sidebarDisable(),
                     Text("oneconfig.sidebar.title.personal", fontSize = 11f).setPalette { text.secondary }.padded(0f, 12f, 0f, 0f),
                     SidebarButton("assets/oneconfig/ico/paintbrush.svg".image(), "oneconfig.themes", label("oneconfig.soon")).onClick {
                         openPage(ThemesPage(), "oneconfig.themes")
-                    }.disable(),
+                    }.sidebarDisable(),
                     SidebarButton("assets/oneconfig/ico/cog.svg".image(), "oneconfig.preferences").onClick {
                         openPage(ConfigVisualizer.INSTANCE.get(ConfigManager.active().get("oneconfig.json")), "oneconfig.preferences")
                     },
@@ -272,6 +272,10 @@ object OneConfigUI {
         window = null
     }
 
+    fun Drawable.sidebarDisable() = apply {
+        this.disable().onClick { shake(); false }
+    }
+
 
     private val sidebarBtnAlign = Align(pad = Vec2(16f, 6f))
 
@@ -291,21 +295,29 @@ object OneConfigUI {
             alignment = sidebarBtnAlign,
         ).namedId("SidebarButton").apply {
             on(Event.Mouse.Entered) {
-                Recolor(this[1], this[1].palette.hovered, Animations.Default.create(0.08.seconds)).add()
+                val a = Animations.Default.create(0.16.seconds)
+                Recolor(this[0], this[0].palette.hovered, a).add()
+                Recolor(this[1], this[1].palette.hovered, a).add()
                 polyUI.cursor = Cursor.Clicker
                 false
             }
             on(Event.Mouse.Exited) {
-                Recolor(this[1], this[1].palette.normal, Animations.Default.create(0.08.seconds)).add()
+                val a = Animations.Default.create(0.16.seconds)
+                Recolor(this[0], this[0].palette.normal, a).add()
+                Recolor(this[1], this[1].palette.normal, a).add()
                 polyUI.cursor = Cursor.Pointer
                 false
             }
             on(Event.Mouse.Pressed) {
-                Recolor(this[1], this[1].palette.pressed, Animations.Default.create(0.08.seconds)).add()
+                val a = Animations.Default.create(0.16.seconds)
+                Recolor(this[0], this[0].palette.pressed, a).add()
+                Recolor(this[1], this[1].palette.pressed, a).add()
                 false
             }
             on(Event.Mouse.Released) {
-                Recolor(this[1], this[1].palette.hovered, Animations.Default.create(0.08.seconds)).add()
+                val a = Animations.Default.create(0.16.seconds)
+                Recolor(this[0], this[0].palette.hovered, a).add()
+                Recolor(this[1], this[1].palette.hovered, a).add()
                 false
             }
         }

@@ -212,22 +212,6 @@ fun Hud<*>.build(): Drawable {
             Event.Mouse.Clicked(0, amountClicks = 2) then {
                 HudManager.openHudEditor(this@build)
             }
-            Event.Mouse.Clicked(1) then {
-                PopupMenu(
-                    Text("oneconfig.huds.edit").withHoverStates(consume = true).onClick {
-                        HudManager.openHudEditor(this@build)
-                        HudManager.polyUI.unfocus()
-                    },
-                    Image("assets/oneconfig/ico/close.svg").setDestructivePalette().withHoverStates(consume = true).onClick {
-                        HudManager.polyUI.unfocus()
-                        HudManager.removeHud(this@build, exe)
-//                    if (HudManager.panel[3] !== HudManager.hudsPage) HudManager.panel[3] = HudManager.hudsPage
-                    },
-                    polyUI = HudManager.polyUI,
-                    spawnPos = SpawnPos.AboveMouse,
-                )
-                true
-            }
         }
     addMenuAndScaler()
     val min = minimumSize()
