@@ -243,7 +243,8 @@ object OneConfigUI {
         } else {
             Platform.screen().display(window)
             if (ui[1][1] != initialScreen) {
-                openPage(initialScreen, "oneconfig.mods")
+                // todo revisit this
+                //openPage(initialScreen, "oneconfig.mods")
             }
         }
     }
@@ -257,7 +258,7 @@ object OneConfigUI {
     fun openPage(page: Component, name: String, animation: SetAnimation = SetAnimation.SlideLeft) {
         val title = ui[1][0][0][2] as Text
         val translated = ui.polyUI.translator.translate(name)
-        title.text = translated.string
+        title._text = translated
         val prev = ui[1][1]
         ui[1].set(prev, page, animation)
     }

@@ -207,7 +207,7 @@ public class OneConfig
         builder.mods(KeyModifiers.RSHIFT).does((s) -> {
             if (s) {
                 // asm: in non-dev prevent the UI from opening in the main menu
-                if (OmniClient.getWorld() == null && !OmniLoader.isDevelopment()) return Unit.INSTANCE;
+                if (!OmniClient.hasWorld() && !OmniLoader.isDevelopment()) return Unit.INSTANCE;
                 try {
                     OneConfigUI.INSTANCE.open();
                 } catch (Throwable t) {
