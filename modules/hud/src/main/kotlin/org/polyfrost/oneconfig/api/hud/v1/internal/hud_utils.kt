@@ -52,7 +52,7 @@ val menu by lazy {
         Image("assets/oneconfig/ico/cog.svg").withHoverStates().onClick { HudManager.openHudEditor(cur ?: return@onClick) },
         Image("assets/oneconfig/ico/trash.svg").withHoverStates().setPalette { state.danger }.onClick {
             val cur = cur ?: return@onClick
-            HudManager.removeHud(cur, cur.tree.getMetadata("updateTicker"))
+            HudManager.removeHud(cur)
         },
         alignment = Align(padEdges = Vec2(10f, 8f), padBetween = Vec2(14f, 8f))
     ).withBorder(2f)
@@ -143,7 +143,8 @@ fun Hud<*>.buildNew(): Drawable {
                 polyUI.inputManager.recalculate()
                 return@onDragEnd
             }
-            val hud = this@buildNew.make().build()
+            val newHud = this@buildNew.make()
+            val hudDrawable = newHud.build()
             val canMultiply = this@buildNew.multipleInstancesAllowed()
             if (!canMultiply) {
                 val p = this.parent
@@ -151,9 +152,10 @@ fun Hud<*>.buildNew(): Drawable {
                 p.addChild(this@buildNew.makeAlreadyUsed())
             }
 
-            polyUI.master.addChild(hud, recalculate = false)
-            hud.x = x
-            hud.y = y
+            polyUI.master.addChild(hudDrawable, recalculate = false)
+            HudManager.activeInstances.add(newHud)
+            hudDrawable.x = x
+            hudDrawable.y = y
 
             if (canMultiply) {
                 x = parent.x + tx

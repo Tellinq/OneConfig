@@ -30,6 +30,8 @@ import dev.deftu.omnicore.common.OmniLoader
 import org.apache.logging.log4j.LogManager
 import org.jetbrains.annotations.ApiStatus
 import org.polyfrost.oneconfig.api.config.v1.ConfigManager
+import org.polyfrost.oneconfig.api.event.v1.eventHandler
+import org.polyfrost.oneconfig.api.event.v1.events.ScreenOpenEvent
 import org.polyfrost.oneconfig.api.hud.v1.internal.*
 import org.polyfrost.oneconfig.api.platform.v1.Platform
 import org.polyfrost.oneconfig.api.ui.v1.UIManager
@@ -51,7 +53,7 @@ import org.polyfrost.polyui.operations.Move
 import org.polyfrost.polyui.unit.Align
 import org.polyfrost.polyui.unit.Vec2
 import org.polyfrost.polyui.unit.seconds
-import org.polyfrost.polyui.utils.Clock
+import org.polyfrost.polyui.utils.fastEach
 import org.polyfrost.polyui.utils.image
 import kotlin.io.path.exists
 import kotlin.io.path.readText
@@ -103,6 +105,11 @@ object HudManager {
     @kotlin.internal.InlineOnly
     inline val polyUI get() = UIManager.INSTANCE.defaultInstance
 
+    /**
+     * **VERY** internal list of active HUD instances. Do not modify this list directly. Please. Like, seriously.
+      */
+    @ApiStatus.Internal
+    val activeInstances = ArrayList<Hud<*>>()
 
     @JvmStatic
     fun register(hud: Hud<*>) {
@@ -120,10 +127,10 @@ object HudManager {
         hudProviders.remove(hud::class.java)
     }
 
-    fun removeHud(hud: Hud<*>, executorCallback: Clock.Executor?) {
-        require(hud.isReal) { "Tried to remove a non-real HUD" }
+    fun removeHud(hud: Hud<*>) {
+        require(hud.isReal) { "Tried to remove a non-real HUD - use unregister() for this case. You might also be calling this method too early!" }
         polyUI.master.removeChild(hud.getBackground() ?: hud.get(), recalculate = false)
-        polyUI.removeExecutor(executorCallback)
+        polyUI.removeExecutor(hud.tree.getMetadata("updateTicker"))
         ConfigManager.active().delete(hud.tree.id)
     }
 
@@ -168,6 +175,7 @@ object HudManager {
                 val h = hudProviders.getOrPut(cls) { MHUtils.instantiate(cls, true).getOrThrow() }
                 used.add(cls)
                 val hud = h.make(data)
+                activeInstances.add(hud)
                 val bg = hud.build()
                 polyUI.master.addChild(bg, recalculate = false)
                 val x = data.getProp("x")?.getAs<Number?>()?.toFloat() ?: 0f
@@ -203,8 +211,17 @@ object HudManager {
             val theHud = hud.build()
             theHud.x = default.x
             theHud.y = default.y
+            activeInstances.add(hud)
             polyUI.master.addChild(theHud, recalculate = false)
             LOGGER.info("Added HUD {} to {} (default)", hud.title, default)
+        }
+
+        // asm: we will check and set update the gui scale of each HUD when a screen is closed.
+        // this means that we will catch 99% of cases when the GUI scale changes,
+        // as most often this will occur in a screen. It is more reliable than listening to the option change directly
+        // as it is a public int so would be impossible to listen to find every change.
+        eventHandler { (screen): ScreenOpenEvent ->
+            if(screen == null) activeInstances.fastEach { it.updateToGuiScale() }
         }
 
         LOGGER.info("HUD load took {}ms", (System.nanoTime() - now) / 1_000_000.0)
@@ -238,6 +255,9 @@ object HudManager {
         panelOpen = !panelOpen
         scaleBlob.renders = false
         menu.renders = false
+        activeInstances.fastEach {
+            it.hidden = panelOpen
+        }
         val pg = panel
         if (!panelOpen) {
             Move(pg, polyUI.size.x - 32f, pg.y, false, Animations.Default.create(0.2.seconds)).add()

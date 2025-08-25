@@ -56,7 +56,7 @@ val alignNoPad = Align(pad = Vec2.ZERO)
 val alignHudDefault = Align(main = Align.Content.Center, cross = Align.Content.Center, pad = Vec2(8f, 8f))
 val BLACK_HALF = rgba(0, 0, 0, 0.5f)
 private val mcFont = FontFamily("Minecraft", "assets/oneconfig/fonts/minecraft/", FontFamily.Type.OpenType)
-const val angleSnapMargin = PI / 12.0
+// const val angleSnapMargin = PI / 12.0
 const val minMargin = 4f
 const val snapMargin = 12f
 
@@ -203,7 +203,7 @@ private fun makeHudDesigner(hud: Hud<*>): Drawable {
         Group(
             Checkbox(size = 18f).onToggle {
                 hud.staticWidth = it
-                val siblings = parent.children!!
+                val siblings = siblings
                 siblings[2].isEnabled = !it
                 siblings[3].isEnabled = !it
             },

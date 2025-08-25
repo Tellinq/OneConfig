@@ -168,7 +168,7 @@ abstract class TextHud(
     }
 
     class DownKeys() : TextHud("down_keys_hud.yml", "Down Keys Hud", Category.INFO, "") {
-        val binder = KeybindManager.inputManager.keyBinder!!
+        val binder = KeybindManager.inputManager.keyBinder ?: throw IllegalStateException("Couldn't find KeyBinder!")
         val downMouse = MHUtils.getField<IntArraySet>(binder, "downMouseButtons").getOrThrow()
         val downUnmapped = MHUtils.getField<IntArraySet>(binder, "downUnmappedKeys").getOrThrow()
         val downKeys = MHUtils.getField<ArrayList<Keys>>(binder, "downKeys").getOrThrow()

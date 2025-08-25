@@ -39,7 +39,7 @@ class BindNotInScreen(
     durationNanos: Long = 0L,
     action: (Boolean) -> Boolean
 ) : KeyBinder.Bind(unmappedKeys, keys, mouse, mods, durationNanos, action) {
-    override fun test(c: IntArraySet, k: ArrayList<Keys>, m: IntArraySet, mods: Byte, deltaTimeNanos: Long, down: Boolean): Boolean {
-        return super.test(c, k, m, mods, deltaTimeNanos, down) && Platform.screen().current<Any?>() == null
+    override fun test(c: IntArraySet, k: ArrayList<Keys>, m: IntArraySet, mods: Byte, down: Boolean): Boolean {
+        return super.test(c, k, m, mods, down) && Platform.screen().current<Any?>() == null
     }
 }

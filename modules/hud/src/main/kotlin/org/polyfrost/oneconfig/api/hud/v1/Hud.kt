@@ -26,7 +26,7 @@
 
 package org.polyfrost.oneconfig.api.hud.v1
 
-import dev.deftu.omnicore.client.render.OmniResolution
+import dev.deftu.omnicore.client.render.GuiScale
 import org.jetbrains.annotations.ApiStatus
 import org.jetbrains.annotations.MustBeInvokedByOverriders
 import org.polyfrost.oneconfig.api.config.v1.Config
@@ -88,7 +88,7 @@ abstract class Hud<T : Drawable>(id: String, title: String, val category: Catego
     var showInScreens = true
 
     @Switch(title = "Use GUI Scale")
-    var useGuiScale = true
+    var useGuiScale = false
 
     @Keybind(title = "Toggle HUD Key")
     var toggleKey = (OCKeybindHelper.builder().does { if (it) hidden = !hidden } as OCKeybindHelper).register()
@@ -116,25 +116,22 @@ abstract class Hud<T : Drawable>(id: String, title: String, val category: Catego
         val out = if (multipleInstancesAllowed()) clone() else this
         val id = with?.id ?: genRid()
         val tree = ConfigManager.collect(out, id)
-        tree.title = out.title
-        tree.addMetadata("category", out.category)
-        tree.addMetadata("hidden", true)
-        tree["x"] = ktProperty(out.hud::x)
-        tree["y"] = ktProperty(out.hud::y)
-        inspect(out.hud, tree)
-        out.addToSerialized(tree)
-        tree["hudClass"] = simple(value = out::class.java.name)
-        if (with != null) {
-            tree.overwrite(with, true)
-            out.addHideHandlers(tree)
-        } else LOGGER.info("generated new HUD config for ${out.title} -> ${tree.id}")
-        out.tree = tree
-        out.addCallbacks(tree)
-
-        ConfigManager.active().register(tree)
-        // asm: we will start hidden when we are using a show keybind.
-        if (showKey.isBound) {
-            out.hidden = true
+        out.apply {
+            tree.title = title
+            tree.addMetadata("category", category)
+            tree.addMetadata("hidden", true)
+            tree["x"] = ktProperty(hud::x)
+            tree["y"] = ktProperty(hud::y)
+            inspect(hud, tree)
+            addToSerialized(tree)
+            tree["hudClass"] = simple(value = out::class.java.name)
+            if (with != null) {
+                tree.overwrite(with, true)
+            } else LOGGER.info("generated new HUD config for ${title} -> ${tree.id}")
+            addHideHandlers(tree)
+            this.tree = tree
+            addCallbacks(tree)
+            ConfigManager.active().register(tree)
         }
         return out
     }
@@ -191,6 +188,13 @@ abstract class Hud<T : Drawable>(id: String, title: String, val category: Catego
             if (!it) hideScreenHandler.register()
             else hideScreenHandler?.unregister()
             false
+        }
+
+        toggleKey.action = { if(it) hidden = !hidden; false }
+        showKey.action = { hidden = !it; false }
+        // asm: we will start hidden when we are using a show keybind.
+        if (showKey.isBound) {
+            hidden = true
         }
     }
 
@@ -331,12 +335,26 @@ abstract class Hud<T : Drawable>(id: String, title: String, val category: Catego
      */
     abstract fun update(): Boolean
 
-    fun updateScale() {
+    /**
+     * This method will set the scaling factor of your HUD to match the current GUI scale, if [useGuiScale] is `true`.
+     * @see getGuiScaleFactor to customize the scaling factors.
+     */
+    fun updateToGuiScale() {
         if (!useGuiScale) return
         val it = getBackground() ?: get()
-        val scale = OmniResolution.scaleFactor.toFloat()
+        val scale = getGuiScaleFactor(GuiScale.currentScale)
         it.scaleX = scale
         it.scaleY = scale
+    }
+
+    /**
+     * Use this function to return a custom scaling factor for each GUI scale option.
+     */
+    open fun getGuiScaleFactor(guiScale: GuiScale) = when(guiScale) {
+        GuiScale.SMALL -> 0.6f
+        GuiScale.MEDIUM -> 1f
+        GuiScale.LARGE, GuiScale.AUTO -> 1.5f
+        GuiScale.VERY_LARGE -> 2f
     }
 
     /**

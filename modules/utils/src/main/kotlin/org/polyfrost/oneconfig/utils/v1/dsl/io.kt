@@ -34,4 +34,4 @@ import java.nio.file.Path
  *
  * @see IOUtils.getFileChecksum
  */
-fun Path.checksum() = IOUtils.getFileChecksum(this)!!
+fun Path.checksum() = IOUtils.getFileChecksum(this)
