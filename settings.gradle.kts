@@ -78,6 +78,8 @@ listOf(
 // FOR ALL NEW VERSIONS MAKE SURE TO INCLUDE THEM IN root.gradle.kts !
 include(":minecraft")
 project(":minecraft").buildFileName = "root.gradle.kts"
+include(":bootstrap")
+project(":bootstrap").buildFileName = "root.gradle.kts"
 listOf(
     "1.8.9-forge",
     "1.8.9-fabric",
@@ -130,5 +132,21 @@ listOf(
     project(proj).apply {
         projectDir = file("minecraft/versions/$version")
         buildFileName = "../../build.gradle.kts"
+    }
+    val bootstrapProj = ":bootstrap:bootstrap-$version"
+    if (listOf("1.8.9-forge",
+            "1.12.2-forge",
+            "1.16.5-forge",
+            "1.16.5-fabric",
+            "1.21.1-fabric",
+            "1.21.2-fabric",
+            "1.21.3-fabric",
+            "1.21.4-fabric",
+            "1.21.5-fabric").contains(version)) {
+        include(bootstrapProj)
+        project(bootstrapProj).apply {
+            projectDir = file("bootstrap/versions/$version")
+            buildFileName = "../../build.gradle.kts"
+        }
     }
 }

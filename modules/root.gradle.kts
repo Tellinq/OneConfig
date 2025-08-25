@@ -106,6 +106,12 @@ subprojects {
             }
         }
     }
+
+    tasks {
+        named<Jar>("jar") {
+            archiveBaseName.set(project.name)
+        }
+    }
 }
 
 apiValidation {

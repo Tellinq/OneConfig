@@ -30,6 +30,8 @@ mixin-extras = "0.5.0"
 asm = "5.2"
 brigadier = "1.0.18"
 
+oneconfig-loader = "1.1.0-alpha.48"
+
 # Gradle
 dgt = "2.50.0"
 kotlinx-abi = "0.17.0"
@@ -108,6 +110,7 @@ dgt-multiversion-root = { id = "dev.deftu.gradle.multiversion-root", version.ref
 dgt-java = { id = "dev.deftu.gradle.tools.java", version.ref = "dgt" }
 dgt-kotlin = { id = "dev.deftu.gradle.tools.jvm.kotlin", version.ref = "dgt" }
 dgt-resources = { id = "dev.deftu.gradle.tools.resources", version.ref = "dgt" }
+dgt-bloom = { id = "dev.deftu.gradle.tools.bloom", version.ref = "dgt" }
 dgt-shadow = { id = "dev.deftu.gradle.tools.shadow", version.ref = "dgt" }
 dgt-publishing-maven = { id = "dev.deftu.gradle.tools.publishing.maven", version.ref = "dgt" }
 dgt-loom = { id = "dev.deftu.gradle.tools.minecraft.loom", version.ref = "dgt" }
