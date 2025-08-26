@@ -328,7 +328,7 @@ open class ConfigVisualizer {
         title: String,
         desc: String?,
     ): Drawable = Group(
-        Text(title, fontSize = 16f),
+        Text(title, fontSize = 16f, limited = true, visibleSize = Vec2(250f, 16f)),
         drawable,
         alignment = stdAccord,
         size = Vec2(503f, 32f),

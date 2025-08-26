@@ -190,8 +190,6 @@ abstract class Hud<T : Drawable>(id: String, title: String, val category: Catego
             false
         }
 
-        toggleKey.action = { if(it) hidden = !hidden; false }
-        showKey.action = { hidden = !it; false }
         // asm: we will start hidden when we are using a show keybind.
         if (showKey.isBound) {
             hidden = true
@@ -251,6 +249,12 @@ abstract class Hud<T : Drawable>(id: String, title: String, val category: Catego
      */
     inline val hud: T
         get() = get()
+
+    /**
+     * Flag for the HUD menu to remove it from the list of available HUDs.
+     */
+    @ApiStatus.Internal
+    var disabled = false
 
     /**
      * Hidden flag for this HUD.
@@ -424,7 +428,11 @@ abstract class Hud<T : Drawable>(id: String, title: String, val category: Catego
      */
     @MustBeInvokedByOverriders
     @Suppress("unchecked_cast")
-    override fun clone(): Hud<T> = (super.clone() as Hud<T>).apply { it = null }
+    override fun clone(): Hud<T> = (super.clone() as Hud<T>).apply {
+        it = null
+        showKey = (OCKeybindHelper.builder().does { hidden = !it } as OCKeybindHelper).register()
+        toggleKey = (OCKeybindHelper.builder().does { if (it) hidden = !hidden } as OCKeybindHelper).register()
+    }
 
     final override fun equals(other: Any?): Boolean {
         if (this === other) return true

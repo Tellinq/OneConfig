@@ -50,7 +50,7 @@ internal fun ModsPage(trees: Map<TreeSource, Set<Tree>>): Drawable {
         children = trees.flatMap { (source, treeSet) ->
             treeSet.mapNotNull { tree ->
                 if (tree.getMetadata<Any?>("hidden") != null) return@mapNotNull null
-                if (tree.title == null) {
+                if (tree.title == null || tree.id == null) {
                     LOGGER.warn("Tree ${tree.id} has no title, it will be skipped.")
                     return@mapNotNull null
                 }

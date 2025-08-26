@@ -94,7 +94,7 @@ fun HudsPage(huds: Collection<Hud<*>>): Drawable {
         if (huds.isNotEmpty()) {
             Group(
                 children = huds.mapNotNull {
-                    if (it.hidden) return@mapNotNull null
+                    if (it.disabled) return@mapNotNull null
                     val preview = it.buildNew()
                     val obj = Block(
                         preview,

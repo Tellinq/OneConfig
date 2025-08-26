@@ -181,7 +181,7 @@ object HudManager {
                 it.hidden = state
             }
         }
-        provider.hidden = state
+        provider.disabled = state
     }
 
     /**
