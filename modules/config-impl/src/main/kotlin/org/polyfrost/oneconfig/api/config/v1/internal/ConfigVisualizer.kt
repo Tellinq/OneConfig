@@ -280,6 +280,8 @@ open class ConfigVisualizer {
                 },
                 Image("polyui/chevron-down.svg").also { it.rotation = PI }
             )
+            // lmao
+            open = !open
             @Suppress("UNCHECKED_CAST") // reason: #already-type-checked
             enabled = e as Property<Boolean>
         } else {

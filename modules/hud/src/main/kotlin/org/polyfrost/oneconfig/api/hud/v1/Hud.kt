@@ -41,12 +41,14 @@ import org.polyfrost.oneconfig.api.event.v1.events.HudEvent
 import org.polyfrost.oneconfig.api.event.v1.events.ScreenOpenEvent
 import org.polyfrost.oneconfig.api.event.v1.invoke.EventHandler
 import org.polyfrost.oneconfig.api.hud.v1.HudManager.LOGGER
+import org.polyfrost.oneconfig.api.ui.v1.keybind.KeybindManager
 import org.polyfrost.oneconfig.api.ui.v1.keybind.OCKeybindHelper
 import org.polyfrost.polyui.color.PolyColor
 import org.polyfrost.polyui.component.Component
 import org.polyfrost.polyui.component.Drawable
 import org.polyfrost.polyui.component.impl.Block
 import org.polyfrost.polyui.component.impl.Text
+import org.polyfrost.polyui.input.KeyBinder
 import org.polyfrost.polyui.unit.Vec2
 import org.polyfrost.polyui.utils.fastAll
 import org.polyfrost.polyui.utils.fastEachIndexed
@@ -91,10 +93,10 @@ abstract class Hud<T : Drawable>(id: String, title: String, val category: Catego
     var useGuiScale = false
 
     @Keybind(title = "Toggle HUD Key")
-    var toggleKey = (OCKeybindHelper.builder().does { if (it) hidden = !hidden } as OCKeybindHelper).register()
+    var toggleKey: KeyBinder.Bind? = (OCKeybindHelper.builder().does { if (it) hidden = !hidden } as OCKeybindHelper).build()
 
     @Keybind(title = "Show HUD Key")
-    var showKey = (OCKeybindHelper.builder().does { hidden = !it } as OCKeybindHelper).register()
+    var showKey: KeyBinder.Bind? = (OCKeybindHelper.builder().does { hidden = !it } as OCKeybindHelper).build()
 
     // we don't need to use this as we initialize in our own way.
     override fun addToInitQueue() {}
@@ -127,7 +129,7 @@ abstract class Hud<T : Drawable>(id: String, title: String, val category: Catego
             tree["hudClass"] = simple(value = out::class.java.name)
             if (with != null) {
                 tree.overwrite(with, true)
-            } else LOGGER.info("generated new HUD config for ${title} -> ${tree.id}")
+            } else LOGGER.info("generated new HUD config for $title -> ${tree.id}")
             addHideHandlers(tree)
             this.tree = tree
             addCallbacks(tree)
@@ -190,9 +192,15 @@ abstract class Hud<T : Drawable>(id: String, title: String, val category: Catego
             false
         }
 
-        // asm: we will start hidden when we are using a show keybind.
-        if (showKey.isBound) {
-            hidden = true
+        toggleKey?.let {
+            it.action = { if (it) hidden = !hidden; false }
+            KeybindManager.registerKeybind(it)
+        }
+
+        showKey?.let {
+            it.action = { hidden = !it; false }
+            KeybindManager.registerKeybind(it)
+            if (it.isBound) hidden = true
         }
     }
 
@@ -251,12 +259,6 @@ abstract class Hud<T : Drawable>(id: String, title: String, val category: Catego
         get() = get()
 
     /**
-     * Flag for the HUD menu to remove it from the list of available HUDs.
-     */
-    @ApiStatus.Internal
-    var disabled = false
-
-    /**
      * Hidden flag for this HUD.
      *
      * If `true`, the HUD will not be rendered, and, if this is in a HUD group, it will resize accordingly.
@@ -264,6 +266,7 @@ abstract class Hud<T : Drawable>(id: String, title: String, val category: Catego
     var hidden: Boolean
         get() = it?.renders == false
         set(new) {
+            if (!isReal) return
             val value = !new
             // useless null-safety checks, but I don't want to risk dumb errors
             val it = it ?: return
@@ -354,7 +357,7 @@ abstract class Hud<T : Drawable>(id: String, title: String, val category: Catego
     /**
      * Use this function to return a custom scaling factor for each GUI scale option.
      */
-    open fun getGuiScaleFactor(guiScale: GuiScale) = when(guiScale) {
+    open fun getGuiScaleFactor(guiScale: GuiScale) = when (guiScale) {
         GuiScale.SMALL -> 0.6f
         GuiScale.MEDIUM -> 1f
         GuiScale.LARGE, GuiScale.AUTO -> 1.5f
@@ -430,8 +433,8 @@ abstract class Hud<T : Drawable>(id: String, title: String, val category: Catego
     @Suppress("unchecked_cast")
     override fun clone(): Hud<T> = (super.clone() as Hud<T>).apply {
         it = null
-        showKey = (OCKeybindHelper.builder().does { hidden = !it } as OCKeybindHelper).register()
-        toggleKey = (OCKeybindHelper.builder().does { if (it) hidden = !hidden } as OCKeybindHelper).register()
+        showKey = null
+        toggleKey = null
     }
 
     final override fun equals(other: Any?): Boolean {

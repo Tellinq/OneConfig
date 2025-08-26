@@ -73,9 +73,10 @@ internal fun ModsPage(trees: Map<TreeSource, Set<Tree>>): Drawable {
 
 private fun List<Component>.reorder(order: List<String>?): Array<Component> {
     if (order == null || order.isEmpty()) return this.toTypedArray()
-    val map = this.associateBy { it.name }
+    val map = this.associateBy { it.name } as MutableMap
     try {
-        return order.mapToArray { map[it]!! }
+        val out = order.mapNotNull { map.remove(it) }
+        return (out + map.values).toTypedArray()
     } catch (e: Exception) {
         LOGGER.error("Failed to reorder mod list, the ordering file may be corrupted. Reverting to default ordering.", e)
         return this.toTypedArray()

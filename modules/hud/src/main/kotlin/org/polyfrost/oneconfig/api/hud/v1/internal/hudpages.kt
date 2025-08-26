@@ -34,6 +34,7 @@ import org.polyfrost.oneconfig.api.hud.v1.LegacyHud
 import org.polyfrost.polyui.PolyUI
 import org.polyfrost.polyui.color.asMutable
 import org.polyfrost.polyui.color.rgba
+import org.polyfrost.polyui.component.Component
 import org.polyfrost.polyui.component.Drawable
 import org.polyfrost.polyui.component.extensions.*
 import org.polyfrost.polyui.component.impl.*
@@ -61,30 +62,33 @@ const val minMargin = 4f
 const val snapMargin = 12f
 
 fun HudsPage(huds: Collection<Hud<*>>): Drawable {
-    val hudMap = HashMap<Hud.Category, Drawable>()
+    val hudMap = HashMap<Hud.Category, ArrayList<Component>>()
+    hudMap[Hud.Category.COMBAT] = ArrayList()
+    hudMap[Hud.Category.INFO] = ArrayList()
+    hudMap[Hud.Category.PLAYER] = ArrayList()
     return Group(
         Group(
             HudButton("oneconfig.huds.all").onClick {
                 parent.parent[1] = Group(
-                    *hudMap.values.toTypedArray(),
+                    *hudMap.flatMap { (_, v) -> v }.toTypedArray(),
                     visibleSize = Vec2(500f, 800f),
                 )
             },
             HudButton("oneconfig.huds.pvp").onClick {
                 parent.parent[1] = Group(
-                    *hudMap.filterValuesByKey { it == Hud.Category.COMBAT }.toTypedArray(),
+                    *hudMap[Hud.Category.COMBAT]?.toTypedArray() ?: arrayOf(),
                     visibleSize = Vec2(500f, 800f),
                 )
             },
             HudButton("oneconfig.huds.info").onClick {
                 parent.parent[1] = Group(
-                    *hudMap.filterValuesByKey { it == Hud.Category.INFO }.toTypedArray(),
+                    *hudMap[Hud.Category.INFO]?.toTypedArray() ?: arrayOf(),
                     visibleSize = Vec2(500f, 800f),
                 )
             },
             HudButton("oneconfig.huds.player").onClick {
                 parent.parent[1] = Group(
-                    *hudMap.filterValuesByKey { it == Hud.Category.PLAYER }.toTypedArray(),
+                    *hudMap[Hud.Category.PLAYER]?.toTypedArray() ?: arrayOf(),
                     visibleSize = Vec2(500f, 800f),
                 )
             },
@@ -94,7 +98,7 @@ fun HudsPage(huds: Collection<Hud<*>>): Drawable {
         if (huds.isNotEmpty()) {
             Group(
                 children = huds.mapNotNull {
-                    if (it.disabled) return@mapNotNull null
+                    if (it.hidden) return@mapNotNull null
                     val preview = it.buildNew()
                     val obj = Block(
                         preview,
@@ -102,8 +106,9 @@ fun HudsPage(huds: Collection<Hud<*>>): Drawable {
                     ).withBorder().minimumSize(215f by 80f).withHoverStates().onInit {
                         // #created-with-set-size = true
                         layoutFlags = layoutFlags or 0b00000010
+                        ensureLargerThan(preview.visibleSize + (alignment.padEdges * Vec2(2f, 2f)))
                     }
-                    hudMap[it.category] = obj
+                    hudMap[it.category]?.add(obj)
                     obj
                 }.toTypedArray(),
                 alignment = Align(pad = Vec2(22f, 22f)),
@@ -120,21 +125,15 @@ fun HudsPage(huds: Collection<Hud<*>>): Drawable {
             polyUI.every(1.seconds) {
                 if (!HudManager.panelExists) return@every
                 huds.forEach {
-                    if (it.update()) it.getBackground()?.recalculate(false)
+                    if (it.update()) {
+                        val bg = it.getBackground() ?: return@forEach
+                        bg.recalculate(false)
+                        bg.parent.recalculate(false)
+                    }
                 }
             }
         }
     }.named("HudsPage")
-}
-
-inline fun <K, reified V> Map<K, V>.filterValuesByKey(predicate: (K) -> Boolean): MutableList<V> {
-    val out = mutableListOf<V>()
-    for ((key, value) in this) {
-        if (predicate(key)) {
-            out.add(value)
-        }
-    }
-    return out
 }
 
 private fun HudButton(text: String): Block {
