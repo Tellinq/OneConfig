@@ -69,7 +69,7 @@ fun interface Visualizer {
                 prop.setAsReferential(p.asMutable())
             }
             val s = Block(color = prop.getAs(), size = Vec2(58f, 32f)).withBorder(3f, color = { page.border20 })
-                .onClick { ColorPicker(State(prop.getAs()), null, null, polyUI); true }
+                .onClick { ColorPicker(State(prop.getAs()), polyUI); true }
             prop.addCallback {
                 s.color = it as PolyColor
                 false

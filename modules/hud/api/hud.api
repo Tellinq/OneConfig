@@ -12,7 +12,6 @@ public abstract class org/polyfrost/oneconfig/api/hud/v1/Hud : org/polyfrost/one
 	public final fun get ()Lorg/polyfrost/polyui/component/Drawable;
 	public final fun getBackground ()Lorg/polyfrost/polyui/component/impl/Block;
 	public final fun getCategory ()Lorg/polyfrost/oneconfig/api/hud/v1/Hud$Category;
-	public fun getGuiScaleFactor (Ldev/deftu/omnicore/client/render/GuiScale;)F
 	public final fun getHidden ()Z
 	public final fun getHud ()Lorg/polyfrost/polyui/component/Drawable;
 	public final fun getShowInF3 ()Z
@@ -21,7 +20,6 @@ public abstract class org/polyfrost/oneconfig/api/hud/v1/Hud : org/polyfrost/one
 	public final fun getShowKey ()Lorg/polyfrost/polyui/input/KeyBinder$Bind;
 	public final fun getStaticWidth ()Z
 	public final fun getToggleKey ()Lorg/polyfrost/polyui/input/KeyBinder$Bind;
-	public final fun getUseGuiScale ()Z
 	public fun hasBackground ()Z
 	public final fun isReal ()Z
 	public final fun make (Lorg/polyfrost/oneconfig/api/config/v1/Tree;)Lorg/polyfrost/oneconfig/api/hud/v1/Hud;
@@ -35,12 +33,10 @@ public abstract class org/polyfrost/oneconfig/api/hud/v1/Hud : org/polyfrost/one
 	public final fun setShowKey (Lorg/polyfrost/polyui/input/KeyBinder$Bind;)V
 	public final fun setStaticWidth (Z)V
 	public final fun setToggleKey (Lorg/polyfrost/polyui/input/KeyBinder$Bind;)V
-	public final fun setUseGuiScale (Z)V
 	public fun setup ()V
 	public abstract fun update ()Z
 	protected final fun updateAndRecalculate ()V
 	public fun updateFrequency ()J
-	public final fun updateToGuiScale ()V
 	protected final fun updateWhenChanged (Ljava/lang/String;)V
 }
 
@@ -71,6 +67,7 @@ public final class org/polyfrost/oneconfig/api/hud/v1/HudManager {
 	public final fun getProvider (Ljava/lang/Class;)Lorg/polyfrost/oneconfig/api/hud/v1/Hud;
 	public final fun getSlinex ()F
 	public final fun getSliney ()F
+	public final fun getUseGuiScale ()Z
 	public final fun getWithEditor ()Ljava/lang/Object;
 	public final fun initialize ()V
 	public static final fun isPanelOpen ()Z
@@ -81,6 +78,7 @@ public final class org/polyfrost/oneconfig/api/hud/v1/HudManager {
 	public static synthetic fun removeHud$default (Lorg/polyfrost/oneconfig/api/hud/v1/HudManager;Lorg/polyfrost/oneconfig/api/hud/v1/Hud;ZILjava/lang/Object;)V
 	public final fun setSlinex (F)V
 	public final fun setSliney (F)V
+	public final fun setUseGuiScale (Z)V
 	public final fun toggle ()V
 	public final fun toggleAllHuds (Lorg/polyfrost/oneconfig/api/hud/v1/Hud;Z)V
 	public final fun toggleHudPicker ()V
@@ -92,7 +90,6 @@ public abstract class org/polyfrost/oneconfig/api/hud/v1/LegacyHud : org/polyfro
 	public fun <init> (Ljava/lang/String;Ljava/lang/String;Lorg/polyfrost/oneconfig/api/hud/v1/Hud$Category;)V
 	protected fun create ()Lorg/polyfrost/polyui/component/Drawable;
 	protected final fun createLegacy ()Lorg/polyfrost/polyui/component/Drawable;
-	public fun getGuiScaleFactor (Ldev/deftu/omnicore/client/render/GuiScale;)F
 	public abstract fun getHeight ()F
 	public abstract fun getWidth ()F
 	public abstract fun render (Ldev/deftu/omnicore/client/render/OmniMatrixStack;FFFFZ)V

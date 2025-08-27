@@ -390,13 +390,13 @@ fun colorOptions(drawable: Drawable) = arrayOf(
     Group(
         Text("oneconfig.hudeditor.color.fill", fontSize = 14f),
         Block(size = 48f by 24f, color = drawable.color.asMutable().also { drawable.color = it }).withBorder(3f).onClick {
-            ColorPicker(State(drawable.color.asMutable()), null, null, polyUI)
+            ColorPicker(State(drawable.color.asMutable()), polyUI)
             false
         },
         if (drawable is Block) Text("oneconfig.hudeditor.color.border", fontSize = 14f) else null,
         if (drawable is Block) Block(size = 48f by 24f, color = drawable.borderColor?.asMutable().also { drawable.borderColor = it }).withBorder(3f).onClick {
             val color = (drawable.borderColor ?: polyUI.colors.page.border20).asMutable().also { drawable.borderColor = it }
-            ColorPicker(State(color), null, null, polyUI)
+            ColorPicker(State(color), polyUI)
             false
         } else null,
         size = Vec2(476f, 0f),
