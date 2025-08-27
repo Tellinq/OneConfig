@@ -2,10 +2,10 @@
 
 # Libraries
 # All
-kotlin = "2.0.20"
-kotlinx-coroutines = "1.8.1"
-kotlinx-atomicfu = "0.27.0"
-fabric-language-kotlin = "1.13.2+kotlin.2.1.20"
+kotlin = "2.2.10"
+kotlinx-coroutines = "1.10.2"
+kotlinx-atomicfu = "0.29.0"
+fabric-language-kotlin = "1.13.5+kotlin.2.2.10"
 polyui = "1.13.5"
 annotations = "24.1.0"
 hypixel-modapi = "1.0.1"
@@ -34,7 +34,7 @@ oneconfig-loader = "1.1.0-alpha.48"
 
 # Gradle
 dgt = "2.50.0"
-kotlinx-abi = "0.17.0"
+kotlinx-abi = "0.18.1"
 licenser = "2.1.1"
 jetbrains-idea-ext = "1.2"
 
@@ -119,4 +119,4 @@ licenser = { id = "dev.yumi.gradle.licenser", version.ref = "licenser" }
 
 jetbrains-idea-ext = { id = "org.jetbrains.gradle.plugin.idea-ext", version.ref = "jetbrains-idea-ext" }
 
-google-ksp = { id = "com.google.devtools.ksp", version = "2.1.20-2.0.1" }
+google-ksp = { id = "com.google.devtools.ksp", version = "2.2.10-2.0.2" }
