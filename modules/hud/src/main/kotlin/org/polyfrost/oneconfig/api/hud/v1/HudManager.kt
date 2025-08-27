@@ -307,7 +307,7 @@ object HudManager {
 
     private fun setAllHudsScaleFactor(scaleFactor: Float) {
         activeInstances.fastEach {
-            if (it.isReal && it !is LegacyHud) {
+            if (it !is LegacyHud) {
                 val drawable = it.getBackground() ?: it.get()
                 drawable.scaleX = scaleFactor
                 drawable.scaleY = scaleFactor
