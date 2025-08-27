@@ -89,9 +89,6 @@ abstract class Hud<T : Drawable>(id: String, title: String, val category: Catego
     @Switch(title = "Show in GUIs")
     var showInScreens = true
 
-    @Switch(title = "Use GUI Scale")
-    var useGuiScale = false
-
     @Keybind(title = "Toggle HUD Key")
     var toggleKey: KeyBinder.Bind? = (OCKeybindHelper.builder().does { if (it) hidden = !hidden } as OCKeybindHelper).build()
 
@@ -341,28 +338,6 @@ abstract class Hud<T : Drawable>(id: String, title: String, val category: Catego
      *         so the system will automatically resize the drawable.
      */
     abstract fun update(): Boolean
-
-    /**
-     * This method will set the scaling factor of your HUD to match the current GUI scale, if [useGuiScale] is `true`.
-     * @see getGuiScaleFactor to customize the scaling factors.
-     */
-    fun updateToGuiScale() {
-        if (!useGuiScale) return
-        val it = getBackground() ?: get()
-        val scale = getGuiScaleFactor(GuiScale.currentScale)
-        it.scaleX = scale
-        it.scaleY = scale
-    }
-
-    /**
-     * Use this function to return a custom scaling factor for each GUI scale option.
-     */
-    open fun getGuiScaleFactor(guiScale: GuiScale) = when (guiScale) {
-        GuiScale.SMALL -> 0.6f
-        GuiScale.MEDIUM -> 1f
-        GuiScale.LARGE, GuiScale.AUTO -> 1.5f
-        GuiScale.VERY_LARGE -> 2f
-    }
 
     /**
      * Return, in *nanoseconds*, how often the [update] method should be called.

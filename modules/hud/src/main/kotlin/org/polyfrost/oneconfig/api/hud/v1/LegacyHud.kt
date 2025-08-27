@@ -66,8 +66,6 @@ abstract class LegacyHud(id: String, title: String, category: Category) : Hud<Dr
      */
     protected fun createLegacy(): Drawable = LegacyHudComponent(hud = this).namedId("LegacyHud")
 
-    override fun getGuiScaleFactor(guiScale: GuiScale) = 1f
-
     @Suppress("SENSELESS_COMPARISON")
     internal class LegacyHudComponent(private val hud: LegacyHud) : Drawable() {
 
@@ -84,7 +82,7 @@ abstract class LegacyHud(id: String, title: String, category: Category) : Hud<Dr
             }
 
         fun renderLegacy(stack: OmniMatrixStack) {
-            val scale = if (hud.useGuiScale) 1f else Platform.screen().pixelRatio() / OmniResolution.scaleFactor.toFloat()
+            val scale = if (HudManager.useGuiScale) 1f else Platform.screen().pixelRatio() / OmniResolution.scaleFactor.toFloat()
             hud.render(stack, x * scale, y * scale, scaleX * scale, scaleY * scale, false)
         }
 

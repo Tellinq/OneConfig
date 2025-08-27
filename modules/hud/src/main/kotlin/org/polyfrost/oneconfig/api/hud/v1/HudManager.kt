@@ -26,12 +26,18 @@
 
 package org.polyfrost.oneconfig.api.hud.v1
 
+import dev.deftu.omnicore.client.render.OmniResolution
 import dev.deftu.omnicore.common.OmniLoader
 import org.apache.logging.log4j.LogManager
 import org.jetbrains.annotations.ApiStatus
 import org.polyfrost.oneconfig.api.config.v1.ConfigManager
 import org.polyfrost.oneconfig.api.event.v1.eventHandler
 import org.polyfrost.oneconfig.api.event.v1.events.ScreenOpenEvent
+import org.polyfrost.oneconfig.api.hud.v1.HudManager.getHudsOfType
+import org.polyfrost.oneconfig.api.hud.v1.HudManager.getProvider
+import org.polyfrost.oneconfig.api.hud.v1.HudManager.removeHud
+import org.polyfrost.oneconfig.api.hud.v1.HudManager.toggleAllHuds
+import org.polyfrost.oneconfig.api.hud.v1.HudManager.unregister
 import org.polyfrost.oneconfig.api.hud.v1.internal.*
 import org.polyfrost.oneconfig.api.platform.v1.Platform
 import org.polyfrost.oneconfig.api.ui.v1.UIManager
@@ -91,6 +97,14 @@ object HudManager {
     @ApiStatus.Internal
     var panelExists = false
         private set
+
+    var useGuiScale = true
+        set(value) {
+            if (field == value) return
+            field = value
+            val scaleFactor = if (value) OmniResolution.scaleFactor.toFloat() else 1f
+            setAllHudsScaleFactor(scaleFactor)
+        }
 
     init {
         register(TextHud.DateTime("Date:", "yyyy-MM-dd"))
@@ -280,15 +294,25 @@ object HudManager {
             LOGGER.info("Added HUD {} to {} (default)", hud.title, default)
         }
 
-        // asm: we will check and set update the gui scale of each HUD when a screen is closed.
+        // asm: we will check and set update the gui scale of each HUD when a screen changes.
         // this means that we will catch 99% of cases when the GUI scale changes,
         // as most often this will occur in a screen. It is more reliable than listening to the option change directly
         // as it is a public int so would be impossible to listen to find every change.
-        eventHandler { (screen): ScreenOpenEvent ->
-            if (screen == null) activeInstances.fastEach { it.updateToGuiScale() }
+        eventHandler { _: ScreenOpenEvent ->
+            if (useGuiScale) setAllHudsScaleFactor(OmniResolution.scaleFactor.toFloat())
         }
 
         LOGGER.info("HUD load took {}ms", (System.nanoTime() - now) / 1_000_000.0)
+    }
+
+    private fun setAllHudsScaleFactor(scaleFactor: Float) {
+        activeInstances.fastEach {
+            if (it.isReal && it !is LegacyHud) {
+                val drawable = it.getBackground() ?: it.get()
+                drawable.scaleX = scaleFactor
+                drawable.scaleY = scaleFactor
+            }
+        }
     }
 
     @ApiStatus.Internal
