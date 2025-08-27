@@ -456,7 +456,9 @@ class RendererImpl(
         return when (image.type) {
             PolyImage.Type.Vector -> {
                 val (svg, map) = svgs[image] ?: return loadSvg(image, image.load { errorHandler(it); defaultImageData!! }.toDirectByteBufferNT())
-                if (!image.size.isPositive) PolyImage.setImageSize(image, Vec2(svg.width, svg.height))
+                if (!image.size.isPositive) PolyImage.setImageSize(image, Vec2(svg.width, svg.height).also {
+                    if(!it.isPositive) throw IllegalArgumentException("SVG ${image.resourcePath} has invalid size ($it), maybe it is missing/corrupted?")
+                })
                 map.getOrPut(width.hashCode() * 31 + height.hashCode()) { resizeSvg(svg, width, height) }
             }
 
@@ -479,7 +481,9 @@ class RendererImpl(
     private fun loadSvg(image: PolyImage, data: ByteBuffer): Int {
         val svg = vg.parseSvg(data)
         val map = Int2IntMap(4)
-        if (!image.size.isPositive) PolyImage.setImageSize(image, Vec2(svg.width, svg.height))
+        if (!image.size.isPositive) PolyImage.setImageSize(image, Vec2(svg.width, svg.height).also {
+            if(!it.isPositive) throw IllegalArgumentException("SVG ${image.resourcePath} has invalid size ($it), maybe it is missing/corrupted?")
+        })
         val o = resizeSvg(svg, svg.width, svg.height)
         map[image.size.hashCode()] = o
         svgs[image] = svg to map
