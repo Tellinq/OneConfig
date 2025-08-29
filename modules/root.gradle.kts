@@ -33,6 +33,17 @@ subprojects {
         "compileOnly"(rootProject.libs.logging.api)
         "testImplementation"(rootProject.libs.bundles.test.core)
         "testImplementation"(platform(rootProject.libs.junit.bom))
+
+        if (project.name != "legacy") { // dependencies:legacy module, which internally uses mc 1.16. we dont run anything here, so its ok.
+            constraints {
+                "compileOnly"(rootProject.libs.logging.api) {
+                    version {
+                        strictly(rootProject.libs.versions.log4j.api.get())
+                    }
+                    because("Version of log4j used by Minecraft 1.8")
+                }
+            }
+        }
     }
 
     configure<TestingExtension> {

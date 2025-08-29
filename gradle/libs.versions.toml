@@ -6,6 +6,7 @@ kotlin = "2.2.10"
 kotlinx-coroutines = "1.10.2"
 kotlinx-atomicfu = "0.29.0"
 fabric-language-kotlin = "1.13.5+kotlin.2.2.10"
+google-ksp = "2.2.10-2.0.2"
 polyui = "1.13.5"
 annotations = "24.1.0"
 hypixel-modapi = "1.0.1"
@@ -119,4 +120,4 @@ licenser = { id = "dev.yumi.gradle.licenser", version.ref = "licenser" }
 
 jetbrains-idea-ext = { id = "org.jetbrains.gradle.plugin.idea-ext", version.ref = "jetbrains-idea-ext" }
 
-google-ksp = { id = "com.google.devtools.ksp", version = "2.2.10-2.0.2" }
+google-ksp = { id = "com.google.devtools.ksp", version.ref = "google-ksp" }
