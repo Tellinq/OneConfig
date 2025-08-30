@@ -120,6 +120,11 @@ subprojects {
 
     tasks {
         named<Jar>("jar") {
+            manifest {
+                attributes(mapOf(
+                    "Fabric-Loom-Remap" to false // Mark explicitly as not needing remapping
+                ))
+            }
             archiveBaseName.set(project.name)
         }
     }
