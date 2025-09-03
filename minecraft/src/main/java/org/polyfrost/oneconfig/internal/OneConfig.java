@@ -117,6 +117,15 @@ public class OneConfig
             LOGGER.error("Attempted to initialize oneconfig twice! this will be ignored");
             return;
         }
+
+        // To enable RenderDoc, set the following JVM arguments:
+        // -Drenderdoc.enabled=true
+        // (Windows) -Drenderdoc.path="C:\Program Files\RenderDoc\renderdoc.dll" (or wherever you installed RenderDoc)
+        // (Linux)   Ensure that librenderdoc.so is available in your LD_PRELOAD
+        //#if MC >= 1.19.2
+        //$$ RenderDoc.init();
+        //#endif
+
         //#if FABRIC
         //$$ try {
         //$$     Class.forName("org.polyfrost.oneconfig.test.TestMod_Test", false, getClass().getClassLoader());
