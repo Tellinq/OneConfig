@@ -66,20 +66,28 @@ jobs:
         with:
           path: |
             **/loom-cache
+            **/prebundled-jars
           key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
           restore-keys: |
             ${{ runner.os }}-gradle-
 
       - name: Build
-        run: ./gradlew build
+        run: ./gradlew build --no-daemon
 
       - name: Test publication
         run: ./gradlew publishToMavenLocal
 
-      - name: Upload Build Artifacts
+      - name: Upload Build Artifacts (Dev)
         uses: actions/upload-artifact@v4
         with:
-          name: oneconfig-artifacts
-          path: | 
+          name: lib-artifacts (Development purposes)
+          path: |
             modules/**/build/libs/
-            versions/**/build/libs/
+            minecraft/versions/**/build/libs/
+
+      - name: Upload Build Artifacts (Bootstrap)
+        uses: actions/upload-artifact@v4
+        with:
+          name: bootstrap-artifacts (Likely what you're looking for)
+          path: |
+            bootstrap/versions/**/build/libs/

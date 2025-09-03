@@ -30,8 +30,6 @@ import dev.deftu.omnicore.client.OmniChat;
 import dev.deftu.omnicore.common.OmniLoader;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.jetbrains.annotations.ApiStatus;
-import org.jetbrains.annotations.Nullable;
 import org.polyfrost.oneconfig.api.event.v1.events.Event;
 import org.polyfrost.oneconfig.api.event.v1.events.InitializationEvent;
 import org.polyfrost.oneconfig.api.event.v1.invoke.EventCollector;
@@ -57,26 +55,11 @@ public final class EventManager {
     private final Deque<EventCollector> collectors = new ArrayDeque<>(2);
     private final Map<Object, Iterable<EventHandler<?>>> cache = new WeakHashMap<>(5);
     private final Map<Class<? extends Event>, List<EventHandler<?>>> handlers = new HashMap<>(8);
-    @ApiStatus.Internal
-    @Nullable
-    public static final List<EventHandler<?>> devUnregistered;
-
-    static {
-        if (OmniLoader.isDevelopment()) {
-            devUnregistered = new ArrayList<>(5);
-        } else devUnregistered = null;
-    }
 
     private EventManager() {
         registerCollector(new AnnotationEventMapper());
         if (OmniLoader.isDevelopment()) {
             register(EventHandler.of(InitializationEvent.class, () -> {
-                if (devUnregistered != null && !devUnregistered.isEmpty()) {
-                    LOGGER.warn("Found {} handlers that were created but not registered: ", devUnregistered.size());
-                    for (EventHandler<?> handler : devUnregistered) {
-                        LOGGER.warn(handler);
-                    }
-                }
                 if (!handlers.isEmpty()) LOGGER.info(getRegisteredHandlersDebugTable());
             }));
         }
@@ -155,10 +138,6 @@ public final class EventManager {
      * @param handler The handler to register.
      */
     public void register(EventHandler<?> handler) {
-        if (devUnregistered != null) {
-            devUnregistered.remove(handler);
-        }
-
         List<EventHandler<?>> handles = handlers.computeIfAbsent(handler.getEventClass(), k -> new CopyOnWriteArrayList<>());
         if (handles.isEmpty()) {
             handles.add(handler);

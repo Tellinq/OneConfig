@@ -2,7 +2,6 @@
 // Shared build logic for all versions of OneConfig.
 
 import com.google.devtools.ksp.gradle.KspAATask
-import com.replaymod.gradle.preprocess.Node
 import com.replaymod.gradle.preprocess.PreprocessTask
 import com.replaymod.gradle.preprocess.ProjectGraphNode
 import com.replaymod.gradle.preprocess.RootPreprocessExtension
@@ -15,6 +14,7 @@ import org.gradle.kotlin.dsl.invoke
 import org.polyfrost.gradle.provideFabricApiDependency
 import org.polyfrost.gradle.provideIncludedDependencies
 import java.text.SimpleDateFormat
+import java.util.Date
 import java.util.function.Predicate
 import kotlin.io.path.absolutePathString
 import java.lang.Boolean as JBoolean
@@ -122,10 +122,6 @@ fun DependencyHandlerScope.handleApiDep(dependency: String, isMod: Boolean = fal
     this.handleApiDep(dep, isMod)
 }
 
-fun DependencyHandlerScope.handleApiDep(dependency: Provider<MinimalExternalModuleDependency>, isMod: Boolean = false) {
-    handleApiDep(dependency.get(), isMod)
-}
-
 fun DependencyHandlerScope.handleApiDep(dependency: ExternalModuleDependency, isMod: Boolean = false) {
     val dep = "${dependency.group}:${dependency.name}:${dependency.version}"
     if (isMod) "oneConfigModulesCompileOnlyApi"(modApi(dep) {
@@ -153,7 +149,7 @@ val skyhanniRelocated = registerRelocationAttribute("relocate-skyhanni-moulconfi
     relocate("io.github.notenoughupdates.moulconfig", "at.hannibal2.skyhanni.deps.moulconfig")
 }
 
-val skyhanniRelocatedConfiguration by configurations.creating {
+val skyhanniRelocatedConfiguration: Configuration by configurations.creating {
     attributes { attribute(skyhanniRelocated, true) }
 }
 
@@ -279,6 +275,7 @@ dependencies {
         mcData.loader.friendlyString
     ).forEach {
         if (it.dep is String) {
+            @Suppress("USELESS_CAST")
             handleApiDep(it.dep as String, it.mod)
         } else {
             handleApiDep(it.dep as ExternalModuleDependency, it.mod)
@@ -287,9 +284,10 @@ dependencies {
 
     if (mcData.isFabric) {
         provideFabricApiDependency(tripleVersion).forEach {
-            include(modApi(if (it.dep is String) it.dep as String else "${(it.dep as ExternalModuleDependency).group}:${(it.dep as ExternalModuleDependency).name}:${(it.dep as ExternalModuleDependency).version}") {
+            @Suppress("USELESS_CAST")
+            modApi(if (it.dep is String) it.dep as String else "${(it.dep as ExternalModuleDependency).group}:${(it.dep as ExternalModuleDependency).name}:${(it.dep as ExternalModuleDependency).version}") {
                 isTransitive = false
-            })
+            }
         }
     }
 
@@ -361,7 +359,7 @@ tasks {
                         "Implementation-Title" to rootProject.name,
                         "Implementation-Version" to project.version,
                         "Implementation-Vendor" to "Polyfrost",
-                        "Implementation-Timestamp" to SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ").format(`java.util`.Date()),
+                        "Implementation-Timestamp" to SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ").format(Date()),
                         "OneConfig-Main-Class" to "org.polyfrost.oneconfig.internal.bootstrap.Bootstrap",
                         "MixinConfigs" to "mixins.oneconfigv1.init.json,mixins.oneconfigv1.json",
                     )

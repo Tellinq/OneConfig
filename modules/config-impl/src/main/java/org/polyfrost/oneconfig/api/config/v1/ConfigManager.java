@@ -57,6 +57,9 @@ public final class ConfigManager {
     private static final ConfigManager backup = new ConfigManager(Paths.get("oneconfig", "backup"), NightConfigSerializer.ALL);
     private static ConfigManager active;
     private static boolean initialized = false;
+    private static boolean isFirstRun = false;
+//    @UnmodifiableView
+//    public static List<String> newOrUpdatedModIds;
     private static final Queue<Config> pendingInitialization = new ArrayDeque<>();
 
     static {
@@ -102,14 +105,17 @@ public final class ConfigManager {
 
     @ApiStatus.Internal
     public static void initialize() {
+        if (initialized) {
+            LOGGER.error("Config already initialized!");
+            return;
+        }
+        initialized = true;
         LOGGER.info("initializing {} configs", pendingInitialization.size());
-        if (!initialized) initialized = true;
         while (!pendingInitialization.isEmpty()) {
             Config config = pendingInitialization.poll();
-            if (config != null) {
-                config.initialize(true);
-            }
+            if (config != null) config.initialize(true);
         }
+        // newOrUpdatedModIds = Collections.unmodifiableList(doModsListScan());
     }
 
     @ApiStatus.Internal
@@ -121,16 +127,53 @@ public final class ConfigManager {
         }
     }
 
+    /*private static List<String> doModsListScan() {
+        List<String> modIds = new ArrayList<>();
+        try {
+            Path listFile = internal().getFolder().resolve("mods-list");
+            HashMap<String, String> oldModToVersion = new HashMap<>();
+            if (Files.exists(listFile)) {
+                List<String> p = Files.readAllLines(internal().getFolder().resolve("mods-list"));
+                for (String s : p) {
+                    int sep = s.indexOf(':');
+                    if (sep == -1) continue;
+                    oldModToVersion.put(s.substring(0, sep), s.substring(sep + 1));
+                }
+            }
+
+            StringBuilder out = new StringBuilder();
+            OmniLoader.getLoadedMods().forEach(info -> {
+                String id = info.getId();
+                String v = oldModToVersion.get(id);
+                if (v == null || !v.equals(info.getVersion())) {
+                    // successfully detected a new or updated mod
+                    modIds.add(id);
+                }
+                out.append(id).append(':').append(info.getVersion()).append('\n');
+            });
+            Files.write(listFile, out.toString().getBytes(StandardCharsets.UTF_8), StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING, StandardOpenOption.WRITE);
+        } catch (Exception e) {
+            LOGGER.error("Failed to scan mods list", e);
+        }
+        LOGGER.info("detected " + modIds.size() + " new or updated mods");
+        return modIds;
+    }*/
+
     static void removePendingInitialization(Config config) {
         pendingInitialization.remove(config);
     }
 
     private static synchronized void initProfiles() {
-        String activeProfile = internal().register(
+        Backend.RegistrationResult result = internal().register(
                 tree("profiles.json").put(
                         Properties.simple("activeProfile", "Active Profile", "The profile which is currently open.", "")
                 )
-        ).get().getProp("activeProfile").getAs();
+        );
+        if (result.state == Backend.RegistrationResult.NEW) {
+            // asm: first run
+            isFirstRun = true;
+        }
+        String activeProfile = result.get().getProp("activeProfile").getAs();
         openProfile(activeProfile);
     }
 
@@ -144,6 +187,10 @@ public final class ConfigManager {
             LOGGER.info("opening profile {}", profile);
             active = new ConfigManager(PROFILES_DIR.resolve(profile), core.backend.getSerializers().toArray(new FileSerializer[0])).withHook().withWatcher();
         }
+    }
+
+    public static boolean isFirstRun() {
+        return isFirstRun;
     }
 
     /**

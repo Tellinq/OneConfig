@@ -34,6 +34,7 @@ import org.polyfrost.oneconfig.api.hud.v1.LegacyHud
 import org.polyfrost.polyui.PolyUI
 import org.polyfrost.polyui.color.asMutable
 import org.polyfrost.polyui.color.rgba
+import org.polyfrost.polyui.component.Component
 import org.polyfrost.polyui.component.Drawable
 import org.polyfrost.polyui.component.extensions.*
 import org.polyfrost.polyui.component.impl.*
@@ -46,45 +47,48 @@ import org.polyfrost.polyui.unit.Vec2
 import org.polyfrost.polyui.unit.by
 import org.polyfrost.polyui.unit.seconds
 import org.polyfrost.polyui.utils.image
-import org.polyfrost.polyui.utils.mapToArray
 import kotlin.experimental.or
 import kotlin.math.PI
 import kotlin.math.roundToInt
 
-val alignC = Align(main = Align.Content.Center, cross = Align.Content.Center)
+val alignC = Align(main = Align.Content.Center, cross = Align.Content.Center, line = Align.Line.Center)
 val alignNoPad = Align(pad = Vec2.ZERO)
 val alignHudDefault = Align(main = Align.Content.Center, cross = Align.Content.Center, pad = Vec2(8f, 8f))
 val BLACK_HALF = rgba(0, 0, 0, 0.5f)
 private val mcFont = FontFamily("Minecraft", "assets/oneconfig/fonts/minecraft/", FontFamily.Type.OpenType)
-const val angleSnapMargin = PI / 12.0
+
+// const val angleSnapMargin = PI / 12.0
 const val minMargin = 4f
 const val snapMargin = 12f
 
 fun HudsPage(huds: Collection<Hud<*>>): Drawable {
-    val hudMap = HashMap<Hud.Category, Drawable>()
+    val hudMap = HashMap<Hud.Category, ArrayList<Component>>()
+    hudMap[Hud.Category.COMBAT] = ArrayList()
+    hudMap[Hud.Category.INFO] = ArrayList()
+    hudMap[Hud.Category.PLAYER] = ArrayList()
     return Group(
         Group(
             HudButton("oneconfig.huds.all").onClick {
                 parent.parent[1] = Group(
-                    *hudMap.values.toTypedArray(),
+                    *hudMap.flatMap { (_, v) -> v }.toTypedArray(),
                     visibleSize = Vec2(500f, 800f),
                 )
             },
             HudButton("oneconfig.huds.pvp").onClick {
                 parent.parent[1] = Group(
-                    *hudMap.filterValuesByKey { it == Hud.Category.COMBAT }.toTypedArray(),
+                    *hudMap[Hud.Category.COMBAT]?.toTypedArray() ?: arrayOf(),
                     visibleSize = Vec2(500f, 800f),
                 )
             },
             HudButton("oneconfig.huds.info").onClick {
                 parent.parent[1] = Group(
-                    *hudMap.filterValuesByKey { it == Hud.Category.INFO }.toTypedArray(),
+                    *hudMap[Hud.Category.INFO]?.toTypedArray() ?: arrayOf(),
                     visibleSize = Vec2(500f, 800f),
                 )
             },
             HudButton("oneconfig.huds.player").onClick {
                 parent.parent[1] = Group(
-                    *hudMap.filterValuesByKey { it == Hud.Category.PLAYER }.toTypedArray(),
+                    *hudMap[Hud.Category.PLAYER]?.toTypedArray() ?: arrayOf(),
                     visibleSize = Vec2(500f, 800f),
                 )
             },
@@ -93,7 +97,8 @@ fun HudsPage(huds: Collection<Hud<*>>): Drawable {
         ).padded(18f, 0f).named("HudsPageFilterButtons"),
         if (huds.isNotEmpty()) {
             Group(
-                children = huds.mapToArray {
+                children = huds.mapNotNull {
+                    if (it.hidden) return@mapNotNull null
                     val preview = it.buildNew()
                     val obj = Block(
                         preview,
@@ -101,10 +106,11 @@ fun HudsPage(huds: Collection<Hud<*>>): Drawable {
                     ).withBorder().minimumSize(215f by 80f).withHoverStates().onInit {
                         // #created-with-set-size = true
                         layoutFlags = layoutFlags or 0b00000010
+                        ensureLargerThan(preview.visibleSize + (alignment.padEdges * Vec2(2f, 2f)))
                     }
-                    hudMap[it.category] = obj
+                    hudMap[it.category]?.add(obj)
                     obj
-                },
+                }.toTypedArray(),
                 alignment = Align(pad = Vec2(22f, 22f)),
                 size = Vec2(500f, 0f),
                 visibleSize = Vec2(500f, 800f),
@@ -119,21 +125,15 @@ fun HudsPage(huds: Collection<Hud<*>>): Drawable {
             polyUI.every(1.seconds) {
                 if (!HudManager.panelExists) return@every
                 huds.forEach {
-                    if (it.update()) it.getBackground()?.recalculate()
+                    if (it.update()) {
+                        val bg = it.getBackground() ?: return@forEach
+                        bg.recalculate(false)
+                        bg.parent.recalculate(false)
+                    }
                 }
             }
         }
     }.named("HudsPage")
-}
-
-inline fun <K, reified V> Map<K, V>.filterValuesByKey(predicate: (K) -> Boolean): MutableList<V> {
-    val out = mutableListOf<V>()
-    for ((key, value) in this) {
-        if (predicate(key)) {
-            out.add(value)
-        }
-    }
-    return out
 }
 
 private fun HudButton(text: String): Block {
@@ -171,7 +171,7 @@ private fun makeHudDesigner(hud: Hud<*>): Drawable {
             DraggingNumericTextInput(icon = "assets/oneconfig/ico/align.svg".image(), suffix = "px", max = 30f, size = Vec2(120f, 32f)).also {
                 it[0].onChange { value: Float ->
                     receiver.alignment = receiver.alignment.copy(padBetween = Vec2(value, value))
-                    receiver.recalculate()
+                    receiver.recalculate(false)
                     false
                 }
             }.titled("oneconfig.hudeditor.padding.between"),
@@ -203,7 +203,7 @@ private fun makeHudDesigner(hud: Hud<*>): Drawable {
         Group(
             Checkbox(size = 18f).onToggle {
                 hud.staticWidth = it
-                val siblings = parent.children!!
+                val siblings = siblings
                 siblings[2].isEnabled = !it
                 siblings[3].isEnabled = !it
             },
@@ -331,7 +331,7 @@ fun textOptions(text: Text): Drawable {
                 2 -> mcFont.get(text.fontWeight, text.italic)
                 else -> polyUI.fonts.get(text.fontWeight, text.italic)
             }
-            text._parent?.recalculate()
+            text._parent?.recalculate(false)
             val ex = (parent.parent[1][0] as? Text) ?: return@onChange false
             ex.font = text.font
             ex.parent.recalculate()
@@ -340,7 +340,7 @@ fun textOptions(text: Text): Drawable {
         DraggingNumericTextInput("assets/oneconfig/ico/text-input.svg".image(), initialValue = text.fontSize.roundToInt().toFloat(), min = 1f, size = Vec2(72f, 0f), suffix = "px").also {
             it[0].onChange { value: Float ->
                 text.fontSize = value
-                text._parent?.recalculate()
+                text._parent?.recalculate(false)
                 val ex = (parent.parent.parent[1][0] as? Text) ?: return@onChange false
                 ex.fontSize = text.fontSize
                 ex.parent.recalculate()
@@ -355,7 +355,7 @@ fun textOptions(text: Text): Drawable {
             "oneconfig.fweight.500",
         ).onChange { it: Int ->
             text.fontWeight = Font.byWeight((it + 1) * 100)
-            text._parent?.recalculate()
+            text._parent?.recalculate(false)
             val ex = (parent.parent[1][0] as? Text) ?: return@onChange false
             ex.fontWeight = text.fontWeight
             ex.parent.recalculate()
@@ -390,13 +390,13 @@ fun colorOptions(drawable: Drawable) = arrayOf(
     Group(
         Text("oneconfig.hudeditor.color.fill", fontSize = 14f),
         Block(size = 48f by 24f, color = drawable.color.asMutable().also { drawable.color = it }).withBorder(3f).onClick {
-            ColorPicker(State(drawable.color.asMutable()), null, null, polyUI)
+            ColorPicker(State(drawable.color.asMutable()), polyUI)
             false
         },
         if (drawable is Block) Text("oneconfig.hudeditor.color.border", fontSize = 14f) else null,
         if (drawable is Block) Block(size = 48f by 24f, color = drawable.borderColor?.asMutable().also { drawable.borderColor = it }).withBorder(3f).onClick {
             val color = (drawable.borderColor ?: polyUI.colors.page.border20).asMutable().also { drawable.borderColor = it }
-            ColorPicker(State(color), null, null, polyUI)
+            ColorPicker(State(color), polyUI)
             false
         } else null,
         size = Vec2(476f, 0f),

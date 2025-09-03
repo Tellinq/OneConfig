@@ -26,6 +26,7 @@
 
 package org.polyfrost.oneconfig.api.hud.v1
 
+import dev.deftu.omnicore.client.render.GuiScale
 import org.jetbrains.annotations.ApiStatus
 import org.jetbrains.annotations.MustBeInvokedByOverriders
 import org.polyfrost.oneconfig.api.config.v1.Config
@@ -40,12 +41,14 @@ import org.polyfrost.oneconfig.api.event.v1.events.HudEvent
 import org.polyfrost.oneconfig.api.event.v1.events.ScreenOpenEvent
 import org.polyfrost.oneconfig.api.event.v1.invoke.EventHandler
 import org.polyfrost.oneconfig.api.hud.v1.HudManager.LOGGER
+import org.polyfrost.oneconfig.api.ui.v1.keybind.KeybindManager
 import org.polyfrost.oneconfig.api.ui.v1.keybind.OCKeybindHelper
 import org.polyfrost.polyui.color.PolyColor
 import org.polyfrost.polyui.component.Component
 import org.polyfrost.polyui.component.Drawable
 import org.polyfrost.polyui.component.impl.Block
 import org.polyfrost.polyui.component.impl.Text
+import org.polyfrost.polyui.input.KeyBinder
 import org.polyfrost.polyui.unit.Vec2
 import org.polyfrost.polyui.utils.fastAll
 import org.polyfrost.polyui.utils.fastEachIndexed
@@ -87,10 +90,10 @@ abstract class Hud<T : Drawable>(id: String, title: String, val category: Catego
     var showInScreens = true
 
     @Keybind(title = "Toggle HUD Key")
-    var toggleKey = (OCKeybindHelper.builder().does { if (it) hidden = !hidden } as OCKeybindHelper).register()
+    var toggleKey: KeyBinder.Bind? = (OCKeybindHelper.builder().does { if (it) hidden = !hidden } as OCKeybindHelper).build()
 
     @Keybind(title = "Show HUD Key")
-    var showKey = (OCKeybindHelper.builder().does { hidden = it } as OCKeybindHelper).register()
+    var showKey: KeyBinder.Bind? = (OCKeybindHelper.builder().does { hidden = !it } as OCKeybindHelper).build()
 
     // we don't need to use this as we initialize in our own way.
     override fun addToInitQueue() {}
@@ -112,25 +115,22 @@ abstract class Hud<T : Drawable>(id: String, title: String, val category: Catego
         val out = if (multipleInstancesAllowed()) clone() else this
         val id = with?.id ?: genRid()
         val tree = ConfigManager.collect(out, id)
-        tree.title = out.title
-        tree.addMetadata("category", out.category)
-        tree.addMetadata("hidden", true)
-        tree["x"] = ktProperty(out.hud::x)
-        tree["y"] = ktProperty(out.hud::y)
-        inspect(out.hud, tree)
-        out.addToSerialized(tree)
-        tree["hudClass"] = simple(value = out::class.java.name)
-        if (with != null) {
-            tree.overwrite(with, true)
-            out.addHideHandlers(tree)
-        } else LOGGER.info("generated new HUD config for ${out.title} -> ${tree.id}")
-        out.tree = tree
-        out.addCallbacks(tree)
-
-        ConfigManager.active().register(tree)
-        // asm: we will start hidden when we are using a show keybind.
-        if (showKey.isBound) {
-            hidden = true
+        out.apply {
+            tree.title = title
+            tree.addMetadata("category", category)
+            tree.addMetadata("hidden", true)
+            tree["x"] = ktProperty(hud::x)
+            tree["y"] = ktProperty(hud::y)
+            inspect(hud, tree)
+            addToSerialized(tree)
+            tree["hudClass"] = simple(value = out::class.java.name)
+            if (with != null) {
+                tree.overwrite(with, true)
+            } else LOGGER.info("generated new HUD config for $title -> ${tree.id}")
+            addHideHandlers(tree)
+            this.tree = tree
+            addCallbacks(tree)
+            ConfigManager.active().register(tree)
         }
         return out
     }
@@ -187,6 +187,17 @@ abstract class Hud<T : Drawable>(id: String, title: String, val category: Catego
             if (!it) hideScreenHandler.register()
             else hideScreenHandler?.unregister()
             false
+        }
+
+        toggleKey?.let {
+            it.action = { if (it) hidden = !hidden; false }
+            KeybindManager.registerKeybind(it)
+        }
+
+        showKey?.let {
+            it.action = { hidden = !it; false }
+            KeybindManager.registerKeybind(it)
+            if (it.isBound) hidden = true
         }
     }
 
@@ -252,6 +263,7 @@ abstract class Hud<T : Drawable>(id: String, title: String, val category: Catego
     var hidden: Boolean
         get() = it?.renders == false
         set(new) {
+            if (!isReal) return
             val value = !new
             // useless null-safety checks, but I don't want to risk dumb errors
             val it = it ?: return
@@ -267,7 +279,7 @@ abstract class Hud<T : Drawable>(id: String, title: String, val category: Catego
             } else if (!value && siblings.fastAll { !it.renders }) {
                 bg.renders = false
             }
-            bg.recalculate()
+            bg.recalculate(false)
         }
 
     /**
@@ -315,7 +327,7 @@ abstract class Hud<T : Drawable>(id: String, title: String, val category: Catego
     }
 
     protected fun updateAndRecalculate() {
-        if (update()) getBackground()?.recalculate()
+        if (update()) getBackground()?.recalculate(false)
     }
 
     /**
@@ -394,7 +406,11 @@ abstract class Hud<T : Drawable>(id: String, title: String, val category: Catego
      */
     @MustBeInvokedByOverriders
     @Suppress("unchecked_cast")
-    override fun clone(): Hud<T> = (super.clone() as Hud<T>).apply { it = null }
+    override fun clone(): Hud<T> = (super.clone() as Hud<T>).apply {
+        it = null
+        showKey = null
+        toggleKey = null
+    }
 
     final override fun equals(other: Any?): Boolean {
         if (this === other) return true

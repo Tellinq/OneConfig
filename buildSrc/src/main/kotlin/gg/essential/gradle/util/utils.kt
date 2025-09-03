@@ -19,7 +19,7 @@
 
 package gg.essential.gradle.util
 
-import kotlinx.metadata.jvm.JvmMetadataVersion
+import kotlin.metadata.jvm.JvmMetadataVersion
 import java.util.Calendar
 import java.util.GregorianCalendar
 

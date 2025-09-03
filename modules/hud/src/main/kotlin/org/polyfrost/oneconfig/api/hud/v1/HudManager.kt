@@ -26,10 +26,18 @@
 
 package org.polyfrost.oneconfig.api.hud.v1
 
+import dev.deftu.omnicore.client.render.OmniResolution
 import dev.deftu.omnicore.common.OmniLoader
 import org.apache.logging.log4j.LogManager
 import org.jetbrains.annotations.ApiStatus
 import org.polyfrost.oneconfig.api.config.v1.ConfigManager
+import org.polyfrost.oneconfig.api.event.v1.eventHandler
+import org.polyfrost.oneconfig.api.event.v1.events.ScreenOpenEvent
+import org.polyfrost.oneconfig.api.hud.v1.HudManager.getHudsOfType
+import org.polyfrost.oneconfig.api.hud.v1.HudManager.getProvider
+import org.polyfrost.oneconfig.api.hud.v1.HudManager.removeHud
+import org.polyfrost.oneconfig.api.hud.v1.HudManager.toggleAllHuds
+import org.polyfrost.oneconfig.api.hud.v1.HudManager.unregister
 import org.polyfrost.oneconfig.api.hud.v1.internal.*
 import org.polyfrost.oneconfig.api.platform.v1.Platform
 import org.polyfrost.oneconfig.api.ui.v1.UIManager
@@ -51,7 +59,7 @@ import org.polyfrost.polyui.operations.Move
 import org.polyfrost.polyui.unit.Align
 import org.polyfrost.polyui.unit.Vec2
 import org.polyfrost.polyui.unit.seconds
-import org.polyfrost.polyui.utils.Clock
+import org.polyfrost.polyui.utils.fastEach
 import org.polyfrost.polyui.utils.image
 import kotlin.io.path.exists
 import kotlin.io.path.readText
@@ -61,6 +69,8 @@ object HudManager {
     internal val LOGGER = LogManager.getLogger("OneConfig/HUD")
     private val hudProviders = HashMap<Class<out Hud<*>>, Hud<*>>()
     private val snapLineColor = rgba(170, 170, 170, 0.8f)
+
+    private var init = false
 
     /**
      * the vertical line x position used for snapping.
@@ -88,6 +98,14 @@ object HudManager {
     var panelExists = false
         private set
 
+    var useGuiScale = true
+        set(value) {
+            if (field == value) return
+            field = value
+            val scaleFactor = if (value) OmniResolution.scaleFactor.toFloat() else 1f
+            setAllHudsScaleFactor(scaleFactor)
+        }
+
     init {
         register(TextHud.DateTime("Date:", "yyyy-MM-dd"))
         register(TextHud.DateTime("Time:", "HH:mm:ss"))
@@ -103,7 +121,15 @@ object HudManager {
     @kotlin.internal.InlineOnly
     inline val polyUI get() = UIManager.INSTANCE.defaultInstance
 
+    /**
+     * **VERY** internal list of active HUD instances. Do not modify this list directly. Please. Like, seriously.
+     */
+    @ApiStatus.Internal
+    val activeInstances = ArrayList<Hud<*>>()
 
+    /**
+     * Register a HUD provider to the system. This does not add an instance of the HUD to the screen; it only makes it available in the HUD picker.
+     */
     @JvmStatic
     fun register(hud: Hud<*>) {
         hudProviders[hud::class.java] = hud
@@ -116,20 +142,79 @@ object HudManager {
         }
     }
 
-    fun unregister(hud: Hud<*>) {
+    /**
+     * Remove a HUD type from the registered providers. If [removeActiveInstances] is true, all active instances of this HUD will be removed from the screen; and they will be returned.
+     * If [delete] is true, the config entries of the removed HUDs will be deleted as well, meaning they won't be restored on next load.
+     *
+     * **The [delete] operation is permanent and CANNOT be undone.** To temporarily hide a HUD, use [toggleAllHuds] instead.
+     */
+    fun <T : Drawable> unregister(hud: Hud<T>, removeActiveInstances: Boolean = false, delete: Boolean = false): ArrayList<Hud<T>>? {
         hudProviders.remove(hud::class.java)
+        if (removeActiveInstances) {
+            val out = ArrayList<Hud<T>>(10.coerceAtMost(activeInstances.size))
+            activeInstances.fastEach {
+                if (it::class.java == hud::class.java) {
+                    removeHud(it, delete)
+                    @Suppress("UNCHECKED_CAST")
+                    out.add(it as Hud<T>)
+                }
+            }
+            return out
+        } else return null
     }
 
-    fun removeHud(hud: Hud<*>, executorCallback: Clock.Executor?) {
-        require(hud.isReal) { "Tried to remove a non-real HUD" }
+    /**
+     * Return all active HUD instances of this type. To get the "provider" HUD (the one in the picker screen), use [getProvider].
+     */
+    fun <T : Drawable> getHudsOfType(hudClass: Class<Hud<T>>): ArrayList<Hud<T>> {
+        val out = ArrayList<Hud<T>>(10.coerceAtMost(activeInstances.size))
+        activeInstances.fastEach {
+            if (it::class.java == hudClass) {
+                @Suppress("UNCHECKED_CAST")
+                out.add(it as Hud<T>)
+            }
+        }
+        return out
+    }
+
+    /**
+     * Get the "provider" HUD of this type, which is the one in the picker screen. To get active instances, use [getHudsOfType].
+     */
+    fun getProvider(hudClass: Class<out Hud<*>>): Hud<*>? = hudProviders[hudClass]
+
+    /**
+     * Hide/unhide **all** the huds of this type on the screen, and remove the HUD from the HUD picker temporarily until the inverse is called.
+     *
+     * To permanently remove a HUD, use [removeHud].
+     * To permanently unregister a HUD type, use [unregister].
+     */
+    fun toggleAllHuds(hud: Hud<*>, state: Boolean) {
+        val provider = hudProviders[hud::class.java] ?: return
+        activeInstances.fastEach {
+            if (it::class.java == hud::class.java) {
+                it.hidden = state
+            }
+        }
+        provider.hidden = state
+    }
+
+    /**
+     * Remove a HUD instance from the screen. If [delete] is true, the HUD's config will be deleted as well, meaning it won't be restored on next load.
+     *
+     * **The [delete] operation is permanent and CANNOT be undone.** To temporarily hide a HUD, use [toggleAllHuds] instead.
+     */
+    fun removeHud(hud: Hud<*>, delete: Boolean = false) {
+        require(hud.isReal) { "Tried to remove a non-real HUD - use unregister() for this case. You might also be calling this method too early!" }
         polyUI.master.removeChild(hud.getBackground() ?: hud.get(), recalculate = false)
-        polyUI.removeExecutor(executorCallback)
-        ConfigManager.active().delete(hud.tree.id)
+        polyUI.removeExecutor(hud.tree.getMetadata("updateTicker"))
+        if (delete) ConfigManager.active().delete(hud.tree.id)
     }
 
     @Suppress("UNCHECKED_CAST")
     @ApiStatus.Internal
     fun initialize() {
+        if (init) throw IllegalStateException("HudManager.initialize() called twice!")
+        init = true
         polyUI.translator.addDelegate("assets/oneconfig/hud")
         LOGGER.info("Initializing HUD...")
         val now = System.nanoTime()
@@ -168,12 +253,17 @@ object HudManager {
                 val h = hudProviders.getOrPut(cls) { MHUtils.instantiate(cls, true).getOrThrow() }
                 used.add(cls)
                 val hud = h.make(data)
-                val theHud = hud.build()
-                polyUI.master.addChild(theHud, recalculate = false)
+                activeInstances.add(hud)
+                val bg = hud.build()
+                polyUI.master.addChild(bg, recalculate = false)
                 val x = data.getProp("x")?.getAs<Number?>()?.toFloat() ?: 0f
                 val y = data.getProp("y")?.getAs<Number?>()?.toFloat() ?: 0f
-                theHud.x = x - (hud.get().x - theHud.x)
-                theHud.y = y - (hud.get().y - theHud.y)
+                val it = hud.get()
+                // asm: place it so that the relative position to bg is maintained
+                bg.x = x - (it.x - bg.x)
+                bg.y = y - (it.y - bg.y)
+                it.x = x
+                it.y = y
                 i++
             } catch (e: ClassNotFoundException) {
                 val cls = e.message?.substringAfter(':') ?: "unknown"
@@ -199,11 +289,30 @@ object HudManager {
             val theHud = hud.build()
             theHud.x = default.x
             theHud.y = default.y
+            activeInstances.add(hud)
             polyUI.master.addChild(theHud, recalculate = false)
             LOGGER.info("Added HUD {} to {} (default)", hud.title, default)
         }
 
+        // asm: we will check and set update the gui scale of each HUD when a screen changes.
+        // this means that we will catch 99% of cases when the GUI scale changes,
+        // as most often this will occur in a screen. It is more reliable than listening to the option change directly
+        // as it is a public int so would be impossible to listen to find every change.
+        eventHandler { _: ScreenOpenEvent ->
+            if (useGuiScale) setAllHudsScaleFactor(OmniResolution.scaleFactor.toFloat())
+        }
+
         LOGGER.info("HUD load took {}ms", (System.nanoTime() - now) / 1_000_000.0)
+    }
+
+    private fun setAllHudsScaleFactor(scaleFactor: Float) {
+        activeInstances.fastEach {
+            if (it !is LegacyHud) {
+                val drawable = it.getBackground() ?: it.get()
+                drawable.scaleX = scaleFactor
+                drawable.scaleY = scaleFactor
+            }
+        }
     }
 
     @ApiStatus.Internal
@@ -214,6 +323,9 @@ object HudManager {
             panel.renders = false
         }
         toggleHudPicker()
+        activeInstances.fastEach {
+            it.hidden = false
+        }
         return UIManager.INSTANCE.createPolyUIScreen(polyUI, 0f, 0f, false, true) { editorClose() }
     }
 
@@ -232,8 +344,7 @@ object HudManager {
     @ApiStatus.Internal
     fun toggle() {
         panelOpen = !panelOpen
-        scaleBlob.renders = false
-        menu.renders = false
+        removeMenu()
         val pg = panel
         if (!panelOpen) {
             Move(pg, polyUI.size.x - 32f, pg.y, false, Animations.Default.create(0.2.seconds)).add()

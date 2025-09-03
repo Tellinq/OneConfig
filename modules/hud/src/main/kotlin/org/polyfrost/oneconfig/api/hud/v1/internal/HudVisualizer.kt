@@ -55,7 +55,7 @@ object HudVisualizer : ConfigVisualizer() {
         return Group(
             if (icon != null) Image(icon) else null,
             Group(
-                Text(title!!, fontSize = 16f).setFont { medium },
+                Text(title ?: "Null", fontSize = 16f).setFont { medium },
                 if (desc != null) Text(desc, visibleSize = Vec2(240f, 12f)) else null,
                 alignment = stdOpt,
             ),

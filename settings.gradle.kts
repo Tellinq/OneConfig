@@ -23,7 +23,7 @@ pluginManagement {
     }
 
     plugins {
-        kotlin("jvm") version("2.0.20")
+        kotlin("jvm") version("2.2.10")
         id("dev.deftu.gradle.multiversion-root") version("2.50.0") // Update in libs.versions.toml too!!!
     }
 }
@@ -34,6 +34,12 @@ dependencyResolutionManagement {
         mavenCentral()
         maven("https://repo.polyfrost.org/releases")
         maven("https://repo.hypixel.net/repository/Hypixel")
+    }
+}
+
+buildscript {
+    dependencies {
+        classpath("org.jetbrains.kotlin:kotlin-compiler-embeddable:2.2.10")
     }
 }
 
@@ -67,7 +73,6 @@ listOf(
     "ui",
     "internal",
     "dependencies",
-    "dependencies:agnostic",
     "dependencies:legacy",
     "utils",
     "relocator"
@@ -78,6 +83,8 @@ listOf(
 // FOR ALL NEW VERSIONS MAKE SURE TO INCLUDE THEM IN root.gradle.kts !
 include(":minecraft")
 project(":minecraft").buildFileName = "root.gradle.kts"
+include(":bootstrap")
+project(":bootstrap").buildFileName = "root.gradle.kts"
 listOf(
     "1.8.9-forge",
     "1.8.9-fabric",
@@ -139,5 +146,21 @@ listOf(
     project(proj).apply {
         projectDir = file("minecraft/versions/$version")
         buildFileName = "../../build.gradle.kts"
+    }
+    val bootstrapProj = ":bootstrap:bootstrap-$version"
+    if (listOf("1.8.9-forge",
+            "1.12.2-forge",
+            "1.16.5-forge",
+            "1.16.5-fabric",
+            "1.21.1-fabric",
+            "1.21.2-fabric",
+            "1.21.3-fabric",
+            "1.21.4-fabric",
+            "1.21.5-fabric").contains(version)) {
+        include(bootstrapProj)
+        project(bootstrapProj).apply {
+            projectDir = file("bootstrap/versions/$version")
+            buildFileName = "../../build.gradle.kts"
+        }
     }
 }

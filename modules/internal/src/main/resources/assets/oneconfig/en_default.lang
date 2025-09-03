@@ -1,4 +1,4 @@
-oneconfig.sidebar.title.options=OPTIONS
+oneconfig.sidebar.title.options=MODS & OPTIONS
 oneconfig.mods=Mods
 oneconfig.profiles=Profiles
 oneconfig.keybinds=Keybinds
@@ -8,6 +8,8 @@ oneconfig.preferences=Preferences
 oneconfig.sidebar.title.extra=HELP & FEEDBACK
 oneconfig.changelog=Changelog
 oneconfig.edithud=Edit HUD
+oneconfig.numberinput.placeholder=Enter a number...
+oneconfig.keybinds.reconding=Recording...
 
 oneconfig.mods.none=No mods installed!
 oneconfig.mods.none.desc=You don't have any compatible mods installed.\nInstall some to configure them here. Visit https://polyfrost.org/mods to get some!

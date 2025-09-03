@@ -7,12 +7,19 @@ import org.polyfrost.oneconfig.api.config.v1.internal.ConfigVisualizer
 import org.polyfrost.oneconfig.api.platform.v1.Platform
 import org.polyfrost.oneconfig.api.ui.v1.Notifications
 import org.polyfrost.oneconfig.internal.ui.OneConfigUI
+import org.polyfrost.polyui.component.Component
 import org.polyfrost.polyui.component.Drawable
 import org.polyfrost.polyui.component.extensions.*
 import org.polyfrost.polyui.component.impl.*
 import org.polyfrost.polyui.data.PolyImage
+import org.polyfrost.polyui.event.Event
 import org.polyfrost.polyui.unit.Align
 import org.polyfrost.polyui.unit.Vec2
+import org.polyfrost.polyui.utils.mapToArray
+import java.nio.file.StandardOpenOption
+import kotlin.io.path.exists
+import kotlin.io.path.readText
+import kotlin.io.path.writeText
 
 internal enum class TreeSource {
     CONFIG, // Comes from OneConfig's config manager
@@ -33,20 +40,47 @@ internal fun ModsPage(trees: Map<TreeSource, Set<Tree>>): Drawable {
     }
 
     // todo add categories
+    val modOrderFile = ConfigManager.internal().folder.resolve("mods_ordering")
+    val order: List<String>? = if (modOrderFile.exists()) {
+        modOrderFile.readText().split(',')
+    } else null
+
+    val sb = StringBuilder()
     return Group(
         children = trees.flatMap { (source, treeSet) ->
             treeSet.mapNotNull { tree ->
                 if (tree.getMetadata<Any?>("hidden") != null) return@mapNotNull null
-                if (tree.title == null) {
+                if (tree.title == null || tree.id == null) {
                     LOGGER.warn("Tree ${tree.id} has no title, it will be skipped.")
                     return@mapNotNull null
                 }
-                ModCard(source, tree)
+                ModCard(source, tree).events {
+                    Event.Lifetime.Removed then {
+                        sb.append(tree.id).append(',')
+                        false
+                    }
+                }
             }
-        }.toTypedArray(),
+        }.reorder(order),
         visibleSize = Vec2(1130f, 635f),
         alignment = Align(line = Align.Line.Start, pad = Vec2(18f, 18f)),
-    ).makeRearrangeableGrid().namedId("ModsPage")
+    ).makeRearrangeableGrid().namedId("ModsPage").events {
+        Event.Lifetime.Removed then {
+            ConfigManager.internal().folder.resolve("mods_ordering").writeText(sb.toString(), Charsets.UTF_8, StandardOpenOption.CREATE, StandardOpenOption.WRITE, StandardOpenOption.TRUNCATE_EXISTING)
+        }
+    }
+}
+
+private fun List<Component>.reorder(order: List<String>?): Array<Component> {
+    if (order == null || order.isEmpty()) return this.toTypedArray()
+    val map = this.associateBy { it.name } as MutableMap
+    try {
+        val out = order.mapNotNull { map.remove(it) }
+        return (out + map.values).toTypedArray()
+    } catch (e: Exception) {
+        LOGGER.error("Failed to reorder mod list, the ordering file may be corrupted. Reverting to default ordering.", e)
+        return this.toTypedArray()
+    }
 }
 
 private fun ModCard(
@@ -61,7 +95,7 @@ private fun ModCard(
             size = Vec2(256f, 104f),
         ).withBorder(1f) { page.border5 }.withHoverStates(),
         Block(
-            Text(tree.title!!, fontSize = 16f).setFont { medium },
+            Text(tree.title ?: tree.id, fontSize = 16f).setFont { medium },
             radii = modBoxBotRad,
             alignment = barAlign,
             size = Vec2(256f, 36f),
@@ -69,7 +103,7 @@ private fun ModCard(
         alignment = modBoxAlign,
     ).onClick { _ ->
         when (source) {
-            TreeSource.CONFIG -> OneConfigUI.openPage(ConfigVisualizer.INSTANCE.get(tree), tree.title!!)
+            TreeSource.CONFIG -> OneConfigUI.openPage(ConfigVisualizer.INSTANCE.get(tree), tree.title ?: tree.id)
             TreeSource.COMMAND -> Platform.compatibility().executeTreeAction(tree.id)
             TreeSource.COMPAT -> tree.getMetadata<() -> Unit>("on_click")?.invoke() ?: Unit
         }
@@ -91,7 +125,7 @@ private fun ModCard(
                 false
             }, polyUI = polyUI)
         }
-    }.namedId("ModCard")
+    }.named(tree.id)
 }
 
 private fun ModCardImage(tree: Tree): Drawable {
@@ -111,8 +145,9 @@ private fun ModCardImage(tree: Tree): Drawable {
 
     // Otherwise, just return text
     return try {
-        Text(tree.title!!, fontSize = 18f).setFont { semiBold }
+        Text(tree.title ?: tree.id, fontSize = 18f).setFont { semiBold }
     } catch (e: Exception) {
+        LOGGER.error("Failed to load name of a mod card somehow! If you see this, contact us to get a reward!", e)
         // Shouldn't happen ever, might as well add it just in case
         Image(defaultModImage).onInit {
             size = size.coerceAtMost(Vec2(64f, 64f))

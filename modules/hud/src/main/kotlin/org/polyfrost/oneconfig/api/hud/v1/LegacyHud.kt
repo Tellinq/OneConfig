@@ -26,6 +26,7 @@
 
 package org.polyfrost.oneconfig.api.hud.v1
 
+import dev.deftu.omnicore.client.render.GuiScale
 import dev.deftu.omnicore.client.render.OmniMatrixStack
 import dev.deftu.omnicore.client.render.OmniResolution
 import org.jetbrains.annotations.ApiStatus
@@ -81,7 +82,7 @@ abstract class LegacyHud(id: String, title: String, category: Category) : Hud<Dr
             }
 
         fun renderLegacy(stack: OmniMatrixStack) {
-            val scale = Platform.screen().pixelRatio() / OmniResolution.scaleFactor.toFloat()
+            val scale = if (HudManager.useGuiScale) 1f else Platform.screen().pixelRatio() / OmniResolution.scaleFactor.toFloat()
             hud.render(stack, x * scale, y * scale, scaleX * scale, scaleY * scale, false)
         }
 

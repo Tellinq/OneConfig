@@ -254,7 +254,7 @@ public abstract class Config {
         }
 
         if (!path.startsWith("assets/")) {
-            path = "assets/" + path;
+            throw new IllegalArgumentException("icons must be located inside a valid assets directory under your mod id");
         }
         return path;
     }

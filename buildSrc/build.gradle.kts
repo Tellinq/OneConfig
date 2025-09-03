@@ -1,4 +1,5 @@
 plugins {
+    kotlin("jvm") version "2.2.10"
     `kotlin-dsl`
 }
 
@@ -9,7 +10,7 @@ repositories {
 
 dependencies {
     // Mirroring https://github.com/EssentialGG/essential-gradle-toolkit/blob/master/build.gradle.kts
-    implementation("org.ow2.asm:asm-commons:9.6")
+    implementation("org.ow2.asm:asm-commons:9.8")
     implementation("com.google.guava:guava:33.0.0-jre")
-    implementation("org.jetbrains.kotlinx:kotlinx-metadata-jvm:0.9.0")
+    implementation("org.jetbrains.kotlin:kotlin-metadata-jvm:2.2.10")
 }

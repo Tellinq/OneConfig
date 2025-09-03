@@ -30,6 +30,7 @@ import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.tree.CommandNode;
 import dev.deftu.clipboard.Clipboard;
 import dev.deftu.omnicore.client.OmniChat;
+import dev.deftu.omnicore.client.OmniClient;
 import dev.deftu.omnicore.client.OmniClientCommands;
 import dev.deftu.omnicore.common.OmniLoader;
 import dev.deftu.textile.minecraft.MCSimpleTextHolder;
@@ -116,6 +117,15 @@ public class OneConfig
             LOGGER.error("Attempted to initialize oneconfig twice! this will be ignored");
             return;
         }
+
+        // To enable RenderDoc, set the following JVM arguments:
+        // -Drenderdoc.enabled=true
+        // (Windows) -Drenderdoc.path="C:\Program Files\RenderDoc\renderdoc.dll" (or wherever you installed RenderDoc)
+        // (Linux)   Ensure that librenderdoc.so is available in your LD_PRELOAD
+        //#if MC >= 1.19.2
+        //$$ RenderDoc.init();
+        //#endif
+
         //#if FABRIC
         //$$ try {
         //$$     Class.forName("org.polyfrost.oneconfig.test.TestMod_Test", false, getClass().getClassLoader());
@@ -202,9 +212,11 @@ public class OneConfig
 
     private static void registerKeybinds() {
         OCKeybindHelper builder = OCKeybindHelper.builder();
-        // if (OmniLoader.isDevelopment()) builder.inScreens(); see #452
+        builder.inScreens();
         builder.mods(KeyModifiers.RSHIFT).does((s) -> {
             if (s) {
+                // asm: in non-dev prevent the UI from opening in the main menu
+                if (!OmniClient.hasWorld() && !OmniLoader.isDevelopment()) return Unit.INSTANCE;
                 try {
                     OneConfigUI.INSTANCE.open();
                 } catch (Throwable t) {

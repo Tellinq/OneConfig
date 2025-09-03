@@ -71,6 +71,6 @@ inline fun <reified E : Event> eventHandler(crossinline handler: (E) -> Unit) = 
     override fun getEventClass() = E::class.java
 }.register()
 
-/** makes code colored!! */
+/** makes code colored! */
 @DslMarker
 private annotation class EventHandlerKt

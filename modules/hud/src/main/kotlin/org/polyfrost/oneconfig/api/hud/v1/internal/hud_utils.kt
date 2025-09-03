@@ -35,11 +35,9 @@ import org.polyfrost.polyui.component.Drawable
 import org.polyfrost.polyui.component.extensions.*
 import org.polyfrost.polyui.component.impl.Block
 import org.polyfrost.polyui.component.impl.Image
-import org.polyfrost.polyui.component.impl.PopupMenu
 import org.polyfrost.polyui.component.impl.Text
 import org.polyfrost.polyui.event.Event
 import org.polyfrost.polyui.unit.Align
-import org.polyfrost.polyui.unit.SpawnPos
 import org.polyfrost.polyui.unit.Vec2
 import org.polyfrost.polyui.utils.fastEach
 import org.polyfrost.polyui.utils.image
@@ -52,7 +50,7 @@ val menu by lazy {
         Image("assets/oneconfig/ico/cog.svg").withHoverStates().onClick { HudManager.openHudEditor(cur ?: return@onClick) },
         Image("assets/oneconfig/ico/trash.svg").withHoverStates().setPalette { state.danger }.onClick {
             val cur = cur ?: return@onClick
-            HudManager.removeHud(cur, cur.tree.getMetadata("updateTicker"))
+            HudManager.removeHud(cur)
         },
         alignment = Align(padEdges = Vec2(10f, 8f), padBetween = Vec2(14f, 8f))
     ).withBorder(2f)
@@ -114,6 +112,10 @@ private var cur: Hud<*>? = null
         menu.renders = value != null
     }
 
+fun removeMenu() {
+    cur = null
+}
+
 /**
  * Build a HUD element, turning the given HUD into a representation for the HUD picker screen.
  *
@@ -143,7 +145,8 @@ fun Hud<*>.buildNew(): Drawable {
                 polyUI.inputManager.recalculate()
                 return@onDragEnd
             }
-            val hud = this@buildNew.make().build()
+            val newHud = this@buildNew.make()
+            val hudDrawable = newHud.build()
             val canMultiply = this@buildNew.multipleInstancesAllowed()
             if (!canMultiply) {
                 val p = this.parent
@@ -151,9 +154,10 @@ fun Hud<*>.buildNew(): Drawable {
                 p.addChild(this@buildNew.makeAlreadyUsed())
             }
 
-            polyUI.master.addChild(hud, recalculate = false)
-            hud.x = x
-            hud.y = y
+            polyUI.master.addChild(hudDrawable, recalculate = false)
+            HudManager.activeInstances.add(newHud)
+            hudDrawable.x = x
+            hudDrawable.y = y
 
             if (canMultiply) {
                 x = parent.x + tx
@@ -185,7 +189,7 @@ fun Hud<*>.build(): Drawable {
         null
     } else {
         HudManager.polyUI.every(freq) {
-            if (update()) getBackground()?.recalculate()
+            if (update()) getBackground()?.recalculate(false)
         }
     }
     tree.addMetadata("updateTicker", exe)
@@ -209,22 +213,6 @@ fun Hud<*>.build(): Drawable {
         .events {
             Event.Mouse.Clicked(0, amountClicks = 2) then {
                 HudManager.openHudEditor(this@build)
-            }
-            Event.Mouse.Clicked(1) then {
-                PopupMenu(
-                    Text("oneconfig.huds.edit").withHoverStates(consume = true).onClick {
-                        HudManager.openHudEditor(this@build)
-                        HudManager.polyUI.unfocus()
-                    },
-                    Image("assets/oneconfig/ico/close.svg").setDestructivePalette().withHoverStates(consume = true).onClick {
-                        HudManager.polyUI.unfocus()
-                        HudManager.removeHud(this@build, exe)
-//                    if (HudManager.panel[3] !== HudManager.hudsPage) HudManager.panel[3] = HudManager.hudsPage
-                    },
-                    polyUI = HudManager.polyUI,
-                    spawnPos = SpawnPos.AboveMouse,
-                )
-                true
             }
         }
     addMenuAndScaler()

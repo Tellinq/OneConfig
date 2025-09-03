@@ -45,6 +45,7 @@ import org.polyfrost.polyui.utils.fastEach
 import org.polyfrost.polyui.utils.image
 import org.polyfrost.polyui.utils.levenshteinDistance
 import org.polyfrost.polyui.utils.mapToArray
+import org.polyfrost.polyui.utils.rescaleToPolyUIInstance
 import java.lang.ref.WeakReference
 import kotlin.math.PI
 
@@ -154,7 +155,7 @@ open class ConfigVisualizer {
             } else {
                 node as Property<*>
                 if (node.getMetadata<Any?>("visualizer") == null) {
-                    // LOGGER.warn("Property ${node.id} does not have a visualizer; ignoring")
+                    LOGGER.warn("Property ${node.id} does not have a visualizer; ignoring")
                     continue
                 }
             }
@@ -162,7 +163,7 @@ open class ConfigVisualizer {
             processNode(config, node, options)
         }
         LOGGER.info("creating config page ${config.title} took ${(System.nanoTime() - now) / 1_000_000f}ms")
-        return makeFinal(flattenSubcategories(options), initialCategory).addRethemingListeners().addRescalingListeners()
+        return makeFinal(flattenSubcategories(options), initialCategory).addRethemingListeners()
     }
 
     protected open fun makeFinal(categories: Map<String, Drawable>, initialCategory: String): Drawable {
@@ -224,7 +225,7 @@ open class ConfigVisualizer {
             children = categories.mapToArray { (category, options) ->
                 Button(text = category).onClick {
                     parent.parent[1] = options
-                    (parent.parent[1] as Scrollable).visibleSize = Vec2(1130f, 635f) // asm: reset size to default
+                    (parent.parent as Scrollable).visibleSize = Vec2(1130f, 635f).rescaleToPolyUIInstance(polyUI) // asm: reset size to default
                 }
             },
         )
@@ -279,6 +280,8 @@ open class ConfigVisualizer {
                 },
                 Image("polyui/chevron-down.svg").also { it.rotation = PI }
             )
+            // lmao
+            open = !open
             @Suppress("UNCHECKED_CAST") // reason: #already-type-checked
             enabled = e as Property<Boolean>
         } else {
@@ -327,7 +330,7 @@ open class ConfigVisualizer {
         title: String,
         desc: String?,
     ): Drawable = Group(
-        Text(title, fontSize = 16f),
+        Text(title, fontSize = 16f, limited = true, visibleSize = Vec2(250f, 16f)),
         drawable,
         alignment = stdAccord,
         size = Vec2(503f, 32f),
