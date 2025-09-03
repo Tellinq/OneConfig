@@ -68,13 +68,14 @@ fun interface Visualizer {
             if (p !is PolyColor.Mutable) {
                 prop.setAsReferential(p.asMutable())
             }
-            val s = Block(color = prop.getAs(), size = Vec2(58f, 32f)).withBorder(3f, color = { page.border20 })
-                .onClick { ColorPicker(State(prop.getAs()), polyUI); true }
+            val state = State(prop.getAs<PolyColor.Mutable>())
+            val out = Block(color = state.value, size = Vec2(58f, 32f)).withBorder(3f, color = { page.border20 })
+            out.onClick { ColorPicker(state, polyUI, attachedDrawable = out); true }
             prop.addCallback {
-                s.color = it as PolyColor
+                state.value = (it as PolyColor).asMutable()
                 false
             }
-            return s
+            return out
         }
     }
 

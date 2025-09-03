@@ -36,7 +36,7 @@ internal fun ModsPage(trees: Map<TreeSource, Set<Tree>>): Drawable {
             Text("oneconfig.mods.none.desc", fontSize = 14f),
             size = Vec2(1130f, 635f),
             alignment = Align(main = Align.Content.Center, pad = Vec2(18f, 18f), mode = Align.Mode.Vertical, wrap = Align.Wrap.NEVER),
-        ).namedId("EmptyModsPage")
+        ).namedId("oneconfig.mods")
     }
 
     // todo add categories
@@ -64,7 +64,7 @@ internal fun ModsPage(trees: Map<TreeSource, Set<Tree>>): Drawable {
         }.reorder(order),
         visibleSize = Vec2(1130f, 635f),
         alignment = Align(line = Align.Line.Start, pad = Vec2(18f, 18f)),
-    ).makeRearrangeableGrid().namedId("ModsPage").events {
+    ).makeRearrangeableGrid().named("oneconfig.mods").events {
         Event.Lifetime.Removed then {
             ConfigManager.internal().folder.resolve("mods_ordering").writeText(sb.toString(), Charsets.UTF_8, StandardOpenOption.CREATE, StandardOpenOption.WRITE, StandardOpenOption.TRUNCATE_EXISTING)
         }
@@ -103,7 +103,7 @@ private fun ModCard(
         alignment = modBoxAlign,
     ).onClick { _ ->
         when (source) {
-            TreeSource.CONFIG -> OneConfigUI.openPage(ConfigVisualizer.INSTANCE.get(tree), tree.title ?: tree.id)
+            TreeSource.CONFIG -> OneConfigUI.openPage(ConfigVisualizer.INSTANCE.get(tree))
             TreeSource.COMMAND -> Platform.compatibility().executeTreeAction(tree.id)
             TreeSource.COMPAT -> tree.getMetadata<() -> Unit>("on_click")?.invoke() ?: Unit
         }
