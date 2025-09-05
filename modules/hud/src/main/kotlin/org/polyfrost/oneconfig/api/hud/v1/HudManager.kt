@@ -133,6 +133,7 @@ object HudManager {
     @JvmStatic
     fun register(hud: Hud<*>) {
         hudProviders[hud::class.java] = hud
+        if (hud.updateFrequency() == 0L) LOGGER.warn("update of HUD ${hud.title} is 0, this is not recommended!")
     }
 
     @JvmStatic
@@ -331,13 +332,14 @@ object HudManager {
 
     @ApiStatus.Internal
     fun openHudEditor(hud: Hud<*>) {
-        if (!panelOpen) toggle()
         panel[0][3] = HudSettingsPage(hud)
+        if (!panelOpen) toggle()
     }
 
     private fun editorClose() {
         toggleHudPicker()
         polyUI.unfocus()
+        removeMenu()
         ConfigManager.active().saveAll()
     }
 

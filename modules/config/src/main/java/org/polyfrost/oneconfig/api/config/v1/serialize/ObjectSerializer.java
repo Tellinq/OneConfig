@@ -28,6 +28,7 @@ package org.polyfrost.oneconfig.api.config.v1.serialize;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.jetbrains.annotations.NotNull;
 import org.polyfrost.oneconfig.api.config.v1.exceptions.SerializationException;
 import org.polyfrost.oneconfig.api.config.v1.serialize.adapter.Adapter;
 import org.polyfrost.oneconfig.api.config.v1.serialize.adapter.impl.ColorAdapter;
@@ -37,7 +38,6 @@ import java.lang.reflect.Array;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.util.*;
-import java.util.function.Function;
 import java.util.stream.Stream;
 
 import static org.polyfrost.oneconfig.utils.v1.WrappingUtils.*;
@@ -50,6 +50,7 @@ public class ObjectSerializer {
      */
     public static final int FIELD_SKIP_MODIFIERS = Modifier.STATIC | Modifier.TRANSIENT | 0x00001000;
     private static final Logger LOGGER = LogManager.getLogger("OneConfig/Config");
+    private static final IdentityHashMap<Class<?>, Field[]> CLASS_FIELD_CACHE = new IdentityHashMap<>(32);
 
     static {
         INSTANCE.registerTypeAdapter(new ColorAdapter());
@@ -64,18 +65,30 @@ public class ObjectSerializer {
         if (in == null) return true;
         Class<?> cls = in.getClass();
         // these classes are never serializable.
-        return !Runnable.class.isAssignableFrom(cls) && !Function.class.getPackage().equals(cls.getPackage());
+        return !Runnable.class.isAssignableFrom(cls) &&
+                !Thread.class.isAssignableFrom(cls) &&
+                !ClassLoader.class.isAssignableFrom(cls) &&
+                !cls.getName().startsWith("java.util.function");
     }
 
+    public static Field[] getAllFields(Class<?> cls) {
+        return CLASS_FIELD_CACHE.computeIfAbsent(cls, k -> {
+            List<Field> all = new ArrayList<>();
+            Class<?> current = k;
+            while (current != null && current != Object.class) {
+                for (Field f : current.getDeclaredFields()) {
+                    if ((f.getModifiers() & FIELD_SKIP_MODIFIERS) == 0) {
+                        all.add(f);
+                    }
+                }
+                current = current.getSuperclass();
+            }
+            return all.toArray(new Field[0]);
+        });
+    }
 
-    /**
-     * Return a stream of all the fields in this object, including the fields of its superclasses.
-     */
     public static Stream<Field> fieldStream(Class<?> cls) {
-        Stream<Field> fields = Arrays.stream(cls.getDeclaredFields());
-        Class<?> superClass = cls.getSuperclass();
-        if (superClass == Object.class) return fields;
-        return superClass == null ? fields : Stream.concat(fields, fieldStream(superClass));
+        return Arrays.stream(getAllFields(cls));
     }
 
     private static void stderrMap(Map<String, Object> map) {
@@ -328,26 +341,54 @@ public class ObjectSerializer {
         if (o == null) {
             throw new SerializationException("Failed to deserialize object: Failed to instantiate " + cls.getName());
         }
+        return _deserialize(in, o, (Class) cls);
+    }
+
+    @SuppressWarnings("unchecked")
+    private <T> T _deserialize(Map<String, Object> in, @NotNull T theObject, Class<T> cls) {
         // asm: it is much faster to iterate over every field and use map to get the potential serialized object
         // than the other way around.
-        fieldStream(cls).filter(f -> (f.getModifiers() & FIELD_SKIP_MODIFIERS) == 0).forEach(f -> {
+        fieldStream(cls).forEach(f -> {
             Object value = in.get(f.getName());
             if (value == null) return;
             try {
                 MHUtils.setAccessible(f);
                 if (value instanceof Map) {
                     Map<String, Object> m = (Map<String, Object>) value;
-                    f.set(o, _deserialize(m, f.getType()));
+                    f.set(theObject, _deserialize(m, f.getType()));
                 } else {
                     Object out = richCast(value, f.getType());
-                    f.set(o, out);
+                    f.set(theObject, out);
                 }
             } catch (Throwable e) {
                 String detail = e.getMessage() != null ? e.getMessage() : "no detail message (potential field access issue?)";
                 throw new SerializationException("Failed to deserialize " + cls.getName() + ": " + detail, e);
             }
         });
-        return o;
+        return theObject;
     }
 
+
+    public static <T> T overwrite(T self, T input) {
+        if (self == null) return null;
+        if (input == null) return self;
+        if (self == input) return self;
+        Class<?> cls = self.getClass();
+        if (!cls.isAssignableFrom(input.getClass())) {
+            throw new IllegalArgumentException("Cannot merge two objects of different classes: " + cls.getName() + " and " + input.getClass().getName());
+        }
+        fieldStream(cls).forEach(f -> {
+            try {
+                MHUtils.setAccessible(f);
+                Object newIn = f.get(input);
+                if (newIn == null) return;
+                f.set(self, newIn);
+            } catch (Throwable e) {
+                String detail = e.getMessage() != null ? e.getMessage() : "no detail message (potential field access issue?)";
+                throw new SerializationException("Failed to overwrite " + cls.getName() + ": " + detail, e);
+            }
+        });
+
+        return self;
+    }
 }

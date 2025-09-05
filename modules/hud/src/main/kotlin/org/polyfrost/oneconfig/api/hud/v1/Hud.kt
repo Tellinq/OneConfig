@@ -26,7 +26,6 @@
 
 package org.polyfrost.oneconfig.api.hud.v1
 
-import dev.deftu.omnicore.client.render.GuiScale
 import org.jetbrains.annotations.ApiStatus
 import org.jetbrains.annotations.MustBeInvokedByOverriders
 import org.polyfrost.oneconfig.api.config.v1.Config
@@ -41,7 +40,6 @@ import org.polyfrost.oneconfig.api.event.v1.events.HudEvent
 import org.polyfrost.oneconfig.api.event.v1.events.ScreenOpenEvent
 import org.polyfrost.oneconfig.api.event.v1.invoke.EventHandler
 import org.polyfrost.oneconfig.api.hud.v1.HudManager.LOGGER
-import org.polyfrost.oneconfig.api.ui.v1.keybind.KeybindManager
 import org.polyfrost.oneconfig.api.ui.v1.keybind.OCKeybindHelper
 import org.polyfrost.polyui.color.PolyColor
 import org.polyfrost.polyui.component.Component
@@ -64,8 +62,8 @@ import kotlin.random.Random
  * - You need to register your HUD with [HudManager.register] in order for it to be available to the user.
  * - **Your HUD's size and positioning, if you are manually specifying it, needs to be designed for a `1920x1080` screen**.
  * - The instance you pass to [HudManager.register] is the instance that is used for the HUD picker screen. When a HUD is added to the screen, a new instance is created using [clone].
- * - HUD config files are stored in `{profile}/huds/{rnd}-`[getID], e.g. `huds/42-my_hud.toml`.
- * - For a hud instance, the following methods are called (in order) [create], [init], and then [periodically][updateFrequency] [update] if required.
+ * - HUD config files are stored in `{profile}/huds/{rnd}-`[id], e.g. `huds/42-my_hud.toml`.
+ * - For a hud instance, the following methods are called (in order) [create], and then [periodically][updateFrequency] [update] if required.
  * - Try not to do really long operations in [update]. The method is called on the render thread and so may cause lag. If you need to do a long operation, consider using an asynchronous task.
  * - The parent of your HUD is a [Block] which is controlled by the user. **You do not need to include a background in your HUD.**
  * - HUDs which are wider than 450px may have issues when displayed on the HUD picker screen, and HUDs this large are not recommended anyway as they may be very distracting.
@@ -90,10 +88,10 @@ abstract class Hud<T : Drawable>(id: String, title: String, val category: Catego
     var showInScreens = true
 
     @Keybind(title = "Toggle HUD Key")
-    var toggleKey: KeyBinder.Bind? = (OCKeybindHelper.builder().does { if (it) hidden = !hidden } as OCKeybindHelper).build()
+    var toggleKey: KeyBinder.Bind? = null
 
     @Keybind(title = "Show HUD Key")
-    var showKey: KeyBinder.Bind? = (OCKeybindHelper.builder().does { hidden = !it } as OCKeybindHelper).build()
+    var showKey: KeyBinder.Bind? = null
 
     // we don't need to use this as we initialize in our own way.
     override fun addToInitQueue() {}
@@ -119,18 +117,18 @@ abstract class Hud<T : Drawable>(id: String, title: String, val category: Catego
             tree.title = title
             tree.addMetadata("category", category)
             tree.addMetadata("hidden", true)
+            val hud = get()
             tree["x"] = ktProperty(hud::x)
             tree["y"] = ktProperty(hud::y)
             inspect(hud, tree)
             addToSerialized(tree)
             tree["hudClass"] = simple(value = out::class.java.name)
-            if (with != null) {
-                tree.overwrite(with, true)
-            } else LOGGER.info("generated new HUD config for $title -> ${tree.id}")
             addHideHandlers(tree)
-            this.tree = tree
             addCallbacks(tree)
+            if (with == null) LOGGER.info("generated new HUD config for $title -> ${tree.id}")
             ConfigManager.active().register(tree)
+            if (showKey?.isBound == true) hidden = true
+            this.tree = tree
         }
         return out
     }
@@ -140,7 +138,6 @@ abstract class Hud<T : Drawable>(id: String, title: String, val category: Catego
      */
     protected open fun addCallbacks(tree: Tree) {
         // initial
-        bgUseSetSize = staticWidth
         tree.getProp<Boolean>("staticWidth")?.addCallback {
             bgUseSetSize = it
             false
@@ -169,10 +166,6 @@ abstract class Hud<T : Drawable>(id: String, title: String, val category: Catego
             // because otherwise you couldn't edit it (which sucks)
             if (HudManager.panelExists) hidden = false
         }
-        // asm: run initial
-        if (!showInF3) hideF3Handler.register()
-        if (!showInTab) hideTabHandler.register()
-        if (!showInScreens) hideScreenHandler.register()
         tree.getProp<Boolean>("showInF3")?.addCallback {
             if (!it) hideF3Handler.register()
             else hideF3Handler?.unregister()
@@ -189,16 +182,8 @@ abstract class Hud<T : Drawable>(id: String, title: String, val category: Catego
             false
         }
 
-        toggleKey?.let {
-            it.action = { if (it) hidden = !hidden; false }
-            KeybindManager.registerKeybind(it)
-        }
-
-        showKey?.let {
-            it.action = { hidden = !it; false }
-            KeybindManager.registerKeybind(it)
-            if (it.isBound) hidden = true
-        }
+        showKey = (OCKeybindHelper.builder().does { hidden = !it } as OCKeybindHelper).register()
+        toggleKey = (OCKeybindHelper.builder().does { if (it) hidden = !hidden } as OCKeybindHelper).register()
     }
 
     private fun inspect(cmp: Component, tree: Tree) {

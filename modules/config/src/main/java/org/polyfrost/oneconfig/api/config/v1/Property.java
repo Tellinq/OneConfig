@@ -28,6 +28,7 @@ package org.polyfrost.oneconfig.api.config.v1;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.polyfrost.oneconfig.api.config.v1.serialize.ObjectSerializer;
 import org.polyfrost.oneconfig.utils.v1.MHUtils;
 import org.polyfrost.oneconfig.utils.v1.WrappingUtils;
 
@@ -183,10 +184,10 @@ public abstract class Property<T> extends Node implements Serializable {
     public void overwrite(Node with, boolean preserveMissingOptions) {
         if (!(with instanceof Property)) throw new IllegalArgumentException("Cannot overwrite a property with a non-property");
         if (!Objects.equals(this.getID(), with.getID())) throw new IllegalArgumentException("ID should be the same for overwrite");
-        Property<T> that = (Property<T>) with;
+        Property<?> that = (Property<?>) with;
         this.addMetadata(that.getMetadata());
-        T in = that.get();
-        if (in != null) this.setReferential(in);
+        Object in = that.get();
+        if (in != null) this.setAsReferential(in);
         if (that.conditions != null) this.addDisplayCondition(that.conditions);
         if (that.callbacks != null) addCallback((Collection) that.callbacks);
     }
@@ -366,18 +367,28 @@ public abstract class Property<T> extends Node implements Serializable {
     static final class Field<T> extends Property<T> {
         private final java.lang.reflect.Field field;
         private final Object owner;
+        private final boolean complex;
 
         Field(@Nullable String title, @Nullable String description, @NotNull java.lang.reflect.Field field, @Nullable Object owner) {
             super(field.getName(), title, description, (Class<T>) field.getType());
             this.field = field;
             this.owner = owner;
             MHUtils.setAccessible(field);
+            this.complex = !WrappingUtils.isSimpleClass(type);
         }
 
         @Override
         public void set0(@Nullable T value) {
             try {
-                field.set(owner, value);
+                T it = get();
+                if (it != null && complex) {
+                    try {
+                        // default behavior will attempt
+                        ObjectSerializer.overwrite(it, value);
+                    } catch (Throwable ignored) {
+                        field.set(owner, value);
+                    }
+                } else field.set(owner, value);
             } catch (IllegalAccessException e) {
                 throw new RuntimeException(e);
             }
