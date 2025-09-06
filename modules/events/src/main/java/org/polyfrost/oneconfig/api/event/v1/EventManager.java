@@ -162,7 +162,7 @@ public final class EventManager {
         Collection<EventHandler<?>> set = handlers.get(handler.getEventClass());
         if (set == null) return false;
         if (!set.remove(handler)) {
-            LOGGER.warn("Attempted to unregister a handler that was not registered!");
+            // LOGGER.warn("Attempted to unregister a handler that was not registered!");
             return false;
         }
         return true;

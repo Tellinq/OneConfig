@@ -28,6 +28,7 @@ package org.polyfrost.oneconfig.internal.ui.pages
 
 import org.polyfrost.oneconfig.internal.ui.OneConfigUI
 import org.polyfrost.polyui.component.Drawable
+import org.polyfrost.polyui.component.extensions.named
 import org.polyfrost.polyui.component.extensions.onClick
 import org.polyfrost.polyui.component.extensions.setFont
 import org.polyfrost.polyui.component.extensions.withHoverStates
@@ -41,7 +42,7 @@ import org.polyfrost.polyui.utils.mapToArray
 import org.polyfrost.polyui.utils.translated
 
 fun ThemesPage(): Drawable {
-    return Group()
+    return Group().named("oneconfig.themes")
 }
 
 fun FeedbackPage(): Drawable {
@@ -54,7 +55,7 @@ fun FeedbackPage(): Drawable {
         size = Vec2(1130f, 0f),
         visibleSize = Vec2(1130f, 635f),
         alignment = Align(line = Align.Line.Start, mode = Align.Mode.Vertical, pad = Vec2(18f, 18f)),
-    )
+    ).named("oneconfig.feedback")
 }
 
 fun ProfilesPage(): Drawable {
@@ -87,8 +88,8 @@ fun ChangelogPage(news: Collection<News>): Drawable {
                                     alignment = Align(line = Align.Line.Start),
                                     size = Vec2(1130f, 0f),
                                     visibleSize = Vec2(1130f, 635f),
-                                )
-                            OneConfigUI.openPage(page, it.title)
+                                ).named(it.title)
+                            OneConfigUI.openPage(page)
                             // todo switch
                         },
                         size = Vec2(612f, 12f),
@@ -98,5 +99,5 @@ fun ChangelogPage(news: Collection<News>): Drawable {
                 ),
             )
         },
-    )
+    ).named("oneconfig.changelog")
 }

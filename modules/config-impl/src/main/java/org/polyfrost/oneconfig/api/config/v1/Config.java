@@ -226,10 +226,6 @@ public abstract class Config {
         return p;
     }
 
-    private static IllegalStateException notInitialized() {
-        return new IllegalStateException("not initialized. this should never happen in correct usage. please report to https://polyfrost.org/discord");
-    }
-
     public void save() {
         if (tree == null) return; // not initialized, nothing to save
         ConfigManager.active().save(tree);

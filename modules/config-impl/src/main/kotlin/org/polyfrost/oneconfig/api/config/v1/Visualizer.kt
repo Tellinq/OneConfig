@@ -26,6 +26,7 @@
 
 package org.polyfrost.oneconfig.api.config.v1
 
+import dev.deftu.omnicore.client.OmniClient
 import org.polyfrost.oneconfig.api.config.v1.internal.ConfigVisualizer.Companion.strv
 import org.polyfrost.polyui.color.PolyColor
 import org.polyfrost.polyui.color.asMutable
@@ -41,7 +42,6 @@ import org.polyfrost.polyui.unit.Vec2
 import org.polyfrost.polyui.utils.image
 import org.polyfrost.polyui.utils.mapToArray
 import java.util.function.Predicate
-import kotlin.jvm.java
 import kotlin.math.roundToInt
 
 /**
@@ -68,13 +68,14 @@ fun interface Visualizer {
             if (p !is PolyColor.Mutable) {
                 prop.setAsReferential(p.asMutable())
             }
-            val s = Block(color = prop.getAs(), size = Vec2(58f, 32f)).withBorder(3f, color = { page.border20 })
-                .onClick { ColorPicker(State(prop.getAs()), polyUI); true }
+            val state = State(prop.getAs<PolyColor.Mutable>())
+            val out = Block(color = state.value, size = Vec2(58f, 32f)).withBorder(3f, color = { page.border20 })
+            out.onClick { ColorPicker(state, polyUI, attachedDrawable = out); true }
             prop.addCallback {
-                s.color = it as PolyColor
+                state.value = (it as PolyColor).asMutable()
                 false
             }
-            return s
+            return out
         }
     }
 
@@ -115,10 +116,12 @@ fun interface Visualizer {
     }
 
     class KeybindVisualizer : Visualizer {
+        private val KEY_MAPPER: ((Int) -> String) = { OmniClient.getKeyDisplayName(it) }
+
         override fun visualize(prop: Property<*>): Drawable {
             return Block(
                 Image("assets/oneconfig/ico/keyboard.svg".image(), at = Vec2(7f, 7f)),
-                Text(prop.getAs<KeyBinder.Bind>().keysToString("oneconfig.keybinds.none")),
+                Text(prop.getAs<KeyBinder.Bind>().keysToString("oneconfig.keybinds.none", KEY_MAPPER)),
                 size = Vec2(230f, 32f),
                 alignment = Align(main = Align.Content.Center, wrap = Wrap.NEVER),
             ).onInit {

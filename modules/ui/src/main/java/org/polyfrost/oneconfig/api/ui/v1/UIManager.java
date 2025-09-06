@@ -31,9 +31,6 @@ import dev.deftu.omnicore.client.render.OmniMatrixStack;
 import dev.deftu.omnicore.client.render.OmniResolution;
 import dev.deftu.omnicore.client.render.framebuffer.ManagedFramebuffer;
 import dev.deftu.omnicore.client.render.pipeline.OmniRenderPipeline;
-import dev.deftu.omnicore.client.render.state.OmniManagedAlphaState;
-import dev.deftu.omnicore.client.render.state.OmniManagedBlendState;
-import dev.deftu.omnicore.client.render.state.OmniManagedDepthState;
 import dev.deftu.omnicore.client.render.texture.GpuTexture;
 import dev.deftu.textile.minecraft.MCSimpleTextHolder;
 import dev.deftu.textile.minecraft.MCTextFormat;
@@ -116,7 +113,7 @@ public interface UIManager {
             ManagedFramebuffer framebuffer = new ManagedFramebuffer(width, height, GpuTexture.TextureFormat.RGBA8, GpuTexture.TextureFormat.DEPTH24_STENCIL8);
 
             Settings settings = new Settings();
-            settings.enableDebugMode(true);
+            settings.enableDebugMode(false);
             settings.enableInitCleanup(false);
 
             PolyUI polyUI = new PolyUI(new Component[0], getRenderer(), settings, 1920f, 1080f);

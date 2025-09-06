@@ -33,14 +33,14 @@ import org.polyfrost.polyui.utils.nullIfEmpty
 /**
  * Java builder-style helper for creating keybinds.
  */
-class OCKeybindHelper : KeybindHelper() {
+class OCKeybindHelper : KeybindHelper<OCKeybindHelper>() {
     private var inScreens = false
 
     override fun build(): KeyBinder.Bind {
         val func = func ?: throw IllegalStateException("Function must be set")
         return if (!inScreens) BindNotInScreen(
             unmappedKeys.nullIfEmpty()?.toIntArray(),
-            keys.nullIfEmpty()?.toTypedArray(),
+            keys.ifEmpty { null }?.toTypedArray(),
             mouse.nullIfEmpty()?.toIntArray(),
             mods, duration, func
         ) else super.build()

@@ -52,14 +52,12 @@ import org.polyfrost.polyui.data.Cursor
 import org.polyfrost.polyui.data.Font
 import org.polyfrost.polyui.data.PolyImage
 import org.polyfrost.polyui.event.Event
-import org.polyfrost.polyui.input.KeyBinder
-import org.polyfrost.polyui.input.KeyModifiers
-import org.polyfrost.polyui.input.Modifiers
 import org.polyfrost.polyui.operations.Move
 import org.polyfrost.polyui.operations.Recolor
 import org.polyfrost.polyui.unit.Align
 import org.polyfrost.polyui.unit.Vec2
 import org.polyfrost.polyui.unit.seconds
+import org.polyfrost.polyui.utils.fastEach
 import org.polyfrost.polyui.utils.image
 
 object OneConfigUI {
@@ -75,6 +73,11 @@ object OneConfigUI {
 
     private lateinit var ui: Drawable
     private var window: Any? = null
+    private val previous = ArrayList<Component>(5)
+    private var current: Component? = null
+    private val next = ArrayList<Component>(5)
+    private var prevArrow: Drawable? = null
+    private var nextArrow: Drawable? = null
 
     private fun collectTrees(): Map<TreeSource, Set<Tree>> {
         val result = mutableMapOf<TreeSource, MutableSet<Tree>>()
@@ -108,7 +111,7 @@ object OneConfigUI {
     }
 
     @JvmOverloads
-    fun open(initialScreen: Component = ModsPage(collectTrees())) {
+    fun open(initialScreen: Component? = null) {
         if (window == null) {
             val builder = OCPolyUIBuilder.create()
                 .blurs()
@@ -139,7 +142,7 @@ object OneConfigUI {
                     SidebarButton(
                         "assets/oneconfig/ico/settings.svg".image(),
                         "oneconfig.mods",
-                    ).onClick { openPage(ModsPage(collectTrees()), "oneconfig.mods") },
+                    ).onClick { openPage(ModsPage(collectTrees())) },
                     SidebarButton(
                         "assets/oneconfig/ico/profiles.svg".image(),
                         "oneconfig.profiles",
@@ -147,16 +150,16 @@ object OneConfigUI {
                     SidebarButton("assets/oneconfig/ico/keyboard.svg".image(), "oneconfig.keybinds").sidebarDisable(),
                     Text("oneconfig.sidebar.title.personal", fontSize = 11f).setPalette { text.secondary }.padded(0f, 12f, 0f, 0f),
                     SidebarButton("assets/oneconfig/ico/paintbrush.svg".image(), "oneconfig.themes", label("oneconfig.soon")).onClick {
-                        openPage(ThemesPage(), "oneconfig.themes")
+                        openPage(ThemesPage())
                     }.sidebarDisable(),
                     SidebarButton("assets/oneconfig/ico/cog.svg".image(), "oneconfig.preferences").onClick {
-                        openPage(ConfigVisualizer.INSTANCE.get(ConfigManager.active().get("oneconfig.json")), "oneconfig.preferences")
+                        openPage(ConfigVisualizer.INSTANCE.get(ConfigManager.active().get("oneconfig.json")).named("oneconfig.preferences"))
                     },
                     Text("oneconfig.sidebar.title.extra", fontSize = 11f).setPalette { text.secondary }.padded(0f, 12f, 0f, 0f),
                     SidebarButton("assets/oneconfig/ico/refresh.svg".image(), "oneconfig.changelog"),
                     SidebarButton(
                         "assets/oneconfig/ico/text.svg".image(), "oneconfig.feedback"
-                    ).onClick { openPage(FeedbackPage(), "oneconfig.feedback") },
+                    ).onClick { openPage(FeedbackPage()) },
                     SidebarButton0(
                         "assets/oneconfig/ico/hud.svg".image(),
                         "oneconfig.edithud",
@@ -171,12 +174,22 @@ object OneConfigUI {
                 Group(
                     Group(
                         Group(
-                            Image("assets/oneconfig/ico/left-arrow.svg".image()).named("Back").disable(),
-                            Image("assets/oneconfig/ico/right-arrow.svg".image()).named("Forward").disable(),
-                            Text(
-                                "oneconfig.mods",
-                                fontSize = 24f,
-                            ).setFont { semiBold }.named("Current"),
+                            Image("assets/oneconfig/ico/left-arrow.svg".image()).named("Back").also { prevArrow = it }.disable().onClick {
+                                val prev = previous.removeLastOrNull() ?: return@onClick false
+                                if (previous.isEmpty()) prevArrow?.disable()
+                                val current = current
+                                openPage(prev, SetAnimation.SlideRight, addToPrev = false, clearNext = false)
+                                next.add(current ?: return@onClick false)
+                                nextArrow?.disable(false)
+                                false
+                            },
+                            Image("assets/oneconfig/ico/right-arrow.svg".image()).named("Forward").also { nextArrow = it }.disable().onClick {
+                                val nextDrawable = next.removeLastOrNull() ?: return@onClick false
+                                if (next.isEmpty()) nextArrow?.disable()
+                                openPage(nextDrawable, clearNext = false)
+                                false
+                            },
+                            Text("oneconfig.mods", fontSize = 24f).setFont { semiBold }.named("Current"),
                             alignment = Align(pad = Vec2(16f, 8f), wrap = Align.Wrap.NEVER),
                         ).named("Controls"),
                         Group(
@@ -196,13 +209,21 @@ object OneConfigUI {
                                         visibleSize = Vec2(210f, 12f),
                                     ).onChange { text: String ->
                                         if (text.length > 2) {
-                                            val scale = Vec2(polyUI.size.x / polyUI.iSize.x, polyUI.size.y / polyUI.iSize.y)
-                                            val search = Group(children = ConfigVisualizer.INSTANCE.getMatching(text).toTypedArray(), visibleSize = Vec2(1130f, 635f) * scale)
-                                            if (search.children.isNullOrEmpty()) search.addChild(searchNoneFound)
-                                            search.setup(polyUI)
-                                            openPage(search, "oneconfig.search", SetAnimation.Fade)
+                                            if(current?.name != "oneconfig.search") {
+                                                val search = Group(children = ConfigVisualizer.INSTANCE.getMatching(text).toTypedArray(), visibleSize = Vec2(1130f, 635f)).named("oneconfig.search")
+                                                if (search.children.isNullOrEmpty()) search.addChild(searchNoneFound)
+                                                search.setup(polyUI)
+                                                openPage(search, SetAnimation.Fade)
+                                            } else {
+                                                val search = current as Group
+                                                search.children?.clear()
+                                                ConfigVisualizer.INSTANCE.getMatching(text).fastEach {
+                                                    search.addChild(it, recalculate = false)
+                                                }
+                                                search.recalculate(false)
+                                            }
                                         } else {
-                                            openPage(ModsPage(collectTrees()), "oneconfig.mods", SetAnimation.Fade)
+                                            openPage(ModsPage(collectTrees()), SetAnimation.Fade)
                                         }
 
                                         false
@@ -224,15 +245,15 @@ object OneConfigUI {
                         size = Vec2(1130f, 64f),
                         alignment = Align(main = Align.Content.SpaceBetween),
                     ).named("Header"),
-                    initialScreen,
+                    (initialScreen ?: ModsPage(collectTrees())).also { current = it },
                     size = Vec2(1127f, 700f),
                     alignment = Align(line = Align.Line.Start, pad = Vec2.ZERO),
                 ),
             )
-            polyUI.keyBinder?.add(KeyBinder.Bind(char = 'F', mods = Modifiers(KeyModifiers.CONTROL)) {
-                polyUI.focus(searchField)
-                false
-            })
+//            polyUI.keyBinder?.add(KeyBinder.Bind(unmappedKeys = arrayOf(OmniKeyboard.KEY_F), mods = Modifiers(KeyModifiers.PRIMARY)) {
+//                polyUI.focus(searchField)
+//                false
+//            })
             ui = polyUI.master
             window = win
             searchNoneFound.setup(polyUI)
@@ -243,10 +264,7 @@ object OneConfigUI {
             }
         } else {
             Platform.screen().display(window)
-            if (ui[1][1] != initialScreen) {
-                // todo revisit this
-                //openPage(initialScreen, "oneconfig.mods")
-            }
+            openPage(initialScreen, SetAnimation.None)
         }
     }
 
@@ -256,9 +274,19 @@ object OneConfigUI {
         }
     }
 
-    fun openPage(page: Component, name: String, animation: SetAnimation = SetAnimation.SlideLeft) {
+    fun openPage(page: Component?, animation: SetAnimation = SetAnimation.SlideLeft, clearNext: Boolean = true, addToPrev: Boolean = true) {
+        if (page == null || current === page || page.name == current?.name) return
+        if (clearNext) {
+            next.clear()
+            nextArrow?.disable()
+        }
+        if (addToPrev) current?.let {
+            previous.add(it)
+            prevArrow?.disable(false)
+        }
+        current = page
+        val translated = ui.polyUI.translator.translate(page.name)
         val title = ui[1][0][0][2] as Text
-        val translated = ui.polyUI.translator.translate(name)
         title._text = translated
         val prev = ui[1][1]
         ui[1].set(prev, page, animation)

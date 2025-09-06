@@ -31,6 +31,16 @@ import java.lang.reflect.Field
 import kotlin.reflect.KMutableProperty0
 
 object Properties {
+//    private val specialMap = HashMap<Class<*>, Supplier<*>>()
+//
+//    fun interface Supplier<T> {
+//        fun create(id: String?, name: String?, description: String?, value: T?): Property<T>
+//    }
+//
+//    fun <T> registerCustomSupplier(cls: Class<T>, supplier: Supplier<T>) {
+//        specialMap[cls] = supplier
+//    }
+
     /**
      * create a new property which is internally backed by a field.
      */

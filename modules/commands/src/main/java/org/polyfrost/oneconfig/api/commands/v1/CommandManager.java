@@ -93,7 +93,7 @@ public class CommandManager {
             }
 
             OmniClientCommands.register(node);
-            LOGGER.info("Registered command node for object {}: {}", obj, node.getName());
+//            LOGGER.info("Registered command node for object {}: {}", obj, node.getName());
         }
 
         return true;

@@ -110,12 +110,14 @@ public final class ConfigManager {
             return;
         }
         initialized = true;
-        LOGGER.info("initializing {} configs", pendingInitialization.size());
+        long t1 = System.nanoTime();
+        LOGGER.info("Initializing {} configs...", pendingInitialization.size());
         while (!pendingInitialization.isEmpty()) {
             Config config = pendingInitialization.poll();
             if (config != null) config.initialize(true);
         }
         // newOrUpdatedModIds = Collections.unmodifiableList(doModsListScan());
+        LOGGER.info("Initialized configs in {}ms", (System.nanoTime() - t1) / 1_000_000.0);
     }
 
     @ApiStatus.Internal
@@ -172,6 +174,7 @@ public final class ConfigManager {
         if (result.state == Backend.RegistrationResult.NEW) {
             // asm: first run
             isFirstRun = true;
+            LOGGER.info("Welcome to OneConfig!");
         }
         String activeProfile = result.get().getProp("activeProfile").getAs();
         openProfile(activeProfile);

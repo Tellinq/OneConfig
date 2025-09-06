@@ -134,6 +134,7 @@ public class OneConfig
         //$$ } catch (Throwable ignored) {
         //$$ }
         //#endif
+        long t1 = System.nanoTime();
         OmniLoader.ModInfo self = OmniLoader.getModInfo("oneconfig");
         String v = self == null ? "LOCAL" : self.getVersion();
         LOGGER.info("Loading OneConfig v{}", v);
@@ -148,7 +149,7 @@ public class OneConfig
         registerEventHandlers();
 
         initialized = true;
-        LOGGER.info("OneConfig initialized!");
+        LOGGER.info("OneConfig initialization took {}ms", (System.nanoTime() - t1) / 1_000_000.0);
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})
@@ -268,7 +269,7 @@ public class OneConfig
             throw new IllegalStateException("Failed to preload necessary PolyUI classes", e);
         }
 
-        LOGGER.info("PolyUI preload took {}ms", (System.nanoTime() - t1) / 1_000_000.0);
+        LOGGER.info("  -> PolyUI preload took {}ms", (System.nanoTime() - t1) / 1_000_000.0);
     }
 
     private static void preloadCopycat() {
@@ -280,6 +281,6 @@ public class OneConfig
             throw new IllegalStateException("Failed to preload necessary Copycat classes", e);
         }
 
-        LOGGER.info("Copycat preload took {}ms", (System.nanoTime() - t1) / 1_000_000.0);
+        LOGGER.info("  -> Copycat preload took {}ms", (System.nanoTime() - t1) / 1_000_000.0);
     }
 }
