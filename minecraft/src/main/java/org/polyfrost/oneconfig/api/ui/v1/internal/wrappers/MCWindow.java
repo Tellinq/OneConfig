@@ -104,7 +104,7 @@ public class MCWindow extends Window {
 
     @NotNull
     @Override
-    public String getKeyName(int i) {
-        return OmniClient.getKeyDisplayName(i, 0);
+    public String getKeyName(int keyCode, int scanCode) {
+        return OmniClient.getKeyDisplayName(keyCode, scanCode);
     }
 }

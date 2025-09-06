@@ -52,9 +52,6 @@ import org.polyfrost.polyui.data.Cursor
 import org.polyfrost.polyui.data.Font
 import org.polyfrost.polyui.data.PolyImage
 import org.polyfrost.polyui.event.Event
-import org.polyfrost.polyui.input.KeyBinder
-import org.polyfrost.polyui.input.KeyModifiers
-import org.polyfrost.polyui.input.Modifiers
 import org.polyfrost.polyui.operations.Move
 import org.polyfrost.polyui.operations.Recolor
 import org.polyfrost.polyui.unit.Align
@@ -62,7 +59,6 @@ import org.polyfrost.polyui.unit.Vec2
 import org.polyfrost.polyui.unit.seconds
 import org.polyfrost.polyui.utils.fastEach
 import org.polyfrost.polyui.utils.image
-import org.polyfrost.polyui.utils.rescaleToPolyUIInstance
 
 object OneConfigUI {
     // Should only be used for native compat trees that require custom on click methods
@@ -254,10 +250,10 @@ object OneConfigUI {
                     alignment = Align(line = Align.Line.Start, pad = Vec2.ZERO),
                 ),
             )
-            polyUI.keyBinder?.add(KeyBinder.Bind(char = 'F', mods = Modifiers(KeyModifiers.CONTROL)) {
-                polyUI.focus(searchField)
-                false
-            })
+//            polyUI.keyBinder?.add(KeyBinder.Bind(unmappedKeys = arrayOf(OmniKeyboard.KEY_F), mods = Modifiers(KeyModifiers.PRIMARY)) {
+//                polyUI.focus(searchField)
+//                false
+//            })
             ui = polyUI.master
             window = win
             searchNoneFound.setup(polyUI)

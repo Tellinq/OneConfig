@@ -26,6 +26,7 @@
 
 package org.polyfrost.oneconfig.api.hud.v1
 
+import dev.deftu.omnicore.client.OmniClient
 import org.jetbrains.annotations.ApiStatus
 import org.polyfrost.oneconfig.api.ui.v1.keybind.KeybindManager
 import org.polyfrost.oneconfig.utils.v1.MHUtils
@@ -179,15 +180,13 @@ abstract class TextHud(
             sb.append("\nUnmapped: ")
             downUnmapped.toIntArray().also {
                 for (i in it) {
-                    if (i in 0..255) sb.append(i.toChar())
-                    else sb.append(i)
-                    sb.append(' ')
+                    sb.append(OmniClient.getKeyDisplayName(i)).append(' ')
                 }
             }
             sb.append("\nKeys: ")
             downKeys.forEach { sb.append(it.name).append(' ') }
             sb.append("\nMods: ")
-            sb.append(KeybindManager.inputManager.keyModifiers.prettyName)
+            sb.append(KeybindManager.inputManager.keyModifiers.name)
             return null
         }
 
