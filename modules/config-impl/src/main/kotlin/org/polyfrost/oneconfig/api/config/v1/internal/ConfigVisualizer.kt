@@ -88,9 +88,11 @@ open class ConfigVisualizer {
         configs.clear()
     }
 
-    fun getMatching(str: String): List<Drawable> {
+    val EMPTY = ArrayList<Drawable>(0)
+
+    fun getMatching(str: String): ArrayList<Drawable> {
         val it = str.trim()
-        if (it.length < 2) return emptyList()
+        if (it.length < 2) return EMPTY
         val out = ArrayList<Drawable>()
         for (config in configs.keys) {
             getMatching(it, config, out)
@@ -163,7 +165,7 @@ open class ConfigVisualizer {
             processNode(config, node, options)
         }
         LOGGER.info("creating config page ${config.title} took ${(System.nanoTime() - now) / 1_000_000f}ms")
-        return makeFinal(flattenSubcategories(options), initialCategory).addRethemingListeners()
+        return makeFinal(flattenSubcategories(options), initialCategory).addRethemingListeners().named(config.title ?: config.id)
     }
 
     protected open fun makeFinal(categories: Map<String, Drawable>, initialCategory: String): Drawable {

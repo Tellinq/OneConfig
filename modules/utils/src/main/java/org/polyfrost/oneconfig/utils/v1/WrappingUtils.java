@@ -180,7 +180,7 @@ public final class WrappingUtils {
 
     public static boolean isSimpleClass(Class<?> c) {
         if (c == null) return true;
-        return Number.class.isAssignableFrom(c) || CharSequence.class.isAssignableFrom(c) || c == Boolean.class || c == Character.class;
+        return c.isEnum() || c.isPrimitive() || Number.class.isAssignableFrom(c) || CharSequence.class.isAssignableFrom(c) || c == Boolean.class || c == Character.class;
     }
 
     /**

@@ -41,6 +41,7 @@ import org.polyfrost.polyui.unit.Align
 import org.polyfrost.polyui.unit.Vec2
 import org.polyfrost.polyui.utils.fastEach
 import org.polyfrost.polyui.utils.image
+import org.polyfrost.polyui.utils.rescaleYToPolyUIInstance
 import kotlin.math.sqrt
 
 private val LOGGER = LogManager.getLogger("OneConfig/HUD")
@@ -82,14 +83,17 @@ val scaleBlob: Image by lazy {
 
             it.scaleX = s
             it.scaleY = s
-            x = it.x + (it.width * s) - (width / 2f)
-            y = it.y + (it.height * s) - (height / 2f)
+            (cur?.getBackground() ?: it).let {
+                val (w, h) = it.visibleSize
+                x = it.x + w - (width / 2f)
+                y = it.y + h - (height / 2f)
+            }
         }
         Unit
     }.onDragEnd {
-        cur?.get()?.let {
+        cur?.getBackground()?.let {
             menu.x = it.x + (it.visibleSize.x / 2f) - (menu.width / 2f)
-            menu.y = it.y - menu.height - 8f
+            menu.y = it.y - menu.height - 8f.rescaleYToPolyUIInstance(polyUI)
         }
         menu.renders = true
     }
@@ -184,7 +188,6 @@ fun Hud<*>.makeAlreadyUsed(): Block {
  */
 fun Hud<*>.build(): Drawable {
     val freq = updateFrequency()
-    if (freq == 0L) LOGGER.warn("update of HUD $this is 0, this is not recommended!")
     val exe = if (freq < 0L) {
         null
     } else {
@@ -229,7 +232,7 @@ private fun <T : Drawable> T.addDefaultBackground(add: Boolean, color: PolyColor
 ).radius(5f).namedId("HudBackground")
 
 private fun Hud<*>.addMenuAndScaler() {
-    this.get().onClick {
+    (this.getBackground() ?: this.get()).onClick {
         val sb = scaleBlob
         sb.renders = true
         val vs = visibleSize
@@ -239,7 +242,7 @@ private fun Hud<*>.addMenuAndScaler() {
         if (!menu.initialized) menu.setup(polyUI)
         menu.renders = true
         menu.x = x + vs.x / 2f - (menu.width / 2f)
-        menu.y = y - menu.height - 8f
+        menu.y = y - menu.height - 8f.rescaleYToPolyUIInstance(polyUI)
         cur = this@addMenuAndScaler
         polyUI.focus(scaleBlob)
         return@onClick false
@@ -296,13 +299,15 @@ fun Drawable.snapHandler() {
     val w = vs.x * scaleX
     val h = vs.y * scaleY
     if (cur?.get() === this) {
-        scaleBlob.let {
-            it.x = x + w - (it.width / 2f)
-            it.y = y + h - (it.height / 2f)
-        }
-        menu.let {
-            it.x = x + (w / 2f) - (it.width / 2f)
-            it.y = y - it.height - 6f
+        (cur?.getBackground() ?: this).apply {
+            scaleBlob.let {
+                it.x = x + w - (it.width / 2f)
+                it.y = y + h - (it.height / 2f)
+            }
+            menu.let {
+                it.x = x + (w / 2f) - (it.width / 2f)
+                it.y = y - it.height - 6f
+            }
         }
     }
     HudManager.slinex = -1f

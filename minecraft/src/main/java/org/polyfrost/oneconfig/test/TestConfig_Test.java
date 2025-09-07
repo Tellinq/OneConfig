@@ -27,6 +27,7 @@
 package org.polyfrost.oneconfig.test;
 
 import dev.deftu.omnicore.client.OmniChat;
+import dev.deftu.omnicore.client.OmniKeyboard;
 import kotlin.Unit;
 import org.polyfrost.oneconfig.api.config.v1.Config;
 import org.polyfrost.oneconfig.api.config.v1.annotations.*;
@@ -38,6 +39,8 @@ import org.polyfrost.polyui.color.PolyColor;
 import org.polyfrost.polyui.input.KeyBinder;
 import org.polyfrost.polyui.input.KeyModifiers;
 import org.polyfrost.polyui.unit.Align;
+
+import java.util.function.Consumer;
 
 @SuppressWarnings("unused")
 public class TestConfig_Test extends Config {
@@ -52,11 +55,8 @@ public class TestConfig_Test extends Config {
     @Number(title = "number", unit = "px", category = "bob")
     public static int number = 50;
 
-    //    @Keybind(title = "keybinding", description = "please send help")
-//    KeyBinder.Bind bind0 = new KeyBinder.Bind('A', null, null, Modifiers.mods(Modifiers.LCONTROL, Modifiers.LSHIFT), () -> {
-//        UChat.chat("you pressed a bind");
-//        return true;
-//    });
+    @Keybind(title = "keybinding", description = "please send help")
+    KeyBinder.Bind bind0 = OCKeybindHelper.builder().keys(OmniKeyboard.KEY_P).mods(KeyModifiers.PRIMARY).does((Consumer<Boolean>) (it) -> OmniChat.displayClientMessage(it ? "pressed keybind" : "released keybind")).register();
     @Slider(title = "Slide", min = 10f, max = 110f, icon = "assets/oneconfig/ico/paintbrush.svg", description = "I do sliding", category = "bob")
     public static float p = 50f;
     @Text(title = "Text")
@@ -96,7 +96,7 @@ public class TestConfig_Test extends Config {
     public float slide = 40f;
 
     @Keybind(title = "keybind")
-    private KeyBinder.Bind bind = ((OCKeybindHelper) OCKeybindHelper.builder().mods(KeyModifiers.CONTROL).chars('g').does((a) -> {
+    private KeyBinder.Bind bind = ((OCKeybindHelper) OCKeybindHelper.builder().mods(KeyModifiers.PRIMARY).keys(OmniKeyboard.KEY_G).does((a) -> {
         Notifications.enqueue(Notifications.Type.Info, "state: " + a);
         return Unit.INSTANCE;
     })).register();
