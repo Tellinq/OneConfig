@@ -27,6 +27,7 @@
 package org.polyfrost.oneconfig.api.ui.v1;
 
 import dev.deftu.omnicore.client.OmniChat;
+import dev.deftu.omnicore.client.render.ImmediateScreenRenderer;
 import dev.deftu.omnicore.client.render.OmniMatrixStack;
 import dev.deftu.omnicore.client.render.OmniResolution;
 import dev.deftu.omnicore.client.render.framebuffer.ManagedFramebuffer;
@@ -129,6 +130,11 @@ public interface UIManager {
                 OmniMatrixStack matrices = event.matrices;
                 Platform.screen().setSmuggledMatrixStack(matrices);
 
+                Object smuggledDrawContext = Platform.screen().getSmuggledDrawContext();
+                if (smuggledDrawContext == null) {
+                    return;
+                }
+
                 framebuffer.clearColor(0f, 0f, 0f, 0f); // Clear to transparent black
                 framebuffer.clearDepthStencil(1.0, 0);
                 framebuffer.usingToRender((matrixStack, w, h) -> {
@@ -144,13 +150,21 @@ public interface UIManager {
                 float scalingFactor = 1f / (float) OmniResolution.getScaleFactor();
                 float scaledWidth = master.getWidth() * scalingFactor * ratio;
                 float scaledHeight = master.getHeight() * scalingFactor * ratio;
-                framebuffer.drawColorTexture(
-                        getRenderPipeline(),
-                        matrices,
-                        0, 0,
-                        scaledWidth, scaledHeight,
-                        Color.WHITE.getRGB()
-                );
+                ImmediateScreenRenderer.INSTANCE.close();
+                ImmediateScreenRenderer.render(smuggledDrawContext, (matrixStack) -> {
+                    framebuffer.drawColorTexture(
+                            getRenderPipeline(),
+                            matrixStack,
+                            0, 0,
+                            scaledWidth, scaledHeight,
+                            -1
+                    );
+
+                    OmniManagedBlendState.disableBlend();
+                    OmniManagedDepthState.disableDepth();
+
+                    return Unit.INSTANCE;
+                });
             });
 
             EventManager.register(ResizeEvent.class, event -> {
