@@ -59,6 +59,7 @@ import org.polyfrost.polyui.unit.Vec2
 import org.polyfrost.polyui.unit.seconds
 import org.polyfrost.polyui.utils.fastEach
 import org.polyfrost.polyui.utils.image
+import org.polyfrost.polyui.utils.rescaleToPolyUIInstance
 
 object OneConfigUI {
     // Should only be used for native compat trees that require custom on click methods
@@ -128,7 +129,6 @@ object OneConfigUI {
             }
             if (!OmniLoader.isDevelopment) builder.pauses()
 
-            val searchField: TextInput
             val (polyUI, win) = builder.makeAndOpenWithRef(
                 Block(
                     Block(
@@ -210,9 +210,9 @@ object OneConfigUI {
                                     ).onChange { text: String ->
                                         if (text.length > 2) {
                                             if(current?.name != "oneconfig.search") {
-                                                val search = Group(children = ConfigVisualizer.INSTANCE.getMatching(text).toTypedArray(), visibleSize = Vec2(1130f, 635f)).named("oneconfig.search")
+                                                val search = Group(children = ConfigVisualizer.INSTANCE.getMatching(text).toTypedArray(), visibleSize = Vec2(1130f, 635f), size = Vec2(1130f, 0f)).named("oneconfig.search")
                                                 if (search.children.isNullOrEmpty()) search.addChild(searchNoneFound)
-                                                search.setup(polyUI)
+                                                // search.setup(polyUI)
                                                 openPage(search, SetAnimation.Fade)
                                             } else {
                                                 val search = current as Group
@@ -220,14 +220,17 @@ object OneConfigUI {
                                                 ConfigVisualizer.INSTANCE.getMatching(text).fastEach {
                                                     search.addChild(it, recalculate = false)
                                                 }
+                                                search.at = search.screenAt
                                                 search.recalculate(false)
+                                                search.visibleSize = Vec2(1130f, 635f).rescaleToPolyUIInstance(polyUI)
+                                                search.clipChildren()
                                             }
                                         } else {
                                             openPage(ModsPage(collectTrees()), SetAnimation.Fade)
                                         }
 
                                         false
-                                    }.also { searchField = it },
+                                    },
                                     size = Vec2(256f, 32f),
                                     alignment = Align(pad = Vec2(10f, 8f)),
                                 ).withBorder(1f) { page.border5 }.named("SearchField").onRightClick {

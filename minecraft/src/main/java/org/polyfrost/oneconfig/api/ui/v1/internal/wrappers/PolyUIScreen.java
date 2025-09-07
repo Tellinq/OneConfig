@@ -165,10 +165,6 @@ public class PolyUIScreen extends OmniScreen implements BlurScreen {
 
 
         try {
-            //#if MC < 1.13
-            typedChar = org.lwjgl.input.Keyboard.getEventCharacter();
-            if (modifiers.isShift()) typedChar = Character.toUpperCase(typedChar);
-            //#endif
             translateKey(polyUI.getInputManager(), keyCode, typedChar, true);
         } catch (Exception e) {
             death(e);
@@ -181,14 +177,7 @@ public class PolyUIScreen extends OmniScreen implements BlurScreen {
     @MustBeInvokedByOverriders
     public boolean handleKeyRelease(int keyCode, int scancode, OmniKeyboard.@NotNull KeyboardModifiers modifiers) {
         try {
-            char typedChar;
-            //#if MC < 1.13
-            typedChar = org.lwjgl.input.Keyboard.getEventCharacter();
-            if (modifiers.isShift()) typedChar = Character.toUpperCase(typedChar);
-            //#else
-            //$$ typedChar = (char) 0; // No character for key release
-            //#endif
-            translateKey(polyUI.getInputManager(), keyCode, typedChar, false);
+            translateKey(polyUI.getInputManager(), keyCode, (char) 0, false);
         } catch (Exception e) {
             death(e);
         }

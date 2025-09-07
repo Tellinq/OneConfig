@@ -104,6 +104,7 @@ object YaclV1Compat {
         category.groups().forEach { group -> if (group.isRoot) parseGroup(group, tree, category.name().stripped) else parseGroup(group, parent, category.name().stripped) }
     }
 
+    @Suppress("UNCHECKED_CAST")
     private fun parseGroup(group: OptionGroup, parent: Tree, category: String) {
         if (group.isRoot) {
             group.options().forEach { option -> parseOption(option as Option<Any>, parent) }
@@ -120,7 +121,7 @@ object YaclV1Compat {
 
         parent.put(tree)
     }
-
+    @Suppress("DEPRECATED")
     private fun parseOption(config: Option<Any>, parent: Tree) {
         val builder = YaclPropertyBuilder(config)
 

@@ -84,8 +84,8 @@ object KeybindManager {
     @JvmStatic
     fun translateKey(inputManager: InputManager, keyCode: Int, char: Char, down: Boolean) {
         try {
-            if (char != '\u0000' && char.isValid()) {
-                if (down) inputManager.keyTyped(char.toInt())
+            if (char.isValid() && inputManager.mods <= 2) { // asm: only allow no mod or shift mod for char input
+                if (down) inputManager.keyTyped(char.code)
             }
             val mod = when (keyCode) {
                 OmniKeyboard.KEY_LSHIFT -> KeyModifiers.LSHIFT
