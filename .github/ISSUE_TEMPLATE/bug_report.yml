@@ -20,6 +20,13 @@ body:
   validations:
     required: true
 - type: textarea
+  id: category
+  attributes:
+    label: Minecraft versions reproduced on
+    description: List all Minecraft versions this is reproducible on, with their respective loaders. The minimum versions that must be tested at 1.8.9 Forge, and all 1.21.X Fabric minor versions. Do not use "all" as a response.
+  validations:
+    required: true
+- type: textarea
   id: bug-description
   attributes:
     label: Bug description
