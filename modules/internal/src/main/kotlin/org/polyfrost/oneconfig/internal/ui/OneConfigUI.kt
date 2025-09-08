@@ -43,6 +43,8 @@ import org.polyfrost.oneconfig.internal.ui.pages.ThemesPage
 import org.polyfrost.oneconfig.internal.ui.pages.TreeSource
 import org.polyfrost.polyui.animate.Animations
 import org.polyfrost.polyui.animate.SetAnimation
+import org.polyfrost.polyui.color.DarkTheme
+import org.polyfrost.polyui.color.LightTheme
 import org.polyfrost.polyui.color.rgba
 import org.polyfrost.polyui.component.Component
 import org.polyfrost.polyui.component.Drawable
@@ -149,9 +151,9 @@ object OneConfigUI {
                     ).sidebarDisable().addHoverInfo(Text("this feature is experimental and is coming soon!")),
                     SidebarButton("assets/oneconfig/ico/keyboard.svg".image(), "oneconfig.keybinds").sidebarDisable(),
                     Text("oneconfig.sidebar.title.personal", fontSize = 11f).setPalette { text.secondary }.padded(0f, 12f, 0f, 0f),
-                    SidebarButton("assets/oneconfig/ico/paintbrush.svg".image(), "oneconfig.themes", label("oneconfig.soon")).onClick {
-                        openPage(ThemesPage())
-                    }.sidebarDisable(),
+                    SidebarButton("assets/oneconfig/ico/paintbrush.svg".image(), "oneconfig.themes", label("oneconfig.new")).onClick {
+                        openPage(ThemesPage(DarkTheme(), LightTheme()))
+                    },
                     SidebarButton("assets/oneconfig/ico/cog.svg".image(), "oneconfig.preferences").onClick {
                         openPage(ConfigVisualizer.INSTANCE.get(ConfigManager.active().get("oneconfig.json")).named("oneconfig.preferences"))
                     },
@@ -297,7 +299,7 @@ object OneConfigUI {
     }
 
     fun label(text: String) = Block(
-        Text(text).setFont { bold },
+        Text(text).setFont { bold }.denyPaletteChanges(),
         alignment = Align(main = Align.Content.Center),
         size = Vec2(54f, 18f),
     ).setPalette { brand.fg }.radius(9f)
