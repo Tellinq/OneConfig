@@ -26,17 +26,18 @@
 
 package org.polyfrost.oneconfig.api.ui.v1.keybind
 
-import org.polyfrost.polyui.input.KeyBinder
 import org.polyfrost.polyui.input.KeybindHelper
+import org.polyfrost.polyui.input.PolyBind
 import org.polyfrost.polyui.utils.nullIfEmpty
 
 /**
  * Java builder-style helper for creating keybinds.
  */
+@Suppress("UnstableApiUsage")
 class OCKeybindHelper : KeybindHelper<OCKeybindHelper>() {
     private var inScreens = false
 
-    override fun build(): KeyBinder.Bind {
+    override fun build(): PolyBind {
         val func = func ?: throw IllegalStateException("Function must be set")
         return if (!inScreens) BindNotInScreen(
             unmappedKeys.nullIfEmpty()?.toIntArray(),
@@ -53,7 +54,7 @@ class OCKeybindHelper : KeybindHelper<OCKeybindHelper>() {
 
     fun register() = build().register()
 
-    fun KeyBinder.Bind.register() = KeybindManager.registerKeybind(this)
+    fun PolyBind.register() = KeybindManager.registerKeybind(this)
 
     companion object {
         @JvmStatic

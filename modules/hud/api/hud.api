@@ -17,9 +17,9 @@ public abstract class org/polyfrost/oneconfig/api/hud/v1/Hud : org/polyfrost/one
 	public final fun getShowInF3 ()Z
 	public final fun getShowInScreens ()Z
 	public final fun getShowInTab ()Z
-	public final fun getShowKey ()Lorg/polyfrost/polyui/input/KeyBinder$Bind;
+	public final fun getShowKey ()Lorg/polyfrost/polyui/input/PolyBind;
 	public final fun getStaticWidth ()Z
-	public final fun getToggleKey ()Lorg/polyfrost/polyui/input/KeyBinder$Bind;
+	public final fun getToggleKey ()Lorg/polyfrost/polyui/input/PolyBind;
 	public fun hasBackground ()Z
 	public final fun isReal ()Z
 	public final fun make (Lorg/polyfrost/oneconfig/api/config/v1/Tree;)Lorg/polyfrost/oneconfig/api/hud/v1/Hud;
@@ -30,9 +30,9 @@ public abstract class org/polyfrost/oneconfig/api/hud/v1/Hud : org/polyfrost/one
 	public final fun setShowInF3 (Z)V
 	public final fun setShowInScreens (Z)V
 	public final fun setShowInTab (Z)V
-	public final fun setShowKey (Lorg/polyfrost/polyui/input/KeyBinder$Bind;)V
+	public final fun setShowKey (Lorg/polyfrost/polyui/input/PolyBind;)V
 	public final fun setStaticWidth (Z)V
-	public final fun setToggleKey (Lorg/polyfrost/polyui/input/KeyBinder$Bind;)V
+	public final fun setToggleKey (Lorg/polyfrost/polyui/input/PolyBind;)V
 	public fun setup ()V
 	public abstract fun update ()Z
 	protected final fun updateAndRecalculate ()V

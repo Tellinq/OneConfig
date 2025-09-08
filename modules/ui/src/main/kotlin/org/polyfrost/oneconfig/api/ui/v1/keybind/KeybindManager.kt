@@ -39,6 +39,7 @@ import org.polyfrost.polyui.input.InputManager
 import org.polyfrost.polyui.input.KeyBinder
 import org.polyfrost.polyui.input.KeyModifiers
 import org.polyfrost.polyui.input.Keys
+import org.polyfrost.polyui.input.PolyBind
 
 @Suppress("UnstableApiUsage")
 object KeybindManager {
@@ -73,7 +74,7 @@ object KeybindManager {
     }
 
     @JvmStatic
-    fun registerKeybind(bind: KeyBinder.Bind?): KeyBinder.Bind? {
+    fun registerKeybind(bind: PolyBind?): PolyBind? {
         if (bind != null) keyBinder.add(bind)
         return bind
     }

@@ -80,8 +80,8 @@ public class org/polyfrost/oneconfig/api/config/v1/KtConfig : org/polyfrost/onec
 	protected final fun getProperty (Lkotlin/reflect/KProperty;)Lorg/polyfrost/oneconfig/api/config/v1/Property;
 	public final fun hideIf (Lkotlin/reflect/KProperty;Lkotlin/jvm/functions/Function0;)V
 	public final fun hideIf (Lkotlin/reflect/KProperty;Lkotlin/reflect/KProperty0;)V
-	protected final synthetic fun keybind (Lorg/polyfrost/polyui/input/KeyBinder$Bind;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)Lorg/polyfrost/oneconfig/api/config/v1/KtConfig$Provider;
-	public static synthetic fun keybind$default (Lorg/polyfrost/oneconfig/api/config/v1/KtConfig;Lorg/polyfrost/polyui/input/KeyBinder$Bind;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;ILjava/lang/Object;)Lorg/polyfrost/oneconfig/api/config/v1/KtConfig$Provider;
+	protected final synthetic fun keybind (Lorg/polyfrost/polyui/input/PolyBind;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)Lorg/polyfrost/oneconfig/api/config/v1/KtConfig$Provider;
+	public static synthetic fun keybind$default (Lorg/polyfrost/oneconfig/api/config/v1/KtConfig;Lorg/polyfrost/polyui/input/PolyBind;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;ILjava/lang/Object;)Lorg/polyfrost/oneconfig/api/config/v1/KtConfig$Provider;
 	protected final fun makeTree ()Lorg/polyfrost/oneconfig/api/config/v1/Tree;
 	protected final synthetic fun radiobutton ([Ljava/lang/String;ILjava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)Lorg/polyfrost/oneconfig/api/config/v1/KtConfig$Provider;
 	public static synthetic fun radiobutton$default (Lorg/polyfrost/oneconfig/api/config/v1/KtConfig;[Ljava/lang/String;ILjava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;ILjava/lang/Object;)Lorg/polyfrost/oneconfig/api/config/v1/KtConfig$Provider;
@@ -351,7 +351,7 @@ public final class org/polyfrost/oneconfig/api/config/v1/dsl/ConfigDSL {
 	public static final fun config (Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Lkotlin/jvm/functions/Function1;)V
 	public final fun dropdown (I[Ljava/lang/String;)Lorg/polyfrost/oneconfig/api/config/v1/dsl/ConfigDSL$Prop;
 	public final fun getTree ()Lorg/polyfrost/oneconfig/api/config/v1/Tree;
-	public final fun keybind (Lorg/polyfrost/polyui/input/KeyBinder$Bind;)Lorg/polyfrost/oneconfig/api/config/v1/dsl/ConfigDSL$Prop;
+	public final fun keybind (Lorg/polyfrost/polyui/input/PolyBind;)Lorg/polyfrost/oneconfig/api/config/v1/dsl/ConfigDSL$Prop;
 	public final fun number (F)Lorg/polyfrost/oneconfig/api/config/v1/dsl/ConfigDSL$FloatProp;
 	public final fun number (I)Lorg/polyfrost/oneconfig/api/config/v1/dsl/ConfigDSL$IntProp;
 	public final fun radiobutton (I[Ljava/lang/String;)Lorg/polyfrost/oneconfig/api/config/v1/dsl/ConfigDSL$Prop;

@@ -29,7 +29,7 @@ package org.polyfrost.oneconfig.api.config.v1
 import org.polyfrost.oneconfig.api.config.v1.Property.Display
 import org.polyfrost.polyui.color.PolyColor
 import org.polyfrost.polyui.color.rgba
-import org.polyfrost.polyui.input.KeyBinder
+import org.polyfrost.polyui.input.PolyBind
 import kotlin.properties.PropertyDelegateProvider
 import kotlin.properties.ReadWriteProperty
 import kotlin.reflect.KProperty
@@ -81,8 +81,8 @@ open class KtConfig(id: String, title: String, category: Category, icon: String?
         Provider(def, name, description, category, subcategory, String::class.java, Visualizer.TextVisualizer::class.java)
 
     @JvmSynthetic
-    protected fun keybind(def: KeyBinder.Bind? = null, name: String? = null, description: String? = null, category: String? = null, subcategory: String? = null) =
-        Provider(def, name, description, category, subcategory, KeyBinder.Bind::class.java, Visualizer.KeybindVisualizer::class.java)
+    protected fun keybind(def: PolyBind? = null, name: String? = null, description: String? = null, category: String? = null, subcategory: String? = null) =
+        Provider(def, name, description, category, subcategory, PolyBind::class.java, Visualizer.KeybindVisualizer::class.java)
 
     @JvmSynthetic
     protected fun radiobutton(options: Array<String>, def: Int = 0, name: String? = null, description: String? = null, category: String? = null, subcategory: String? = null) =

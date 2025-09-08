@@ -5,7 +5,7 @@ import org.polyfrost.oneconfig.api.config.v1.Properties
 import org.polyfrost.oneconfig.api.config.v1.Tree
 import org.polyfrost.oneconfig.api.config.v1.Visualizer
 import org.polyfrost.polyui.color.PolyColor
-import org.polyfrost.polyui.input.KeyBinder
+import org.polyfrost.polyui.input.PolyBind
 
 /**
  * Experimental DSL for creating config trees.
@@ -93,8 +93,8 @@ class ConfigDSL(id: String? = null, title: String? = null, description: String? 
         return prop
     }
 
-    fun keybind(default: KeyBinder.Bind): Prop<KeyBinder.Bind> {
-        val prop = Prop(default, KeyBinder.Bind::class.java)
+    fun keybind(default: PolyBind): Prop<PolyBind> {
+        val prop = Prop(default, PolyBind::class.java)
         prop["visualizer"] = Visualizer.KeybindVisualizer::class.java
         tree.put(prop.property)
         return prop

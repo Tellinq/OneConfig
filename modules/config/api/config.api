@@ -172,7 +172,9 @@ public class org/polyfrost/oneconfig/api/config/v1/serialize/ObjectSerializer {
 	public fun deserialize (Ljava/util/Map;)Ljava/lang/Object;
 	public static fun fieldStream (Ljava/lang/Class;)Ljava/util/stream/Stream;
 	public fun getAdapter (Ljava/lang/Class;)Lorg/polyfrost/oneconfig/api/config/v1/serialize/adapter/Adapter;
+	public static fun getAllFields (Ljava/lang/Class;)[Ljava/lang/reflect/Field;
 	public static fun isSerializable (Ljava/lang/Object;)Z
+	public static fun overwrite (Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;
 	public fun registerTypeAdapter (Lorg/polyfrost/oneconfig/api/config/v1/serialize/adapter/Adapter;)V
 	public fun registerTypeAdapter ([Lorg/polyfrost/oneconfig/api/config/v1/serialize/adapter/Adapter;)V
 	public fun serialize (Ljava/lang/Object;)Ljava/lang/Object;
@@ -193,6 +195,11 @@ public abstract class org/polyfrost/oneconfig/api/config/v1/serialize/adapter/Ad
 	public abstract fun getTargetClass ()Ljava/lang/Class;
 	public final fun hashCode ()I
 	public abstract fun serialize (Ljava/lang/Object;)Ljava/lang/Object;
+}
+
+public abstract class org/polyfrost/oneconfig/api/config/v1/serialize/adapter/ComplexAdapter : org/polyfrost/oneconfig/api/config/v1/serialize/adapter/Adapter {
+	public fun <init> ()V
+	public final fun getOutputClass ()Ljava/lang/Class;
 }
 
 public class org/polyfrost/oneconfig/api/config/v1/serialize/adapter/impl/ColorAdapter : org/polyfrost/oneconfig/api/config/v1/serialize/adapter/Adapter {

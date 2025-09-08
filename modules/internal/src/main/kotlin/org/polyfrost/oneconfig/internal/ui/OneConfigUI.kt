@@ -210,9 +210,8 @@ object OneConfigUI {
                                     ).onChange { text: String ->
                                         if (text.length > 2) {
                                             if(current?.name != "oneconfig.search") {
-                                                val search = Group(children = ConfigVisualizer.INSTANCE.getMatching(text).toTypedArray(), visibleSize = Vec2(1130f, 635f), size = Vec2(1130f, 0f)).named("oneconfig.search")
-                                                if (search.children.isNullOrEmpty()) search.addChild(searchNoneFound)
-                                                // search.setup(polyUI)
+                                                val search = Group(children = ConfigVisualizer.INSTANCE.getMatching(text).toTypedArray(), visibleSize = Vec2(1130f, 635f)).named("oneconfig.search")
+                                                if (search.children.isNullOrEmpty()) search.addChild(searchNoneFound, recalculate = false)
                                                 openPage(search, SetAnimation.Fade)
                                             } else {
                                                 val search = current as Group
@@ -220,8 +219,10 @@ object OneConfigUI {
                                                 ConfigVisualizer.INSTANCE.getMatching(text).fastEach {
                                                     search.addChild(it, recalculate = false)
                                                 }
-                                                search.at = search.screenAt
+                                                if (search.children.isNullOrEmpty()) search.addChild(searchNoneFound, recalculate = false)
+                                                // search.at = search.screenAt
                                                 search.recalculate(false)
+                                                search.resetScroll()
                                                 search.visibleSize = Vec2(1130f, 635f).rescaleToPolyUIInstance(polyUI)
                                                 search.clipChildren()
                                             }
@@ -253,7 +254,7 @@ object OneConfigUI {
                     alignment = Align(line = Align.Line.Start, pad = Vec2.ZERO),
                 ),
             )
-//            polyUI.keyBinder?.add(KeyBinder.Bind(unmappedKeys = arrayOf(OmniKeyboard.KEY_F), mods = Modifiers(KeyModifiers.PRIMARY)) {
+//            polyUI.keyBinder?.add(PolyBind(unmappedKeys = arrayOf(OmniKeyboard.KEY_F), mods = Modifiers(KeyModifiers.PRIMARY)) {
 //                polyUI.focus(searchField)
 //                false
 //            })

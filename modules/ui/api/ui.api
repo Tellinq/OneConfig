@@ -142,7 +142,7 @@ public abstract interface class org/polyfrost/oneconfig/api/ui/v1/api/TinyFdApi 
 	public abstract fun showNotification (Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)I
 }
 
-public final class org/polyfrost/oneconfig/api/ui/v1/keybind/BindNotInScreen : org/polyfrost/polyui/input/KeyBinder$Bind {
+public final class org/polyfrost/oneconfig/api/ui/v1/keybind/BindNotInScreen : org/polyfrost/polyui/input/PolyBind {
 	public synthetic fun <init> ([I[Lorg/polyfrost/polyui/input/Keys;[IBJLkotlin/jvm/functions/Function1;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
 	public synthetic fun <init> ([I[Lorg/polyfrost/polyui/input/Keys;[IBJLkotlin/jvm/functions/Function1;Lkotlin/jvm/internal/DefaultConstructorMarker;)V
 }
@@ -151,20 +151,18 @@ public final class org/polyfrost/oneconfig/api/ui/v1/keybind/KeybindManager {
 	public static final field INSTANCE Lorg/polyfrost/oneconfig/api/ui/v1/keybind/KeybindManager;
 	public static final fun builder ()Lorg/polyfrost/oneconfig/api/ui/v1/keybind/OCKeybindHelper;
 	public final fun getInputManager ()Lorg/polyfrost/polyui/input/InputManager;
-	public static final fun getKeysMap ()Ljava/util/Map;
-	public static final fun getModsMap ()Lorg/polyfrost/polyui/utils/Int2IntMap;
-	public static final fun registerKeybind (Lorg/polyfrost/polyui/input/KeyBinder$Bind;)Lorg/polyfrost/polyui/input/KeyBinder$Bind;
+	public static final fun registerKeybind (Lorg/polyfrost/polyui/input/PolyBind;)Lorg/polyfrost/polyui/input/PolyBind;
 	public static final fun translateKey (Lorg/polyfrost/polyui/input/InputManager;ICZ)V
 }
 
 public final class org/polyfrost/oneconfig/api/ui/v1/keybind/OCKeybindHelper : org/polyfrost/polyui/input/KeybindHelper {
 	public static final field Companion Lorg/polyfrost/oneconfig/api/ui/v1/keybind/OCKeybindHelper$Companion;
 	public fun <init> ()V
-	public fun build ()Lorg/polyfrost/polyui/input/KeyBinder$Bind;
+	public fun build ()Lorg/polyfrost/polyui/input/PolyBind;
 	public static final fun builder ()Lorg/polyfrost/oneconfig/api/ui/v1/keybind/OCKeybindHelper;
 	public final fun inScreens ()Lorg/polyfrost/oneconfig/api/ui/v1/keybind/OCKeybindHelper;
-	public final fun register ()Lorg/polyfrost/polyui/input/KeyBinder$Bind;
-	public final fun register (Lorg/polyfrost/polyui/input/KeyBinder$Bind;)Lorg/polyfrost/polyui/input/KeyBinder$Bind;
+	public final fun register ()Lorg/polyfrost/polyui/input/PolyBind;
+	public final fun register (Lorg/polyfrost/polyui/input/PolyBind;)Lorg/polyfrost/polyui/input/PolyBind;
 }
 
 public final class org/polyfrost/oneconfig/api/ui/v1/keybind/OCKeybindHelper$Companion {
