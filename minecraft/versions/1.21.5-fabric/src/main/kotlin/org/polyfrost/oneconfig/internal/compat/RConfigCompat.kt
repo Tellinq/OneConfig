@@ -11,13 +11,12 @@ import com.teamresourceful.resourcefulconfig.api.types.options.EntryType
 import com.teamresourceful.resourcefulconfig.api.types.options.Option
 import dev.deftu.omnicore.common.OmniLoader
 import org.polyfrost.oneconfig.api.config.v1.*
-import org.polyfrost.oneconfig.api.config.v1.Properties
+import org.polyfrost.oneconfig.api.config.v1.dsl.*
 import org.polyfrost.oneconfig.internal.DynamicPolyImage
-import org.polyfrost.oneconfig.utils.v1.dsl.*
 import org.polyfrost.polyui.color.PolyColor
 import org.polyfrost.polyui.color.argb
 import org.polyfrost.polyui.color.asMutable
-import java.util.*
+import java.util.UUID
 import kotlin.reflect.KClass
 
 internal object RConfigCompat {
@@ -154,7 +153,7 @@ internal object RConfigCompat {
         tree.put(build)
     }
 
-    private class RConfigPropertyBuilder internal constructor(option: ResourcefulConfigValueEntry) {
+    private class RConfigPropertyBuilder constructor(option: ResourcefulConfigValueEntry) {
         val name: String? = option.options().title.toLocalizedString()
         val description: String? = option.options().comment.toLocalizedString()
 

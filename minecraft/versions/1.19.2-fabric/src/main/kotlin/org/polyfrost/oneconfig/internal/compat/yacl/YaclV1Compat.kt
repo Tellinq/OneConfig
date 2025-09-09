@@ -19,18 +19,14 @@ import org.polyfrost.oneconfig.api.config.v1.ConfigManager
 import org.polyfrost.oneconfig.api.config.v1.Properties
 import org.polyfrost.oneconfig.api.config.v1.Tree
 import org.polyfrost.oneconfig.api.config.v1.Visualizer
+import org.polyfrost.oneconfig.api.config.v1.dsl.*
 import org.polyfrost.oneconfig.internal.DynamicPolyImage
 import org.polyfrost.oneconfig.internal.compat.CompatLoader
-import org.polyfrost.oneconfig.utils.v1.dsl.category
-import org.polyfrost.oneconfig.utils.v1.dsl.icon
-import org.polyfrost.oneconfig.utils.v1.dsl.saveFunction
-import org.polyfrost.oneconfig.utils.v1.dsl.subcategory
-import org.polyfrost.oneconfig.utils.v1.dsl.visualizer
 import org.polyfrost.polyui.color.PolyColor
 import org.polyfrost.polyui.color.asMutable
 import org.polyfrost.polyui.color.toPolyColor
 import java.awt.Color
-import java.util.*
+import java.util.UUID
 
 
 internal val extraYaclHandlers = mutableListOf<ExtraHandler<out Controller<*>>>()
@@ -60,6 +56,7 @@ object YaclV1Compat {
             )?.let(ConfigManager.active()::register)
         }
     }
+
     private fun parseConfig(
         text: Text,
         categories: List<ConfigCategory>,
@@ -112,7 +109,7 @@ object YaclV1Compat {
         }
 
         val tree = Tree.tree()
-        tree.subcategory =  group.name().stripped
+        tree.subcategory = group.name().stripped
         tree.category = category
         tree.title = group.name().stripped.takeUnless(String::isEmpty) ?: "General"
         tree.id = UUID.randomUUID().toString()
@@ -121,6 +118,7 @@ object YaclV1Compat {
 
         parent.put(tree)
     }
+
     @Suppress("DEPRECATED")
     private fun parseOption(config: Option<Any>, parent: Tree) {
         val builder = YaclPropertyBuilder(config)

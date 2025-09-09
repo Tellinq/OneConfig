@@ -118,6 +118,7 @@ abstract class Hud<T : Drawable>(id: String, title: String, val category: Catego
             tree.addMetadata("category", category)
             tree.addMetadata("hidden", true)
             val hud = get()
+            hud.rawRescalePosition = true
             tree["x"] = ktProperty(hud::x)
             tree["y"] = ktProperty(hud::y)
             inspect(hud, tree)

@@ -9,17 +9,17 @@ import org.polyfrost.oneconfig.api.config.v1.ConfigManager
 import org.polyfrost.oneconfig.api.config.v1.Tree
 import org.polyfrost.oneconfig.api.config.v1.Visualizer
 import org.polyfrost.oneconfig.api.config.v1.Visualizer.*
+import org.polyfrost.oneconfig.api.config.v1.dsl.*
 import org.polyfrost.oneconfig.internal.DynamicPolyImage
 import org.polyfrost.oneconfig.internal.mixin.compat.moulconfig.Accessor_GuiOptionEditorDropdown
-import org.polyfrost.oneconfig.relocator.annotations.MoulConfig as Moulconfig
-import org.polyfrost.oneconfig.utils.v1.dsl.*
 import org.polyfrost.polyui.color.PolyColor
 import java.lang.reflect.Type
-import java.util.*
+import java.util.UUID
 import kotlin.reflect.KClass
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.nanoseconds
 import io.github.notenoughupdates.moulconfig.Config as MoulConfig
+import org.polyfrost.oneconfig.relocator.annotations.MoulConfig as Moulconfig
 
 @Moulconfig
 object MoulConfigCompat {

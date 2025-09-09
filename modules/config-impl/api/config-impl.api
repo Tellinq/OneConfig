@@ -423,6 +423,23 @@ public final class org/polyfrost/oneconfig/api/config/v1/dsl/ConfigDSL$TextProp 
 	public final fun setPlaceholder (Ljava/lang/String;)V
 }
 
+public final class org/polyfrost/oneconfig/api/config/v1/dsl/Tree_extensionsKt {
+	public static final fun getCategory (Lorg/polyfrost/oneconfig/api/config/v1/Node;)Ljava/lang/String;
+	public static final fun getIcon (Lorg/polyfrost/oneconfig/api/config/v1/Node;)Lorg/polyfrost/polyui/data/PolyImage;
+	public static final fun getIndex (Lorg/polyfrost/oneconfig/api/config/v1/Node;)Ljava/lang/Integer;
+	public static final fun getNoCache (Lorg/polyfrost/oneconfig/api/config/v1/Tree;)Z
+	public static final fun getSaveFunction (Lorg/polyfrost/oneconfig/api/config/v1/Tree;)Ljava/lang/Runnable;
+	public static final fun getSubcategory (Lorg/polyfrost/oneconfig/api/config/v1/Node;)Ljava/lang/String;
+	public static final fun getVisualizer (Lorg/polyfrost/oneconfig/api/config/v1/Property;)Ljava/lang/Class;
+	public static final fun setCategory (Lorg/polyfrost/oneconfig/api/config/v1/Node;Ljava/lang/String;)V
+	public static final fun setIcon (Lorg/polyfrost/oneconfig/api/config/v1/Node;Lorg/polyfrost/polyui/data/PolyImage;)V
+	public static final fun setIndex (Lorg/polyfrost/oneconfig/api/config/v1/Node;Ljava/lang/Integer;)V
+	public static final fun setNoCache (Lorg/polyfrost/oneconfig/api/config/v1/Tree;Z)V
+	public static final fun setSaveFunction (Lorg/polyfrost/oneconfig/api/config/v1/Tree;Ljava/lang/Runnable;)V
+	public static final fun setSubcategory (Lorg/polyfrost/oneconfig/api/config/v1/Node;Ljava/lang/String;)V
+	public static final fun setVisualizer (Lorg/polyfrost/oneconfig/api/config/v1/Property;Ljava/lang/Class;)V
+}
+
 public class org/polyfrost/oneconfig/api/config/v1/serialize/adapter/impl/PolyColorAdapter : org/polyfrost/oneconfig/api/config/v1/serialize/adapter/Adapter {
 	public fun <init> ()V
 	public synthetic fun deserialize (Ljava/lang/Object;)Ljava/lang/Object;

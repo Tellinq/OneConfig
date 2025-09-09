@@ -1,4 +1,4 @@
-package org.polyfrost.oneconfig.utils.v1.dsl
+package org.polyfrost.oneconfig.api.config.v1.dsl
 
 import org.polyfrost.oneconfig.api.config.v1.Node
 import org.polyfrost.oneconfig.api.config.v1.Property
@@ -31,6 +31,6 @@ var Tree.saveFunction: Runnable?
     get() = metadata?.get("custom_save") as? Runnable
     set(value) = addMetadata("custom_save", value)
 
-var Tree.noCache: Boolean?
-    get() = metadata?.get("no_cache") as? Boolean
+var Tree.noCache: Boolean
+    get() = metadata?.getOrDefault("no_cache", false) as Boolean
     set(value) = addMetadata("no_cache", value)

@@ -65,7 +65,7 @@ open class ConfigVisualizer {
      * For information, see [create].
      */
     fun get(config: Tree): Drawable {
-        if (config.getOrPutMetadata("no_cache") { false }) return create(config)
+        if (config.getMetadata<Boolean?>("no_cache") == true) return create(config)
         val it = configs[config]
         if (it != null) {
             // asm: might've been searched, so we need to reposition our option lists

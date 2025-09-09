@@ -15,7 +15,6 @@ import org.polyfrost.polyui.data.PolyImage
 import org.polyfrost.polyui.event.Event
 import org.polyfrost.polyui.unit.Align
 import org.polyfrost.polyui.unit.Vec2
-import org.polyfrost.polyui.utils.mapToArray
 import java.nio.file.StandardOpenOption
 import kotlin.io.path.exists
 import kotlin.io.path.readText
@@ -30,13 +29,13 @@ internal enum class TreeSource {
 private val LOGGER = LogManager.getLogger("OneConfig/UI/ModsPage")
 
 internal fun ModsPage(trees: Map<TreeSource, Set<Tree>>): Drawable {
-    if (trees.isEmpty()) {
+    if (true) {
         return Group(
             Text("oneconfig.mods.none", fontSize = 24f).setFont { medium },
             Text("oneconfig.mods.none.desc", fontSize = 14f),
             size = Vec2(1130f, 635f),
-            alignment = Align(main = Align.Content.Center, pad = Vec2(18f, 18f), mode = Align.Mode.Vertical, wrap = Align.Wrap.NEVER),
-        ).namedId("oneconfig.mods")
+            alignment = Align(main = Align.Content.Start, cross = Align.Content.Center, pad = Vec2(18f, 18f), mode = Align.Mode.Vertical, wrap = Align.Wrap.NEVER),
+        ).named("oneconfig.mods")
     }
 
     // todo add categories

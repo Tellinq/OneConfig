@@ -11,9 +11,9 @@ import org.polyfrost.oneconfig.api.config.v1.ConfigManager
 import org.polyfrost.oneconfig.api.config.v1.Properties
 import org.polyfrost.oneconfig.api.config.v1.Tree
 import org.polyfrost.oneconfig.api.config.v1.Visualizer
+import org.polyfrost.oneconfig.api.config.v1.dsl.*
 import org.polyfrost.oneconfig.internal.DynamicPolyImage
-import org.polyfrost.oneconfig.utils.v1.dsl.*
-import java.util.*
+import java.util.UUID
 
 internal object RConfigCompat {
 
@@ -130,7 +130,7 @@ internal object RConfigCompat {
         tree.put(builder.build())
     }
 
-    private class RConfigPropertyBuilder internal constructor(option: ResourcefulConfigValueEntry) {
+    private class RConfigPropertyBuilder constructor(option: ResourcefulConfigValueEntry) {
         val name: String? = option.options().title.toLocalizedString()
         val description: String? = option.options().comment().toLocalizedString()
 
