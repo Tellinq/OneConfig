@@ -29,7 +29,7 @@ internal enum class TreeSource {
 private val LOGGER = LogManager.getLogger("OneConfig/UI/ModsPage")
 
 internal fun ModsPage(trees: Map<TreeSource, Set<Tree>>): Drawable {
-    if (true) {
+    if (trees.isEmpty()) {
         return Group(
             Text("oneconfig.mods.none", fontSize = 24f).setFont { medium },
             Text("oneconfig.mods.none.desc", fontSize = 14f),
