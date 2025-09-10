@@ -106,6 +106,7 @@ public class OneConfigMixinInit implements IMixinConfigPlugin {
         //#endif
         //#else
         mixins.add("events.Mixin_KeyInputEvent_Screen");
+        mixins.add("events.Mixin_MouseInputEvent_Screen");
         mixins.add("hidpi.Mixin_EnableHiDPI");
         mixins.add("hidpi.Mixin_FixDisplaySizeHiDPI");
         mixins.add("hidpi.Mixin_FixMousePositionHiDPI_Screen");

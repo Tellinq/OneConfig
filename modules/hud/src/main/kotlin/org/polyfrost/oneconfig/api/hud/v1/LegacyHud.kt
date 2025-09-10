@@ -26,13 +26,13 @@
 
 package org.polyfrost.oneconfig.api.hud.v1
 
-import dev.deftu.omnicore.client.render.GuiScale
 import dev.deftu.omnicore.client.render.OmniMatrixStack
 import dev.deftu.omnicore.client.render.OmniResolution
 import org.jetbrains.annotations.ApiStatus
 import org.polyfrost.oneconfig.api.platform.v1.Platform
 import org.polyfrost.polyui.component.Drawable
 import org.polyfrost.polyui.component.extensions.namedId
+import org.polyfrost.polyui.renderer.Renderer
 
 /**
  * [Hud] implementation that uses the old rendering system, with a standard [render] method.
@@ -50,7 +50,7 @@ abstract class LegacyHud(id: String, title: String, category: Category) : Hud<Dr
     abstract var width: Float
     abstract var height: Float
 
-    override fun create() = createLegacy()
+    override fun create(): Drawable = createLegacy()
 
     /**
      * Render your HUD. Note that [x] and [y], unlike the normal render methods of other HUD classes, are scaled to **Minecraft's coordinate space**
@@ -59,15 +59,23 @@ abstract class LegacyHud(id: String, title: String, category: Category) : Hud<Dr
      *
      * **Note:** This method is called every frame, so you should not perform any heavy calculations here.
      */
-    abstract fun render(stack: OmniMatrixStack, x: Float, y: Float, scaleX: Float, scaleY: Float, example: Boolean)
+    abstract fun renderLegacy(stack: OmniMatrixStack, x: Float, y: Float, scaleX: Float, scaleY: Float, example: Boolean)
 
     /**
-     * Wraps the [render] method in a [Drawable] instance, with the [Drawable.size] property delegating to [width] and [height].
+     * Render extra things for your HUD using the PolyUI renderer.
+     *
+     * **This is called inside a PolyUI rendering context,** so you can use PolyUI components and methods here, but you **CANNOT** use
+     * Minecraft rendering methods as they will not work correctly, cause visual glitches, or even crash.
+     *
+     * Due to differences in Minecraft versions, you *may not* experience issues, **but they will happen on some versions**.
+     * So don't. Use [renderLegacy] for that.
      */
-    protected fun createLegacy(): Drawable = LegacyHudComponent(hud = this).namedId("LegacyHud")
+    open fun render(renderer: Renderer, drawable: Drawable) {}
+
+    protected fun createLegacy() = LegacyHudComponent(hud = this).namedId("LegacyHud")
 
     @Suppress("SENSELESS_COMPARISON")
-    internal class LegacyHudComponent(private val hud: LegacyHud) : Drawable() {
+    class LegacyHudComponent(private val hud: LegacyHud) : Drawable() {
 
         override var width: Float
             get() = hud.width
@@ -83,13 +91,11 @@ abstract class LegacyHud(id: String, title: String, category: Category) : Hud<Dr
 
         fun renderLegacy(stack: OmniMatrixStack) {
             val scale = if (HudManager.useGuiScale) 1f else Platform.screen().pixelRatio() / OmniResolution.scaleFactor.toFloat()
-            hud.render(stack, x * scale, y * scale, scaleX * scale, scaleY * scale, false)
+            hud.renderLegacy(stack, x * scale, y * scale, scaleX * scale, scaleY * scale, false)
         }
 
         override fun render() {
-            // nop
-            // asm: we do not render here because rendering in the nanovg context
-            // just fucks everything up
+            hud.render(polyUI.renderer, this)
         }
     }
 }

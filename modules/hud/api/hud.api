@@ -89,12 +89,22 @@ public final class org/polyfrost/oneconfig/api/hud/v1/HudManager {
 public abstract class org/polyfrost/oneconfig/api/hud/v1/LegacyHud : org/polyfrost/oneconfig/api/hud/v1/Hud {
 	public fun <init> (Ljava/lang/String;Ljava/lang/String;Lorg/polyfrost/oneconfig/api/hud/v1/Hud$Category;)V
 	protected fun create ()Lorg/polyfrost/polyui/component/Drawable;
-	protected final fun createLegacy ()Lorg/polyfrost/polyui/component/Drawable;
+	protected final fun createLegacy ()Lorg/polyfrost/oneconfig/api/hud/v1/LegacyHud$LegacyHudComponent;
 	public abstract fun getHeight ()F
 	public abstract fun getWidth ()F
-	public abstract fun render (Ldev/deftu/omnicore/client/render/OmniMatrixStack;FFFFZ)V
+	public fun render (Lorg/polyfrost/polyui/renderer/Renderer;Lorg/polyfrost/polyui/component/Drawable;)V
+	public abstract fun renderLegacy (Ldev/deftu/omnicore/client/render/OmniMatrixStack;FFFFZ)V
 	public abstract fun setHeight (F)V
 	public abstract fun setWidth (F)V
+}
+
+public final class org/polyfrost/oneconfig/api/hud/v1/LegacyHud$LegacyHudComponent : org/polyfrost/polyui/component/Drawable {
+	public fun <init> (Lorg/polyfrost/oneconfig/api/hud/v1/LegacyHud;)V
+	public fun getHeight ()F
+	public fun getWidth ()F
+	public final fun renderLegacy (Ldev/deftu/omnicore/client/render/OmniMatrixStack;)V
+	public fun setHeight (F)V
+	public fun setWidth (F)V
 }
 
 public abstract class org/polyfrost/oneconfig/api/hud/v1/TextHud : org/polyfrost/oneconfig/api/hud/v1/Hud {
@@ -139,5 +149,11 @@ public final class org/polyfrost/oneconfig/api/hud/v1/TextHud$Simple : org/polyf
 	public final fun getIt ()Ljava/lang/String;
 	public final fun setIt (Ljava/lang/String;)V
 	public fun setup ()V
+}
+
+public class org/polyfrost/oneconfig/api/hud/v1/events/HudEditorToggleEvent : org/polyfrost/oneconfig/api/event/v1/events/Event {
+	public static final field CLOSE Lorg/polyfrost/oneconfig/api/hud/v1/events/HudEditorToggleEvent;
+	public static final field OPEN Lorg/polyfrost/oneconfig/api/hud/v1/events/HudEditorToggleEvent;
+	public final field open Z
 }
 

@@ -31,13 +31,10 @@ import dev.deftu.omnicore.common.OmniLoader
 import org.apache.logging.log4j.LogManager
 import org.jetbrains.annotations.ApiStatus
 import org.polyfrost.oneconfig.api.config.v1.ConfigManager
+import org.polyfrost.oneconfig.api.event.v1.EventManager
 import org.polyfrost.oneconfig.api.event.v1.eventHandler
 import org.polyfrost.oneconfig.api.event.v1.events.ScreenOpenEvent
-import org.polyfrost.oneconfig.api.hud.v1.HudManager.getHudsOfType
-import org.polyfrost.oneconfig.api.hud.v1.HudManager.getProvider
-import org.polyfrost.oneconfig.api.hud.v1.HudManager.removeHud
-import org.polyfrost.oneconfig.api.hud.v1.HudManager.toggleAllHuds
-import org.polyfrost.oneconfig.api.hud.v1.HudManager.unregister
+import org.polyfrost.oneconfig.api.hud.v1.events.HudEditorToggleEvent
 import org.polyfrost.oneconfig.api.hud.v1.internal.*
 import org.polyfrost.oneconfig.api.platform.v1.Platform
 import org.polyfrost.oneconfig.api.ui.v1.UIManager
@@ -373,13 +370,13 @@ object HudManager {
             Fade(pg, 0f, false, Animations.Default.create(0.2.seconds)) {
                 renders = false
             }.add()
-            // remove scale blob
-            polyUI.inputManager.focus(null)
+            EventManager.INSTANCE.post(HudEditorToggleEvent.CLOSE)
         } else {
             pg.alpha = 0f
             Fade(pg, 1f, false, Animations.Default.create(0.2.seconds)).add()
             pg.x = polyUI.size.x - 32f
             toggle()
+            EventManager.INSTANCE.post(HudEditorToggleEvent.OPEN)
         }
         panelExists = !panelExists
     }
