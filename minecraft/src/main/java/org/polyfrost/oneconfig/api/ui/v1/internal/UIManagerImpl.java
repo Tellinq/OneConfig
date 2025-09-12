@@ -165,7 +165,7 @@ public class UIManagerImpl implements UIManager {
                     DrawModes.QUADS
             );
 
-            builder.blendState = OmniManagedBlendState.ALPHA_OVERWRITE;
+            builder.blendState = OmniManagedBlendState.ALPHA;
             this.pipeline = builder.build();
         }
 
