@@ -123,7 +123,7 @@ fun HudsPage(huds: Collection<Hud<*>>): Drawable {
     ).onInit {
         if (huds.isNotEmpty()) {
             polyUI.every(1.seconds) {
-                if (!HudManager.panelExists) return@every
+                if (!HudManager.isEditing) return@every
                 huds.forEach {
                     if (it.update()) {
                         val bg = it.getBackground() ?: return@forEach

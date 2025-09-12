@@ -165,7 +165,7 @@ abstract class Hud<T : Drawable>(id: String, title: String, val category: Catego
             hidden = screen != null
             // asm: don't hide when we open the hud editor
             // because otherwise you couldn't edit it (which sucks)
-            if (HudManager.panelExists) hidden = false
+            if (HudManager.isEditing) hidden = false
         }
         tree.getProp<Boolean>("showInF3")?.addCallback {
             if (!it) hideF3Handler.register()
