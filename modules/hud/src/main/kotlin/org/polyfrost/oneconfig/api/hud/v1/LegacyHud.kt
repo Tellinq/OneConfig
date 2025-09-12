@@ -30,9 +30,12 @@ import dev.deftu.omnicore.client.render.OmniMatrixStack
 import dev.deftu.omnicore.client.render.OmniResolution
 import org.jetbrains.annotations.ApiStatus
 import org.polyfrost.oneconfig.api.platform.v1.Platform
+import org.polyfrost.polyui.component.Component
 import org.polyfrost.polyui.component.Drawable
-import org.polyfrost.polyui.component.extensions.namedId
 import org.polyfrost.polyui.renderer.Renderer
+import org.polyfrost.polyui.unit.Align
+import org.polyfrost.polyui.unit.AlignDefault
+import org.polyfrost.polyui.unit.Vec2
 
 /**
  * [Hud] implementation that uses the old rendering system, with a standard [render] method.
@@ -43,13 +46,16 @@ import org.polyfrost.polyui.renderer.Renderer
  * The [create] method is `open` in case you wish to override it. This is recommended for advanced users only.
  *
  * This class is marked with [ApiStatus.Obsolete] because the PolyUI system should be used for new code.
- * There are currently no plans to remove this, hence it is not considered a warning. This may change in the future.
+ * There are currently no plans to remove this, hence it is not considered a warning.
  */
 @ApiStatus.Obsolete(since = "1.0.0")
 abstract class LegacyHud(id: String, title: String, category: Category) : Hud<Drawable>(id, title, category) {
     abstract var width: Float
     abstract var height: Float
 
+    /**
+     * Support for complex hybrid legacy HUDs with PolyUI children is currently experimental. Please report any issues you find.
+     */
     override fun create(): Drawable = createLegacy()
 
     /**
@@ -59,7 +65,7 @@ abstract class LegacyHud(id: String, title: String, category: Category) : Hud<Dr
      *
      * **Note:** This method is called every frame, so you should not perform any heavy calculations here.
      */
-    abstract fun renderLegacy(stack: OmniMatrixStack, x: Float, y: Float, scaleX: Float, scaleY: Float, example: Boolean)
+    abstract fun renderLegacy(stack: OmniMatrixStack, x: Float, y: Float, scaleX: Float, scaleY: Float)
 
     /**
      * Render extra things for your HUD using the PolyUI renderer.
@@ -72,10 +78,23 @@ abstract class LegacyHud(id: String, title: String, category: Category) : Hud<Dr
      */
     open fun render(renderer: Renderer, drawable: Drawable) {}
 
-    protected fun createLegacy() = LegacyHudComponent(hud = this).namedId("LegacyHud")
+    @ApiStatus.Experimental
+    protected fun createLegacy(
+        vararg children: Component? = arrayOf(),
+        alignment: Align = AlignDefault,
+        size: Vec2 = Vec2.ZERO,
+        focusable: Boolean = false
+    ) = LegacyHudComponent(hud = this, children = children, alignment = alignment, size = size, focusable = focusable)
 
     @Suppress("SENSELESS_COMPARISON")
-    class LegacyHudComponent(private val hud: LegacyHud) : Drawable() {
+    open class LegacyHudComponent(
+        private val hud: LegacyHud,
+        vararg children: Component? = arrayOf(),
+        alignment: Align = AlignDefault,
+        size: Vec2 = Vec2.ZERO,
+        focusable: Boolean = false
+    ) :
+        Drawable(children = children, alignment = alignment, size = size, focusable = focusable) {
 
         override var width: Float
             get() = hud.width
@@ -91,7 +110,7 @@ abstract class LegacyHud(id: String, title: String, category: Category) : Hud<Dr
 
         fun renderLegacy(stack: OmniMatrixStack) {
             val scale = if (HudManager.useGuiScale) 1f else Platform.screen().pixelRatio() / OmniResolution.scaleFactor.toFloat()
-            hud.renderLegacy(stack, x * scale, y * scale, scaleX * scale, scaleY * scale, false)
+            hud.renderLegacy(stack, x * scale, y * scale, scaleX * scale, scaleY * scale)
         }
 
         override fun render() {
