@@ -136,6 +136,7 @@ public class OneConfig
         //$$ } catch (Throwable ignored) {
         //$$ }
         //#endif
+        
         long t1 = System.nanoTime();
         OmniLoader.ModInfo self = OmniLoader.getModInfo("oneconfig");
         String v = self == null ? "LOCAL" : self.getVersion();

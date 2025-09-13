@@ -127,7 +127,7 @@ public class PolyUIScreen extends OmniScreen implements BlurScreen {
             }
 
             framebuffer.usingToRender((matrixStack, w, h) -> {
-                matrices.runReplacingGlobalState(polyUI::render);
+                matrixStack.runReplacingGlobalState(polyUI::render);
                 return Unit.INSTANCE;
             });
         } catch (Exception e) {
@@ -135,8 +135,8 @@ public class PolyUIScreen extends OmniScreen implements BlurScreen {
             death(e);
         }
 
-        float scalingFactor = 1f / (float) OmniResolution.getScaleFactor();
         float ratio = Platform.screen().pixelRatio();
+        float scalingFactor = 1f / (float) OmniResolution.getScaleFactor();
 
         float scaledX = (Platform.screen().viewportWidth() / 2f - master.getWidth() * ratio / 2f) * scalingFactor;
         float scaledY = (Platform.screen().viewportHeight() / 2f - master.getHeight() * ratio / 2f) * scalingFactor;

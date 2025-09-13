@@ -47,6 +47,20 @@ public interface ScreenPlatform {
     @ApiStatus.Obsolete
     void setSmuggledMatrixStack(OmniMatrixStack stack);
 
+    /**
+     * <b>Do NOT call this method yourself. it is used for modern HUD only.</b>
+     */
+    @ApiStatus.Internal
+    @ApiStatus.Obsolete
+    void setSmuggledDrawContext(Object ctx);
+
+    /**
+     * <b>Do NOT call this method yourself. it is used for modern HUD only.</b>
+     */
+    @ApiStatus.Internal
+    @ApiStatus.Obsolete
+    Object getSmuggledDrawContext();
+
     void renderLegacyHuds();
 
     default float pixelRatio() {

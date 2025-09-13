@@ -45,7 +45,8 @@ public class ScreenPlatformImpl implements ScreenPlatform {
 //    //$$ private final float[] pixelScaleFactor = new float[1];
 //    //#endif
 
-    private OmniMatrixStack smuggled = new OmniMatrixStack();
+    private OmniMatrixStack smuggledMatrixStack = new OmniMatrixStack();
+    private Object smuggledDrawContext = null;
 
     @Override
     public int viewportWidth() {
@@ -91,7 +92,7 @@ public class ScreenPlatformImpl implements ScreenPlatform {
 
         for (Component child : children) {
             if (!(child instanceof LegacyHud.LegacyHudComponent)) continue;
-            ((LegacyHud.LegacyHudComponent) child).renderLegacy(smuggled);
+            ((LegacyHud.LegacyHudComponent) child).renderLegacy(smuggledMatrixStack);
         }
     }
 
@@ -115,7 +116,17 @@ public class ScreenPlatformImpl implements ScreenPlatform {
     @Override
     public void setSmuggledMatrixStack(OmniMatrixStack stack) {
         if (stack == null) return;
-        this.smuggled = stack;
+        this.smuggledMatrixStack = stack;
+    }
+
+    @Override
+    public Object getSmuggledDrawContext() {
+        return smuggledDrawContext;
+    }
+
+    @Override
+    public void setSmuggledDrawContext(Object smuggledDrawContext) {
+        this.smuggledDrawContext = smuggledDrawContext;
     }
 
     @Override

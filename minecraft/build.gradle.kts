@@ -201,6 +201,8 @@ dependencies {
         rconfig("1.21.4", "3.4.3"),
         rconfig("1.21.5", "3.5.9"),
         rconfig("1.21.6", "3.6.2"),
+        rconfig("1.21.7", "3.7.2"),
+        rconfig("1.21.8", "3.7.2", "1.21.7"),
     )
 
     compileOnlyCompat(rconfig[mcVersionString])
@@ -239,6 +241,8 @@ dependencies {
         yacl("1.21.4", "3.7.1"),
         yacl("1.21.5", "3.7.1"),
         yacl("1.21.6", "3.7.1"),
+        yacl("1.21.7", "3.7.1", "1.21.6"),
+        yacl("1.21.8", "3.7.1", "1.21.6"),
     )
     compileOnlyCompat(yacl[mcVersionString])
 
@@ -259,6 +263,9 @@ dependencies {
         modMenu("1.21.3", "12.0.0"),
         modMenu("1.21.4", "13.0.3"),
         modMenu("1.21.5", "14.0.0-rc.2"),
+        modMenu("1.21.6", "15.0.0-beta.3"),
+        modMenu("1.21.7", "15.0.0-beta.3"),
+        modMenu("1.21.8", "15.0.0-beta.3"),
     )
     compileOnlyCompat(modMenu[mcVersionString])
 
