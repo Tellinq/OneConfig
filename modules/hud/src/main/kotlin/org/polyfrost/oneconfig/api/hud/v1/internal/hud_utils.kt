@@ -52,6 +52,7 @@ val menu by lazy {
         Image("assets/oneconfig/ico/trash.svg").withHoverStates().setPalette { state.danger }.onClick {
             val cur = cur ?: return@onClick
             HudManager.removeHud(cur)
+            removeMenu()
         },
         alignment = Align(padEdges = Vec2(10f, 8f), padBetween = Vec2(14f, 8f))
     ).withBorder(2f)
@@ -222,6 +223,7 @@ fun Hud<*>.build(): Drawable {
     val min = minimumSize()
     if (min != Vec2.ZERO) o.minimumSize(min)
     setup()
+    o.rawRescalePosition = true
     return o
 }
 
@@ -303,10 +305,6 @@ fun Drawable.snapHandler() {
             scaleBlob.let {
                 it.x = x + w - (it.width / 2f)
                 it.y = y + h - (it.height / 2f)
-            }
-            menu.let {
-                it.x = x + (w / 2f) - (it.width / 2f)
-                it.y = y - it.height - 6f
             }
         }
     }

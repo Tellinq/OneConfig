@@ -127,7 +127,7 @@ public class PolyUIScreen extends OmniScreen implements BlurScreen {
             }
 
             framebuffer.usingToRender((matrixStack, w, h) -> {
-                matrices.runReplacingGlobalState(polyUI::render);
+                matrixStack.runReplacingGlobalState(polyUI::render);
                 return Unit.INSTANCE;
             });
         } catch (Exception e) {
@@ -135,8 +135,8 @@ public class PolyUIScreen extends OmniScreen implements BlurScreen {
             death(e);
         }
 
-        float scalingFactor = 1f / (float) OmniResolution.getScaleFactor();
         float ratio = Platform.screen().pixelRatio();
+        float scalingFactor = 1f / (float) OmniResolution.getScaleFactor();
 
         float scaledX = (Platform.screen().viewportWidth() / 2f - master.getWidth() * ratio / 2f) * scalingFactor;
         float scaledY = (Platform.screen().viewportHeight() / 2f - master.getHeight() * ratio / 2f) * scalingFactor;
@@ -165,10 +165,6 @@ public class PolyUIScreen extends OmniScreen implements BlurScreen {
 
 
         try {
-            //#if MC < 1.13
-            typedChar = org.lwjgl.input.Keyboard.getEventCharacter();
-            if (modifiers.isShift()) typedChar = Character.toUpperCase(typedChar);
-            //#endif
             translateKey(polyUI.getInputManager(), keyCode, typedChar, true);
         } catch (Exception e) {
             death(e);
@@ -181,14 +177,7 @@ public class PolyUIScreen extends OmniScreen implements BlurScreen {
     @MustBeInvokedByOverriders
     public boolean handleKeyRelease(int keyCode, int scancode, OmniKeyboard.@NotNull KeyboardModifiers modifiers) {
         try {
-            char typedChar;
-            //#if MC < 1.13
-            typedChar = org.lwjgl.input.Keyboard.getEventCharacter();
-            if (modifiers.isShift()) typedChar = Character.toUpperCase(typedChar);
-            //#else
-            //$$ typedChar = (char) 0; // No character for key release
-            //#endif
-            translateKey(polyUI.getInputManager(), keyCode, typedChar, false);
+            translateKey(polyUI.getInputManager(), keyCode, (char) 0, false);
         } catch (Exception e) {
             death(e);
         }
@@ -316,8 +305,8 @@ public class PolyUIScreen extends OmniScreen implements BlurScreen {
             float ratio = Platform.screen().pixelRatio();
             // framebuffer should you know probably be the correct larger size because.. well yeah of course it does
             // didn't anyone think of that?
-            framebuffer.resize((int) (initialWidth * sx * ratio), (int) (initialHeight * sy * ratio));
             polyUI.resize(initialWidth * sx, initialHeight * sy, force);
+            framebuffer.resize((int) (polyUI.getMaster().getWidth() * ratio), (int) (polyUI.getMaster().getHeight() * ratio));
             polyUI.getWindow().setPixelRatio(ratio);
         } catch (Exception e) {
             death(e);

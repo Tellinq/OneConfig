@@ -120,6 +120,14 @@ public class org/polyfrost/oneconfig/api/event/v1/events/MouseInputEvent : org/p
 	public fun component2 ()I
 }
 
+public final class org/polyfrost/oneconfig/api/event/v1/events/MouseInputEvent$Moved : org/polyfrost/oneconfig/api/event/v1/events/Event {
+	public fun component1 ()F
+	public fun component2 ()F
+	public fun getX ()F
+	public fun getY ()F
+	public static fun post (FF)V
+}
+
 public abstract class org/polyfrost/oneconfig/api/event/v1/events/PacketEvent : org/polyfrost/oneconfig/api/event/v1/events/Event$Cancellable {
 	public fun <init> (Ljava/lang/Object;)V
 	public fun component1 ()Ljava/lang/Object;

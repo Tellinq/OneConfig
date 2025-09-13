@@ -35,7 +35,7 @@ import org.polyfrost.polyui.component.extensions.*
 import org.polyfrost.polyui.component.impl.*
 import org.polyfrost.polyui.event.Event
 import org.polyfrost.polyui.event.State
-import org.polyfrost.polyui.input.KeyBinder
+import org.polyfrost.polyui.input.PolyBind
 import org.polyfrost.polyui.unit.Align
 import org.polyfrost.polyui.unit.Align.Wrap
 import org.polyfrost.polyui.unit.Vec2
@@ -118,16 +118,17 @@ fun interface Visualizer {
     class KeybindVisualizer : Visualizer {
         private val KEY_MAPPER: ((Int) -> String) = { OmniClient.getKeyDisplayName(it) }
 
+        @Suppress("UnstableApiUsage")
         override fun visualize(prop: Property<*>): Drawable {
             return Block(
                 Image("assets/oneconfig/ico/keyboard.svg".image(), at = Vec2(7f, 7f)),
-                Text(prop.getAs<KeyBinder.Bind>().keysToString("oneconfig.keybinds.none", KEY_MAPPER)),
+                Text(prop.getAs<PolyBind>().keysToString("oneconfig.keybinds.none", KEY_MAPPER)),
                 size = Vec2(230f, 32f),
                 alignment = Align(main = Align.Content.Center, wrap = Wrap.NEVER),
             ).onInit {
                 polyUI.keyBinder?.add(prop.getAs())
             }.withHoverStates().onClick {
-                val bind = prop.getAs<KeyBinder.Bind>()
+                val bind = prop.getAs<PolyBind>()
                 val image = this[0] as Image
                 val text = this[1] as Text
                 text.text = "oneconfig.keybinds.recording"

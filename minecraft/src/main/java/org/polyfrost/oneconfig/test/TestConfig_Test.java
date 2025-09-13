@@ -36,8 +36,8 @@ import org.polyfrost.oneconfig.api.ui.v1.Notifications;
 import org.polyfrost.oneconfig.api.ui.v1.keybind.OCKeybindHelper;
 import org.polyfrost.polyui.color.ColorUtils;
 import org.polyfrost.polyui.color.PolyColor;
-import org.polyfrost.polyui.input.KeyBinder;
 import org.polyfrost.polyui.input.KeyModifiers;
+import org.polyfrost.polyui.input.PolyBind;
 import org.polyfrost.polyui.unit.Align;
 
 import java.util.function.Consumer;
@@ -56,7 +56,7 @@ public class TestConfig_Test extends Config {
     public static int number = 50;
 
     @Keybind(title = "keybinding", description = "please send help")
-    KeyBinder.Bind bind0 = OCKeybindHelper.builder().keys(OmniKeyboard.KEY_P).mods(KeyModifiers.PRIMARY).does((Consumer<Boolean>) (it) -> OmniChat.displayClientMessage(it ? "pressed keybind" : "released keybind")).register();
+    PolyBind bind0 = OCKeybindHelper.builder().keys(OmniKeyboard.KEY_P).mods(KeyModifiers.PRIMARY).does((Consumer<Boolean>) (it) -> OmniChat.displayClientMessage(it ? "pressed keybind" : "released keybind")).register();
     @Slider(title = "Slide", min = 10f, max = 110f, icon = "assets/oneconfig/ico/paintbrush.svg", description = "I do sliding", category = "bob")
     public static float p = 50f;
     @Text(title = "Text")
@@ -96,10 +96,10 @@ public class TestConfig_Test extends Config {
     public float slide = 40f;
 
     @Keybind(title = "keybind")
-    private KeyBinder.Bind bind = ((OCKeybindHelper) OCKeybindHelper.builder().mods(KeyModifiers.PRIMARY).keys(OmniKeyboard.KEY_G).does((a) -> {
+    private final PolyBind bind = OCKeybindHelper.builder().mods(KeyModifiers.PRIMARY).keys(OmniKeyboard.KEY_G).does((a) -> {
         Notifications.enqueue(Notifications.Type.Info, "state: " + a);
         return Unit.INSTANCE;
-    })).register();
+    }).register();
 
     public TestConfig_Test() {
         super("test_mod.json", "Test Mod", Category.QOL);
@@ -108,7 +108,7 @@ public class TestConfig_Test extends Config {
     }
 
     @Button(title = "Test")
-    private void main() {
+    private void button() {
         OmniChat.displayClientMessage("button pressed");
     }
 

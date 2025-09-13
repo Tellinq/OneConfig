@@ -2,13 +2,8 @@ package org.polyfrost.oneconfig.internal.mixin.events;
 
 //#if MC >= 1.16.5
 //$$ import net.minecraft.client.MouseHandler;
-//$$ import org.spongepowered.asm.mixin.injection.At;
-//#if FORGE
-//$$ import org.spongepowered.asm.mixin.injection.Inject;
-//$$ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-//#else
+//$$ import dev.deftu.omnicore.client.OmniScreen;
 //$$ import org.spongepowered.asm.mixin.injection.ModifyVariable;
-//#endif
 //#else
 import net.minecraft.client.Minecraft;
 //#endif
@@ -80,6 +75,13 @@ public class Mixin_MouseInputEvent {
         EventManager.INSTANCE.post(new MouseInputEvent(org.lwjgl.input.Mouse.getEventButton(), org.lwjgl.input.Mouse.getEventButtonState() ? 1 : 0));
     }
 
+    //#endif
+
+    //#if MC >= 1.16.5
+    //$$ @Inject(method = "onMove", at = @At("HEAD"))
+    //$$ private void mouseMoveCallback(long handle, double x, double y, CallbackInfo ci) {
+    //$$     if(OmniScreen.isInScreen()) MouseInputEvent.Moved.post((float) x, (float) y);
+    //$$ }
     //#endif
 
 }

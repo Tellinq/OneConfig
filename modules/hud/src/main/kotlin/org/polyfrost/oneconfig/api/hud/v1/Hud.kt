@@ -46,7 +46,7 @@ import org.polyfrost.polyui.component.Component
 import org.polyfrost.polyui.component.Drawable
 import org.polyfrost.polyui.component.impl.Block
 import org.polyfrost.polyui.component.impl.Text
-import org.polyfrost.polyui.input.KeyBinder
+import org.polyfrost.polyui.input.PolyBind
 import org.polyfrost.polyui.unit.Vec2
 import org.polyfrost.polyui.utils.fastAll
 import org.polyfrost.polyui.utils.fastEachIndexed
@@ -73,7 +73,7 @@ import kotlin.random.Random
  * - For fields that are mutable references to other objects, you must set them yourself in [clone] in order for each HUD to be independent of each other.
  * - The easiest way to ensure that your HUD works when placed multiple times is to just not use `static` fields, so you don't abuse them.
  */
-@Suppress("EqualsOrHashCode")
+@Suppress("EqualsOrHashCode", "PROPERTY_HIDES_JAVA_FIELD", "UnstableApiUsage")
 abstract class Hud<T : Drawable>(id: String, title: String, val category: Category) : Cloneable, Config(id, null, title, null) {
     @Switch(title = "Static Width")
     var staticWidth = false
@@ -88,10 +88,10 @@ abstract class Hud<T : Drawable>(id: String, title: String, val category: Catego
     var showInScreens = true
 
     @Keybind(title = "Toggle HUD Key")
-    var toggleKey: KeyBinder.Bind? = null
+    var toggleKey: PolyBind? = null
 
     @Keybind(title = "Show HUD Key")
-    var showKey: KeyBinder.Bind? = null
+    var showKey: PolyBind? = null
 
     // we don't need to use this as we initialize in our own way.
     override fun addToInitQueue() {}
@@ -118,6 +118,7 @@ abstract class Hud<T : Drawable>(id: String, title: String, val category: Catego
             tree.addMetadata("category", category)
             tree.addMetadata("hidden", true)
             val hud = get()
+            hud.rawRescalePosition = true
             tree["x"] = ktProperty(hud::x)
             tree["y"] = ktProperty(hud::y)
             inspect(hud, tree)
@@ -164,7 +165,7 @@ abstract class Hud<T : Drawable>(id: String, title: String, val category: Catego
             hidden = screen != null
             // asm: don't hide when we open the hud editor
             // because otherwise you couldn't edit it (which sucks)
-            if (HudManager.panelExists) hidden = false
+            if (HudManager.isEditing) hidden = false
         }
         tree.getProp<Boolean>("showInF3")?.addCallback {
             if (!it) hideF3Handler.register()
@@ -182,8 +183,8 @@ abstract class Hud<T : Drawable>(id: String, title: String, val category: Catego
             false
         }
 
-        showKey = (OCKeybindHelper.builder().does { hidden = !it } as OCKeybindHelper).register()
-        toggleKey = (OCKeybindHelper.builder().does { if (it) hidden = !hidden } as OCKeybindHelper).register()
+        showKey = OCKeybindHelper.builder().does { hidden = !it }.register()
+        toggleKey = OCKeybindHelper.builder().does { if (it) hidden = !hidden }.register()
     }
 
     private fun inspect(cmp: Component, tree: Tree) {

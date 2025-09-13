@@ -39,6 +39,7 @@ import org.polyfrost.polyui.input.InputManager
 import org.polyfrost.polyui.input.KeyBinder
 import org.polyfrost.polyui.input.KeyModifiers
 import org.polyfrost.polyui.input.Keys
+import org.polyfrost.polyui.input.PolyBind
 
 @Suppress("UnstableApiUsage")
 object KeybindManager {
@@ -73,7 +74,7 @@ object KeybindManager {
     }
 
     @JvmStatic
-    fun registerKeybind(bind: KeyBinder.Bind?): KeyBinder.Bind? {
+    fun registerKeybind(bind: PolyBind?): PolyBind? {
         if (bind != null) keyBinder.add(bind)
         return bind
     }
@@ -84,8 +85,8 @@ object KeybindManager {
     @JvmStatic
     fun translateKey(inputManager: InputManager, keyCode: Int, char: Char, down: Boolean) {
         try {
-            if (char != '\u0000' && char.isValid()) {
-                if (down) inputManager.keyTyped(char.toInt())
+            if (char.isValid() && inputManager.mods <= 2) { // asm: only allow no mod or shift mod for char input
+                if (down) inputManager.keyTyped(char.code)
             }
             val mod = when (keyCode) {
                 OmniKeyboard.KEY_LSHIFT -> KeyModifiers.LSHIFT

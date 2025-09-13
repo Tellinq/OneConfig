@@ -27,18 +27,19 @@
 package org.polyfrost.oneconfig.api.ui.v1.keybind
 
 import org.polyfrost.oneconfig.api.platform.v1.Platform
-import org.polyfrost.polyui.input.KeyBinder
+import org.polyfrost.polyui.input.PolyBind
 import org.polyfrost.polyui.input.Keys
 import org.polyfrost.polyui.input.Modifiers
 import org.polyfrost.polyui.utils.IntArraySet
 
+@Suppress("UnstableApiUsage")
 class BindNotInScreen(
     unmappedKeys: IntArray? = null, keys: Array<Keys>? = null,
     mouse: IntArray? = null,
     mods: Modifiers = Modifiers(0),
     durationNanos: Long = 0L,
     action: (Boolean) -> Boolean
-) : KeyBinder.Bind(unmappedKeys, keys, mouse, mods, durationNanos, action) {
+) : PolyBind(unmappedKeys, keys, mouse, mods, durationNanos, action) {
     override fun test(c: IntArraySet, k: ArrayList<Keys>, m: IntArraySet, mods: Byte, down: Boolean): Boolean {
         return super.test(c, k, m, mods, down) && Platform.screen().current<Any?>() == null
     }

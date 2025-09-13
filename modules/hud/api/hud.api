@@ -17,9 +17,9 @@ public abstract class org/polyfrost/oneconfig/api/hud/v1/Hud : org/polyfrost/one
 	public final fun getShowInF3 ()Z
 	public final fun getShowInScreens ()Z
 	public final fun getShowInTab ()Z
-	public final fun getShowKey ()Lorg/polyfrost/polyui/input/KeyBinder$Bind;
+	public final fun getShowKey ()Lorg/polyfrost/polyui/input/PolyBind;
 	public final fun getStaticWidth ()Z
-	public final fun getToggleKey ()Lorg/polyfrost/polyui/input/KeyBinder$Bind;
+	public final fun getToggleKey ()Lorg/polyfrost/polyui/input/PolyBind;
 	public fun hasBackground ()Z
 	public final fun isReal ()Z
 	public final fun make (Lorg/polyfrost/oneconfig/api/config/v1/Tree;)Lorg/polyfrost/oneconfig/api/hud/v1/Hud;
@@ -30,9 +30,9 @@ public abstract class org/polyfrost/oneconfig/api/hud/v1/Hud : org/polyfrost/one
 	public final fun setShowInF3 (Z)V
 	public final fun setShowInScreens (Z)V
 	public final fun setShowInTab (Z)V
-	public final fun setShowKey (Lorg/polyfrost/polyui/input/KeyBinder$Bind;)V
+	public final fun setShowKey (Lorg/polyfrost/polyui/input/PolyBind;)V
 	public final fun setStaticWidth (Z)V
-	public final fun setToggleKey (Lorg/polyfrost/polyui/input/KeyBinder$Bind;)V
+	public final fun setToggleKey (Lorg/polyfrost/polyui/input/PolyBind;)V
 	public fun setup ()V
 	public abstract fun update ()Z
 	protected final fun updateAndRecalculate ()V
@@ -63,14 +63,14 @@ public final class org/polyfrost/oneconfig/api/hud/v1/HudManager {
 	public final fun getActiveInstances ()Ljava/util/ArrayList;
 	public final fun getHudsOfType (Ljava/lang/Class;)Ljava/util/ArrayList;
 	public final fun getPanel ()Lorg/polyfrost/polyui/component/Drawable;
-	public final fun getPanelExists ()Z
 	public final fun getProvider (Ljava/lang/Class;)Lorg/polyfrost/oneconfig/api/hud/v1/Hud;
 	public final fun getSlinex ()F
 	public final fun getSliney ()F
 	public final fun getUseGuiScale ()Z
 	public final fun getWithEditor ()Ljava/lang/Object;
 	public final fun initialize ()V
-	public static final fun isPanelOpen ()Z
+	public static final fun isEditing ()Z
+	public final fun isPanelOpen ()Z
 	public final fun openHudEditor (Lorg/polyfrost/oneconfig/api/hud/v1/Hud;)V
 	public static final fun register (Lorg/polyfrost/oneconfig/api/hud/v1/Hud;)V
 	public static final fun register ([Lorg/polyfrost/oneconfig/api/hud/v1/Hud;)V
@@ -89,12 +89,25 @@ public final class org/polyfrost/oneconfig/api/hud/v1/HudManager {
 public abstract class org/polyfrost/oneconfig/api/hud/v1/LegacyHud : org/polyfrost/oneconfig/api/hud/v1/Hud {
 	public fun <init> (Ljava/lang/String;Ljava/lang/String;Lorg/polyfrost/oneconfig/api/hud/v1/Hud$Category;)V
 	protected fun create ()Lorg/polyfrost/polyui/component/Drawable;
-	protected final fun createLegacy ()Lorg/polyfrost/polyui/component/Drawable;
+	protected final fun createLegacy-Op45VSw ([Lorg/polyfrost/polyui/component/Component;Lorg/polyfrost/polyui/unit/Align;JZ)Lorg/polyfrost/oneconfig/api/hud/v1/LegacyHud$LegacyHudComponent;
+	public static synthetic fun createLegacy-Op45VSw$default (Lorg/polyfrost/oneconfig/api/hud/v1/LegacyHud;[Lorg/polyfrost/polyui/component/Component;Lorg/polyfrost/polyui/unit/Align;JZILjava/lang/Object;)Lorg/polyfrost/oneconfig/api/hud/v1/LegacyHud$LegacyHudComponent;
 	public abstract fun getHeight ()F
 	public abstract fun getWidth ()F
-	public abstract fun render (Ldev/deftu/omnicore/client/render/OmniMatrixStack;FFFFZ)V
+	public fun render (Lorg/polyfrost/polyui/renderer/Renderer;Lorg/polyfrost/polyui/component/Drawable;)V
+	public abstract fun renderLegacy (Ldev/deftu/omnicore/client/render/OmniMatrixStack;FFFF)V
 	public abstract fun setHeight (F)V
 	public abstract fun setWidth (F)V
+}
+
+public class org/polyfrost/oneconfig/api/hud/v1/LegacyHud$LegacyHudComponent : org/polyfrost/polyui/component/Drawable {
+	public synthetic fun <init> (Lorg/polyfrost/oneconfig/api/hud/v1/LegacyHud;[Lorg/polyfrost/polyui/component/Component;Lorg/polyfrost/polyui/unit/Align;JZILkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public synthetic fun <init> (Lorg/polyfrost/oneconfig/api/hud/v1/LegacyHud;[Lorg/polyfrost/polyui/component/Component;Lorg/polyfrost/polyui/unit/Align;JZLkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public fun getHeight ()F
+	public fun getWidth ()F
+	protected fun render ()V
+	public final fun renderLegacy (Ldev/deftu/omnicore/client/render/OmniMatrixStack;)V
+	public fun setHeight (F)V
+	public fun setWidth (F)V
 }
 
 public abstract class org/polyfrost/oneconfig/api/hud/v1/TextHud : org/polyfrost/oneconfig/api/hud/v1/Hud {
@@ -139,5 +152,11 @@ public final class org/polyfrost/oneconfig/api/hud/v1/TextHud$Simple : org/polyf
 	public final fun getIt ()Ljava/lang/String;
 	public final fun setIt (Ljava/lang/String;)V
 	public fun setup ()V
+}
+
+public class org/polyfrost/oneconfig/api/hud/v1/events/HudEditorToggleEvent : org/polyfrost/oneconfig/api/event/v1/events/Event {
+	public static final field CLOSE Lorg/polyfrost/oneconfig/api/hud/v1/events/HudEditorToggleEvent;
+	public static final field OPEN Lorg/polyfrost/oneconfig/api/hud/v1/events/HudEditorToggleEvent;
+	public final field open Z
 }
 

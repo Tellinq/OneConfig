@@ -1,7 +1,6 @@
 package org.polyfrost.oneconfig.internal.compat
 
 import dev.deftu.omnicore.common.OmniLoader
-import kotlinx.coroutines.NonCancellable.key
 import org.polyfrost.oneconfig.api.event.v1.EventManager
 import org.polyfrost.oneconfig.api.event.v1.events.Event
 import org.polyfrost.oneconfig.api.event.v1.events.ResourceFinishedLoading
@@ -55,13 +54,12 @@ object CompatLoader {
     init {
         OmniLoader.loadedMods.forEach { mod ->
             mod.file?.let {
-                pathFactory.put(mod, it.toUri().toString()::plus)
+                pathFactory[mod] = it.toUri().toString()::plus
             }
         }
 
         register<ResourceFinishedLoading> {
-            list.sortedBy { (key) -> key }.forEach { (_, value) ->
-                println(key)
+            list.sortedBy { (key, _) -> key }.forEach { (_, value) ->
                 value()
             }
         }

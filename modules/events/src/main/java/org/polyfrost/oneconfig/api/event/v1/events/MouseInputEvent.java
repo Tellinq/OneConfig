@@ -26,6 +26,9 @@
 
 package org.polyfrost.oneconfig.api.event.v1.events;
 
+import org.jetbrains.annotations.ApiStatus;
+import org.polyfrost.oneconfig.api.event.v1.EventManager;
+
 public class MouseInputEvent implements Event {
     public final int button;
     public final int state;
@@ -41,5 +44,38 @@ public class MouseInputEvent implements Event {
 
     public int component2() {
         return state;
+    }
+
+    /**
+     * This event is only fired when the mouse is moved inside a screen. The provided coordinates are SCREEN coordinates, not minecraft-specific.
+     */
+    public static final class Moved implements Event {
+        private static final Moved INSTANCE = new Moved();
+        private float x, y;
+
+        private Moved() {}
+
+        @ApiStatus.Internal
+        public static void post(float x, float y) {
+            INSTANCE.x = x;
+            INSTANCE.y = y;
+            EventManager.INSTANCE.post(INSTANCE);
+        }
+
+        public float getX() {
+            return x;
+        }
+
+        public float getY() {
+            return y;
+        }
+
+        public float component1() {
+            return x;
+        }
+
+        public float component2() {
+            return y;
+        }
     }
 }

@@ -28,6 +28,7 @@ import dev.deftu.omnicore.client.render.OmniGameRendering;
 import dev.deftu.omnicore.client.render.OmniMatrixStack;
 import org.polyfrost.oneconfig.api.event.v1.EventManager;
 import org.polyfrost.oneconfig.api.event.v1.events.HudRenderEvent;
+import org.polyfrost.oneconfig.api.platform.v1.Platform;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -72,6 +73,14 @@ public class Mixin_HudRenderEvent {
                 //$$ ctx
                 //#endif
         );
+
+        //#if MC >= 1.20.1
+        //$$ Platform.screen().setSmuggledDrawContext(ctx);
+        //#elseif MC >= 1.16.5
+        //$$ Platform.screen().setSmuggledDrawContext(stack);
+        //#else
+        Platform.screen().setSmuggledDrawContext(stack);
+        //#endif
 
         float partialTicks = OmniGameRendering.getTickDelta(false);
         EventManager.INSTANCE.post(new HudRenderEvent(stack, partialTicks));

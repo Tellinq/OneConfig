@@ -27,10 +27,12 @@
 package org.polyfrost.oneconfig.api.ui.v1;
 
 import dev.deftu.omnicore.client.OmniChat;
+import dev.deftu.omnicore.client.render.ImmediateScreenRenderer;
 import dev.deftu.omnicore.client.render.OmniMatrixStack;
 import dev.deftu.omnicore.client.render.OmniResolution;
 import dev.deftu.omnicore.client.render.framebuffer.ManagedFramebuffer;
 import dev.deftu.omnicore.client.render.pipeline.OmniRenderPipeline;
+import dev.deftu.omnicore.client.render.state.OmniManagedColorMask;
 import dev.deftu.omnicore.client.render.texture.GpuTexture;
 import dev.deftu.textile.minecraft.MCSimpleTextHolder;
 import dev.deftu.textile.minecraft.MCTextFormat;
@@ -117,7 +119,7 @@ public interface UIManager {
             settings.enableInitCleanup(false);
 
             PolyUI polyUI = new PolyUI(new Component[0], getRenderer(), settings, 1920f, 1080f);
-            polyUI.getMaster().setRawResize(true);
+            polyUI.getMaster().setRawRescaleSize(true);
             polyUI.setWindow(createWindow());
             polyUI.resize(Platform.screen().windowWidth(), Platform.screen().windowHeight(), false);
 
@@ -126,6 +128,12 @@ public interface UIManager {
                 OmniMatrixStack matrices = event.matrices;
                 Platform.screen().setSmuggledMatrixStack(matrices);
 
+                Object smuggledDrawContext = Platform.screen().getSmuggledDrawContext();
+                if (smuggledDrawContext == null) {
+                    return;
+                }
+
+                new OmniManagedColorMask(true, true, true, true).activate();
                 framebuffer.clearColor(0f, 0f, 0f, 0f); // Clear to transparent black
                 framebuffer.clearDepthStencil(1.0, 0);
                 framebuffer.usingToRender((matrixStack, w, h) -> {
@@ -141,19 +149,24 @@ public interface UIManager {
                 float scalingFactor = 1f / (float) OmniResolution.getScaleFactor();
                 float scaledWidth = master.getWidth() * scalingFactor * ratio;
                 float scaledHeight = master.getHeight() * scalingFactor * ratio;
-                framebuffer.drawColorTexture(
-                        getRenderPipeline(),
-                        matrices,
-                        0, 0,
-                        scaledWidth, scaledHeight,
-                        Color.WHITE.getRGB()
-                );
+                ImmediateScreenRenderer.INSTANCE.close();
+                ImmediateScreenRenderer.render(smuggledDrawContext, (matrixStack) -> {
+                    framebuffer.drawColorTexture(
+                            getRenderPipeline(),
+                            matrixStack,
+                            0, 0,
+                            scaledWidth, scaledHeight,
+                            -1
+                    );
+
+                    return Unit.INSTANCE;
+                });
             });
 
             EventManager.register(ResizeEvent.class, event -> {
                 float ratio = Platform.screen().pixelRatio();
-                framebuffer.resize((int) (event.newWidth * ratio), (int) (event.newHeight * ratio));
                 polyUI.resize(event.newWidth, event.newHeight, false);
+                framebuffer.resize((int) (polyUI.getMaster().getWidth() * ratio), (int) (polyUI.getMaster().getHeight() * ratio));
                 polyUI.getWindow().setPixelRatio(ratio);
             });
 
