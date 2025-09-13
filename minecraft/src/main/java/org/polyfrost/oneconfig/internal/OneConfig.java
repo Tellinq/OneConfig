@@ -32,10 +32,12 @@ import dev.deftu.clipboard.Clipboard;
 import dev.deftu.omnicore.client.OmniChat;
 import dev.deftu.omnicore.client.OmniClient;
 import dev.deftu.omnicore.client.OmniClientCommands;
+import dev.deftu.omnicore.client.OmniScreen;
 import dev.deftu.omnicore.common.OmniLoader;
 import dev.deftu.textile.minecraft.MCSimpleTextHolder;
 import dev.deftu.textile.minecraft.MCTextFormat;
 import kotlin.Unit;
+import net.minecraft.client.gui.GuiChat;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.polyfrost.oneconfig.api.commands.v1.CommandManager;
@@ -219,6 +221,8 @@ public class OneConfig
             if (s) {
                 // asm: in non-dev prevent the UI from opening in the main menu
                 if (!OmniClient.hasWorld() && !OmniLoader.isDevelopment()) return Unit.INSTANCE;
+                // also prevent opening in chat
+                if (OmniScreen.getCurrentScreen() instanceof GuiChat) return Unit.INSTANCE;
                 try {
                     OneConfigUI.INSTANCE.open();
                 } catch (Throwable t) {

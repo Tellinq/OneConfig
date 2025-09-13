@@ -31,13 +31,10 @@ import dev.deftu.omnicore.common.OmniLoader
 import org.apache.logging.log4j.LogManager
 import org.jetbrains.annotations.ApiStatus
 import org.polyfrost.oneconfig.api.config.v1.ConfigManager
+import org.polyfrost.oneconfig.api.event.v1.EventManager
 import org.polyfrost.oneconfig.api.event.v1.eventHandler
 import org.polyfrost.oneconfig.api.event.v1.events.ScreenOpenEvent
-import org.polyfrost.oneconfig.api.hud.v1.HudManager.getHudsOfType
-import org.polyfrost.oneconfig.api.hud.v1.HudManager.getProvider
-import org.polyfrost.oneconfig.api.hud.v1.HudManager.removeHud
-import org.polyfrost.oneconfig.api.hud.v1.HudManager.toggleAllHuds
-import org.polyfrost.oneconfig.api.hud.v1.HudManager.unregister
+import org.polyfrost.oneconfig.api.hud.v1.events.HudEditorToggleEvent
 import org.polyfrost.oneconfig.api.hud.v1.internal.*
 import org.polyfrost.oneconfig.api.platform.v1.Platform
 import org.polyfrost.oneconfig.api.ui.v1.UIManager
@@ -87,15 +84,18 @@ object HudManager {
     var sliney = -1f
 
     /**
-     * returns true if the HUD panel is open, which is the equivalent of `HudCore.editing` in V0.
+     * Whether the HUD editor panel is currently open, i.e. collapsed or expanded.
      */
     @get:JvmName("isPanelOpen")
-    @JvmStatic
     var panelOpen = false
         private set
 
-    @ApiStatus.Internal
-    var panelExists = false
+    /**
+     * Whether the HUD editor is currently on the screen, i.e. `HudCore.editing` in V0.
+     */
+    @JvmStatic
+    @get:JvmName("isEditing")
+    var isEditing = false
         private set
 
     var useGuiScale = true
@@ -299,8 +299,11 @@ object HudManager {
         // this means that we will catch 99% of cases when the GUI scale changes,
         // as most often this will occur in a screen. It is more reliable than listening to the option change directly
         // as it is a public int so would be impossible to listen to find every change.
-        eventHandler { _: ScreenOpenEvent ->
+        eventHandler { (screen): ScreenOpenEvent ->
             if (useGuiScale) setAllHudsScaleFactor(OmniResolution.scaleFactor.toFloat())
+            // in the case the screen crashes or doesn't exit cleanly, we force it to close here
+            // as otherwise it can end up being stuck open. seems to be confined to modern only. see #505.
+            if(screen == null && isEditing) editorClose()
         }
 
         LOGGER.info("HUD load took {}ms", (System.nanoTime() - now) / 1_000_000.0)
@@ -327,7 +330,10 @@ object HudManager {
         activeInstances.fastEach {
             it.hidden = false
         }
-        return UIManager.INSTANCE.createPolyUIScreen(polyUI, 0f, 0f, false, true) { editorClose() }
+        val o = UIManager.INSTANCE.createPolyUIScreen(polyUI, 0f, 0f, false, true) { editorClose() }
+        // asm: ensure that the panel is the correct height.
+        panel[0].height = polyUI.size.y - 32f
+        return o
     }
 
     @ApiStatus.Internal
@@ -343,6 +349,9 @@ object HudManager {
         ConfigManager.active().saveAll()
     }
 
+    /**
+     * Expand or collapse the HUD editor panel, so move it on or off screen.
+     */
     @ApiStatus.Internal
     fun toggle() {
         panelOpen = !panelOpen
@@ -358,6 +367,9 @@ object HudManager {
         }
     }
 
+    /**
+     * Open or close the HUD editor.
+     */
     @ApiStatus.Internal
     fun toggleHudPicker() {
         val pg = panel
@@ -366,19 +378,19 @@ object HudManager {
         }
         pg.prioritize()
         pg.renders = true
-        if (panelExists) {
+        if (isEditing) {
             Fade(pg, 0f, false, Animations.Default.create(0.2.seconds)) {
                 renders = false
             }.add()
-            // remove scale blob
-            polyUI.inputManager.focus(null)
+            EventManager.INSTANCE.post(HudEditorToggleEvent.CLOSE)
         } else {
             pg.alpha = 0f
             Fade(pg, 1f, false, Animations.Default.create(0.2.seconds)).add()
             pg.x = polyUI.size.x - 32f
             toggle()
+            EventManager.INSTANCE.post(HudEditorToggleEvent.OPEN)
         }
-        panelExists = !panelExists
+        isEditing = !isEditing
     }
 
     internal fun canAutoOpen(): Boolean = !polyUI.master.hasChildIn(polyUI.size.x - panel.width - 34f, 0f, panel.width, polyUI.size.y)

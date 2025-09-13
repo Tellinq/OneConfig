@@ -119,7 +119,7 @@ public interface UIManager {
             settings.enableInitCleanup(false);
 
             PolyUI polyUI = new PolyUI(new Component[0], getRenderer(), settings, 1920f, 1080f);
-            polyUI.getMaster().setRawResize(true);
+            polyUI.getMaster().setRawRescaleSize(true);
             polyUI.setWindow(createWindow());
             polyUI.resize(Platform.screen().windowWidth(), Platform.screen().windowHeight(), false);
 

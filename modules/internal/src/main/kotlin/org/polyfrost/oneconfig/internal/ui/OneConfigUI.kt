@@ -43,6 +43,8 @@ import org.polyfrost.oneconfig.internal.ui.pages.ThemesPage
 import org.polyfrost.oneconfig.internal.ui.pages.TreeSource
 import org.polyfrost.polyui.animate.Animations
 import org.polyfrost.polyui.animate.SetAnimation
+import org.polyfrost.polyui.color.DarkTheme
+import org.polyfrost.polyui.color.LightTheme
 import org.polyfrost.polyui.color.rgba
 import org.polyfrost.polyui.component.Component
 import org.polyfrost.polyui.component.Drawable
@@ -59,6 +61,7 @@ import org.polyfrost.polyui.unit.Vec2
 import org.polyfrost.polyui.unit.seconds
 import org.polyfrost.polyui.utils.fastEach
 import org.polyfrost.polyui.utils.image
+import org.polyfrost.polyui.utils.rescaleToPolyUIInstance
 
 object OneConfigUI {
     // Should only be used for native compat trees that require custom on click methods
@@ -128,7 +131,6 @@ object OneConfigUI {
             }
             if (!OmniLoader.isDevelopment) builder.pauses()
 
-            val searchField: TextInput
             val (polyUI, win) = builder.makeAndOpenWithRef(
                 Block(
                     Block(
@@ -149,9 +151,9 @@ object OneConfigUI {
                     ).sidebarDisable().addHoverInfo(Text("this feature is experimental and is coming soon!")),
                     SidebarButton("assets/oneconfig/ico/keyboard.svg".image(), "oneconfig.keybinds").sidebarDisable(),
                     Text("oneconfig.sidebar.title.personal", fontSize = 11f).setPalette { text.secondary }.padded(0f, 12f, 0f, 0f),
-                    SidebarButton("assets/oneconfig/ico/paintbrush.svg".image(), "oneconfig.themes", label("oneconfig.soon")).onClick {
-                        openPage(ThemesPage())
-                    }.sidebarDisable(),
+                    SidebarButton("assets/oneconfig/ico/paintbrush.svg".image(), "oneconfig.themes", label("oneconfig.new")).onClick {
+                        openPage(ThemesPage(DarkTheme(), LightTheme()))
+                    },
                     SidebarButton("assets/oneconfig/ico/cog.svg".image(), "oneconfig.preferences").onClick {
                         openPage(ConfigVisualizer.INSTANCE.get(ConfigManager.active().get("oneconfig.json")).named("oneconfig.preferences"))
                     },
@@ -211,8 +213,7 @@ object OneConfigUI {
                                         if (text.length > 2) {
                                             if(current?.name != "oneconfig.search") {
                                                 val search = Group(children = ConfigVisualizer.INSTANCE.getMatching(text).toTypedArray(), visibleSize = Vec2(1130f, 635f)).named("oneconfig.search")
-                                                if (search.children.isNullOrEmpty()) search.addChild(searchNoneFound)
-                                                search.setup(polyUI)
+                                                if (search.children.isNullOrEmpty()) search.addChild(searchNoneFound, recalculate = false)
                                                 openPage(search, SetAnimation.Fade)
                                             } else {
                                                 val search = current as Group
@@ -220,14 +221,19 @@ object OneConfigUI {
                                                 ConfigVisualizer.INSTANCE.getMatching(text).fastEach {
                                                     search.addChild(it, recalculate = false)
                                                 }
+                                                if (search.children.isNullOrEmpty()) search.addChild(searchNoneFound, recalculate = false)
+                                                // search.at = search.screenAt
                                                 search.recalculate(false)
+                                                search.resetScroll()
+                                                search.visibleSize = Vec2(1130f, 635f).rescaleToPolyUIInstance(polyUI)
+                                                search.clipChildren()
                                             }
                                         } else {
                                             openPage(ModsPage(collectTrees()), SetAnimation.Fade)
                                         }
 
                                         false
-                                    }.also { searchField = it },
+                                    },
                                     size = Vec2(256f, 32f),
                                     alignment = Align(pad = Vec2(10f, 8f)),
                                 ).withBorder(1f) { page.border5 }.named("SearchField").onRightClick {
@@ -250,7 +256,7 @@ object OneConfigUI {
                     alignment = Align(line = Align.Line.Start, pad = Vec2.ZERO),
                 ),
             )
-//            polyUI.keyBinder?.add(KeyBinder.Bind(unmappedKeys = arrayOf(OmniKeyboard.KEY_F), mods = Modifiers(KeyModifiers.PRIMARY)) {
+//            polyUI.keyBinder?.add(PolyBind(unmappedKeys = arrayOf(OmniKeyboard.KEY_F), mods = Modifiers(KeyModifiers.PRIMARY)) {
 //                polyUI.focus(searchField)
 //                false
 //            })
@@ -293,7 +299,7 @@ object OneConfigUI {
     }
 
     fun label(text: String) = Block(
-        Text(text).setFont { bold },
+        Text(text).setFont { bold }.denyPaletteChanges(),
         alignment = Align(main = Align.Content.Center),
         size = Vec2(54f, 18f),
     ).setPalette { brand.fg }.radius(9f)

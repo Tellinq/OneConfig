@@ -168,6 +168,7 @@ abstract class TextHud(
         override fun clone() = super.clone().also { _formatter = null }
     }
 
+    @Suppress("UnstableApiUsage")
     class DownKeys() : TextHud("down_keys_hud.yml", "Down Keys Hud", Category.INFO, "") {
         val binder = KeybindManager.inputManager.keyBinder ?: throw IllegalStateException("Couldn't find KeyBinder!")
         val downMouse = MHUtils.getField<IntArraySet>(binder, "downMouseButtons").getOrThrow()
@@ -176,13 +177,9 @@ abstract class TextHud(
 
         override fun getText(): String? {
             sb.append("Mouse: ")
-            downMouse.toIntArray().also { for (i in it) sb.append(i).append(' ') }
+            downMouse.forEach { sb.append(it).append(' ') }
             sb.append("\nUnmapped: ")
-            downUnmapped.toIntArray().also {
-                for (i in it) {
-                    sb.append(OmniClient.getKeyDisplayName(i)).append(' ')
-                }
-            }
+            downUnmapped.forEach { sb.append(OmniClient.getKeyDisplayName(it)).append(' ') }
             sb.append("\nKeys: ")
             downKeys.forEach { sb.append(it.name).append(' ') }
             sb.append("\nMods: ")
