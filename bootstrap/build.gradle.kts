@@ -16,6 +16,7 @@ plugins {
     id(libs.plugins.dgt.bloom.get().pluginId)
     id(libs.plugins.dgt.shadow.get().pluginId)
     id(libs.plugins.dgt.loom.get().pluginId)
+    signing
 }
 
 toolkitLoomHelper {
@@ -75,6 +76,19 @@ afterEvaluate {
     tasks {
         matching { it.group == "publishing" }.forEach {
             it.enabled = false
+        }
+    }
+    publishing {
+        publications {
+            named<MavenPublication>("mavenJava") {
+                artifactId = project.name
+                groupId = project.group.toString()
+
+                signing {
+                    isRequired = project.properties["signing.keyId"] != null
+                    sign(this@named)
+                }
+            }
         }
     }
 }

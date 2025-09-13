@@ -332,7 +332,7 @@ object HudManager {
         }
         val o = UIManager.INSTANCE.createPolyUIScreen(polyUI, 0f, 0f, false, true) { editorClose() }
         // asm: ensure that the panel is the correct height.
-        panel[0].height = polyUI.size.y - 32f
+//        panel[0].height = polyUI.size.y - 32f
         return o
     }
 
@@ -455,6 +455,9 @@ object HudManager {
                 }
             },
             size = Vec2(0f, 1080f)
-        )
+        ).also {
+            it.rawRescalePosition = true
+            it.rawRescaleSize = true
+        }
     }
 }

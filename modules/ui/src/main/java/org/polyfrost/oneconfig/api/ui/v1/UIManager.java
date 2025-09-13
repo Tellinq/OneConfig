@@ -165,8 +165,8 @@ public interface UIManager {
 
             EventManager.register(ResizeEvent.class, event -> {
                 float ratio = Platform.screen().pixelRatio();
-                framebuffer.resize((int) (event.newWidth * ratio), (int) (event.newHeight * ratio));
                 polyUI.resize(event.newWidth, event.newHeight, false);
+                framebuffer.resize((int) (polyUI.getMaster().getWidth() * ratio), (int) (polyUI.getMaster().getHeight() * ratio));
                 polyUI.getWindow().setPixelRatio(ratio);
             });
 

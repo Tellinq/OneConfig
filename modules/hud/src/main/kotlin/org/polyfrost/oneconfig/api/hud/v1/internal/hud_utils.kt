@@ -306,10 +306,6 @@ fun Drawable.snapHandler() {
                 it.x = x + w - (it.width / 2f)
                 it.y = y + h - (it.height / 2f)
             }
-            menu.let {
-                it.x = x + (w / 2f) - (it.width / 2f)
-                it.y = y - it.height - 6f
-            }
         }
     }
     HudManager.slinex = -1f
