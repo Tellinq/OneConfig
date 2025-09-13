@@ -32,6 +32,7 @@ import dev.deftu.omnicore.client.render.OmniMatrixStack;
 import dev.deftu.omnicore.client.render.OmniResolution;
 import dev.deftu.omnicore.client.render.framebuffer.ManagedFramebuffer;
 import dev.deftu.omnicore.client.render.pipeline.OmniRenderPipeline;
+import dev.deftu.omnicore.client.render.state.OmniManagedColorMask;
 import dev.deftu.omnicore.client.render.texture.GpuTexture;
 import dev.deftu.textile.minecraft.MCSimpleTextHolder;
 import dev.deftu.textile.minecraft.MCTextFormat;
@@ -132,6 +133,7 @@ public interface UIManager {
                     return;
                 }
 
+                new OmniManagedColorMask(true, true, true, true).activate();
                 framebuffer.clearColor(0f, 0f, 0f, 0f); // Clear to transparent black
                 framebuffer.clearDepthStencil(1.0, 0);
                 framebuffer.usingToRender((matrixStack, w, h) -> {
@@ -156,9 +158,6 @@ public interface UIManager {
                             scaledWidth, scaledHeight,
                             -1
                     );
-
-                    OmniManagedBlendState.disableBlend();
-                    OmniManagedDepthState.disableDepth();
 
                     return Unit.INSTANCE;
                 });
