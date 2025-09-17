@@ -68,7 +68,7 @@ object OneConfigUI {
     @ApiStatus.Internal
     val extraConfigTrees: MutableList<Tree> = mutableListOf()
 
-    private val playerHead = PolyImage(
+    private val playerHead = PolyImage.of(
         "https://mc-heads.net/avatar/${OmniClientPlayer.name}/24",
         type = PolyImage.Type.Raster,
     )

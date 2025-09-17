@@ -97,7 +97,7 @@ public abstract class Config {
         }
         if ((tree = makeTree()) != null) {
             tree.setTitle(title);
-            if (iconPath != null) tree.addMetadata("icon", new PolyImage(iconPath));
+            if (iconPath != null) tree.addMetadata("icon", PolyImage.of(iconPath));
 
             tree.addMetadata("category", category);
             ConfigManager.backup().backend.save0(tree);

@@ -29,23 +29,14 @@ package org.polyfrost.oneconfig.internal.ui.pages
 import org.polyfrost.oneconfig.internal.ui.OneConfigUI
 import org.polyfrost.polyui.color.Colors
 import org.polyfrost.polyui.component.Drawable
-import org.polyfrost.polyui.component.extensions.denyPaletteChanges
-import org.polyfrost.polyui.component.extensions.ignoreLayout
-import org.polyfrost.polyui.component.extensions.named
-import org.polyfrost.polyui.component.extensions.onClick
-import org.polyfrost.polyui.component.extensions.padded
-import org.polyfrost.polyui.component.extensions.radius
-import org.polyfrost.polyui.component.extensions.setFont
-import org.polyfrost.polyui.component.extensions.setPalette
-import org.polyfrost.polyui.component.extensions.withBorder
-import org.polyfrost.polyui.component.extensions.withHoverStates
+import org.polyfrost.polyui.component.extensions.*
 import org.polyfrost.polyui.component.impl.Block
 import org.polyfrost.polyui.component.impl.Group
 import org.polyfrost.polyui.component.impl.Image
 import org.polyfrost.polyui.component.impl.Text
-import org.polyfrost.polyui.data.PolyImage
 import org.polyfrost.polyui.unit.Align
 import org.polyfrost.polyui.unit.Vec2
+import org.polyfrost.polyui.utils.image
 import org.polyfrost.polyui.utils.mapToArray
 import org.polyfrost.polyui.utils.translated
 
@@ -65,7 +56,7 @@ fun ThemesPage(vararg registeredThemes: Colors): Drawable {
 private fun ThemesLargeCard() = Block(
     Block(
         Block(size = Vec2(108f, 5f)).setPalette { text.primary },
-        Block(size = Vec2(48f, 3f)).padded(0f, -1f, 0f, 9f).setPalette { text.secondary},
+        Block(size = Vec2(48f, 3f)).padded(0f, -1f, 0f, 9f).setPalette { text.secondary },
         Block(size = Vec2(84f, 4f)).setPalette { state.danger },
         Block(size = Vec2(60f, 4f)).setPalette { state.warning },
         Block(size = Vec2(78f, 4f)).setPalette { state.success },
@@ -91,7 +82,7 @@ private fun ThemesSmallCard(colors: Colors) = Block(
 
 fun FeedbackPage(): Drawable {
     return Group(
-        Image(PolyImage("assets/oneconfig/brand/polyfrost.png")),
+        Image("assets/oneconfig/brand/polyfrost.png".image()),
         Text("oneconfig.feedback.title", fontSize = 24f).setFont { medium },
         Text("oneconfig.feedback.credits", fontSize = 14f),
         Text("oneconfig.feedback.bugreport", fontSize = 24f).setFont { medium },

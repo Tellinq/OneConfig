@@ -126,7 +126,8 @@ public class UIManagerImpl implements UIManager {
             tinyFD = Lwjgl3Manager.getIsolated(TinyFdApi.class, LWJGL_IMPL_PACKAGE + "TinyFdImpl");
             //#endif
 
-            renderer = new RendererImpl(isGl3, lwjgl, nanoVg, stb);
+            // don't do this unless you have little will to live.
+            renderer = new RendererImpl(isGl3, lwjgl, nanoVg, stb);//GLRendererImpl.INSTANCE;
         } catch (Exception e) {
             throw new RuntimeException("Failed to get valid rendering implementation", e);
         }
