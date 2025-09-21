@@ -149,7 +149,6 @@ public interface UIManager {
                 float scalingFactor = 1f / (float) OmniResolution.getScaleFactor();
                 float scaledWidth = master.getWidth() * scalingFactor * ratio;
                 float scaledHeight = master.getHeight() * scalingFactor * ratio;
-                ImmediateScreenRenderer.INSTANCE.close();
                 ImmediateScreenRenderer.render(smuggledDrawContext, (matrixStack) -> {
                     framebuffer.drawColorTexture(
                             getRenderPipeline(),

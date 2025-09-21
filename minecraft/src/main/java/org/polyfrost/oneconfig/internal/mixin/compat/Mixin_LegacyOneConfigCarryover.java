@@ -82,7 +82,7 @@ public abstract class Mixin_LegacyOneConfigCarryover {
                 if (stream != null) {
                     t.addMetadata("icon", new DynamicPolyImage(iconPath, stream));
                 } else {
-                    t.addMetadata("icon", new PolyImage(iconPath));
+                    t.addMetadata("icon", PolyImage.of(iconPath));
                 }
             }
 
