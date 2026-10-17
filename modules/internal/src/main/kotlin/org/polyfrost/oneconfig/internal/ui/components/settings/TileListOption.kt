@@ -112,6 +112,7 @@ internal fun <T : PickerEntry> PickerListOption(
             onDismissRequest = { expanded = false },
             offset = DpOffset((-16).dp, 8.dp),
             modifier = Modifier.width(SelectorWidth),
+            pinAnchor = true,
         ) {
             TilePicker(
                 entries = entries,

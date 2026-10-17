@@ -112,6 +112,7 @@ fun SimpleDropdownMenu(
     focusable: Boolean = true,
     modifier: Modifier = Modifier,
     offset: DpOffset = DpOffset(0.dp, 0.dp),
+    pinAnchor: Boolean = false,
     content: @Composable BoxScope.() -> Unit
 ) {
     val expandedStates = remember { MutableTransitionState(false) }
@@ -122,12 +123,14 @@ fun SimpleDropdownMenu(
         val density = LocalDensity.current
         // the stock DropdownMenuPositionProvider cuts off long menus on large screens
         // see https://github.com/JetBrains/compose-jb/issues/1388
-        val popupPositionProvider = DropdownPositionProvider(
+        val pinnedAnchor = remember { mutableStateOf<IntRect?>(null) }
+        val dropdownPositionProvider = DropdownPositionProvider(
             offset,
             density
         ) { parentBounds, menuBounds ->
             transformOriginState.value = calculateTransformOrigin(parentBounds, menuBounds)
         }
+        val popupPositionProvider = if (!pinAnchor) dropdownPositionProvider else PinnedAnchorPositionProvider(dropdownPositionProvider, pinnedAnchor)
 
         Popup(
             popupPositionProvider = popupPositionProvider,
@@ -141,6 +144,21 @@ fun SimpleDropdownMenu(
                 content = content
             )
         }
+    }
+}
+
+private class PinnedAnchorPositionProvider(
+    private val provider: PopupPositionProvider,
+    private val anchor: MutableState<IntRect?>,
+) : PopupPositionProvider {
+    override fun calculatePosition(
+        anchorBounds: IntRect,
+        windowSize: IntSize,
+        layoutDirection: LayoutDirection,
+        popupContentSize: IntSize
+    ): IntOffset {
+        val pinned = anchor.value ?: anchorBounds.also { anchor.value = it }
+        return provider.calculatePosition(pinned, windowSize, layoutDirection, popupContentSize)
     }
 }
 
