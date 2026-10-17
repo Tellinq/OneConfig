@@ -10,6 +10,7 @@ import org.polyfrost.oneconfig.api.config.v1.Property
 import org.polyfrost.oneconfig.internal.ui.api.shown
 import org.polyfrost.oneconfig.api.config.v1.ValueFormatter
 import org.polyfrost.oneconfig.internal.ui.components.asRenderText
+import org.polyfrost.oneconfig.internal.ui.components.effect.normalizeEffectIds
 import org.polyfrost.oneconfig.internal.ui.components.item.normalizeItemIds
 import org.polyfrost.oneconfig.internal.ui.components.localizedDescription
 import org.polyfrost.oneconfig.internal.ui.components.localizedString
@@ -217,6 +218,16 @@ class ItemListOptionData(prop: Property<*>) : ListOptionData(prop) {
 
     fun setIds(values: List<String>) = prop.setItemListElements(
         normalizeItemIds(values)
+    )
+}
+
+class EffectListOptionData(prop: Property<*>) : ListOptionData(prop) {
+    fun ids(): List<String> = normalizeEffectIds(
+        elements().mapNotNull { it as? String }
+    )
+
+    fun setIds(values: List<String>) = prop.setItemListElements(
+        normalizeEffectIds(values)
     )
 }
 
