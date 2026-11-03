@@ -77,6 +77,9 @@ private val hudUiEpochs = mutableStateMapOf<Hud, Int>()
 private val STATIC_SIZE_OPTIONS = setOf("staticW", "staticH")
 private val POSITION_OPTIONS = setOf("section", "relativeX", "relativeY")
 
+// which group a HUD is in is structure rather than a setting, so resetting the HUD keeps it grouped
+private val UNRESETTABLE_OPTIONS = setOf("groupPath")
+
 /** Bumped when any HUD field is reset so bound [remember] state is recreated from the HUD */
 fun hudUiEpoch(hud: Hud): Int = hudUiEpochs[hud] ?: 0
 
@@ -101,7 +104,7 @@ fun hudHasResettableDefaults(hud: Hud): Boolean {
 private fun treeHasResettableDefaults(tree: Tree): Boolean {
     for (node in tree.map.values) {
         when (node) {
-            is Property<*> -> if (optionHasDefault(node)) return true
+            is Property<*> -> if ((node.id ?: node.getID()) !in UNRESETTABLE_OPTIONS && optionHasDefault(node)) return true
             is Tree -> if (treeHasResettableDefaults(node)) return true
         }
     }
@@ -183,7 +186,7 @@ private fun resetTreeDefaults(hud: Hud, tree: Tree) {
         when (node) {
             is Property<*> -> {
                 val optionId = node.id ?: node.getID()
-                if (optionId !in STATIC_SIZE_OPTIONS && optionHasDefault(node)) resetOption(node)
+                if (optionId !in STATIC_SIZE_OPTIONS && optionId !in UNRESETTABLE_OPTIONS && optionHasDefault(node)) resetOption(node)
             }
             is Tree -> resetTreeDefaults(hud, node)
         }
@@ -290,6 +293,13 @@ fun HudCanvasResetMenu(
     redoEnabled: Boolean = false,
     preview: Boolean = false,
     onMeasured: (IntSize) -> Unit = {},
+    /** [targets] split into what moves as one block, so a selected group aligns as a whole */
+    units: List<Collection<Hud>> = emptyList(),
+    onGroup: (() -> Unit)? = null,
+    onUngroup: (() -> Unit)? = null,
+    onRemoveFromGroup: (() -> Unit)? = null,
+    /** Existing groups the targets can be moved into, each with its label */
+    addToGroups: List<Pair<String, () -> Unit>> = emptyList(),
 ) {
     if (hud == null || !expanded) return
     val theme = LocalTheme.current
@@ -362,7 +372,7 @@ fun HudCanvasResetMenu(
             }
             HudAlignRow { align ->
                 onDismiss()
-                alignHuds(actionTargets, align)
+                alignHuds(units.ifEmpty { actionTargets.map(::listOf) }, align)
             }
             Box(
                 modifier = if (preview) {
@@ -387,6 +397,33 @@ fun HudCanvasResetMenu(
                     Snapshot.withMutableSnapshot {
                         actionTargets.forEach { it.clearAnchor() }
                     }
+                    onDismiss()
+                }
+            }
+            if (onGroup != null || onUngroup != null || onRemoveFromGroup != null || addToGroups.isNotEmpty()) {
+                HudMenuDivider()
+            }
+            if (onGroup != null) {
+                HudMenuRow(icon = "group", text = "Group") {
+                    onGroup()
+                    onDismiss()
+                }
+            }
+            if (onUngroup != null) {
+                HudMenuRow(icon = "ungroup", text = "Ungroup") {
+                    onUngroup()
+                    onDismiss()
+                }
+            }
+            for ((label, onAdd) in addToGroups) {
+                HudMenuRow(icon = "plus", text = "Add to $label") {
+                    onAdd()
+                    onDismiss()
+                }
+            }
+            if (onRemoveFromGroup != null) {
+                HudMenuRow(icon = "minus", text = "Remove from group") {
+                    onRemoveFromGroup()
                     onDismiss()
                 }
             }
