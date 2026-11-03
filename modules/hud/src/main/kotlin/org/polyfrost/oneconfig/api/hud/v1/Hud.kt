@@ -368,6 +368,11 @@ abstract class Hud(id: String, title: String, val category: Category) : Cloneabl
         return minSize
     }
 
+    /** Drops the size measured this frame for a caller which has just changed what it depends on */
+    internal fun forgetMinimumSize() {
+        minSizeFrame = Long.MIN_VALUE
+    }
+
     open val scaledWidth: Float get() {
         val scale = effectiveScale
         val w = if (staticWidth || renderedW <= 0f) staticW * scale else renderedW

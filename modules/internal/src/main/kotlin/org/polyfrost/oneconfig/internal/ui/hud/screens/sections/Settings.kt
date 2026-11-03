@@ -26,10 +26,14 @@ import androidx.compose.ui.input.pointer.pointerHoverIcon
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import org.polyfrost.oneconfig.api.hud.v1.Hud
+import org.polyfrost.oneconfig.api.hud.v1.HudGroup
+import org.polyfrost.oneconfig.api.hud.v1.HudGroups
 import org.polyfrost.oneconfig.api.hud.v1.HudManager
 import org.polyfrost.oneconfig.api.hud.v1.HudResize
 import org.polyfrost.oneconfig.api.hud.v1.LegacyHudMarker
 import org.polyfrost.oneconfig.internal.ui.components.Icon
+import org.polyfrost.oneconfig.internal.ui.components.blockInteraction
+import org.polyfrost.oneconfig.internal.ui.components.localizedLabel
 import org.polyfrost.oneconfig.internal.ui.components.Text
 import org.polyfrost.oneconfig.internal.ui.components.onClick
 import org.polyfrost.oneconfig.internal.ui.components.rememberInteractionSource
@@ -40,6 +44,7 @@ import org.polyfrost.oneconfig.internal.ui.hud.HudSettingsContent
 import org.polyfrost.oneconfig.internal.ui.hud.hudHasPositionDefaults
 import org.polyfrost.oneconfig.internal.ui.hud.repairHudStaticSize
 import org.polyfrost.oneconfig.internal.ui.hud.resetHudPosition
+import org.polyfrost.oneconfig.internal.ui.hud.screens.hudGroupLabel
 import org.polyfrost.oneconfig.internal.ui.screens.HudConfigScreen
 import org.polyfrost.oneconfig.internal.ui.themes.AccentBrush
 import org.polyfrost.oneconfig.internal.ui.themes.LocalTheme
@@ -62,6 +67,83 @@ private fun HudScaleSpinner(hud: Hud, optionId: String) {
             unit = "x",
             label = "Scale",
         )
+    }
+}
+
+/** What the HUDs of [group] share, with [onOpen] stepping into the group to reach what is inside it */
+@Composable
+fun GroupSettings(group: HudGroup, query: String, onOpen: (Set<Hud>) -> Unit) {
+    // the group reads the HUD list, which compose cannot see change
+    HudManager.instancesRevision.intValue
+    val theme = LocalTheme.current
+    val locked = group.locked
+    Section("Position", query, "Lock position") {
+        Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(12.dp),
+            ) {
+                SwitchControl(locked) { HudGroups.setLocked(group, it) }
+                Text("Lock position", color = theme.textColor, fontSize = 14.sp)
+            }
+            if (!locked && group.huds.any { it.locked }) {
+                Text("Some HUDs are locked on their own and hold still inside the group.", color = theme.textColorSecondary, fontSize = 12.sp)
+            }
+        }
+    }
+    val scalable = group.huds.any { it.resizeAxes == HudResize.Both }
+    if (scalable) Section("Scale", query, "Match scale") {
+        val range = HudGroups.scaleRange(group)
+        val scale = group.scale
+        Column(
+            modifier = Modifier.blockInteraction(locked),
+            verticalArrangement = Arrangement.spacedBy(12.dp),
+        ) {
+            NumberSpinner(
+                scale,
+                { HudGroups.setScale(group, it) },
+                range.start,
+                range.endInclusive,
+                0.25f,
+                width = 176.dp,
+                format = { "%.2f".format(it) },
+                unit = "x",
+                label = "Scale",
+            )
+            if (!group.uniformScale) {
+                GroupRow("Set every HUD to %.2fx".format(scale), "align") { HudGroups.matchScale(group, scale) }
+            }
+        }
+    }
+    Section("HUDs", query) {
+        Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
+            for (sub in group.subGroups) {
+                GroupRow(hudGroupLabel(sub), "group") { onOpen(sub.huds.toSet()) }
+            }
+            for (hud in group.directHuds) {
+                GroupRow(localizedLabel(hud.title) ?: hud.title, "right-arrow") { onOpen(setOf(hud)) }
+            }
+        }
+    }
+}
+
+@Composable
+private fun GroupRow(text: String, icon: String, onClick: () -> Unit) {
+    val theme = LocalTheme.current
+    val interactionSource = rememberInteractionSource()
+    val isHovered by interactionSource.collectIsHoveredAsState()
+    val background by animateColorAsState(theme.textColor.copy(alpha = if (isHovered) 0.10f else 0f))
+    Row(
+        modifier = Modifier
+            .pointerHoverIcon(PointerIcon.Hand)
+            .background(background, theme.buttonShape)
+            .onClick(interactionSource, onClick = onClick)
+            .padding(horizontal = 10.dp, vertical = 6.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(8.dp),
+    ) {
+        Icon(icon, color = theme.textColorSecondary, modifier = Modifier.size(14.dp))
+        Text(text, color = theme.textColor, fontSize = 13.sp)
     }
 }
 
