@@ -48,7 +48,25 @@ inline fun <reified E : Enum<E>> Dropdown(
     label: String,
     value: Enum<E>,
     crossinline onValueChange: (E) -> Unit,
-    width: Dp = 175.dp
+    width: Dp = 175.dp,
+    mixed: Boolean = false,
+) {
+    ChoiceDropdown(label, enumValues<E>().toList(), value as E, { it.name }, { onValueChange(it) }, width, mixed)
+}
+
+/**
+ * @param mixed reads "Mixed" in place of [value] and marks no choice as picked, for a setting that differs
+ * between several things
+ */
+@Composable
+fun <T> ChoiceDropdown(
+    label: String,
+    values: List<T>,
+    value: T,
+    name: (T) -> String,
+    onValueChange: (T) -> Unit,
+    width: Dp = 175.dp,
+    mixed: Boolean = false,
 ) {
     var expanded by remember { mutableStateOf(false) }
 
@@ -77,8 +95,8 @@ inline fun <reified E : Enum<E>> Dropdown(
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
                 Text(
-                    value.name,
-                    color = textColor,
+                    if (mixed) "Mixed" else name(value),
+                    color = if (mixed) LocalTheme.current.textColorSecondary else textColor,
                     fontSize = 12.sp,
                     fontWeight = FontWeight.Medium,
                     modifier = Modifier
@@ -102,10 +120,10 @@ inline fun <reified E : Enum<E>> Dropdown(
                         .padding(4.dp),
                     verticalArrangement = Arrangement.spacedBy(4.dp)
                 ) {
-                    enumValues<E>().forEach {
+                    values.forEach {
                         DropdownItem(
-                            it,
-                            it == value,
+                            name(it),
+                            !mixed && it == value,
                             {
                                 Snapshot.withMutableSnapshot {
                                     onValueChange(it)
@@ -122,8 +140,8 @@ inline fun <reified E : Enum<E>> Dropdown(
 }
 
 @Composable
-fun <E : Enum<E>> DropdownItem(
-    e: E,
+fun DropdownItem(
+    name: String,
     selected: Boolean,
     onClick: () -> Unit,
     width: Dp,
@@ -147,7 +165,7 @@ fun <E : Enum<E>> DropdownItem(
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Text(
-            e.name,
+            name,
             color = LocalTheme.current.textColor,
             fontSize = 12.sp,
             fontWeight = FontWeight.Medium,

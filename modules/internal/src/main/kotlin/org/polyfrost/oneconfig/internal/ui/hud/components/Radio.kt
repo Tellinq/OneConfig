@@ -30,12 +30,35 @@ interface RadioValue {
 inline fun <reified E> Radio(
     label: String,
     value: E,
+    mixed: Boolean = false,
     crossinline onChange: (E) -> Unit,
 ) where E : RadioValue, E : Enum<E> {
+    ChoiceRadio(label, enumValues<E>().toList(), value, { it.icon }, { onChange(it) }, mixed)
+}
+
+/**
+ * @param mixed marks no choice as picked and says so beside [label], for a setting that differs between
+ * several things
+ */
+@Composable
+fun <T> ChoiceRadio(
+    label: String,
+    values: List<T>,
+    value: T,
+    icon: (T) -> String,
+    onChange: (T) -> Unit,
+    mixed: Boolean = false,
+) {
     Column(
         verticalArrangement = Arrangement.spacedBy(10.dp),
     ) {
-        Text(label, color = LocalTheme.current.textColor, fontSize = 14.sp)
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+        ) {
+            Text(label, color = LocalTheme.current.textColor, fontSize = 14.sp)
+            if (mixed) Text("Mixed", color = LocalTheme.current.textColorSecondary, fontSize = 12.sp)
+        }
         Box(
             modifier = Modifier.background(Color(0x192126).copy(.7f), RoundedCornerShape(6.dp))
                 .border(1.dp, LocalTheme.current.borderColor, RoundedCornerShape(6.dp))
@@ -45,7 +68,7 @@ inline fun <reified E> Radio(
                 horizontalArrangement = Arrangement.spacedBy(0.dp),
                 verticalAlignment = Alignment.CenterVertically,
             ) {
-                enumValues<E>().forEach { it as RadioValue
+                values.forEach {
                     Box(
                         modifier = Modifier
                             .size(36.dp)
@@ -57,8 +80,8 @@ inline fun <reified E> Radio(
                         contentAlignment = Alignment.Center,
                     ) {
                         SelectableIconButton(
-                            it.icon,
-                            selected = value == it,
+                            icon(it),
+                            selected = !mixed && value == it,
                             modifier = Modifier.size(18.dp),
                             onClick = {
                                 Snapshot.withMutableSnapshot {

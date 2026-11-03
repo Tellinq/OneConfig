@@ -378,6 +378,7 @@ fun Section(title: String, query: String, vararg labels: String, content: @Compo
     }
 }
 
+/** @param mixed reads "Mixed" in place of the color, for a setting that differs between several things */
 @Composable
 internal fun ColorButton(
     label: String,
@@ -386,6 +387,7 @@ internal fun ColorButton(
     chromaSpeed: Float = 1f,
     onColorChanged: (Color) -> Unit,
     onChromaChanged: (Boolean, Float) -> Unit = { _, _ -> },
+    mixed: Boolean = false,
 ) {
     var expanded by remember { mutableStateOf(false) }
     val pickerModel = remember {
@@ -417,13 +419,16 @@ internal fun ColorButton(
         Box {
             Box(
                 modifier = Modifier
-                    .size(32.dp)
+                    .size(if (mixed) 56.dp else 32.dp, 32.dp)
                     .clip(theme.sideBarNavigationEntryShape)
-                    .background(displayColor)
+                    .background(if (mixed) theme.componentBackground else displayColor)
                     .border(1.dp, theme.borderColor, theme.sideBarNavigationEntryShape)
                     .onClick(rememberInteractionSource()) { expanded = !expanded }
-                    .pointerHoverIcon(PointerIcon.Hand)
-            )
+                    .pointerHoverIcon(PointerIcon.Hand),
+                contentAlignment = Alignment.Center,
+            ) {
+                if (mixed) Text("Mixed", color = theme.textColorSecondary, fontSize = 11.sp)
+            }
             if (expanded) {
                 ShellPopup(
                     alignment = Alignment.TopStart,

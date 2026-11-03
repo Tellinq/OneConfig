@@ -852,6 +852,14 @@ fun HudConfigScreen(tree: Tree, searchQuery: String) {
     key(System.identityHashCode(tree)) { HudConfigScreenContent(tree, searchQuery) }
 }
 
+/** One option laid out the way [HudConfigScreen] lays out the options of a HUD */
+@Composable
+fun HudOptionRow(prop: Property<*>) {
+    CompositionLocalProvider(LocalOptionWidth provides 220.dp) {
+        SettingRow(prop, compact = isWideControl(prop))
+    }
+}
+
 @Composable
 private fun HudConfigScreenContent(tree: Tree, searchQuery: String) {
     val categories = remember(tree) { buildCategories(tree) { !isHudInternal(it) } }
