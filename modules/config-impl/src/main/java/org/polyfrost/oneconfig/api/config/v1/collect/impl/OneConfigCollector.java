@@ -58,7 +58,7 @@ import static org.polyfrost.oneconfig.api.config.v1.Node.strv;
  */
 public class OneConfigCollector extends ReflectiveCollector {
     public OneConfigCollector() {
-        super(1);
+        super(4);
     }
 
     @Override
@@ -78,11 +78,36 @@ public class OneConfigCollector extends ReflectiveCollector {
                 } else throw new IllegalArgumentException("Property " + p.getID() + " is dependant on property " + cond + ", but it is not annotation boolean property");
             }
         });
+        wireNestedConditions(tree, tree);
         return tree;
+    }
+
+    private void wireNestedConditions(Tree root, Tree parent) {
+        parent.onAll((id, node) -> {
+            if (!(node instanceof Tree child)) return;
+            child.onAllProps((s, p) -> {
+                String[] conditions = p.consumeMetadata("conditions");
+                if (conditions == null) return;
+                for (String cond : conditions) {
+                    Property<?> condition = child.getProp(cond);
+                    if (condition == null) condition = root.getProp(cond);
+                    if (condition == null || condition.type != boolean.class) {
+                        LOGGER.warn("Property {}.{} is dependant on property {}, but no boolean property with that name exists next to it or at the root", child.getID(), p.getID(), cond);
+                        continue;
+                    }
+                    //noinspection unchecked
+                    p.addDisplayCondition((Property<Boolean>) condition, false);
+                }
+            });
+            wireNestedConditions(root, child);
+        });
     }
 
     @Override
     protected void handleField(@NotNull Field f, @NotNull Object src, @NotNull Tree tree) {
+        if (f.isAnnotationPresent(Primary.class) && !hasOptionAnnotation(f)) {
+            throw new IllegalArgumentException(String.format("@Primary field '%s' needs an option annotation such as @Switch", f.getName()));
+        }
         if (f.isAnnotationPresent(MasterToggle.class)) {
             Class<?> fieldType = f.getType();
             if (fieldType != boolean.class && fieldType != Boolean.class) {
@@ -106,14 +131,15 @@ public class OneConfigCollector extends ReflectiveCollector {
                 continue;
             }
             if (type == Accordion.class) {
+                Tree t = Tree.tree(f.getName());
                 try {
-                    Tree t = Tree.tree(f.getName());
                     t.addMetadata(MHUtils.getAnnotationValues(a).getOrThrow());
-                    handle(t, MHUtils.instantiate(f.getType(), true).getOrThrow(), 1);
-                    tree.put(t);
+                    handle(t, MHUtils.instantiate(f.getType(), true).getOrThrow(), maxDepth);
                 } catch (Throwable e) {
                     throw new RuntimeException("Failed to collect accordion-type field " + f.getName(), e);
                 }
+                requireSinglePrimary(t);
+                tree.put(t);
                 continue;
             }
             Option opt = type.getDeclaredAnnotation(Option.class);
@@ -121,6 +147,7 @@ public class OneConfigCollector extends ReflectiveCollector {
             try {
                 Property<?> p = Properties.field(null, null, f, src);
                 handleMetadata(tree, p, a, opt, f);
+                if (f.isAnnotationPresent(Primary.class)) p.addMetadata("primary", true);
                 tree.put(p);
             } catch (Throwable e) {
                 throw new RuntimeException("Failed to create setter for field " + f.getName() + "; ensure it is not static final", e);
@@ -132,7 +159,11 @@ public class OneConfigCollector extends ReflectiveCollector {
     @Override
     protected void handleMethod(@NotNull Method m, @NotNull Object src, @NotNull Tree builder) {
         Button b = m.getDeclaredAnnotation(Button.class);
-        if (b == null) return;
+        boolean primary = m.isAnnotationPresent(Primary.class);
+        if (b == null) {
+            if (primary) throw new IllegalArgumentException(String.format("@Primary method '%s' needs @Button", m.getName()));
+            return;
+        }
         if (m.getParameterCount() != 0) throw new IllegalArgumentException("Button method " + m.getName() + " must have no parameters");
         Property<?> p = Properties.dummy(m.getName(), b.title(), b.description());
         final MethodHandle mh = MHUtils.getMethodHandle(m, src).getOrThrow();
@@ -149,20 +180,43 @@ public class OneConfigCollector extends ReflectiveCollector {
         p.addMetadata("icon", strv(b.icon()));
         p.addMetadata("category", b.category());
         p.addMetadata("subcategory", b.subcategory());
+        if (primary) p.addMetadata("primary", true);
         builder.put(p);
     }
 
     @Override
     protected void handleInnerClass(@NotNull Class<?> c, @NotNull Object src, int depth, @NotNull Tree builder) {
         Accordion a = c.getDeclaredAnnotation(Accordion.class);
-        if (a == null) return;
+        Submenu s = c.getDeclaredAnnotation(Submenu.class);
+        if (a == null && s == null) return;
+        if (a != null && s != null) {
+            throw new IllegalArgumentException(String.format("%s cannot be both an @Accordion and a @Submenu", c.getName()));
+        }
+        Tree t = Tree.tree(c.getSimpleName());
         try {
-            Tree t = Tree.tree(c.getSimpleName());
-            t.addMetadata(MHUtils.getAnnotationValues(a).getOrThrow());
-            handle(t, MHUtils.instantiate(c, false).getOrThrow(), depth + 1);
-            builder.put(t);
+            t.addMetadata(MHUtils.getAnnotationValues(a != null ? a : s).getOrThrow());
+            if (s != null) t.addMetadata("submenu", true);
+            handle(t, MHUtils.instantiate(c, false).getOrThrow(), s != null ? depth : maxDepth);
         } catch (Exception e) {
             throw new RuntimeException(e);
+        }
+        requireSinglePrimary(t);
+        builder.put(t);
+    }
+
+    private boolean hasOptionAnnotation(Field f) {
+        for (Annotation a : f.getDeclaredAnnotations()) {
+            if (a.annotationType().isAnnotationPresent(Option.class)) return true;
+        }
+        return false;
+    }
+
+    private void requireSinglePrimary(Tree tree) {
+        long primaries = tree.map.values().stream()
+            .filter(n -> n instanceof Property<?> && n.getMetadata("primary") != null)
+            .count();
+        if (primaries > 1) {
+            throw new IllegalArgumentException(String.format("'%s' has %d @Primary options but only one is allowed", tree.getID(), primaries));
         }
     }
 
