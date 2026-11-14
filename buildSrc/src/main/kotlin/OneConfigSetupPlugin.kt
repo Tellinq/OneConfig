@@ -45,45 +45,28 @@ class OneConfigSetupPlugin : Plugin<Project> {
         pluginManager.apply(OneConfigLintPlugin::class.java)
 
         repositories {
-            fun scopedMaven(url: String, vararg groups: String, includeSubgroups: Boolean = false) = maven(url) {
-                content { for (group in groups) if (!includeSubgroups) includeGroup(group) else includeGroupAndSubgroups(group) }
+            fun scopedMaven(url: String, vararg groups: String) = maven(url) {
+                content { for (group in groups) includeGroupAndSubgroups(group) }
             }
 
-            maven("https://repo.polyfrost.org/releases")
-            maven("https://repo.polyfrost.org/snapshots")
-            maven("https://repo.hypixel.net/repository/Hypixel/")
-            maven("https://maven.deftu.dev/releases")
-            maven("https://maven.notenoughupdates.org/releases/") {
-                content { includeGroup("org.notenoughupdates.moulconfig") }
-            }
-            maven("https://maven.teamresourceful.com/repository/maven-releases") {
-                content { includeGroup("com.teamresourceful.resourcefulconfig") }
-            }
-            maven("https://maven.isxander.dev/releases") {
-                content { includeGroup("dev.isxander") }
-            }
-            maven("https://api.modrinth.com/maven") {
-                content { includeGroup("maven.modrinth") } // some yacl versions only exist here and not on the official repo
-            }
-            maven("https://jitpack.io") {
-                content { includeGroupAndSubgroups("com.github") }
-            }
-            maven("https://maven.terraformersmc.com/releases") {
-                content { includeGroup("com.terraformersmc") }
-            }
-            maven("https://maven.teamresourceful.com/repository/maven-public/") {
-                content { includeGroupAndSubgroups("me.owdding"); includeGroupAndSubgroups("tech.thatgravyboat") }
-            }
-            maven("https://maven.azureaaron.net/releases") {
-                content { includeGroup("net.azureaaron") }
-            }
-            maven("https://maven.bawnorton.com/releases") {
-                content { includeGroup("com.github.bawnorton.mixinsquared") }
-            }
-            maven("https://redirector.kotlinlang.org/maven/compose-dev")
+            scopedMaven("https://repo.polyfrost.org/releases", "org.polyfrost")
+            scopedMaven("https://repo.polyfrost.org/snapshots", "org.polyfrost")
+            scopedMaven("https://repo.hypixel.net/repository/Hypixel/", "net.hypixel")
+            scopedMaven("https://maven.deftu.dev/releases", "dev.deftu")
+            scopedMaven("https://maven.notenoughupdates.org/releases/", "org.notenoughupdates")
+            scopedMaven("https://maven.teamresourceful.com/repository/maven-releases", "com.teamresourceful")
+            scopedMaven("https://maven.isxander.dev/releases", "dev.isxander")
+            scopedMaven("https://api.modrinth.com/maven", "maven.modrinth") // some yacl versions only exist here and not on the official repo
+            scopedMaven("https://jitpack.io", "com.github")
+            scopedMaven("https://maven.terraformersmc.com/releases", "com.terraformersmc")
+            scopedMaven("https://maven.teamresourceful.com/repository/maven-public/", "me.owdding", "tech.thatgravyboat")
+            scopedMaven("https://maven.azureaaron.net/releases", "net.azureaaron")
+            scopedMaven("https://maven.bawnorton.com/releases", "com.github.bawnorton")
+            scopedMaven("https://redirector.kotlinlang.org/maven/compose-dev", "org.jetbrains")
             scopedMaven("https://central.sonatype.com/repository/maven-snapshots/", "net.kyori")
             scopedMaven("https://maven.azureaaron.net/snapshots", "net.azureaaron")
             google()
+            mavenLocal()
         }
 
         evaluationDependsOn(":modules")
