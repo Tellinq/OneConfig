@@ -17,6 +17,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import net.minecraft.client.Minecraft
 import org.polyfrost.oneconfig.api.hud.v1.HudManager
+import org.polyfrost.oneconfig.api.hud.v1.LegacyHudMarker
 import org.polyfrost.oneconfig.api.platform.v1.Platform
 import org.polyfrost.oneconfig.internal.ui.compose.ComposeScreen
 import org.polyfrost.oneconfig.internal.ui.compose.RenderThreadDispatcher
@@ -170,7 +171,8 @@ object ComposeUiHarness_Test {
         shot()
         textInputTest()
         val k = Platform.screen().windowWidth() / HudManager.guiScreenWidth
-        val hud = HudManager.instances().filter { it.scaledWidth > 10 && it.y > 40 }.minByOrNull { it.y }
+        // a legacy HUD has no bounds outside a world, so it cannot be dragged from the title screen
+        val hud = HudManager.instances().filter { it.scaledWidth > 10 && it.y > 40 && it !is LegacyHudMarker }.minByOrNull { it.y }
         if (hud == null) { check("hud: instance", false); return }
         val x0 = hud.x; val y0 = hud.y
         val c = Offset((x0 + hud.scaledWidth / 2) * k, (y0 + hud.scaledHeight / 2) * k)
