@@ -16,7 +16,9 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import net.minecraft.client.Minecraft
+import org.polyfrost.oneconfig.api.hud.v1.Hud
 import org.polyfrost.oneconfig.api.hud.v1.HudManager
+import org.polyfrost.oneconfig.api.hud.v1.HudSnapEdge
 import org.polyfrost.oneconfig.api.hud.v1.LegacyHudMarker
 import org.polyfrost.oneconfig.api.platform.v1.Platform
 import org.polyfrost.oneconfig.internal.ui.compose.ComposeScreen
@@ -201,9 +203,70 @@ object ComposeUiHarness_Test {
             hud.x = x0; hud.y = y0
         }
         delay(800)
-        key(InputConstants.KEY_ESCAPE)
-        delay(1500)
+        hudSnapTest(k)
+        // the first escape only clears the selection the snap test leaves behind
+        for (i in 0 until 3) {
+            if (screen() == null) break
+            key(InputConstants.KEY_ESCAPE)
+            delay(1200)
+        }
         check("hud: escape closes editor", screen() == null)
+    }
+
+    /** Snaps one HUD's centre onto another's, then widens it to check the centre holds */
+    private suspend fun hudSnapTest(k: Float) {
+        fun centreX(hud: Hud) = hud.x + hud.scaledWidth / 2f
+
+        val free = HudManager.instances().filter {
+            it.scaledWidth > 10 && !it.locked && !it.isAnchored && !it.isMergeAnchored && it !is LegacyHudMarker
+        }
+        val target = free.firstOrNull()
+        val dragged = free.firstOrNull { it !== target }
+        if (target == null || dragged == null) { check("hud snap: two free HUDs", false); return }
+        val sw = HudManager.guiScreenWidth
+        val sh = HudManager.guiScreenHeight
+        val starts = free.associateWith { it.x to it.y }
+        val startPad = dragged.padRight
+
+        // the other HUDs are parked on the right so the target's guides are the only ones near the drop
+        free.filter { it !== target && it !== dragged }.forEachIndexed { i, hud ->
+            hud.setAbsolutePosition(sw * 0.72f, sh * (0.08f + 0.14f * i))
+        }
+        // in the left third a HUD grows from its left edge unless a snap says otherwise
+        target.setAbsolutePosition(sw * 0.18f, sh * 0.35f)
+        dragged.setAbsolutePosition(sw * 0.45f, sh * 0.7f)
+        delay(600)
+
+        val from = Offset(centreX(dragged) * k, (dragged.y + dragged.scaledHeight / 2f) * k)
+        val to = Offset(centreX(target) * k + 2f, (target.y + target.scaledHeight + sh * 0.12f + dragged.scaledHeight / 2f) * k)
+        drag(from, to, steps = 24, stepMs = 40)
+        delay(600)
+        shot()
+        // HUDs sit on whole pixels, so an odd width under an even one leaves the centres half a pixel apart
+        check("hud snap: centre ${centreX(dragged)} on the target's ${centreX(target)}", abs(centreX(dragged) - centreX(target)) < 0.51f)
+        check("hud snap: drop recorded the centre edge", dragged.snapEdgeX == HudSnapEdge.Center)
+
+        val centre = centreX(dragged)
+        val width = dragged.scaledWidth
+        dragged.padRight = startPad + 40f
+        delay(800)
+        shot()
+        check("hud snap: HUD got wider $width -> ${dragged.scaledWidth}", dragged.scaledWidth > width + 10f)
+        check("hud snap: centre held while widening $centre -> ${centreX(dragged)}", abs(centreX(dragged) - centre) < 0.6f)
+
+        // without the edge the same widening moves the centre, which shows the check above can fail
+        dragged.padRight = startPad
+        delay(600)
+        dragged.setSnapEdgesKeepingPosition(HudSnapEdge.None, HudSnapEdge.None)
+        val plainCentre = centreX(dragged)
+        dragged.padRight = startPad + 40f
+        delay(800)
+        check("hud snap: centre drifts without the edge $plainCentre -> ${centreX(dragged)}", abs(centreX(dragged) - plainCentre) > 5f)
+        dragged.padRight = startPad
+        delay(400)
+
+        for ((hud, start) in starts) hud.setAbsolutePosition(start.first, start.second)
+        delay(400)
     }
 
     private suspend fun scrollTo(label: String) {
